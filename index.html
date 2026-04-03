@@ -892,11 +892,14 @@ function goTab(tab) {
 
 /* Storage */
 function getH() { try { return JSON.parse(localStorage.getItem('dh')||'[]'); } catch(e){ return []; } }
-function saveH(e) { try { var h=getH(); h.unshift(e); localStorage.setItem('dh', JSON.stringify(h.slice(0,200))); } catch(ex) { console.warn('saveH failed:', ex); } }
+function getTotals() { try { return JSON.parse(localStorage.getItem('dh_totals')||'{"games":0,"play_time":0,"c180":0}'); } catch(e) { return {games:0,play_time:0,c180:0}; } }
+function saveTotals(t) { try { localStorage.setItem('dh_totals', JSON.stringify(t)); } catch(ex) { console.warn('saveTotals failed:', ex); } }
+function migrateTotals() { if(localStorage.getItem('dh_totals')!==null) return; var h=getH(); if(!h.length) return; var t={games:h.length,play_time:0,c180:0}; for(var i=0;i<h.length;i++){ t.play_time+=(h[i].duration||0); var r=h[i].rounds||[]; for(var j=0;j<r.length;j++) if(r[j]===180) t.c180++; } saveTotals(t); }
+function saveH(e) { try { var h=getH(); h.unshift(e); localStorage.setItem('dh', JSON.stringify(h.slice(0,200))); var t=getTotals(); t.games+=1; t.play_time+=(e.duration||0); var r=e.rounds||[]; for(var i=0;i<r.length;i++) if(r[i]===180) t.c180++; saveTotals(t); } catch(ex) { console.warn('saveH failed:', ex); } }
 function openCfm() { document.getElementById('ocfm').classList.add('show'); }
 function closeCfm() { document.getElementById('ocfm').classList.remove('show'); }
-function delAll() { localStorage.removeItem('dh'); closeCfm(); renderHist(); }
-function delOne(i) { var h=getH(); h.splice(i,1); localStorage.setItem('dh',JSON.stringify(h)); renderHist(); }
+function delAll() { localStorage.removeItem('dh'); localStorage.removeItem('dh_totals'); closeCfm(); renderHist(); }
+function delOne(i) { var h=getH(); var rem=h.splice(i,1)[0]; localStorage.setItem('dh',JSON.stringify(h)); if(rem){ var t=getTotals(); t.games=Math.max(0,t.games-1); t.play_time=Math.max(0,t.play_time-(rem.duration||0)); var r=rem.rounds||[]; for(var j=0;j<r.length;j++) if(r[j]===180) t.c180=Math.max(0,t.c180-1); saveTotals(t); } renderHist(); }
 
 /* ============================================================
    ショートカットカスタマイズ
@@ -1374,6 +1377,7 @@ function renderPer(h) {
 
 /* Render history */
 function renderHist() {
+  migrateTotals();
   var h=getH();
   var s3=document.getElementById('hs3');
   var a3=document.getElementById('ha3');
@@ -1422,15 +1426,9 @@ function renderHist() {
     if (avg30s > avg30sp) arrow30s = '<span style="color:#ff6b35;font-size:16px;font-weight:900;"> ▲</span>';
     else if (avg30s < avg30sp) arrow30s = '<span style="color:#4fc3f7;font-size:16px;font-weight:900;"> ▼</span>';
   }
-  // 通算180回数
-  var total180 = 0;
-  for(var i=0;i<h.length;i++) {
-    var r=h[i].rounds||[];
-    for(var j=0;j<r.length;j++) if(r[j]===180) total180++;
-  }
-  // プロフィールカード
-  var allDurSec = 0; for(var i=0;i<h.length;i++) allDurSec += (h[i].duration||0);
-  var allDurH = Math.floor(allDurSec/3600), allDurM = Math.floor((allDurSec%3600)/60);
+  // 累計統計（dh_totalsから取得 — 200件上限に依存しない真の累計）
+  var totals = getTotals();
+  var allDurH = Math.floor(totals.play_time/3600), allDurM = Math.floor((totals.play_time%3600)/60);
   var allDurStr = allDurH > 0 ? allDurH+'時間'+allDurM+'分' : allDurM+'分';
   var bestRankLabel = rank(best);
   var rankColors = { 'S+': ['#ffd700','#000'], 'S': ['#e8ff47','#000'], 'A': ['#47ffb4','#000'], 'B': ['#4fc3f7','#000'], 'C': ['#ff6b35','#fff'], 'D': ['#6b6b88','#fff'] };
@@ -1446,8 +1444,8 @@ function renderHist() {
         '<div class="pcard-rank" style="background:'+rc2[0]+';color:'+rc2[1]+';">' + bestRankLabel + ' RANK</div>' +
         '<hr class="pcard-divider">' +
         '<div class="pcard-stats">' +
-          '<div class="pcard-stat"><div class="pcard-stat-val" style="color:rgba(255,255,255,0.7);">' + h.length + '</div><div class="pcard-stat-lbl">Total Games</div></div>' +
-          '<div class="pcard-stat"><div class="pcard-stat-val" style="color:#ffd700;">×' + total180 + '</div><div class="pcard-stat-lbl">通算 180</div></div>' +
+          '<div class="pcard-stat"><div class="pcard-stat-val" style="color:rgba(255,255,255,0.7);">' + totals.games + '</div><div class="pcard-stat-lbl">Total Games</div></div>' +
+          '<div class="pcard-stat"><div class="pcard-stat-val" style="color:#ffd700;">×' + totals.c180 + '</div><div class="pcard-stat-lbl">通算 180</div></div>' +
           '<div class="pcard-stat"><div class="pcard-stat-val" style="color:var(--grn);font-size:22px;">' + allDurStr + '</div><div class="pcard-stat-lbl">Total Play Time</div></div>' +
         '</div>' +
       '</div>';
