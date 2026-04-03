@@ -458,6 +458,23 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-hist-grade { font-family:'Bebas Neue',cursive; font-size:16px; }
 .arr-hist-right { display:flex; align-items:baseline; gap:4px; }
 .arr-hist-score { font-family:'Bebas Neue',cursive; font-size:16px; color:var(--fg); }
+/* 定石表ボタン */
+.arr-teiseki-btn { display:block; width:calc(100% - 24px); margin:8px 0 0; background:transparent; color:var(--mut); border:1px solid var(--bd); border-radius:12px; padding:10px; font-size:13px; cursor:pointer; }
+.arr-teiseki-btn:active { opacity:.7; }
+/* 定石表パネル */
+.arr-teiseki-panel { position:fixed; inset:0; background:var(--bg); z-index:300; display:flex; flex-direction:column; }
+.arr-teiseki-header { display:flex; align-items:center; padding:12px 12px 8px; gap:8px; border-bottom:1px solid var(--bd); flex-shrink:0; }
+.arr-teiseki-tabs { display:flex; gap:6px; flex:1; }
+.arr-t-tab { flex:1; background:transparent; color:var(--mut); border:1px solid var(--bd); border-radius:8px; padding:7px 4px; font-size:13px; cursor:pointer; }
+.arr-t-tab.on { background:var(--acc); color:#000; border-color:var(--acc); font-weight:700; }
+.arr-teiseki-close { background:transparent; color:var(--mut); border:none; font-size:20px; cursor:pointer; padding:4px 8px; }
+.arr-teiseki-list { flex:1; overflow-y:auto; padding:8px 12px 20px; display:flex; flex-direction:column; gap:4px; }
+.arr-t-row { display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--card); border:1px solid var(--bd); border-radius:10px; }
+.arr-t-score { font-family:'Bebas Neue',cursive; font-size:22px; color:var(--acc); min-width:44px; text-align:right; }
+.arr-t-path { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.arr-t-dart { font-size:13px; background:var(--bg); border:1px solid var(--bd); border-radius:6px; padding:3px 8px; }
+.arr-t-dart.finish { color:var(--acc); border-color:var(--acc); }
+.arr-t-arr { color:var(--mut); font-size:11px; }
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYXJ1LZ2J1"></script>
@@ -646,7 +663,21 @@ canvas.schart { width: 100%; height: 100%; }
         </div>
         <button class="arr-start-btn" data-fn="startArrSession">チャレンジ開始 →</button>
         <div class="arr-best-disp" id="arr-best-disp"></div>
+        <button class="arr-teiseki-btn" data-fn="showTeiseki">📋 定石表を見る</button>
       </div>
+    </div>
+    <!-- 定石表 -->
+    <div class="arr-teiseki-panel hide" id="arr-teiseki-panel">
+      <div class="arr-teiseki-header">
+        <div class="arr-teiseki-tabs">
+          <button class="arr-t-tab on" data-fn="filterTeiseki" data-arg="0">全部</button>
+          <button class="arr-t-tab" data-fn="filterTeiseki" data-arg="3">3本</button>
+          <button class="arr-t-tab" data-fn="filterTeiseki" data-arg="2">2本</button>
+          <button class="arr-t-tab" data-fn="filterTeiseki" data-arg="1">1本</button>
+        </div>
+        <button class="arr-teiseki-close" data-fn="hideTeiseki">✕</button>
+      </div>
+      <div class="arr-teiseki-list" id="arr-teiseki-list"></div>
     </div>
     <!-- 履歴 -->
     <div class="arr-hist-wrap" id="arr-hist-wrap">
@@ -2232,6 +2263,54 @@ function goArrSetup() {
   _renderArrHist();
 }
 
+/* 定石表 */
+var _teisekiFilter = 0; // 0=全部, 1=1本, 2=2本, 3=3本
+
+function _buildTeisekiEntries() {
+  var entries = Object.keys(CHECKOUT).map(function(k){ return {score: +k, path: CHECKOUT[k]}; });
+  for (var n = 2; n <= 40; n += 2) {
+    if (!CHECKOUT[n]) entries.push({score: n, path: ['D' + (n/2)]});
+  }
+  entries.sort(function(a, b){ return b.score - a.score; });
+  return entries;
+}
+
+function showTeiseki() {
+  _teisekiFilter = 0;
+  document.querySelectorAll('.arr-t-tab').forEach(function(t, i){ t.className = 'arr-t-tab' + (i === 0 ? ' on' : ''); });
+  _renderTeiseki();
+  document.getElementById('arr-teiseki-panel').className = 'arr-teiseki-panel';
+}
+
+function hideTeiseki() {
+  document.getElementById('arr-teiseki-panel').className = 'arr-teiseki-panel hide';
+}
+
+function filterTeiseki(n) {
+  _teisekiFilter = +n;
+  document.querySelectorAll('.arr-t-tab').forEach(function(t){
+    var arg = +t.getAttribute('data-arg');
+    t.className = 'arr-t-tab' + (arg === _teisekiFilter ? ' on' : '');
+  });
+  _renderTeiseki();
+}
+
+function _renderTeiseki() {
+  var entries = _buildTeisekiEntries();
+  if (_teisekiFilter > 0) entries = entries.filter(function(e){ return e.path.length === _teisekiFilter; });
+  var html = '';
+  entries.forEach(function(e) {
+    var pathHtml = '';
+    e.path.forEach(function(d, i) {
+      if (i > 0) pathHtml += '<span class="arr-t-arr">→</span>';
+      var isFinish = i === e.path.length - 1;
+      pathHtml += '<span class="arr-t-dart' + (isFinish ? ' finish' : '') + '">' + d + '</span>';
+    });
+    html += '<div class="arr-t-row"><div class="arr-t-score">' + e.score + '</div><div class="arr-t-path">' + pathHtml + '</div></div>';
+  });
+  document.getElementById('arr-teiseki-list').innerHTML = html;
+}
+
 /* 次の問題へ */
 function _arrNextQ() {
   if (_arrG.qIdx >= _arrG.qList.length) { _arrFinish(); return; }
@@ -2570,7 +2649,10 @@ var _fns = { kp: kp, kd: kd, doOk: doOk, commit: commit,
   startArrSession: startArrSession,
   goArrSetup: goArrSetup,
   chooseArr: chooseArr,
-  advanceArr: advanceArr
+  advanceArr: advanceArr,
+  showTeiseki: showTeiseki,
+  hideTeiseki: hideTeiseki,
+  filterTeiseki: filterTeiseki
 };
 
 function _exec(el) {
