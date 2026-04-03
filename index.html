@@ -701,9 +701,9 @@ function commit(total) {
   g.scores.push(total);
   g.total += total;
   buf = '';
-  soundCommit(total);
+  if (total === 180) { sound180(); show180(); setTimeout(launchConfetti, 150); }
+  else { soundCommit(total); }
   showRoundPopup(total);
-  if (total === 180) { show180(); setTimeout(launchConfetti, 150); }
   var el = document.getElementById('total');
   el.textContent = g.total;
   el.classList.add('bump');
@@ -782,6 +782,8 @@ function doUndo() {
   g.total -= last;
   g.round = g.scores.length + 1;
   buf = '';
+  var rp = document.getElementById('round-popup');
+  if (rp) rp.innerHTML = '';
   document.getElementById('total').textContent = g.total;
   drawRoundGrid();
   document.getElementById('rnum').innerHTML = g.round + ' <em>/ 8</em>';
@@ -957,8 +959,10 @@ function goTab(tab) {
   document.getElementById('thist').className = 'tab' + (tab==='hist'?' on':'');
   document.getElementById('vgame').className = 'view' + (tab==='game'?'':' hide');
   document.getElementById('vhist').className = 'view' + (tab==='hist'?'':' hide');
-  if (tab === 'game' && g.scores.length >= ROUNDS) {
-    document.getElementById('ngp').className = 'ngp show';
+  if (tab === 'game') {
+    var rp = document.getElementById('round-popup');
+    if (rp) rp.innerHTML = '';
+    if (g.scores.length >= ROUNDS) document.getElementById('ngp').className = 'ngp show';
   }
   if (tab === 'hist') renderHist();
 }
