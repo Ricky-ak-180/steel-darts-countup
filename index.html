@@ -272,10 +272,10 @@ canvas.schart { width: 100%; height: 100%; }
 .pr > div { padding: 4px 6px; border-bottom: 1px solid var(--bdr); }
 .pr:last-child > div { border-bottom: none; }
 .plbl { color: var(--mut); font-size: 11px; display: flex; align-items: center; }
-.pbest { text-align: center; font-family: 'Bebas Neue', cursive; font-size: 52px; color: var(--acc); display: flex; align-items: center; justify-content: center; }
-.pavg  { text-align: center; font-family: 'Bebas Neue', cursive; font-size: 52px; color: var(--acc2); display: flex; align-items: center; justify-content: center; }
-.pcnt  { text-align: center; font-size: 22px; font-weight: 700; color: var(--mut); display: flex; align-items: center; justify-content: center; }
-.p180  { text-align: center; font-family: 'Bebas Neue', cursive; font-size: 52px; color: #ffd700; display: flex; align-items: center; justify-content: center; }
+.pbest { text-align: center; font-family: 'Bebas Neue', cursive; font-size: 28px; color: var(--acc); display: flex; align-items: center; justify-content: center; }
+.pavg  { text-align: center; font-family: 'Bebas Neue', cursive; font-size: 28px; color: var(--acc2); display: flex; align-items: center; justify-content: center; }
+.pcnt  { text-align: center; font-size: 16px; font-weight: 700; color: var(--mut); display: flex; align-items: center; justify-content: center; }
+.p180  { text-align: center; font-family: 'Bebas Neue', cursive; font-size: 28px; color: #ffd700; display: flex; align-items: center; justify-content: center; }
 .pempty { padding: 14px 10px; font-size: 11px; color: var(--mut); grid-column: span 6; }
 
 /* Onboarding */
@@ -1346,7 +1346,7 @@ function renderPer(h) {
       '<div class="plbl">'+r.label+'</div>'+
       '<div class="pbest">'+r.best+'</div>'+
       '<div class="pavg">'+r.avg+'</div>'+
-      '<div class="pavg" style="color:#b47fff;font-size:36px;font-family:\'Bebas Neue\',cursive;letter-spacing:1px;line-height:1;">'+tda+tdaArrow+'</div>'+
+      '<div class="pavg" style="color:#b47fff;font-size:24px;font-family:\'Bebas Neue\',cursive;letter-spacing:1px;line-height:1;">'+tda+tdaArrow+'</div>'+
       '<div class="pcnt">'+r.count+'G</div>'+
       '<div class="p180">'+(r.c180>0?r.c180:'—')+'</div>'+
       mHtml+
