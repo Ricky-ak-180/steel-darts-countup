@@ -249,13 +249,17 @@ canvas.schart { width: 100%; height: 100%; }
 .ac .al { font-size: 9px; color: var(--mut); line-height: 1.4; margin-top: 2px; }
 /* ラウンド割合カード */
 .rrate-card { background: var(--sur); border: 1px solid var(--bdr); border-radius: 12px; padding: 8px 12px; }
-.rrate-title { font-size: 10px; color: var(--mut); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+.rrate-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.rrate-title { font-size: 10px; color: var(--mut); letter-spacing: 2px; text-transform: uppercase; }
+.rrate-tabs { display: flex; gap: 3px; }
+.rrate-tab { background: transparent; border: 1px solid var(--bdr); color: var(--mut); border-radius: 6px; padding: 2px 7px; font-size: 9px; letter-spacing: 1px; cursor: pointer; font-weight: 700; }
+.rrate-tab.on { background: var(--acc); color: #000; border-color: var(--acc); }
 .rrate-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
 .rrate-row:last-child { margin-bottom: 0; }
 .rrate-lbl { font-size: 15px; color: var(--mut); width: 46px; flex-shrink: 0; text-align: right; font-weight: 700; }
 .rrate-bar-wrap { flex: 1; background: var(--sur2); border-radius: 4px; height: 18px; overflow: hidden; }
 .rrate-bar { height: 100%; border-radius: 4px; transition: width 0.4s; }
-.rrate-cnt { font-family: 'Bebas Neue', cursive; font-size: 20px; width: 36px; text-align: right; flex-shrink: 0; }
+.rrate-cnt { font-family: 'Bebas Neue', cursive; font-size: 20px; min-width: 52px; text-align: right; flex-shrink: 0; white-space: nowrap; }
 .rrate-pct { font-family: 'Bebas Neue', cursive; font-size: 20px; width: 44px; text-align: right; flex-shrink: 0; color: var(--mut); }
 
 /* Profile card */
@@ -479,7 +483,15 @@ canvas.schart { width: 100%; height: 100%; }
     <div id="streak-badge" style="font-size:11px;color:var(--acc);font-weight:700;text-align:right;"></div>
     <div id="ha3" style="display:none;"></div>
     <div class="rrate-card" id="rrate-card" style="display:none;">
-      <div class="rrate-title">直近30G スコア分布</div>
+      <div class="rrate-header">
+        <div class="rrate-title">スコア分布</div>
+        <div class="rrate-tabs">
+          <button class="rrate-tab on" onclick="switchRrate('30g')">直近30G</button>
+          <button class="rrate-tab" onclick="switchRrate('today')">当日</button>
+          <button class="rrate-tab" onclick="switchRrate('30d')">直近30DAY</button>
+          <button class="rrate-tab" onclick="switchRrate('all')">TOTAL</button>
+        </div>
+      </div>
       <div id="rrate-rows"></div>
     </div>
     <div class="slbl">期間別成績</div>
@@ -1389,6 +1401,49 @@ function renderPer(h) {
   });
 }
 
+/* スコア分布 */
+var _rrateH = [];
+var _rrateMode = '30g';
+function switchRrate(mode) {
+  _rrateMode = mode;
+  document.querySelectorAll('.rrate-tab').forEach(function(b) {
+    b.classList.toggle('on', b.getAttribute('onclick') === "switchRrate('"+mode+"')");
+  });
+  renderRrateRows();
+}
+function renderRrateRows() {
+  var h = _rrateH;
+  var todayStr = new Date().toISOString().slice(0,10);
+  var ago30d = new Date(); ago30d.setDate(ago30d.getDate()-30);
+  var games;
+  if (_rrateMode === '30g') games = h.slice(0,30);
+  else if (_rrateMode === 'today') games = h.filter(function(g){ return g.date && g.date.slice(0,10)===todayStr; });
+  else if (_rrateMode === '30d') games = h.filter(function(g){ return g.date && new Date(g.date)>=ago30d; });
+  else games = h;
+  var rounds = [];
+  for(var i=0;i<games.length;i++) if(games[i].rounds) for(var j=0;j<games[i].rounds.length;j++) rounds.push(games[i].rounds[j]);
+  var total = rounds.length;
+  var rrateRows = document.getElementById('rrate-rows');
+  if (!rrateRows) return;
+  if (!total) { rrateRows.innerHTML='<div style="text-align:center;color:var(--mut);font-size:12px;padding:8px 0;">データなし</div>'; return; }
+  var bands = [
+    { lbl:'180',  color:'#ffd700', fn:function(s){return s===180;} },
+    { lbl:'140+', color:'#47ffb4', fn:function(s){return s>=140&&s<180;} },
+    { lbl:'100+', color:'#ff6b35', fn:function(s){return s>=100&&s<140;} },
+    { lbl:'60+',  color:'#4fc3f7', fn:function(s){return s>=60&&s<100;} },
+    { lbl:'59-',  color:'#6b6b88', fn:function(s){return s<60;} },
+  ];
+  rrateRows.innerHTML = bands.map(function(b){
+    var cnt=rounds.filter(b.fn).length, pct=Math.round(cnt/total*100);
+    return '<div class="rrate-row">'+
+      '<div class="rrate-lbl" style="color:'+b.color+';">'+b.lbl+'</div>'+
+      '<div class="rrate-bar-wrap"><div class="rrate-bar" style="width:'+pct+'%;background:'+b.color+';opacity:0.85;"></div></div>'+
+      '<div class="rrate-cnt" style="color:'+b.color+';">'+cnt+'回</div>'+
+      '<div class="rrate-pct" style="color:'+b.color+';">'+pct+'%</div>'+
+      '</div>';
+  }).join('');
+}
+
 /* Render history */
 function renderHist() {
   migrateTotals();
@@ -1519,36 +1574,11 @@ function renderHist() {
   }
   a3.innerHTML = '<div class="ac"><div class="av">'+(avg30!==null?avg30:'—')+arrow30+'</div><div class="al">直近30G 平均スコア</div></div>';
 
-  // ラウンド割合を計算（直近30G）
-  var allRounds = [];
-  for(var i=0;i<sl30.length;i++) {
-    if(sl30[i].rounds) for(var j=0;j<sl30[i].rounds.length;j++) allRounds.push(sl30[i].rounds[j]);
-  }
-  var total = allRounds.length;
+  // スコア分布
+  _rrateH = h;
   var rrateCard = document.getElementById('rrate-card');
-  var rrateRows = document.getElementById('rrate-rows');
-  if (total > 0 && rrateCard && rrateRows) {
-    rrateCard.style.display = 'block';
-    var bands = [
-      { lbl: '180',  color: '#ffd700', fn: function(s){ return s===180; } },
-      { lbl: '140+', color: '#47ffb4', fn: function(s){ return s>=140 && s<180; } },
-      { lbl: '100+', color: '#ff6b35', fn: function(s){ return s>=100 && s<140; } },
-      { lbl: '60+',  color: '#4fc3f7', fn: function(s){ return s>=60 && s<100; } },
-      { lbl: '59-',  color: '#6b6b88', fn: function(s){ return s<60; } },
-    ];
-    rrateRows.innerHTML = bands.map(function(b) {
-      var cnt = allRounds.filter(b.fn).length;
-      var pct = Math.round(cnt/total*100);
-      return '<div class="rrate-row">' +
-        '<div class="rrate-lbl" style="color:'+b.color+';">'+b.lbl+'</div>' +
-        '<div class="rrate-bar-wrap"><div class="rrate-bar" style="width:'+pct+'%;background:'+b.color+';opacity:0.85;"></div></div>' +
-        '<div class="rrate-cnt" style="color:'+b.color+';">'+cnt+'回</div>' +
-        '<div class="rrate-pct" style="color:'+b.color+';">'+pct+'%</div>' +
-        '</div>';
-    }).join('');
-  } else if (rrateCard) {
-    rrateCard.style.display = 'none';
-  }
+  if (rrateCard) rrateCard.style.display = 'block';
+  switchRrate(_rrateMode);
 
   // ストリーク計算
   var streak = 0;
