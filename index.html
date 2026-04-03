@@ -67,8 +67,8 @@ body::before {
 @keyframes pd { 0%,100%{box-shadow:0 0 0 0 rgba(255,107,53,0.4)}50%{box-shadow:0 0 0 5px transparent} }
 
 /* Score card */
-.scard { background: var(--sur); border: 1px solid var(--bdr); border-radius: 8px; padding: 4px; text-align: center; }
-.total { font-family: 'Bebas Neue', cursive; font-size: 48px; line-height: 1; color: var(--acc); letter-spacing: 4px; text-shadow: 0 0 40px rgba(232,255,71,0.3); transition: transform 0.15s; }
+.scard { background: linear-gradient(180deg, #14142a 0%, #0a0a18 100%); border: 1px solid rgba(232,255,71,0.12); border-radius: 10px; padding: 4px; text-align: center; }
+.total { font-family: 'Bebas Neue', cursive; font-size: 76px; line-height: 1; color: var(--acc); letter-spacing: 6px; text-shadow: 0 0 60px rgba(232,255,71,0.6), 0 0 120px rgba(232,255,71,0.2); transition: transform 0.15s; }
 .total.bump { transform: scale(1.06); }
 .rgrid { display: grid; grid-template-columns: repeat(8,1fr); gap: 3px; margin-top: 3px; }
 .rcell { background: var(--sur2); border-radius: 4px; padding: 2px; text-align: center; }
@@ -84,25 +84,25 @@ body::before {
 
 /* Shortcuts */
 .scrow { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; }
-.sc { background: var(--sur2); border: 1px solid rgba(232,255,71,0.25); border-radius: 12px; padding: 0; text-align: center; cursor: pointer; font-family: 'Bebas Neue', cursive; font-size: 58px; color: var(--acc); transition: background 0.08s; touch-action: manipulation; min-height: 60px; display: flex; align-items: center; justify-content: center; }
-.sc:active, .sc.pressing { background: var(--acc); color: #000; transform: scale(0.93); }
+.sc { background: linear-gradient(160deg, #1e1e2c 0%, #141420 100%); border: 1px solid rgba(232,255,71,0.3); border-radius: 12px; padding: 0; text-align: center; cursor: pointer; font-family: 'Bebas Neue', cursive; font-size: 58px; color: var(--acc); transition: background 0.08s, transform 0.08s; touch-action: manipulation; min-height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.4), inset 0 1px 0 rgba(232,255,71,0.08); }
+.sc:nth-child(-n+4) { background: linear-gradient(160deg, #232318 0%, #161610 100%); border-color: rgba(232,255,71,0.5); box-shadow: 0 3px 12px rgba(0,0,0,0.45), inset 0 1px 0 rgba(232,255,71,0.15); }
+.sc:active, .sc.pressing { background: var(--acc); color: #000; transform: scale(0.92); box-shadow: none; }
 
 /* Tenkey display */
-.tkd { background: var(--sur2); border: 1px solid var(--bdr); border-radius: 8px; padding: 4px 10px; display: flex; align-items: center; justify-content: space-between; }
-.tkv { font-family: 'Bebas Neue', cursive; font-size: 26px; color: var(--acc); letter-spacing: 3px; }
-.tkv.empty { color: var(--mut); }
+.tkd { background: linear-gradient(180deg, #161628 0%, #0e0e1e 100%); border: 1px solid rgba(232,255,71,0.12); border-radius: 10px; padding: 6px 14px; display: flex; align-items: center; justify-content: space-between; }
+.tkv { font-family: 'Bebas Neue', cursive; font-size: 40px; color: var(--acc); letter-spacing: 3px; }
+.tkv.empty { color: var(--mut); font-size: 28px; }
 .tkh { font-size: 10px; color: var(--mut); text-align: right; }
 
 /* Tenkey grid */
-.tkg { display: grid; grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(4,1fr); gap: 5px; flex: 1; min-height: 0; }
-.tk { background: var(--sur2); border: 1px solid #4a4a5e; border-radius: 10px; padding: 0; min-height: 0; text-align: center; cursor: pointer; font-family: 'Bebas Neue', cursive; font-size: 40px; color: var(--txt); transition: background 0.08s; display: flex; align-items: center; justify-content: center; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-.tk:active, .tk.pressing { background: var(--acc); color: #000; transform: scale(0.94); }
+.tkg { display: grid; grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(4,1fr); gap: 6px; flex: 1; min-height: 0; }
+.tk { background: linear-gradient(180deg, #1e1e30 0%, #141422 100%); border: 1px solid #32324a; border-radius: 12px; padding: 0; min-height: 0; text-align: center; cursor: pointer; font-family: 'Bebas Neue', cursive; font-size: 40px; color: var(--txt); transition: background 0.08s, transform 0.08s; display: flex; align-items: center; justify-content: center; touch-action: manipulation; -webkit-tap-highlight-color: transparent; box-shadow: 0 3px 6px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04); }
+.tk:active, .tk.pressing { background: var(--acc); color: #000; transform: scale(0.93); box-shadow: none; }
 .tk.wide { grid-column: span 2; }
-.tk.del { color: var(--mut); font-size: 28px; }
-.tk.del:active { background: var(--red); color: #fff; }
-.tk.enter { background: var(--sur2); color: var(--mut); font-size: 22px; font-family: 'Noto Sans JP', sans-serif; font-weight: 700; border: 1px solid var(--bdr); }
-.tk.enter.ready { background: var(--acc2); color: #fff; border-color: var(--acc2); }
-.tk.del:active { background: var(--red); color: #fff; }
+.tk.del { background: linear-gradient(180deg, #281e1e 0%, #1a1212 100%); border-color: #3e2828; color: #ff7070; font-size: 26px; }
+.tk.del:active { background: var(--red); color: #fff; transform: scale(0.93); }
+.tk.enter { background: linear-gradient(180deg, #1e1e30 0%, #141422 100%); color: var(--mut); font-size: 22px; font-family: 'Noto Sans JP', sans-serif; font-weight: 700; border-color: #32324a; }
+.tk.enter.ready { background: linear-gradient(145deg, #ff7744 0%, #ff3300 100%); color: #fff; border-color: transparent; box-shadow: 0 4px 24px rgba(255,80,0,0.55), inset 0 1px 0 rgba(255,255,255,0.2); font-size: 22px; }
 
 /* Action row */
 .arow { display: flex; gap: 8px; }
@@ -119,12 +119,15 @@ body::before {
 .ngp { display: none; background: var(--sur); border: 1px solid var(--acc); border-radius: 14px; padding: 16px 20px; text-align: center; box-shadow: 0 0 30px rgba(232,255,71,0.1); }
 .ngp.show { display: block; }
 /* ゲームスタート画面 */
-.game-start { position: fixed; inset: 0; z-index: 200; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+@keyframes gsPulse { 0%,100%{filter:drop-shadow(0 0 18px rgba(232,255,71,0.4));} 50%{filter:drop-shadow(0 0 48px rgba(232,255,71,0.95));} }
+.game-start { position: fixed; inset: 0; z-index: 200; background: radial-gradient(ellipse at 50% 38%, #1a1a2e 0%, #0a0a0f 68%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
 .game-start.hide { display: none; }
-.gs-icon { font-size: 52px; line-height: 1; margin-bottom: 8px; }
-.gs-title { font-family: 'Bebas Neue', cursive; font-size: 44px; color: var(--acc); letter-spacing: 6px; line-height: 1; }
-.gs-sub { font-family: 'Bebas Neue', cursive; font-size: 44px; color: var(--acc2); letter-spacing: 6px; line-height: 1; }
-.gs-btn { background: var(--acc); color: #000; border: none; border-radius: 16px; padding: 20px 60px; font-family: 'Bebas Neue', cursive; font-size: 32px; letter-spacing: 4px; cursor: pointer; margin-top: 10px; }
+.gs-icon { font-size: 68px; line-height: 1; margin-bottom: 4px; animation: gsPulse 2.5s ease-in-out infinite; }
+.gs-title { font-family: 'Bebas Neue', cursive; font-size: 50px; color: var(--acc); letter-spacing: 8px; line-height: 1; text-shadow: 0 0 40px rgba(232,255,71,0.4); }
+.gs-sub { font-family: 'Bebas Neue', cursive; font-size: 26px; color: var(--acc2); letter-spacing: 8px; line-height: 1; margin-top: -8px; }
+.gs-best { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 2px; text-transform: uppercase; min-height: 16px; }
+.gs-btn { background: linear-gradient(145deg, #eeff55 0%, #c4d800 100%); color: #000; border: none; border-radius: 20px; padding: 18px 72px; font-family: 'Bebas Neue', cursive; font-size: 34px; letter-spacing: 5px; cursor: pointer; margin-top: 8px; box-shadow: 0 8px 32px rgba(232,255,71,0.45), 0 2px 8px rgba(0,0,0,0.5); transition: transform 0.1s, box-shadow 0.1s; touch-action: manipulation; }
+.gs-btn:active { transform: scale(0.95); box-shadow: 0 4px 14px rgba(232,255,71,0.3); }
 .ngp-t { font-family: 'Bebas Neue', cursive; font-size: 22px; color: var(--acc); letter-spacing: 3px; margin-bottom: 4px; }
 .ngp-s { font-size: 11px; color: var(--mut); margin-bottom: 14px; }
 .ngp-b { display: flex; gap: 8px; }
@@ -359,6 +362,7 @@ canvas.schart { width: 100%; height: 100%; }
   <div class="gs-icon">🎯</div>
   <div class="gs-title">STEEL DARTS</div>
   <div class="gs-sub">COUNTUP</div>
+  <div class="gs-best" id="gs-best"></div>
   <button class="gs-btn" id="gs-btn">GAME START</button>
 </div>
 
@@ -1803,6 +1807,15 @@ var impFile = document.getElementById('imp-file');
 if (impFile) {
   impFile.addEventListener('change', function(){ importData(this); });
 }
+// スタート画面にベストスコアを表示
+(function(){
+  var gb = document.getElementById('gs-best');
+  if (!gb) return;
+  try {
+    var t = JSON.parse(localStorage.getItem('dh_totals')||'{}');
+    if (t.best) gb.textContent = 'Personal Best  ' + t.best + '  |  ' + t.games + ' Games';
+  } catch(e){}
+})();
 // Service Worker 登録
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(function(){});
