@@ -380,46 +380,45 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-start-btn { background:var(--acc); color:#000; border:none; border-radius:12px; padding:14px 0; font-size:16px; font-weight:700; cursor:pointer; width:100%; letter-spacing:1px; }
 .arr-best-disp { font-size:12px; color:var(--mut); text-align:center; min-height:18px; }
 /* HUD */
-.arr-hud { display:flex; align-items:center; justify-content:space-between; padding:10px 14px 2px; }
+.arr-hud { display:flex; align-items:center; justify-content:space-between; padding:8px 14px 2px; }
 .arr-hud.hide,.arr-card.hide,.arr-finish.hide { display:none; }
-.arr-hud-left { display:flex; flex-direction:column; gap:1px; }
-.arr-hud-q { font-size:11px; color:var(--mut); letter-spacing:1px; }
-.arr-hud-stage { font-size:12px; color:var(--acc); font-weight:700; letter-spacing:1px; }
-.arr-hud-score { font-family:'Bebas Neue',cursive; font-size:28px; color:var(--acc); letter-spacing:2px; }
+.arr-hud-left { display:flex; flex-direction:column; gap:0px; }
+.arr-hud-q { font-size:10px; color:var(--mut); letter-spacing:1px; }
+.arr-hud-stage { font-size:13px; color:var(--acc); font-weight:700; letter-spacing:2px; }
+.arr-hud-score { font-family:'Bebas Neue',cursive; font-size:32px; color:var(--acc); letter-spacing:2px; }
 /* クイズカード */
-.arr-card { margin:4px 12px 16px; background:var(--card); border:1px solid var(--bd); border-radius:16px; padding:16px 14px 18px; display:flex; flex-direction:column; align-items:center; gap:12px; }
-.arr-scenario { text-align:center; line-height:1.6; width:100%; }
-.arr-remaining { font-family:'Bebas Neue',cursive; font-size:72px; color:var(--acc); letter-spacing:3px; line-height:1; display:block; }
-.arr-darts-lbl { font-size:12px; color:var(--mut); display:block; }
-.arr-miss-note { font-size:12px; color:var(--fg); display:block; margin-top:2px; padding:6px 10px; background:rgba(255,107,53,0.08); border:1px solid rgba(255,107,53,0.2); border-radius:7px; }
-.arr-miss-dart { color:var(--acc2); font-weight:700; }
-.arr-q-label { font-size:14px; color:var(--fg); font-weight:600; display:block; margin-top:8px; }
+.arr-card { margin:4px 12px 16px; background:var(--card); border:1px solid var(--bd); border-radius:16px; padding:14px 14px 16px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+/* シナリオ: ステージ0 */
+.arr-scenario { text-align:center; width:100%; }
+.arr-remaining { font-family:'Bebas Neue',cursive; font-size:80px; color:var(--acc); letter-spacing:4px; line-height:1; display:block; }
+.arr-darts-lbl { font-size:11px; color:var(--mut); display:block; letter-spacing:1px; margin-top:2px; }
+.arr-q-label { font-size:13px; color:var(--fg); font-weight:600; display:block; margin-top:6px; letter-spacing:0.5px; }
+/* シナリオ: ステージ1+ (前の投結果 + 新残り) */
+.arr-dart-result { display:flex; flex-direction:column; align-items:center; gap:4px; width:100%; }
+.arr-dart-result-badge { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; padding:6px 14px; border-radius:20px; }
+.arr-dart-result-badge.success { background:rgba(71,255,180,0.1); border:1px solid rgba(71,255,180,0.3); color:#47ffb4; }
+.arr-dart-result-badge.miss { background:rgba(255,107,53,0.1); border:1px solid rgba(255,107,53,0.3); color:var(--acc2); }
+.arr-dart-result-score { font-family:'Bebas Neue',cursive; font-size:64px; color:var(--acc); letter-spacing:3px; line-height:1; }
 /* タイマーバー */
 .arr-timer-wrap { width:100%; height:5px; background:var(--bd); border-radius:3px; overflow:hidden; }
 .arr-timer-bar { height:100%; width:100%; background:var(--acc); border-radius:3px; }
 /* 選択肢 */
 .arr-choices { display:grid; grid-template-columns:1fr 1fr; gap:8px; width:100%; }
-.arr-choice { padding:15px 0; border:1px solid var(--bd); background:var(--bg); border-radius:10px; font-family:'Bebas Neue',cursive; font-size:22px; color:var(--fg); cursor:pointer; letter-spacing:1px; }
+.arr-choice { padding:17px 0; border:1px solid var(--bd); background:var(--bg); border-radius:10px; font-family:'Bebas Neue',cursive; font-size:24px; color:var(--fg); cursor:pointer; letter-spacing:1px; }
 .arr-choice-correct { background:#1a3a1a !important; color:#66bb6a !important; border-color:#388e3c !important; }
 .arr-choice-wrong { background:#3a1a1a !important; color:#ef5350 !important; border-color:#c62828 !important; }
-/* 正誤 */
-.arr-result { width:100%; display:flex; flex-direction:column; gap:8px; }
-.arr-result.hide { display:none; }
-.arr-result-icon { font-size:16px; font-weight:700; text-align:center; }
+/* 正誤フラッシュ */
+.arr-result { width:100%; text-align:center; font-size:15px; font-weight:700; min-height:20px; }
+.arr-result.hide { visibility:hidden; }
 .arr-ok { color:#66bb6a; }
 .arr-ng { color:#ef5350; }
-.arr-path-label { font-size:10px; color:var(--mut); letter-spacing:1px; text-align:center; }
-.arr-path-row { display:flex; align-items:center; gap:5px; flex-wrap:wrap; justify-content:center; }
-.arr-dart { font-family:'Bebas Neue',cursive; font-size:20px; color:var(--fg); background:var(--bg); border:1px solid var(--bd); border-radius:7px; padding:3px 9px; display:inline-block; }
-.arr-dart-sm { font-size:16px; padding:2px 7px; }
-.arr-arrow { color:var(--mut); font-size:13px; }
-.arr-correct-label { font-size:12px; color:var(--mut); text-align:center; }
-.arr-score-gain { font-size:14px; font-weight:700; color:var(--acc); text-align:center; }
+.arr-dart { font-family:'Bebas Neue',cursive; font-size:18px; color:var(--fg); background:var(--bg); border:1px solid var(--bd); border-radius:6px; padding:2px 8px; display:inline-block; }
+.arr-arrow { color:var(--mut); font-size:12px; }
+.arr-score-gain { font-size:14px; font-weight:700; color:var(--acc); }
+/* 次の問題ボタン（最終ステージのみ） */
 .arr-next-row { display:flex; width:100%; }
 .arr-next-row.hide { display:none; }
-.arr-next { color:#000; width:100%; padding:13px; font-size:14px; font-weight:700; border:none; border-radius:12px; cursor:pointer; }
-.arr-next-stage { background:var(--acc2); }
-.arr-next-q { background:var(--acc); }
+.arr-next { background:var(--acc); color:#000; width:100%; padding:13px; font-size:15px; font-weight:700; border:none; border-radius:12px; cursor:pointer; }
 /* 終了画面 */
 .arr-finish { display:flex; flex-direction:column; align-items:center; gap:18px; padding:28px 16px 24px; }
 .arr-grade-wrap { display:flex; flex-direction:column; align-items:center; gap:2px; }
@@ -2073,7 +2072,8 @@ var _arrG = {
   choices: [],      // 現在の4択
   stageStart: 0,    // ステージ開始タイムスタンプ
   timerRAF: null,
-  STAGE_MS: 7000,   // 7秒制限
+  STAGE_MS: 5000,   // 5秒制限
+  advTimeout: null,
   totalScore: 0,
   maxScore: 0,      // 正規化用：実際に出せる最大点数
   correctCt: 0,
@@ -2174,31 +2174,40 @@ function _arrShowStage() {
   var correct = st.path[0];
   var stageNames = ['第1投','第2投','第3投'];
   var stageName = stageNames[_arrG.stgIdx] || ('第' + (_arrG.stgIdx+1) + '投');
+  var isLast = _arrG.stgIdx === st.path.length - 1 ||
+               _arrG.stgIdx === _arrG.stages.length - 1;
+  var qLabel = isLast && st.darts === 1 ? 'フィニッシュ！ダブルは？' :
+               _arrG.stgIdx === 0 ? '1本目の狙いは？' : stageName + 'の狙いは？';
 
   // HUD更新
   document.getElementById('arr-hud-q').textContent = '問題 ' + (_arrG.qIdx+1) + ' / 10';
   document.getElementById('arr-hud-stage').textContent = stageName;
   document.getElementById('arr-hud-score').textContent = _arrG.totalScore;
 
-  // シナリオ文
-  var html = '';
+  // シナリオ表示
+  var scenEl = document.getElementById('arr-scenario');
   if (_arrG.stgIdx === 0) {
-    html = '<span class="arr-remaining">' + st.score + '</span>' +
-           '<span class="arr-darts-lbl">' + st.darts + '本残り</span>' +
-           '<span class="arr-q-label">1本目の狙いは？</span>';
+    // ステージ0：残りスコアを大きく
+    scenEl.innerHTML =
+      '<span class="arr-remaining">' + st.score + '</span>' +
+      '<span class="arr-darts-lbl">' + st.darts + '本残り</span>' +
+      '<span class="arr-q-label">' + qLabel + '</span>';
   } else {
+    // ステージ1+：前の投結果バッジ → 残りスコア
     var pd = st.prevDart, pt = st.prevType;
-    var noteClass = pt === 'success' ? 'arr-miss-note' : 'arr-miss-note';
-    var noteStyle = pt === 'success' ? 'background:rgba(71,255,180,0.07);border-color:rgba(71,255,180,0.2)' : '';
-    var noteText = pt === 'success'
-      ? '<span class="arr-miss-dart">' + pd + '</span> が入った！'
-      : '<span class="arr-miss-dart">' + pd + '</span> を外して <span class="arr-miss-dart">' + _missLabel(pd) + '</span> に！';
-    html = '<span class="arr-miss-note" style="' + noteStyle + '">' + noteText + '</span>' +
-           '<span class="arr-remaining">' + st.score + '</span>' +
-           '<span class="arr-darts-lbl">' + st.darts + '本残り</span>' +
-           '<span class="arr-q-label">' + stageName + 'の狙いは？</span>';
+    var scored = pt === 'success' ? _dartVal(pd) : _missVal(pd);
+    var badgeClass = pt === 'success' ? 'success' : 'miss';
+    var badgeText = pt === 'success'
+      ? pd + '  入った！  +' + scored
+      : pd + '  外れて ' + _missLabel(pd) + '  −' + scored;
+    scenEl.innerHTML =
+      '<div class="arr-dart-result">' +
+        '<div class="arr-dart-result-badge ' + badgeClass + '">' + badgeText + '</div>' +
+        '<div class="arr-dart-result-score">' + st.score + '</div>' +
+        '<span class="arr-darts-lbl">' + st.darts + '本残り</span>' +
+      '</div>' +
+      '<span class="arr-q-label" style="margin-top:4px">' + qLabel + '</span>';
   }
-  document.getElementById('arr-scenario').innerHTML = html;
 
   // 4択生成
   var decoys = _arrShuffle(_ARR_DECOY_POOL.filter(function(d){ return d !== correct; })).slice(0, 3);
@@ -2216,15 +2225,15 @@ function _arrShowStage() {
   });
 
   document.getElementById('arr-result').className = 'arr-result hide';
-  document.getElementById('arr-result').innerHTML = '';
+  document.getElementById('arr-result').textContent = '';
   document.getElementById('arr-next-row').className = 'arr-next-row hide';
 
-  // タイマー開始
+  // タイマー開始（5秒）
   _arrG.stageStart = Date.now();
   _startArrTimer();
 }
 
-/* タイマー */
+/* タイマー（5秒） */
 function _startArrTimer() {
   _clearArrTimer();
   var bar = document.getElementById('arr-timer-bar');
@@ -2233,13 +2242,14 @@ function _startArrTimer() {
     var p = Math.max(0, 1 - (Date.now() - start) / dur);
     bar.style.width = (p * 100) + '%';
     bar.style.background = p > 0.5 ? 'var(--acc)' : p > 0.25 ? '#ff9800' : '#ef5350';
-    if (p <= 0) { chooseArr(-1); return; } // タイムアウト
+    if (p <= 0) { chooseArr(-1); return; }
     _arrG.timerRAF = requestAnimationFrame(tick);
   }
   _arrG.timerRAF = requestAnimationFrame(tick);
 }
 function _clearArrTimer() {
   if (_arrG.timerRAF) { cancelAnimationFrame(_arrG.timerRAF); _arrG.timerRAF = null; }
+  if (_arrG.advTimeout) { clearTimeout(_arrG.advTimeout); _arrG.advTimeout = null; }
 }
 
 /* 回答処理 */
@@ -2252,7 +2262,7 @@ function chooseArr(idx) {
   var chosen = isTimeout ? null : _arrG.choices[idx];
   var isCorrect = !isTimeout && chosen === correct;
 
-  // 得点計算：正解×速度ボーナス
+  // 得点計算
   var base = _ARR_BASE_PTS[Math.min(_arrG.stgIdx, 2)];
   var speed = isCorrect ? Math.max(0, 1 - elapsed / _arrG.STAGE_MS) : 0;
   var pts = Math.round(base * speed);
@@ -2260,47 +2270,59 @@ function chooseArr(idx) {
   _arrG.totalStages++;
   _arrG.totalTimeMs += elapsed;
   if (isCorrect) _arrG.correctCt++;
-  document.getElementById('arr-hud-score').textContent = _arrG.totalScore;
 
-  // ボタン色変え
+  // タイマーバーを即クリア
   document.getElementById('arr-timer-bar').style.width = '0%';
+
+  // ボタン色変え（全ボタン無効化）
   document.getElementById('arr-choices').querySelectorAll('.arr-choice').forEach(function(btn) {
     btn.setAttribute('data-fn', '');
     var v = btn.getAttribute('data-val');
     if (v === correct) btn.className = 'arr-choice arr-choice-correct';
     else if (v === chosen) btn.className = 'arr-choice arr-choice-wrong';
-    else btn.style.opacity = '0.3';
+    else btn.style.opacity = '0.25';
   });
 
-  // 結果表示
-  var rhtml = '<div class="arr-result-icon ' + (isCorrect ? 'arr-ok' : 'arr-ng') + '">';
-  rhtml += isTimeout ? '⏱ 時間切れ' : (isCorrect ? '◯ 正解！' : '✕ 不正解');
-  rhtml += '</div>';
-  if (!isCorrect) rhtml += '<div class="arr-correct-label">正解は <span class="arr-dart arr-dart-sm">' + correct + '</span></div>';
-  rhtml += '<div class="arr-path-label">このアレンジ</div>';
-  rhtml += '<div class="arr-path-row">' +
-    st.path.map(function(s){ return '<span class="arr-dart">' + s + '</span>'; }).join('<span class="arr-arrow">→</span>') + '</div>';
-  if (pts > 0) rhtml += '<div class="arr-score-gain">+' + pts + ' pt</div>';
-  document.getElementById('arr-result').innerHTML = rhtml;
-  document.getElementById('arr-result').className = 'arr-result';
-
-  // 次ボタン
+  // 結果フラッシュ（シンプルに）
+  var resEl = document.getElementById('arr-result');
   var hasNextStage = (_arrG.stgIdx + 1) < _arrG.stages.length;
   var isLastQ = (_arrG.qIdx + 1) >= _arrG.qList.length;
-  var btn = document.getElementById('arr-next-btn');
-  if (hasNextStage) {
-    var nt = _arrG.stages[_arrG.stgIdx].nextType;
-    btn.textContent = nt === 'success' ? '入った前提で次へ →' : 'ミス後のシナリオへ →';
-    btn.className = 'arr-next ' + (nt === 'success' ? 'arr-next-stage' : 'arr-next-q');
+  var isSessionEnd = !hasNextStage && isLastQ;
+
+  if (isCorrect) {
+    resEl.className = 'arr-result arr-ok';
+    resEl.textContent = pts > 0 ? '◯  +' + pts + ' pt' : '◯';
+  } else if (isTimeout) {
+    resEl.className = 'arr-result arr-ng';
+    resEl.textContent = '⏱  正解は ' + correct;
   } else {
-    btn.textContent = isLastQ ? '結果を見る' : '次の問題 →';
-    btn.className = 'arr-next arr-next-q';
+    resEl.className = 'arr-result arr-ng';
+    resEl.textContent = '✕  正解は ' + correct;
   }
-  document.getElementById('arr-next-row').className = 'arr-next-row';
+
+  // スコアHUD更新
+  document.getElementById('arr-hud-score').textContent = _arrG.totalScore;
+
+  if (isSessionEnd) {
+    // 最終問題の最終ステージ → ボタンで結果へ
+    var btn = document.getElementById('arr-next-btn');
+    btn.textContent = '結果を見る';
+    document.getElementById('arr-next-row').className = 'arr-next-row';
+  } else if (!hasNextStage) {
+    // 次の問題へ（ボタン表示）
+    var btn2 = document.getElementById('arr-next-btn');
+    btn2.textContent = '次の問題 →';
+    document.getElementById('arr-next-row').className = 'arr-next-row';
+  } else {
+    // 次ステージへ自動遷移（正解:0.9s、不正解:2.0s）
+    var delay = isCorrect ? 900 : 2000;
+    _arrG.advTimeout = setTimeout(advanceArr, delay);
+  }
 }
 
 /* 次ステージ or 次問題 */
 function advanceArr() {
+  _clearArrTimer();
   _arrG.stgIdx++;
   if (_arrG.stgIdx < _arrG.stages.length) {
     _arrShowStage();
