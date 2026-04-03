@@ -2043,9 +2043,6 @@ var _ARR_SCORES = (function(){
   ];
 })();
 
-var _arr = { mode: 0, queue: [], hit: 0, total: 0, current: null, choices: [] };
-var _arrInited = false;
-
 var _ARR_DECOY_POOL = ["T20","T19","T18","T17","T16","T15","T14","T13","T12","T11","T10","T7","Bull","20","19","18","17","16"];
 
 function _arrShuffle(a) {
@@ -2087,6 +2084,50 @@ function _getPath(n) {
   return null;
 }
 
+// ボード隣接番号マップ（時計回り順: 20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5）
+var _ADJACENT = {
+  1:[20,18], 2:[15,17], 3:[17,19], 4:[18,13], 5:[12,20],
+  6:[13,10], 7:[19,16], 8:[16,11], 9:[14,12], 10:[6,15],
+  11:[8,14], 12:[9,5],  13:[4,6],  14:[11,9], 15:[10,2],
+  16:[7,8],  17:[2,3],  18:[1,4],  19:[3,7],  20:[5,1]
+};
+
+// dart(例:"T18")を cur点から投げたときの全可能アウトカム（CHECKOUTが続くものだけ）
+function _getMissOptions(dart, cur) {
+  var opts = [];
+  function tryAdd(type, val, missTarget) {
+    var ns = cur - val;
+    if (ns < 0) return;
+    if (ns === 0 || _getPath(ns)) {
+      var lbl = type === 'success'
+        ? dart + '　入った！  +' + val
+        : dart + ' → ' + missTarget + '　刺さった！  −' + val;
+      opts.push({ type: type, val: val, newScore: ns, dart: dart, missTarget: missTarget, label: lbl });
+    }
+  }
+  var sv = _dartVal(dart);
+  tryAdd('success', sv, null);
+  if (dart === 'Bull') {
+    tryAdd('miss', 25, '外ブル');
+  } else {
+    var num = parseInt(dart[0]==='T'||dart[0]==='D' ? dart.slice(1) : dart);
+    var ring = dart[0]==='T' ? 'T' : dart[0]==='D' ? 'D' : 'S';
+    // S[同じ番号]ミス
+    tryAdd('miss', num, 'S'+num);
+    // 隣接番号ミス
+    (_ADJACENT[num]||[]).forEach(function(a){
+      tryAdd('miss', a, 'S'+a);               // シングル隣接
+      if (ring==='T') tryAdd('miss', a*3, 'T'+a); // トリプル隣接（トリプル狙いのみ）
+    });
+  }
+  // newScoreの重複除去（最初に追加されたものを残す）
+  var seen = {};
+  return opts.filter(function(o){
+    if (seen[o.newScore]) return false;
+    seen[o.newScore] = true; return true;
+  });
+}
+
 /* ── アレンジ：セッション管理 ─────────────────────────── */
 var _arrG = {
   mode: 0,
@@ -2109,41 +2150,44 @@ var _arrG = {
 var _arrInited = false;
 var _ARR_BASE_PTS = [40, 35, 25]; // ステージ0,1,2の基底点
 
-/* ステージシーケンスを構築（成功チェーン or ミスチェーンをランダムに混在） */
+/* ステージシーケンスを構築（隣接ミスを含むリアルなアウトカムをランダムに選択） */
 function _buildArrStages(score) {
-  var path0 = _getPath(score);
-  if (!path0) return [];
+  if (!_getPath(score)) return [];
   var stages = [];
-  var totalDarts = path0.length;
   var cur = score;
-  var prevDart = null, prevType = null;
+  var prevOutcome = null;
+  var MAX_STAGES = 3; // 最大3投（1ターン分）
 
-  for (var i = 0; i < totalDarts; i++) {
+  for (var i = 0; i < MAX_STAGES; i++) {
     var p = _getPath(cur);
     if (!p) break;
-    stages.push({ score: cur, path: p, darts: totalDarts - i, prevDart: prevDart, prevType: prevType });
+    stages.push({ score: cur, path: p, prevOutcome: prevOutcome });
 
-    if (i >= totalDarts - 1) break; // 最終ステージは次なし
-
-    // 次ステージの種類を決める: 'success' or 'miss'
     var dart = p[0];
-    var succScore = cur - _dartVal(dart);
-    var missScore = cur - _missVal(dart);
-    var dartsNext = totalDarts - i - 1;
+    var opts = _getMissOptions(dart, cur);
+    // 成功以外の選択肢（ミス）があるかチェック
+    var missOpts = opts.filter(function(o){ return o.type === 'miss'; });
+    if (opts.length === 0) break;
 
-    var canMiss = _missVal(dart) > 0 && !!_getPath(missScore) && _getPath(missScore).length <= dartsNext;
-    var canSucc = !!_getPath(succScore) && _getPath(succScore).length <= dartsNext;
+    var pick;
+    if (missOpts.length === 0) {
+      pick = opts[0]; // 成功のみ
+    } else if (opts.length === 1) {
+      pick = opts[0];
+    } else {
+      // 成功:45%、ミス(複数均等):55% でランダム選択
+      var r = Math.random();
+      if (r < 0.45) {
+        pick = opts.filter(function(o){ return o.type==='success'; })[0] || missOpts[0];
+      } else {
+        pick = missOpts[Math.floor(Math.random() * missOpts.length)];
+      }
+    }
 
-    var type;
-    if (canMiss && canSucc) type = Math.random() < 0.5 ? 'success' : 'miss';
-    else if (canSucc) type = 'success';
-    else if (canMiss) type = 'miss';
-    else break;
-
-    stages[i].nextType = type;
-    prevDart = dart;
-    prevType = type;
-    cur = (type === 'success') ? succScore : missScore;
+    stages[i].nextOutcome = pick;
+    prevOutcome = pick;
+    cur = pick.newScore;
+    if (cur === 0) break; // チェックアウト完了
   }
   return stages;
 }
@@ -2204,9 +2248,9 @@ function _arrShowStage() {
   var correct = st.path[0];
   var stageNames = ['第1投','第2投','第3投'];
   var stageName = stageNames[_arrG.stgIdx] || ('第' + (_arrG.stgIdx+1) + '投');
-  var isLast = _arrG.stgIdx === st.path.length - 1 ||
-               _arrG.stgIdx === _arrG.stages.length - 1;
-  var qLabel = isLast && st.darts === 1 ? 'フィニッシュ！ダブルは？' :
+  var dartsLeft = st.path.length; // このスコアを仕上げるのに必要な本数
+  var isFinish = dartsLeft === 1; // ダブル or Bull でフィニッシュ
+  var qLabel = isFinish ? 'フィニッシュ！ダブルは？' :
                _arrG.stgIdx === 0 ? '1本目の狙いは？' : stageName + 'の狙いは？';
 
   // HUD更新
@@ -2238,7 +2282,7 @@ function _arrShowStage() {
     // ステージ0：即表示
     scenEl.innerHTML =
       '<span class="arr-remaining">' + st.score + '</span>' +
-      '<span class="arr-darts-lbl">' + st.darts + '本残り</span>' +
+      '<span class="arr-darts-lbl">' + dartsLeft + '本残り</span>' +
       '<span class="arr-q-label">' + qLabel + '</span>';
     choicesEl.style.display = '';
     document.getElementById('arr-timer-bar').style.width = '100%';
@@ -2246,16 +2290,13 @@ function _arrShowStage() {
     _startArrTimer();
   } else {
     // ステージ1+：まず「どこに刺さったか」を見せてから、次の問いへ
-    var pd = st.prevDart, pt = st.prevType;
-    var scored = pt === 'success' ? _dartVal(pd) : _missVal(pd);
-    var badgeClass = pt === 'success' ? 'success' : 'miss';
-    var revealText = pt === 'success'
-      ? pd + '　入った！  +' + scored
-      : pd + ' → ' + _missLabel(pd) + '　刺さった！  −' + scored;
+    var po = st.prevOutcome;
+    var badgeClass = po.type === 'success' ? 'success' : 'miss';
+    var revealText = po.label;
     var badgeHtml = '<div class="arr-dart-result">' +
       '<div class="arr-dart-result-badge ' + badgeClass + '" style="font-size:15px;padding:9px 18px">' + revealText + '</div>' +
       '<div class="arr-dart-result-score">' + st.score + '</div>' +
-      '<span class="arr-darts-lbl">' + st.darts + '本残り</span>' +
+      '<span class="arr-darts-lbl">' + dartsLeft + '本残り</span>' +
       '</div>';
 
     // フェーズ1: 刺さった場所を見せる（選択肢なし）
@@ -2316,7 +2357,7 @@ function chooseArr(idx) {
     stgIdx: _arrG.stgIdx, stageScore: st.score,
     correct: correct, chosen: chosen,
     isCorrect: isCorrect, isTimeout: isTimeout,
-    prevDart: st.prevDart, prevType: st.prevType, pts: pts });
+    prevOutcome: st.prevOutcome || null, pts: pts });
 
   // タイマーバーを即クリア
   document.getElementById('arr-timer-bar').style.width = '0%';
@@ -2449,9 +2490,10 @@ function _renderArrReview() {
     var icon = le.isCorrect ? '✓' : (le.isTimeout ? '⏱' : '✗');
     var ic = le.isCorrect ? '#66bb6a' : '#ef5350';
     var ctx = '';
-    if (le.prevDart && le.prevType) {
-      var lbl = le.prevType === 'success' ? le.prevDart+'→入' : le.prevDart+'→'+_missLabel(le.prevDart);
-      ctx = '<span style="font-size:10px;color:var(--mut);margin-right:4px">['+lbl+']</span>';
+    if (le.prevOutcome) {
+      var po2 = le.prevOutcome;
+      var ctxLbl = po2.type === 'success' ? po2.dart+'→入' : po2.dart+'→'+po2.missTarget;
+      ctx = '<span style="font-size:10px;color:var(--mut);margin-right:4px">['+ctxLbl+']</span>';
     }
     var ans = '';
     if (le.isCorrect) {
