@@ -448,16 +448,9 @@ canvas.schart { width: 100%; height: 100%; }
     </div>
     <div id="streak-badge" style="font-size:11px;color:var(--acc);font-weight:700;text-align:right;"></div>
     <div id="ha3" style="display:none;"></div>
-    <div id="rrate-wrap" style="display:none;flex-direction:row;gap:8px;align-items:stretch;">
-      <div class="rrate-card" id="rrate-card" style="flex:1;">
-        <div class="rrate-title">直近30G スコア分布</div>
-        <div id="rrate-rows"></div>
-      </div>
-      <div class="rrate-card" id="ptime-card" style="flex:0 0 auto;min-width:86px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:2px;">
-        <div class="rrate-title" style="margin-bottom:2px;">合計プレイ時間</div>
-        <div id="ptime-value" style="font-family:'Bebas Neue',cursive;font-size:26px;color:var(--acc);line-height:1;"></div>
-        <div id="ptime-period" style="font-size:9px;color:var(--mut);margin-top:2px;"></div>
-      </div>
+    <div class="rrate-card" id="rrate-card" style="display:none;">
+      <div class="rrate-title">直近30G スコア分布</div>
+      <div id="rrate-rows"></div>
     </div>
     <div class="slbl">期間別成績</div>
     <div id="hper"></div>
@@ -1302,13 +1295,10 @@ function renderPer(h) {
     var m = Math.floor(sec/60), s = sec%60;
     return m>0 ? m+'分'+(s>0?s+'秒':'') : (s>0 ? s+'秒' : '—');
   }
-  // ptime-card をタブに応じて更新
-  var ptMap = { day: { sec: totalSecDay, lbl: '本日', color: 'var(--acc)' }, week: { sec: totalSecWeek, lbl: '今週', color: 'var(--acc2)' }, month: { sec: totalSecMonth, lbl: '今月', color: 'var(--grn)' } };
+  // タブに応じた合計プレイ時間
+  var ptMap = { day: { sec: totalSecDay, lbl: '本日' }, week: { sec: totalSecWeek, lbl: '今週' }, month: { sec: totalSecMonth, lbl: '今月' } };
   var ptInfo = ptMap[pTab] || ptMap['day'];
-  var ptVal = document.getElementById('ptime-value');
-  var ptPer = document.getElementById('ptime-period');
-  if (ptVal) { ptVal.style.color = ptInfo.color; ptVal.textContent = fmtTime(ptInfo.sec); }
-  if (ptPer) ptPer.textContent = ptInfo.lbl;
+  var ptFooter = ptInfo.sec > 0 ? '<div style="text-align:right;padding:6px 8px 2px;font-size:9px;color:var(--mut);">🕐 合計プレイ時間（'+ptInfo.lbl+'）<span style="font-family:\'Bebas Neue\',cursive;font-size:13px;color:var(--fg);margin-left:4px;">'+fmtTime(ptInfo.sec)+'</span></div>' : '';
   var s=getPer(h,pTab);
   var tabs=[['day','日別'],['week','週別'],['month','月別']].map(function(t){
     return '<div class="ptab'+(pTab===t[0]?' on':'')+'" data-t="'+t[0]+'">'+t[1]+'</div>';
@@ -1351,7 +1341,7 @@ function renderPer(h) {
     '<div class="ptabs" id="ptabs">'+tabs+'</div>'+
     '<div class="pgrid">'+
     '<div class="phd"><span>期間</span><span>最高点</span><span>平均点</span><span>3ダーツ平均</span><span>回数</span><span>180</span></div>'+
-    rows+'</div></div>';
+    rows+'</div>'+ptFooter+'</div>';
   document.getElementById('ptabs').addEventListener('click',function(e){
     var t=e.target.getAttribute('data-t');
     if(t){pTab=t;renderPer(getH());}
@@ -1368,8 +1358,8 @@ function renderHist() {
     s3.innerHTML=''; a3.innerHTML=''; document.getElementById('hper').innerHTML='';
     var cw = document.getElementById('chart-wrap');
     if (cw) cw.style.display = 'none';
-    var rw = document.getElementById('rrate-wrap');
-    if (rw) rw.style.display = 'none';
+    var rc = document.getElementById('rrate-card');
+    if (rc) rc.style.display = 'none';
     var sb = document.getElementById('streak-badge');
     if (sb) sb.textContent = '';
     hl.innerHTML='<div class="hempty"><div class="ei">🎯</div>まだ記録がありません。<br>ゲームを完了すると自動で保存されます。</div>';
@@ -1442,10 +1432,10 @@ function renderHist() {
     if(sl30[i].rounds) for(var j=0;j<sl30[i].rounds.length;j++) allRounds.push(sl30[i].rounds[j]);
   }
   var total = allRounds.length;
-  var rrateWrap = document.getElementById('rrate-wrap');
+  var rrateCard = document.getElementById('rrate-card');
   var rrateRows = document.getElementById('rrate-rows');
-  if (total > 0 && rrateWrap && rrateRows) {
-    rrateWrap.style.display = 'flex';
+  if (total > 0 && rrateCard && rrateRows) {
+    rrateCard.style.display = 'block';
     var bands = [
       { lbl: '180',  color: '#ffd700', fn: function(s){ return s===180; } },
       { lbl: '140+', color: '#47ffb4', fn: function(s){ return s>=140 && s<180; } },
@@ -1463,8 +1453,8 @@ function renderHist() {
         '<div class="rrate-pct" style="color:'+b.color+';">'+pct+'%</div>' +
         '</div>';
     }).join('');
-  } else if (rrateWrap) {
-    rrateWrap.style.display = 'none';
+  } else if (rrateCard) {
+    rrateCard.style.display = 'none';
   }
 
   // ストリーク計算
