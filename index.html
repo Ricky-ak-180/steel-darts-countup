@@ -892,10 +892,10 @@ function goTab(tab) {
 
 /* Storage */
 function getH() { try { return JSON.parse(localStorage.getItem('dh')||'[]'); } catch(e){ return []; } }
-function getTotals() { try { return JSON.parse(localStorage.getItem('dh_totals')||'{"games":0,"play_time":0,"c180":0}'); } catch(e) { return {games:0,play_time:0,c180:0}; } }
+function getTotals() { try { var t=JSON.parse(localStorage.getItem('dh_totals')||'{"games":0,"play_time":0,"c180":0,"best":0}'); if(!t.best) t.best=0; return t; } catch(e) { return {games:0,play_time:0,c180:0,best:0}; } }
 function saveTotals(t) { try { localStorage.setItem('dh_totals', JSON.stringify(t)); } catch(ex) { console.warn('saveTotals failed:', ex); } }
-function migrateTotals() { if(localStorage.getItem('dh_totals')!==null) return; var h=getH(); if(!h.length) return; var t={games:h.length,play_time:0,c180:0}; for(var i=0;i<h.length;i++){ t.play_time+=(h[i].duration||0); var r=h[i].rounds||[]; for(var j=0;j<r.length;j++) if(r[j]===180) t.c180++; } saveTotals(t); }
-function saveH(e) { try { var h=getH(); h.unshift(e); localStorage.setItem('dh', JSON.stringify(h.slice(0,200))); var t=getTotals(); t.games+=1; t.play_time+=(e.duration||0); var r=e.rounds||[]; for(var i=0;i<r.length;i++) if(r[i]===180) t.c180++; saveTotals(t); } catch(ex) { console.warn('saveH failed:', ex); } }
+function migrateTotals() { var ex=localStorage.getItem('dh_totals'); if(ex!==null){ try{ var t=JSON.parse(ex); if(!t.best){ var h=getH(); t.best=h.length?Math.max.apply(null,h.map(function(x){return x.score;})):0; saveTotals(t); } } catch(e){} return; } var h=getH(); if(!h.length) return; var t={games:h.length,play_time:0,c180:0,best:0}; for(var i=0;i<h.length;i++){ t.play_time+=(h[i].duration||0); if(h[i].score>t.best) t.best=h[i].score; var r=h[i].rounds||[]; for(var j=0;j<r.length;j++) if(r[j]===180) t.c180++; } saveTotals(t); }
+function saveH(e) { try { var h=getH(); h.unshift(e); localStorage.setItem('dh', JSON.stringify(h.slice(0,200))); var t=getTotals(); t.games+=1; t.play_time+=(e.duration||0); if(e.score>t.best) t.best=e.score; var r=e.rounds||[]; for(var i=0;i<r.length;i++) if(r[i]===180) t.c180++; saveTotals(t); } catch(ex) { console.warn('saveH failed:', ex); } }
 function openCfm() { document.getElementById('ocfm').classList.add('show'); }
 function closeCfm() { document.getElementById('ocfm').classList.remove('show'); }
 function delAll() { localStorage.removeItem('dh'); localStorage.removeItem('dh_totals'); closeCfm(); renderHist(); }
@@ -1211,7 +1211,7 @@ function drawChart(hist) {
 function exportData() {
   var h = getH();
   if (!h.length) { alert('履歴がありません'); return; }
-  var json = JSON.stringify({ version: 1, exported: new Date().toISOString(), data: h }, null, 2);
+  var json = JSON.stringify({ version: 2, exported: new Date().toISOString(), data: h, totals: getTotals() }, null, 2);
   var blob = new Blob([json], { type: 'application/json' });
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
@@ -1242,15 +1242,29 @@ function importData(input) {
       // 日付で重複チェックしてマージ
       var dates = {};
       current.forEach(function(x){ dates[x.date] = true; });
-      var added = 0;
+      var newGames = [];
       incoming.forEach(function(x) {
-        if (!dates[x.date]) { current.push(x); added++; }
+        if (!dates[x.date]) { current.push(x); newGames.push(x); }
       });
       // 日付順で並べ直す
       current.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
       localStorage.setItem('dh', JSON.stringify(current.slice(0, 200)));
+      // totals 更新
+      var t = getTotals();
+      if (t.games === 0 && obj.totals) {
+        // 新端末への完全リストア: エクスポートのtotalsをそのまま使用
+        t = { games: obj.totals.games||0, play_time: obj.totals.play_time||0, c180: obj.totals.c180||0, best: obj.totals.best||0 };
+      } else {
+        // 既存データへの追加: 新規ゲーム分だけインクリメント
+        for (var i=0; i<newGames.length; i++) {
+          var g=newGames[i]; t.games+=1; t.play_time+=(g.duration||0);
+          if(g.score>t.best) t.best=g.score;
+          var r=g.rounds||[]; for(var j=0;j<r.length;j++) if(r[j]===180) t.c180++;
+        }
+      }
+      saveTotals(t);
       renderHist();
-      alert(added + '件のデータを追加しました（重複は除外）');
+      alert(newGames.length + '件のデータを追加しました（重複は除外）');
     } catch(err) {
       alert('読み込みに失敗しました: ' + err.message);
     }
@@ -1430,7 +1444,8 @@ function renderHist() {
   var totals = getTotals();
   var allDurH = Math.floor(totals.play_time/3600), allDurM = Math.floor((totals.play_time%3600)/60);
   var allDurStr = allDurH > 0 ? allDurH+'時間'+allDurM+'分' : allDurM+'分';
-  var bestRankLabel = rank(best);
+  var profileBest = Math.max(totals.best || 0, best);
+  var bestRankLabel = rank(profileBest);
   var rankColors = { 'S+': ['#ffd700','#000'], 'S': ['#e8ff47','#000'], 'A': ['#47ffb4','#000'], 'B': ['#4fc3f7','#000'], 'C': ['#ff6b35','#fff'], 'D': ['#6b6b88','#fff'] };
   var rc2 = rankColors[bestRankLabel] || ['#444','#fff'];
   var pc = document.getElementById('profile-card');
@@ -1439,7 +1454,7 @@ function renderHist() {
     pc.innerHTML =
       '<div class="pcard">' +
         '<div class="pcard-brand"><span class="pcard-badge">🏆 累計成績</span><span class="pcard-app">🎯 Steel Darts Countup</span></div>' +
-        '<div class="pcard-score">' + best + '</div>' +
+        '<div class="pcard-score">' + profileBest + '</div>' +
         '<div class="pcard-score-label">Personal Best</div>' +
         '<div class="pcard-rank" style="background:'+rc2[0]+';color:'+rc2[1]+';">' + bestRankLabel + ' RANK</div>' +
         '<hr class="pcard-divider">' +
