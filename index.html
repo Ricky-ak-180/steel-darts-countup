@@ -805,10 +805,10 @@ function showResult() {
   var pb = 0; for (var i=0;i<h.length;i++) if(h[i].score>pb) pb=h[i].score;
   var isPB = g.total > pb;
   // 本日のベスト判定（保存前に今日のスコアを取得）
-  var todayStr = new Date().toISOString().slice(0,10);
+  var todayStr = localDateStr(new Date());
   var todayBest = 0;
   for (var i=0;i<h.length;i++) {
-    if (h[i].date && h[i].date.slice(0,10) === todayStr && h[i].score > todayBest) todayBest = h[i].score;
+    if (h[i].date && localDateStr(new Date(h[i].date)) === todayStr && h[i].score > todayBest) todayBest = h[i].score;
   }
   var isDB = !isPB && g.total > todayBest; // 自己ベストでないが本日ベスト
   var elapsed = stopTimer();
@@ -908,6 +908,7 @@ function goTab(tab) {
 
 /* Storage */
 function getH() { try { return JSON.parse(localStorage.getItem('dh')||'[]'); } catch(e){ return []; } }
+function localDateStr(d) { return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
 function getTotals() { try { var t=JSON.parse(localStorage.getItem('dh_totals')||'{"games":0,"play_time":0,"c180":0,"best":0}'); if(!t.best) t.best=0; return t; } catch(e) { return {games:0,play_time:0,c180:0,best:0}; } }
 function saveTotals(t) { try { localStorage.setItem('dh_totals', JSON.stringify(t)); } catch(ex) { console.warn('saveTotals failed:', ex); } }
 function migrateTotals() { var ex=localStorage.getItem('dh_totals'); if(ex!==null){ try{ var t=JSON.parse(ex); if(!t.best){ var h=getH(); t.best=h.length?Math.max.apply(null,h.map(function(x){return x.score;})):0; saveTotals(t); } } catch(e){} return; } var h=getH(); if(!h.length) return; var t={games:h.length,play_time:0,c180:0,best:0}; for(var i=0;i<h.length;i++){ t.play_time+=(h[i].duration||0); if(h[i].score>t.best) t.best=h[i].score; var r=h[i].rounds||[]; for(var j=0;j<r.length;j++) if(r[j]===180) t.c180++; } saveTotals(t); }
@@ -1417,11 +1418,11 @@ function switchRrate(mode) {
 }
 function renderRrateRows() {
   var h = _rrateH;
-  var todayStr = new Date().toISOString().slice(0,10);
+  var todayStr = localDateStr(new Date());
   var ago30d = new Date(); ago30d.setDate(ago30d.getDate()-30);
   var games;
   if (_rrateMode === '30g') games = h.slice(0,30);
-  else if (_rrateMode === 'today') games = h.filter(function(g){ return g.date && g.date.slice(0,10)===todayStr; });
+  else if (_rrateMode === 'today') games = h.filter(function(g){ return g.date && localDateStr(new Date(g.date))===todayStr; });
   else if (_rrateMode === '30d') games = h.filter(function(g){ return g.date && new Date(g.date)>=ago30d; });
   else games = h;
   var rounds = [];
@@ -1478,10 +1479,10 @@ function renderHist() {
     bestDate = '<div style="font-size:9px;color:var(--mut);margin-top:2px;">' + bd.getFullYear() + '/' + (bd.getMonth()+1) + '/' + bd.getDate() + '</div>';
   }
   // 本日の自己ベスト
-  var todayStrH = new Date().toISOString().slice(0,10);
+  var todayStrH = localDateStr(new Date());
   var todayBestScore = 0;
   for (var i=0; i<h.length; i++) {
-    if (h[i].date && h[i].date.slice(0,10) === todayStrH && h[i].score > todayBestScore) todayBestScore = h[i].score;
+    if (h[i].date && localDateStr(new Date(h[i].date)) === todayStrH && h[i].score > todayBestScore) todayBestScore = h[i].score;
   }
   var todayBestHtml = todayBestScore > 0
     ? '<div class="sv" style="color:var(--acc);">'+todayBestScore+'</div><div class="sl">本日ベスト</div>'
@@ -1525,8 +1526,8 @@ function renderHist() {
       '</div>';
   }
   // 今日のカード
-  var todayStr2 = new Date().toISOString().slice(0,10);
-  var todayGames = h.filter(function(g){ return g.date && g.date.slice(0,10) === todayStr2; });
+  var todayStr2 = localDateStr(new Date());
+  var todayGames = h.filter(function(g){ return g.date && localDateStr(new Date(g.date)) === todayStr2; });
   var tc = document.getElementById('today-card');
   if (tc) {
     if (todayGames.length > 0) {
