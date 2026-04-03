@@ -1773,6 +1773,10 @@ var impFile = document.getElementById('imp-file');
 if (impFile) {
   impFile.addEventListener('change', function(){ importData(this); });
 }
+// Service Worker 登録
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(function(){});
+}
 </script>
 </body>
 </html>
