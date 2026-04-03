@@ -916,7 +916,7 @@ function saveH(e) { try { var h=getH(); h.unshift(e); localStorage.setItem('dh',
 function openCfm() { document.getElementById('ocfm').classList.add('show'); }
 function closeCfm() { document.getElementById('ocfm').classList.remove('show'); }
 function delAll() { localStorage.removeItem('dh'); localStorage.removeItem('dh_totals'); closeCfm(); renderHist(); }
-function delOne(i) { var h=getH(); var rem=h.splice(i,1)[0]; localStorage.setItem('dh',JSON.stringify(h)); if(rem){ var t=getTotals(); t.games=Math.max(0,t.games-1); t.play_time=Math.max(0,t.play_time-(rem.duration||0)); var r=rem.rounds||[]; for(var j=0;j<r.length;j++) if(r[j]===180) t.c180=Math.max(0,t.c180-1); saveTotals(t); } renderHist(); }
+function delOne(i) { var h=getH(); var rem=h.splice(i,1)[0]; localStorage.setItem('dh',JSON.stringify(h)); if(rem){ var t=getTotals(); t.games=Math.max(0,t.games-1); t.play_time=Math.max(0,t.play_time-(rem.duration||0)); var r=rem.rounds||[]; for(var j=0;j<r.length;j++) if(r[j]===180) t.c180=Math.max(0,t.c180-1); if(rem.score>=t.best){ t.best=h.length?Math.max.apply(null,h.map(function(x){return x.score;})):0; } saveTotals(t); } renderHist(); }
 
 /* ============================================================
    ショートカットカスタマイズ

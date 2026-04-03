@@ -14,18 +14,18 @@ self.addEventListener('activate', function(e) {
   self.clients.claim();
 });
 
+// Network-first: オンライン時は常に最新版を取得してキャッシュ更新、オフライン時はキャッシュで動作
 self.addEventListener('fetch', function(e) {
   if (e.request.method !== 'GET') return;
   e.respondWith(
-    caches.match(e.request).then(function(cached) {
-      var net = fetch(e.request).then(function(res) {
-        if (res && res.ok) {
-          var clone = res.clone();
-          caches.open(CACHE).then(function(c) { c.put(e.request, clone); });
-        }
-        return res;
-      }).catch(function() { return cached; });
-      return cached || net;
+    fetch(e.request).then(function(res) {
+      if (res && res.ok) {
+        var clone = res.clone();
+        caches.open(CACHE).then(function(c) { c.put(e.request, clone); });
+      }
+      return res;
+    }).catch(function() {
+      return caches.match(e.request);
     })
   );
 });
