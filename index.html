@@ -1233,7 +1233,7 @@ function exportData() {
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
   a.href = url;
-  a.download = 'darts_history_' + new Date().toISOString().slice(0,10) + '.json';
+  a.download = 'darts_history_' + localDateStr(new Date()) + '.json';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
