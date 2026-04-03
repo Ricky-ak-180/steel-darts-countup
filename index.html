@@ -2153,44 +2153,43 @@ var _arrG = {
 var _arrInited = false;
 var _ARR_BASE_PTS = [40, 35, 25]; // ステージ0,1,2の基底点
 
-/* ステージシーケンスを構築（隣接ミスを含むリアルなアウトカムをランダムに選択） */
+/* ステージシーケンスを構築（スコアが0になるまで続ける = 1問 = 1チェックアウト完了） */
 function _buildArrStages(score) {
   if (!_getPath(score)) return [];
   var stages = [];
   var cur = score;
   var prevOutcome = null;
-  var MAX_STAGES = 3; // 最大3投（1ターン分）
+  var MAX_DARTS = 9; // 最大9投（3ターン分）で安全停止
 
-  for (var i = 0; i < MAX_STAGES; i++) {
+  for (var i = 0; i < MAX_DARTS; i++) {
     var p = _getPath(cur);
     if (!p) break;
     stages.push({ score: cur, path: p, prevOutcome: prevOutcome });
 
     var dart = p[0];
     var opts = _getMissOptions(dart, cur);
-    // 成功以外の選択肢（ミス）があるかチェック
-    var missOpts = opts.filter(function(o){ return o.type === 'miss'; });
     if (opts.length === 0) break;
 
+    var missOpts = opts.filter(function(o){ return o.type === 'miss'; });
+    var successOpt = opts.filter(function(o){ return o.type === 'success'; })[0];
     var pick;
-    if (missOpts.length === 0) {
-      pick = opts[0]; // 成功のみ
-    } else if (opts.length === 1) {
-      pick = opts[0];
+
+    // 最後の安全投: 強制的に成功させてチェックアウト完了へ
+    if (i >= MAX_DARTS - 1) {
+      pick = successOpt || opts[0];
+    } else if (missOpts.length === 0) {
+      pick = successOpt;
     } else {
-      // 成功:45%、ミス(複数均等):55% でランダム選択
+      // 成功40% ミス60% でランダム選択（ミス多めで練習になる）
       var r = Math.random();
-      if (r < 0.45) {
-        pick = opts.filter(function(o){ return o.type==='success'; })[0] || missOpts[0];
-      } else {
-        pick = missOpts[Math.floor(Math.random() * missOpts.length)];
-      }
+      pick = (r < 0.4 && successOpt) ? successOpt
+           : missOpts[Math.floor(Math.random() * missOpts.length)];
     }
 
     stages[i].nextOutcome = pick;
     prevOutcome = pick;
     cur = pick.newScore;
-    if (cur === 0) break; // チェックアウト完了
+    if (cur === 0) break; // チェックアウト完了 → 1問終了
   }
   return stages;
 }
