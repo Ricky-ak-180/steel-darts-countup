@@ -1484,7 +1484,7 @@ function renderHist() {
   }
   s3.style.gridTemplateColumns = 'repeat(2,1fr)';
   s3.innerHTML=
-    '<div class="sc3" style="position:relative;">'+(arrow30s?'<div style="position:absolute;top:6px;right:8px;font-size:13px;line-height:1;">'+arrow30s+'</div>':'')+'<div class="sv" style="color:var(--acc2);">'+avg30s+'</div><div class="sl">直近30G 平均</div></div>'+
+    '<div class="sc3" style="position:relative;">'+(arrow30s?'<div style="position:absolute;top:6px;right:8px;font-size:13px;line-height:1;">'+arrow30s+'</div>':'')+'<div class="sv">'+avg30s+'</div><div class="sl">直近30G 平均</div></div>'+
     '<div class="sc3" style="position:relative;">'+(avg30sp!==null&&avg30s>avg30sp?'<div style="position:absolute;top:6px;right:8px;font-size:13px;line-height:1;color:#ff6b35;font-weight:900;">▲</div>':avg30sp!==null&&avg30s<avg30sp?'<div style="position:absolute;top:6px;right:8px;font-size:13px;line-height:1;color:#4fc3f7;font-weight:900;">▼</div>':'')+'<div class="sv" style="color:#b47fff;font-size:30px;letter-spacing:0;">'+(avg30s?(avg30s/8).toFixed(2):'—')+'</div><div class="sl">直近30G 3ダーツ平均</div></div>';
   // 直近30G平均（1本化）
   var sl30=h.slice(0,30), s30=0;
