@@ -1431,7 +1431,7 @@ function renderHist() {
   // プロフィールカード
   var allDurSec = 0; for(var i=0;i<h.length;i++) allDurSec += (h[i].duration||0);
   var allDurH = Math.floor(allDurSec/3600), allDurM = Math.floor((allDurSec%3600)/60);
-  var allDurStr = allDurH > 0 ? allDurH+'h '+allDurM+'m' : allDurM+'m';
+  var allDurStr = allDurH > 0 ? allDurH+'時間'+allDurM+'分' : allDurM+'分';
   var bestRankLabel = rank(best);
   var rankColors = { 'S+': ['#ffd700','#000'], 'S': ['#e8ff47','#000'], 'A': ['#47ffb4','#000'], 'B': ['#4fc3f7','#000'], 'C': ['#ff6b35','#fff'], 'D': ['#6b6b88','#fff'] };
   var rc2 = rankColors[bestRankLabel] || ['#444','#fff'];
@@ -1446,9 +1446,9 @@ function renderHist() {
         '<div class="pcard-rank" style="background:'+rc2[0]+';color:'+rc2[1]+';">' + bestRankLabel + ' RANK</div>' +
         '<hr class="pcard-divider">' +
         '<div class="pcard-stats">' +
-          '<div class="pcard-stat"><div class="pcard-stat-val" style="color:var(--grn);font-size:22px;">' + allDurStr + '</div><div class="pcard-stat-lbl">累計プレイ時間</div></div>' +
-          '<div class="pcard-stat"><div class="pcard-stat-val" style="color:#ffd700;">×' + total180 + '</div><div class="pcard-stat-lbl">通算 180</div></div>' +
           '<div class="pcard-stat"><div class="pcard-stat-val" style="color:rgba(255,255,255,0.7);">' + h.length + '</div><div class="pcard-stat-lbl">Total Games</div></div>' +
+          '<div class="pcard-stat"><div class="pcard-stat-val" style="color:#ffd700;">×' + total180 + '</div><div class="pcard-stat-lbl">通算 180</div></div>' +
+          '<div class="pcard-stat"><div class="pcard-stat-val" style="color:var(--grn);font-size:22px;">' + allDurStr + '</div><div class="pcard-stat-lbl">Total Play Time</div></div>' +
         '</div>' +
       '</div>';
   }
