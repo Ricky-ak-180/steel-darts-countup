@@ -261,7 +261,9 @@ canvas.schart { width: 100%; height: 100%; }
 /* Profile card */
 .pcard { margin: 0 0 8px; padding: 20px 16px 16px; background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f0f1a 100%); border: 1px solid rgba(232,255,71,0.2); border-radius: 16px; position: relative; overflow: hidden; text-align: center; }
 .pcard::before { content: ''; position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(232,255,71,0.08) 0%, transparent 70%); pointer-events: none; }
-.pcard-brand { font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; }
+.pcard-brand { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.pcard-badge { font-family: 'Bebas Neue', cursive; font-size: 14px; letter-spacing: 2px; background: rgba(232,255,71,0.15); color: var(--acc); border: 1px solid rgba(232,255,71,0.3); border-radius: 20px; padding: 2px 12px; }
+.pcard-app { font-size: 8px; color: rgba(255,255,255,0.25); letter-spacing: 2px; text-transform: uppercase; }
 .pcard-score { font-family: 'Bebas Neue', cursive; font-size: 80px; line-height: 1; color: var(--acc); text-shadow: 0 0 40px rgba(232,255,71,0.5); letter-spacing: 2px; }
 .pcard-score-label { font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 3px; text-transform: uppercase; margin-top: 2px; margin-bottom: 6px; }
 .pcard-rank { display: inline-block; font-family: 'Bebas Neue', cursive; font-size: 15px; letter-spacing: 2px; padding: 3px 12px; border-radius: 20px; margin-bottom: 16px; }
@@ -274,7 +276,9 @@ canvas.schart { width: 100%; height: 100%; }
 /* Today card */
 .tcard { margin: 0 0 8px; padding: 14px 16px 14px; background: linear-gradient(145deg, #1a1a1a 0%, #141420 100%); border: 1px solid rgba(255,107,53,0.25); border-radius: 16px; position: relative; overflow: hidden; text-align: center; }
 .tcard::before { content: ''; position: absolute; top: -30px; right: -30px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(255,107,53,0.07) 0%, transparent 70%); pointer-events: none; }
-.tcard-brand { font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; }
+.tcard-brand { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.tcard-badge { font-family: 'Bebas Neue', cursive; font-size: 14px; letter-spacing: 2px; background: rgba(255,107,53,0.15); color: var(--acc2); border: 1px solid rgba(255,107,53,0.3); border-radius: 20px; padding: 2px 12px; }
+.tcard-date { font-size: 8px; color: rgba(255,255,255,0.25); letter-spacing: 1px; }
 .tcard-score { font-family: 'Bebas Neue', cursive; font-size: 64px; line-height: 1; color: var(--acc2); text-shadow: 0 0 30px rgba(255,107,53,0.4); letter-spacing: 2px; }
 .tcard-score-label { font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 3px; text-transform: uppercase; margin-top: 2px; margin-bottom: 6px; }
 .tcard-rank { display: inline-block; font-family: 'Bebas Neue', cursive; font-size: 13px; letter-spacing: 2px; padding: 2px 10px; border-radius: 20px; margin-bottom: 12px; }
@@ -1431,7 +1435,7 @@ function renderHist() {
     pc.style.display = 'block';
     pc.innerHTML =
       '<div class="pcard">' +
-        '<div class="pcard-brand">🎯 Steel Darts Countup — Player Stats</div>' +
+        '<div class="pcard-brand"><span class="pcard-badge">🏆 累計成績</span><span class="pcard-app">🎯 Steel Darts Countup</span></div>' +
         '<div class="pcard-score">' + best + '</div>' +
         '<div class="pcard-score-label">Personal Best</div>' +
         '<div class="pcard-rank" style="background:'+rc2[0]+';color:'+rc2[1]+';">' + bestRankLabel + ' RANK</div>' +
@@ -1462,7 +1466,7 @@ function renderHist() {
       var trc = rankColors[todayRankLabel] || ['#444','#fff'];
       tc.innerHTML =
         '<div class="tcard">' +
-          '<div class="tcard-brand">📅 Today — ' + todayStr2 + '</div>' +
+          '<div class="tcard-brand"><span class="tcard-badge">📅 今日の成績</span><span class="tcard-date">' + todayStr2 + '</span></div>' +
           '<div class="tcard-score">' + todayBest2 + '</div>' +
           '<div class="tcard-score-label">Today\'s Best</div>' +
           '<div class="tcard-rank" style="background:'+trc[0]+';color:'+trc[1]+';">' + todayRankLabel + ' RANK</div>' +
