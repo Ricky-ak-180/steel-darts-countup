@@ -56,12 +56,12 @@ body::before {
 .hide { display: none !important; }
 
 /* Round bar */
-.rbar { display: flex; align-items: center; gap: 6px; background: var(--sur); border: 1px solid var(--bdr); border-radius: 8px; padding: 4px 8px; }
+.rbar { display: flex; align-items: center; gap: 4px; background: var(--sur); border: 1px solid var(--bdr); border-radius: 8px; padding: 4px 6px; }
 .rlbl { font-size: 9px; color: var(--mut); letter-spacing: 1px; }
 .rnum { font-family: 'Bebas Neue', cursive; font-size: 14px; color: var(--txt); margin-top: 0; }
 .rnum em { font-size: 13px; color: var(--mut); font-style: normal; }
-.dots { display: flex; gap: 2px; flex-wrap: nowrap; }
-.dot { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--bdr); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: var(--mut); transition: all 0.3s; }
+.dots { display: flex; gap: 1px; flex-wrap: nowrap; }
+.dot { width: 15px; height: 15px; border-radius: 50%; border: 1px solid var(--bdr); display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: 700; color: var(--mut); transition: all 0.3s; }
 .dot.done { border-color: var(--acc); color: var(--acc); background: rgba(232,255,71,0.1); }
 .dot.now { border-color: var(--acc2); color: var(--acc2); background: rgba(255,107,53,0.15); animation: pd 1.5s infinite; }
 @keyframes pd { 0%,100%{box-shadow:0 0 0 0 rgba(255,107,53,0.4)}50%{box-shadow:0 0 0 5px transparent} }
@@ -208,7 +208,7 @@ body::before {
 .bpause.show { display: inline-block; }
 .bpause.paused { border-color: var(--acc2); color: var(--acc2); }
 .toast-final { position: fixed; top: -64px; left: 50%; transform: translateX(-50%); background: var(--acc2); color: #000; font-family: 'Bebas Neue', cursive; font-size: 20px; letter-spacing: 3px; padding: 12px 28px; border-radius: 32px; z-index: 600; transition: top 0.35s cubic-bezier(0.34,1.56,0.64,1); white-space: nowrap; box-shadow: 0 4px 24px rgba(255,107,53,0.5); pointer-events: none; }
-.toast-final.show { top: 20px; }
+.toast-final.show { top: calc(env(safe-area-inset-top, 20px) + 12px); }
 .practice-time { background: var(--sur); border: 1px solid var(--bdr); border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 0; }
 .practice-time .pt-val { font-family: 'Bebas Neue', cursive; font-size: 28px; color: var(--acc); letter-spacing: 2px; }
 .practice-time .pt-lbl { font-size: 9px; color: var(--mut); letter-spacing: 1px; margin-top: 2px; }
@@ -231,7 +231,7 @@ body::before {
 .chart-tab.on-avg { background: var(--acc2); color: #000; border-color: var(--acc2); }
 .chart-tab.on-3da { background: #b47fff; color: #000; border-color: #b47fff; }
 .chart-tab.on-time { background: var(--grn); color: #000; border-color: var(--grn); }
-.chart-canvas-wrap { position: relative; height: 96px; }
+.chart-canvas-wrap { position: relative; height: 80px; }
 canvas.schart { width: 100%; height: 100%; }
 
 /* History */
@@ -240,12 +240,12 @@ canvas.schart { width: 100%; height: 100%; }
 .bclr { background: transparent; border: 1px solid var(--bdr); color: var(--mut); border-radius: 8px; padding: 7px 12px; font-size: 11px; cursor: pointer; letter-spacing: 1px; }
 .bclr:hover { border-color: var(--red); color: var(--red); }
 .s3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; }
-.sc3 { background: var(--sur); border: 1px solid var(--bdr); border-radius: 14px; padding: 8px 6px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 66px; }
-.sc3 .sv { font-family: 'Bebas Neue', cursive; font-size: 30px; color: var(--acc); letter-spacing: 1px; line-height: 1; display: flex; align-items: center; justify-content: center; }
-.sc3 .sl { font-size: 10px; color: var(--mut); letter-spacing: 0.5px; margin-top: 2px; }
+.sc3 { background: var(--sur); border: 1px solid var(--bdr); border-radius: 12px; padding: 6px 4px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 58px; }
+.sc3 .sv { font-family: 'Bebas Neue', cursive; font-size: 26px; color: var(--acc); letter-spacing: 1px; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.sc3 .sl { font-size: 9px; color: var(--mut); letter-spacing: 0.5px; margin-top: 2px; }
 .a3 { display: grid; grid-template-columns: repeat(1,1fr); gap: 8px; }
-.ac { background: var(--sur); border: 1px solid var(--bdr); border-radius: 12px; padding: 8px 14px; text-align: center; }
-.ac .av { font-family: 'Bebas Neue', cursive; font-size: 36px; color: var(--acc2); letter-spacing: 2px; }
+.ac { background: var(--sur); border: 1px solid var(--bdr); border-radius: 12px; padding: 6px 14px; text-align: center; }
+.ac .av { font-family: 'Bebas Neue', cursive; font-size: 28px; color: var(--acc2); letter-spacing: 2px; }
 .ac .al { font-size: 9px; color: var(--mut); line-height: 1.4; margin-top: 2px; }
 /* ラウンド割合カード */
 .rrate-card { background: var(--sur); border: 1px solid var(--bdr); border-radius: 12px; padding: 8px 12px; }
