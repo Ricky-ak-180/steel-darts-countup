@@ -2043,7 +2043,10 @@ var _ARR_SCORES = (function(){
   ];
 })();
 
-var _ARR_DECOY_POOL = ["T20","T19","T18","T17","T16","T15","T14","T13","T12","T11","T10","T7","Bull","20","19","18","17","16"];
+// 中間ステージ（何点入れる？）の選択肢候補（値）
+var _ARR_VAL_POOL = ["60","57","54","51","48","45","42","39","50","20","19","18","17","16","25","36","33","30"];
+// フィニッシュステージ（ダブルは？）の選択肢候補
+var _ARR_FINISH_POOL = ["D20","D10","D18","D16","D12","D8","D4","D2","Bull","D17","D15","D19","D6","D14","D3","D5"];
 
 function _arrShuffle(a) {
   for (var i = a.length - 1; i > 0; i--) {
@@ -2100,8 +2103,8 @@ function _getMissOptions(dart, cur) {
     if (ns < 0) return;
     if (ns === 0 || _getPath(ns)) {
       var lbl = type === 'success'
-        ? dart + '　入った！  +' + val
-        : dart + ' → ' + missTarget + '　刺さった！  −' + val;
+        ? val + '　入った！'
+        : val + '　に外れた！';
       opts.push({ type: type, val: val, newScore: ns, dart: dart, missTarget: missTarget, label: lbl });
     }
   }
@@ -2251,16 +2254,20 @@ function _arrShowStage() {
   var dartsLeft = st.path.length; // このスコアを仕上げるのに必要な本数
   var isFinish = dartsLeft === 1; // ダブル or Bull でフィニッシュ
   var qLabel = isFinish ? 'フィニッシュ！ダブルは？' :
-               _arrG.stgIdx === 0 ? '1本目の狙いは？' : stageName + 'の狙いは？';
+               _arrG.stgIdx === 0 ? '何点入れる？' : '次は何点？';
 
   // HUD更新
   document.getElementById('arr-hud-q').textContent = '問題 ' + (_arrG.qIdx+1) + ' / 10';
   document.getElementById('arr-hud-stage').textContent = stageName;
   document.getElementById('arr-hud-score').textContent = _arrG.totalScore;
 
-  // 4択を事前生成
-  var decoys = _arrShuffle(_ARR_DECOY_POOL.filter(function(d){ return d !== correct; })).slice(0, 3);
-  _arrG.choices = _arrShuffle([correct].concat(decoys));
+  // 4択を事前生成（中間：値, フィニッシュ：ダブル記号）
+  var isFinish = dartsLeft === 1;
+  var correctChoice = isFinish ? correct : String(_dartVal(correct));
+  var pool = isFinish ? _ARR_FINISH_POOL : _ARR_VAL_POOL;
+  var decoys = _arrShuffle(pool.filter(function(d){ return d !== correctChoice; })).slice(0, 3);
+  _arrG.choices = _arrShuffle([correctChoice].concat(decoys));
+  _arrG.isFinish = isFinish;
   var choicesEl = document.getElementById('arr-choices');
   choicesEl.innerHTML = '';
   _arrG.choices.forEach(function(val, i) {
@@ -2341,7 +2348,8 @@ function chooseArr(idx) {
   var elapsed = Date.now() - _arrG.stageStart;
   var isTimeout = idx < 0;
   var st = _arrG.stages[_arrG.stgIdx];
-  var correct = st.path[0];
+  var correctDart = st.path[0];
+  var correct = _arrG.isFinish ? correctDart : String(_dartVal(correctDart));
   var chosen = isTimeout ? null : _arrG.choices[idx];
   var isCorrect = !isTimeout && chosen === correct;
 
@@ -2355,7 +2363,7 @@ function chooseArr(idx) {
   if (isCorrect) _arrG.correctCt++;
   _arrG.log.push({ q: _arrG.qIdx, qScore: _arrG.qList[_arrG.qIdx],
     stgIdx: _arrG.stgIdx, stageScore: st.score,
-    correct: correct, chosen: chosen,
+    correct: correctDart, correctDisplay: correct, chosen: chosen,
     isCorrect: isCorrect, isTimeout: isTimeout,
     prevOutcome: st.prevOutcome || null, pts: pts });
 
@@ -2382,10 +2390,10 @@ function chooseArr(idx) {
     resEl.textContent = pts > 0 ? '◯  +' + pts + ' pt' : '◯';
   } else if (isTimeout) {
     resEl.className = 'arr-result arr-ng';
-    resEl.textContent = '⏱  正解は ' + correct;
+    resEl.textContent = '⏱  正解は ' + correct + (_arrG.isFinish ? '' : ' (' + correctDart + ')');
   } else {
     resEl.className = 'arr-result arr-ng';
-    resEl.textContent = '✕  正解は ' + correct;
+    resEl.textContent = '✕  正解は ' + correct + (_arrG.isFinish ? '' : ' (' + correctDart + ')');
   }
 
   // スコアHUD更新
