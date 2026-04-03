@@ -374,19 +374,33 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-stats { display:flex; align-items:center; justify-content:center; gap:12px; padding:2px 12px 8px; font-size:13px; color:var(--mut); }
 #arr-stat-text { font-weight:700; color:var(--fg); }
 #arr-stat-pct { color:var(--acc); font-weight:700; font-size:15px; min-width:44px; text-align:right; }
-.arr-card { margin:8px 12px 20px; background:var(--card); border:1px solid var(--bd); border-radius:16px; padding:28px 20px 24px; display:flex; flex-direction:column; align-items:center; gap:16px; }
-.arr-remain-label { font-size:12px; color:var(--mut); letter-spacing:2px; }
-.arr-score { font-family:'Bebas Neue',cursive; font-size:88px; color:var(--acc); letter-spacing:4px; line-height:1; }
-.arr-answer { display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; min-height:40px; }
-.arr-answer.hide { display:none; }
-.arr-dart { font-family:'Bebas Neue',cursive; font-size:26px; color:var(--fg); background:var(--bg); border:1px solid var(--bd); border-radius:8px; padding:4px 12px; }
-.arr-arrow { color:var(--mut); font-size:18px; }
-.arr-btn-row { display:flex; gap:10px; width:100%; }
-.arr-btn-row.hide { display:none; }
-.arr-btn { flex:1; padding:14px 0; border:none; border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; }
-.arr-reveal { background:var(--acc); color:#000; }
-.arr-hit { background:#1a3a1a; color:#66bb6a; border:1px solid #388e3c; font-size:14px; }
-.arr-miss { background:#3a1a1a; color:#ef5350; border:1px solid #c62828; font-size:14px; }
+.arr-card { margin:8px 12px 20px; background:var(--card); border:1px solid var(--bd); border-radius:16px; padding:20px 16px 20px; display:flex; flex-direction:column; align-items:center; gap:14px; }
+.arr-header { display:flex; flex-direction:column; align-items:center; gap:2px; }
+.arr-remain-label { font-size:11px; color:var(--mut); letter-spacing:2px; }
+.arr-score { font-family:'Bebas Neue',cursive; font-size:80px; color:var(--acc); letter-spacing:4px; line-height:1; }
+.arr-darts { font-size:13px; color:var(--mut); letter-spacing:1px; }
+.arr-question { font-size:14px; color:var(--fg); font-weight:600; letter-spacing:0.5px; }
+.arr-choices { display:grid; grid-template-columns:1fr 1fr; gap:8px; width:100%; }
+.arr-choice { padding:16px 0; border:1px solid var(--bd); background:var(--bg); border-radius:10px; font-family:'Bebas Neue',cursive; font-size:22px; color:var(--fg); cursor:pointer; letter-spacing:1px; transition:opacity 0.15s; }
+.arr-choice-correct { background:#1a3a1a !important; color:#66bb6a !important; border-color:#388e3c !important; }
+.arr-choice-wrong { background:#3a1a1a !important; color:#ef5350 !important; border-color:#c62828 !important; }
+.arr-result { width:100%; display:flex; flex-direction:column; gap:8px; }
+.arr-result.hide { display:none; }
+.arr-result-icon { font-size:17px; font-weight:700; text-align:center; }
+.arr-ok { color:#66bb6a; }
+.arr-ng { color:#ef5350; }
+.arr-path-label { font-size:10px; color:var(--mut); letter-spacing:1px; text-align:center; }
+.arr-path-row { display:flex; align-items:center; gap:5px; flex-wrap:wrap; justify-content:center; }
+.arr-correct-label { font-size:12px; color:var(--mut); text-align:center; }
+.arr-dart { font-family:'Bebas Neue',cursive; font-size:22px; color:var(--fg); background:var(--bg); border:1px solid var(--bd); border-radius:7px; padding:3px 10px; display:inline-block; }
+.arr-dart-sm { font-size:18px; padding:2px 7px; }
+.arr-arrow { color:var(--mut); font-size:15px; }
+.arr-miss-box { background:rgba(255,255,255,0.04); border:1px solid var(--bd); border-radius:8px; padding:8px 12px; display:flex; flex-direction:column; gap:4px; }
+.arr-miss-lbl { font-size:10px; color:var(--mut); letter-spacing:1px; }
+.arr-miss-rem { display:flex; align-items:center; gap:5px; flex-wrap:wrap; font-size:12px; color:var(--fg); }
+.arr-next-row { display:flex; width:100%; }
+.arr-next-row.hide { display:none; }
+.arr-next { background:var(--acc); color:#000; width:100%; padding:13px; font-size:15px; font-weight:700; border:none; border-radius:12px; cursor:pointer; letter-spacing:0.5px; }
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYXJ1LZ2J1"></script>
@@ -567,15 +581,16 @@ canvas.schart { width: 100%; height: 100%; }
       <span>正解</span><span id="arr-stat-text">0 / 0</span><span id="arr-stat-pct"></span>
     </div>
     <div class="arr-card">
-      <div class="arr-remain-label">REMAINING</div>
-      <div class="arr-score" id="arr-score">-</div>
-      <div class="arr-answer hide" id="arr-answer"></div>
-      <div class="arr-btn-row" id="arr-reveal-row">
-        <button class="arr-btn arr-reveal" data-fn="revealArr">答えを見る</button>
+      <div class="arr-header">
+        <div class="arr-remain-label">REMAINING</div>
+        <div class="arr-score" id="arr-score">-</div>
+        <div class="arr-darts" id="arr-darts"></div>
       </div>
-      <div class="arr-btn-row hide" id="arr-judge-row">
-        <button class="arr-btn arr-hit" data-fn="recordArr" data-arg="1">◯ 覚えてた</button>
-        <button class="arr-btn arr-miss" data-fn="recordArr" data-arg="0">✕ 覚えてなかった</button>
+      <div class="arr-question">1本目の狙いは？</div>
+      <div class="arr-choices" id="arr-choices"></div>
+      <div class="arr-result hide" id="arr-result"></div>
+      <div class="arr-next-row hide" id="arr-next-row">
+        <button class="arr-next" data-fn="nextArr">次の問題 →</button>
       </div>
     </div>
   </div>
@@ -1926,15 +1941,17 @@ var CHECKOUT = {
 var _ARR_SCORES = (function(){
   var all = Object.keys(CHECKOUT).map(Number);
   return [
-    all.filter(function(n){ return n <= 100; }),   // 0: 初級
-    all.filter(function(n){ return n >= 101 && n <= 130; }), // 1: 中級
-    all.filter(function(n){ return n >= 131; }),   // 2: 上級
-    all                                            // 3: 全部
+    all.filter(function(n){ return n <= 100; }),
+    all.filter(function(n){ return n >= 101 && n <= 130; }),
+    all.filter(function(n){ return n >= 131; }),
+    all
   ];
 })();
 
-var _arr = { mode: 0, queue: [], hit: 0, total: 0, current: null, revealed: false };
+var _arr = { mode: 0, queue: [], hit: 0, total: 0, current: null, choices: [] };
 var _arrInited = false;
+
+var _ARR_DECOY_POOL = ["T20","T19","T18","T17","T16","T15","T14","T13","T12","T11","T10","T7","Bull","20","19","18","17","16"];
 
 function _arrShuffle(a) {
   for (var i = a.length - 1; i > 0; i--) {
@@ -1944,43 +1961,131 @@ function _arrShuffle(a) {
   return a;
 }
 
+// ダーツ記号の得点
+function _dartVal(s) {
+  if (s === "Bull") return 50;
+  if (s[0] === "T") return parseInt(s.slice(1)) * 3;
+  if (s[0] === "D") return parseInt(s.slice(1)) * 2;
+  return parseInt(s) || 0;
+}
+
+// 外れてシングルに当たった場合の得点
+function _missVal(s) {
+  if (s === "Bull") return 25;       // 外ブル
+  if (s[0] === "T") return parseInt(s.slice(1));
+  if (s[0] === "D") return parseInt(s.slice(1));
+  return 0;                          // シングル完全ミス
+}
+
+function _missLabel(s) {
+  if (s === "Bull") return "外ブル(25)";
+  if (s[0] === "T") return "S" + s.slice(1);
+  if (s[0] === "D") return "S" + s.slice(1);
+  return "0(完全ミス)";
+}
+
+// スコアから最短チェックアウトパスを返す（≤40の偶数にも対応）
+function _getPath(n) {
+  if (CHECKOUT[n]) return CHECKOUT[n];
+  if (n === 50) return ["Bull"];
+  if (n > 0 && n <= 40 && n % 2 === 0) return ["D" + (n / 2)];
+  return null;
+}
+
 function setArrMode(mode) {
   _arr.mode = mode; _arr.hit = 0; _arr.total = 0;
   document.querySelectorAll('.arr-mode').forEach(function(el, i){
     el.className = 'arr-mode' + (i === mode ? ' on' : '');
   });
   _arr.queue = _arrShuffle(_ARR_SCORES[mode].slice());
+  updateArrStats();
   nextArr();
 }
 
 function nextArr() {
   if (_arr.queue.length === 0) _arr.queue = _arrShuffle(_ARR_SCORES[_arr.mode].slice());
   _arr.current = _arr.queue.pop();
-  _arr.revealed = false;
-  document.getElementById('arr-score').textContent = _arr.current;
-  var ans = document.getElementById('arr-answer');
-  ans.className = 'arr-answer hide'; ans.innerHTML = '';
-  document.getElementById('arr-reveal-row').className = 'arr-btn-row';
-  document.getElementById('arr-judge-row').className = 'arr-btn-row hide';
-  updateArrStats();
-}
-
-function revealArr() {
-  if (_arr.revealed) return;
-  _arr.revealed = true;
   var path = CHECKOUT[_arr.current];
-  var el = document.getElementById('arr-answer');
-  el.innerHTML = path.map(function(s){ return '<span class="arr-dart">' + s + '</span>'; }).join('<span class="arr-arrow">→</span>');
-  el.className = 'arr-answer';
-  document.getElementById('arr-reveal-row').className = 'arr-btn-row hide';
-  document.getElementById('arr-judge-row').className = 'arr-btn-row';
+  var correct = path[0];
+
+  // デコイ生成（正解以外からランダムに3つ）
+  var decoys = _arrShuffle(_ARR_DECOY_POOL.filter(function(d){ return d !== correct; })).slice(0, 3);
+  _arr.choices = _arrShuffle([correct].concat(decoys));
+
+  document.getElementById('arr-score').textContent = _arr.current;
+  document.getElementById('arr-darts').textContent = path.length + '本残り';
+  document.getElementById('arr-result').className = 'arr-result hide';
+  document.getElementById('arr-result').innerHTML = '';
+  document.getElementById('arr-next-row').className = 'arr-next-row hide';
+
+  // 選択肢ボタンを生成
+  var choicesEl = document.getElementById('arr-choices');
+  choicesEl.innerHTML = '';
+  _arr.choices.forEach(function(val, i) {
+    var btn = document.createElement('button');
+    btn.className = 'arr-choice';
+    btn.textContent = val;
+    btn.setAttribute('data-fn', 'chooseArr');
+    btn.setAttribute('data-arg', String(i));
+    btn.setAttribute('data-val', val);
+    choicesEl.appendChild(btn);
+  });
 }
 
-function recordArr(hit) {
+function chooseArr(idx) {
+  var chosen = _arr.choices[idx];
+  var score = _arr.current;
+  var path = CHECKOUT[score];
+  var correct = path[0];
+  var isCorrect = chosen === correct;
+
   _arr.total++;
-  if (hit) _arr.hit++;
+  if (isCorrect) _arr.hit++;
   updateArrStats();
-  nextArr();
+
+  // 選択肢ボタンの色変え＆無効化
+  document.getElementById('arr-choices').querySelectorAll('.arr-choice').forEach(function(btn) {
+    btn.setAttribute('data-fn', '');
+    var v = btn.getAttribute('data-val');
+    if (v === correct) btn.className = 'arr-choice arr-choice-correct';
+    else if (v === chosen) btn.className = 'arr-choice arr-choice-wrong';
+    else btn.style.opacity = '0.35';
+  });
+
+  // 結果HTML生成
+  var html = '<div class="arr-result-icon ' + (isCorrect ? 'arr-ok' : 'arr-ng') + '">' +
+    (isCorrect ? '◯ 正解！' : '✕ 不正解') + '</div>';
+  if (!isCorrect) {
+    html += '<div class="arr-correct-label">正解は <span class="arr-dart arr-dart-sm">' + correct + '</span></div>';
+  }
+  html += '<div class="arr-path-label">アレンジ</div>';
+  html += '<div class="arr-path-row">' +
+    path.map(function(s){ return '<span class="arr-dart">' + s + '</span>'; })
+        .join('<span class="arr-arrow">→</span>') +
+    '</div>';
+
+  // ミスシナリオ（1本目が外れてシングルに当たった場合）
+  var mv = _missVal(path[0]);
+  var dartsLeft = path.length - 1;
+  if (mv > 0 && dartsLeft > 0) {
+    var newScore = score - mv;
+    var missPath = _getPath(newScore);
+    html += '<div class="arr-miss-box">';
+    html += '<div class="arr-miss-lbl">外れて ' + _missLabel(path[0]) + ' なら</div>';
+    if (missPath && missPath.length <= dartsLeft) {
+      html += '<div class="arr-miss-rem"><span style="color:var(--mut)">残り' + newScore + '、' + dartsLeft + '本</span><span class="arr-arrow">→</span>' +
+        missPath.map(function(s){ return '<span class="arr-dart arr-dart-sm">' + s + '</span>'; })
+                .join('<span class="arr-arrow">→</span>') +
+        '</div>';
+    } else {
+      html += '<div class="arr-miss-rem" style="color:var(--mut)">残り' + newScore + '（アレンジ要確認）</div>';
+    }
+    html += '</div>';
+  }
+
+  document.getElementById('arr-result').innerHTML = html;
+  document.getElementById('arr-result').className = 'arr-result';
+  document.getElementById('arr-next-row').className = 'arr-next-row';
 }
 
 function updateArrStats() {
@@ -2002,8 +2107,8 @@ var _fns = { kp: kp, kd: kd, doOk: doOk, commit: commit,
   togglePause: togglePause,
   toggleSound: toggleSound,
   setArrMode: setArrMode,
-  revealArr: revealArr,
-  recordArr: recordArr
+  chooseArr: chooseArr,
+  nextArr: nextArr
 };
 
 function _exec(el) {
