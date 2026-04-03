@@ -920,6 +920,8 @@ function resetState() {
   var ub = document.getElementById('bundo');
   if (ub) ub.className = 'bundo';
   updDisp(); drawDots();
+  var rp = document.getElementById('round-popup');
+  if (rp) rp.innerHTML = '';
   var pb = document.getElementById('pace-bar');
   if (pb) pb.style.display = 'none';
   stopTimer();
