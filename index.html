@@ -829,7 +829,8 @@ function updatePace() {
 /* Result */
 function showResult() {
   var h = getH();
-  var pb = 0; for (var i=0;i<h.length;i++) if(h[i].score>pb) pb=h[i].score;
+  var pb = getTotals().best || 0;
+  for (var i=0;i<h.length;i++) if(h[i].score>pb) pb=h[i].score;
   var isPB = g.total > pb;
   // 本日のベスト判定（保存前に今日のスコアを取得）
   var todayStr = localDateStr(new Date());
@@ -886,6 +887,9 @@ function showResult() {
   }
   var em = Math.floor(elapsed/60), es = elapsed%60;
   timeEl.textContent = 'GAME TIME: ' + em + ':' + (es<10?'0':'') + es;
+  // 180フラッシュを閉じてから結果画面を表示
+  var f180 = document.getElementById('flash-180');
+  if (f180) f180.classList.remove('show');
   if (isPB) setTimeout(launchConfetti, 300);
   document.getElementById('ovr').classList.add('show');
 }
