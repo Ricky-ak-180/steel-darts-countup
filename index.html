@@ -439,6 +439,25 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-finish-btns { display:flex; flex-direction:column; gap:8px; width:100%; }
 .arr-retry-btn { background:var(--acc); color:#000; border:none; border-radius:12px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; width:100%; }
 .arr-back-btn { background:transparent; color:var(--mut); border:1px solid var(--bd); border-radius:12px; padding:12px; font-size:14px; cursor:pointer; width:100%; }
+/* 答え合わせ */
+.arr-review { width:100%; }
+.arr-review-toggle { font-size:11px; color:var(--mut); letter-spacing:2px; text-align:center; padding:4px 0 8px; cursor:pointer; user-select:none; }
+.arr-review-body { display:none; flex-direction:column; gap:8px; }
+.arr-review-body.open { display:flex; }
+.arr-review-q { background:var(--bg); border:1px solid var(--bd); border-radius:10px; padding:10px 12px; }
+.arr-review-q-hdr { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+.arr-review-q-num { font-family:'Bebas Neue',cursive; font-size:18px; color:var(--acc); }
+.arr-review-q-path { font-size:11px; color:var(--mut); }
+.arr-review-stage { display:flex; align-items:center; gap:6px; font-size:12px; padding:4px 0; border-top:1px solid var(--bd); flex-wrap:wrap; }
+/* 履歴（セットアップ画面） */
+.arr-hist-wrap { margin:0 12px 16px; }
+.arr-hist-hdr { font-size:10px; color:var(--mut); letter-spacing:2px; padding:4px 2px 6px; }
+.arr-hist-list { display:flex; flex-direction:column; gap:4px; }
+.arr-hist-row { display:flex; justify-content:space-between; align-items:center; font-size:12px; padding:7px 10px; background:var(--card); border:1px solid var(--bd); border-radius:8px; }
+.arr-hist-left { display:flex; gap:8px; align-items:center; color:var(--mut); }
+.arr-hist-grade { font-family:'Bebas Neue',cursive; font-size:16px; }
+.arr-hist-right { display:flex; align-items:baseline; gap:4px; }
+.arr-hist-score { font-family:'Bebas Neue',cursive; font-size:16px; color:var(--fg); }
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYXJ1LZ2J1"></script>
@@ -629,6 +648,11 @@ canvas.schart { width: 100%; height: 100%; }
         <div class="arr-best-disp" id="arr-best-disp"></div>
       </div>
     </div>
+    <!-- 履歴 -->
+    <div class="arr-hist-wrap" id="arr-hist-wrap">
+      <div class="arr-hist-hdr">HISTORY</div>
+      <div class="arr-hist-list" id="arr-hist-list"></div>
+    </div>
     <!-- プレイ中HUD -->
     <div class="arr-hud hide" id="arr-hud">
       <div class="arr-hud-left">
@@ -658,6 +682,7 @@ canvas.schart { width: 100%; height: 100%; }
         <div class="arr-score-final-max">/ 1000</div>
       </div>
       <div class="arr-finish-stats" id="arr-finish-stats"></div>
+      <div class="arr-review" id="arr-review"></div>
       <div class="arr-finish-btns">
         <button class="arr-retry-btn" data-fn="startArrSession">もう一度</button>
         <button class="arr-back-btn" data-fn="goArrSetup">設定に戻る</button>
@@ -2078,7 +2103,8 @@ var _arrG = {
   maxScore: 0,      // 正規化用：実際に出せる最大点数
   correctCt: 0,
   totalStages: 0,
-  totalTimeMs: 0
+  totalTimeMs: 0,
+  log: []
 };
 var _arrInited = false;
 var _ARR_BASE_PTS = [40, 35, 25]; // ステージ0,1,2の基底点
@@ -2138,8 +2164,10 @@ function startArrSession() {
   _arrG.qIdx = 0;
   _arrG.totalScore = 0; _arrG.maxScore = 0;
   _arrG.correctCt = 0; _arrG.totalStages = 0; _arrG.totalTimeMs = 0;
+  _arrG.log = [];
 
   document.getElementById('arr-setup').style.display = 'none';
+  document.getElementById('arr-hist-wrap').style.display = 'none';
   document.getElementById('arr-finish').className = 'arr-finish hide';
   document.getElementById('arr-hud').className = 'arr-hud';
   document.getElementById('arr-card').className = 'arr-card';
@@ -2150,10 +2178,12 @@ function startArrSession() {
 function goArrSetup() {
   _clearArrTimer();
   document.getElementById('arr-setup').style.display = '';
+  document.getElementById('arr-hist-wrap').style.display = '';
   document.getElementById('arr-hud').className = 'arr-hud hide';
   document.getElementById('arr-card').className = 'arr-card hide';
   document.getElementById('arr-finish').className = 'arr-finish hide';
   _renderArrBest();
+  _renderArrHist();
 }
 
 /* 次の問題へ */
@@ -2184,32 +2214,7 @@ function _arrShowStage() {
   document.getElementById('arr-hud-stage').textContent = stageName;
   document.getElementById('arr-hud-score').textContent = _arrG.totalScore;
 
-  // シナリオ表示
-  var scenEl = document.getElementById('arr-scenario');
-  if (_arrG.stgIdx === 0) {
-    // ステージ0：残りスコアを大きく
-    scenEl.innerHTML =
-      '<span class="arr-remaining">' + st.score + '</span>' +
-      '<span class="arr-darts-lbl">' + st.darts + '本残り</span>' +
-      '<span class="arr-q-label">' + qLabel + '</span>';
-  } else {
-    // ステージ1+：前の投結果バッジ → 残りスコア
-    var pd = st.prevDart, pt = st.prevType;
-    var scored = pt === 'success' ? _dartVal(pd) : _missVal(pd);
-    var badgeClass = pt === 'success' ? 'success' : 'miss';
-    var badgeText = pt === 'success'
-      ? pd + '  入った！  +' + scored
-      : pd + '  外れて ' + _missLabel(pd) + '  −' + scored;
-    scenEl.innerHTML =
-      '<div class="arr-dart-result">' +
-        '<div class="arr-dart-result-badge ' + badgeClass + '">' + badgeText + '</div>' +
-        '<div class="arr-dart-result-score">' + st.score + '</div>' +
-        '<span class="arr-darts-lbl">' + st.darts + '本残り</span>' +
-      '</div>' +
-      '<span class="arr-q-label" style="margin-top:4px">' + qLabel + '</span>';
-  }
-
-  // 4択生成
+  // 4択を事前生成
   var decoys = _arrShuffle(_ARR_DECOY_POOL.filter(function(d){ return d !== correct; })).slice(0, 3);
   _arrG.choices = _arrShuffle([correct].concat(decoys));
   var choicesEl = document.getElementById('arr-choices');
@@ -2223,14 +2228,51 @@ function _arrShowStage() {
     btn.setAttribute('data-val', val);
     choicesEl.appendChild(btn);
   });
-
   document.getElementById('arr-result').className = 'arr-result hide';
   document.getElementById('arr-result').textContent = '';
   document.getElementById('arr-next-row').className = 'arr-next-row hide';
 
-  // タイマー開始（5秒）
-  _arrG.stageStart = Date.now();
-  _startArrTimer();
+  // シナリオ表示
+  var scenEl = document.getElementById('arr-scenario');
+  if (_arrG.stgIdx === 0) {
+    // ステージ0：即表示
+    scenEl.innerHTML =
+      '<span class="arr-remaining">' + st.score + '</span>' +
+      '<span class="arr-darts-lbl">' + st.darts + '本残り</span>' +
+      '<span class="arr-q-label">' + qLabel + '</span>';
+    choicesEl.style.display = '';
+    document.getElementById('arr-timer-bar').style.width = '100%';
+    _arrG.stageStart = Date.now();
+    _startArrTimer();
+  } else {
+    // ステージ1+：まず「どこに刺さったか」を見せてから、次の問いへ
+    var pd = st.prevDart, pt = st.prevType;
+    var scored = pt === 'success' ? _dartVal(pd) : _missVal(pd);
+    var badgeClass = pt === 'success' ? 'success' : 'miss';
+    var revealText = pt === 'success'
+      ? pd + '　入った！  +' + scored
+      : pd + ' → ' + _missLabel(pd) + '　刺さった！  −' + scored;
+    var badgeHtml = '<div class="arr-dart-result">' +
+      '<div class="arr-dart-result-badge ' + badgeClass + '" style="font-size:15px;padding:9px 18px">' + revealText + '</div>' +
+      '<div class="arr-dart-result-score">' + st.score + '</div>' +
+      '<span class="arr-darts-lbl">' + st.darts + '本残り</span>' +
+      '</div>';
+
+    // フェーズ1: 刺さった場所を見せる（選択肢なし）
+    scenEl.innerHTML = badgeHtml;
+    choicesEl.style.display = 'none';
+    document.getElementById('arr-timer-bar').style.width = '0%';
+
+    // フェーズ2: 800ms後に問いと選択肢を表示してタイマー開始
+    _arrG.advTimeout = setTimeout(function() {
+      _arrG.advTimeout = null;
+      scenEl.innerHTML = badgeHtml +
+        '<span class="arr-q-label" style="margin-top:4px">' + qLabel + '</span>';
+      choicesEl.style.display = '';
+      _arrG.stageStart = Date.now();
+      _startArrTimer();
+    }, 800);
+  }
 }
 
 /* タイマー（5秒） */
@@ -2270,6 +2312,11 @@ function chooseArr(idx) {
   _arrG.totalStages++;
   _arrG.totalTimeMs += elapsed;
   if (isCorrect) _arrG.correctCt++;
+  _arrG.log.push({ q: _arrG.qIdx, qScore: _arrG.qList[_arrG.qIdx],
+    stgIdx: _arrG.stgIdx, stageScore: st.score,
+    correct: correct, chosen: chosen,
+    isCorrect: isCorrect, isTimeout: isTimeout,
+    prevDart: st.prevDart, prevType: st.prevType, pts: pts });
 
   // タイマーバーを即クリア
   document.getElementById('arr-timer-bar').style.width = '0%';
@@ -2365,21 +2412,101 @@ function _arrFinish() {
   if (isNewBest) shtml += '<div class="arr-stat-row"><span style="color:var(--acc);font-weight:700">🏆 ベスト更新！</span><span></span></div>';
   document.getElementById('arr-finish-stats').innerHTML = shtml;
 
+  // 履歴保存
+  var hist = _arrGetHistory();
+  hist.unshift({ date: new Date().toISOString(), mode: _arrG.mode, score: score,
+    grade: grade, correct: _arrG.correctCt, total: _arrG.totalStages });
+  if (hist.length > 30) hist.length = 30;
+  try { localStorage.setItem('arr_history', JSON.stringify(hist)); } catch(e) {}
+
+  // 答え合わせ
+  _renderArrReview();
+
   document.getElementById('arr-hud').className = 'arr-hud hide';
   document.getElementById('arr-card').className = 'arr-card hide';
   document.getElementById('arr-finish').className = 'arr-finish';
 }
 
+function _renderArrReview() {
+  var modeNames = ['初級','中級','上級','全部'];
+  var html = '<div class="arr-review-toggle" onclick="var b=document.getElementById(\'arr-review-body\');b.classList.toggle(\'open\');this.textContent=b.classList.contains(\'open\')?\'答え合わせ ▴\':\'答え合わせ ▾\'">答え合わせ ▾</div>';
+  html += '<div class="arr-review-body" id="arr-review-body">';
+  var curQ = -1;
+  for (var li = 0; li < _arrG.log.length; li++) {
+    var le = _arrG.log[li];
+    if (le.q !== curQ) {
+      if (curQ !== -1) html += '</div></div>';
+      curQ = le.q;
+      var fullPath = (CHECKOUT[le.qScore] || []).join(' → ');
+      html += '<div class="arr-review-q">';
+      html += '<div class="arr-review-q-hdr">';
+      html += '<span class="arr-review-q-num">Q' + (le.q+1) + '  ' + le.qScore + '</span>';
+      html += '<span class="arr-review-q-path">' + fullPath + '</span>';
+      html += '</div><div>';
+    }
+    var stgNames = ['1本目','2本目','3本目'];
+    var sn = stgNames[le.stgIdx] || (le.stgIdx+1+'本目');
+    var icon = le.isCorrect ? '✓' : (le.isTimeout ? '⏱' : '✗');
+    var ic = le.isCorrect ? '#66bb6a' : '#ef5350';
+    var ctx = '';
+    if (le.prevDart && le.prevType) {
+      var lbl = le.prevType === 'success' ? le.prevDart+'→入' : le.prevDart+'→'+_missLabel(le.prevDart);
+      ctx = '<span style="font-size:10px;color:var(--mut);margin-right:4px">['+lbl+']</span>';
+    }
+    var ans = '';
+    if (le.isCorrect) {
+      ans = '<span style="color:#66bb6a;font-weight:700">'+le.correct+'</span>';
+      if (le.pts > 0) ans += '<span style="color:var(--mut);font-size:10px"> +'+le.pts+'pt</span>';
+    } else if (le.chosen) {
+      ans = '<span style="color:#ef5350;text-decoration:line-through">'+le.chosen+'</span><span style="color:#66bb6a;font-weight:700"> → '+le.correct+'</span>';
+    } else {
+      ans = '<span style="color:#ef5350">⏱</span><span style="color:#66bb6a;font-weight:700"> → '+le.correct+'</span>';
+    }
+    html += '<div class="arr-review-stage" style="'+(le.stgIdx===0?'':'border-top:1px solid var(--bd)')+'">';
+    html += '<span style="color:'+ic+';min-width:14px">'+icon+'</span>';
+    html += '<span style="color:var(--mut);min-width:32px">'+sn+'</span>';
+    html += ctx + ans;
+    html += '</div>';
+  }
+  if (curQ !== -1) html += '</div></div>';
+  html += '</div>';
+  document.getElementById('arr-review').innerHTML = html;
+}
+
 function _arrGetBests() {
   try { return JSON.parse(localStorage.getItem('arr_best') || '[0,0,0,0]'); } catch(e) { return [0,0,0,0]; }
+}
+function _arrGetHistory() {
+  try { return JSON.parse(localStorage.getItem('arr_history') || '[]'); } catch(e) { return []; }
 }
 function _renderArrBest() {
   var b = _arrGetBests()[_arrG.mode];
   var el = document.getElementById('arr-best-disp');
   if (el) el.textContent = b > 0 ? 'ベスト: ' + b + ' pt' : '';
 }
+function _renderArrHist() {
+  var el = document.getElementById('arr-hist-list');
+  if (!el) return;
+  var hist = _arrGetHistory();
+  if (hist.length === 0) { el.innerHTML = '<div style="font-size:12px;color:var(--mut);text-align:center;padding:8px">まだ記録がありません</div>'; return; }
+  var modeNames = ['初級','中級','上級','全部'];
+  var gradeColors = { S:'#e8ff47', A:'#4fc3f7', B:'#47ffb4', C:'#ff6b35', D:'var(--mut)' };
+  var html = '';
+  for (var i = 0; i < Math.min(hist.length, 10); i++) {
+    var h = hist[i];
+    var d = new Date(h.date);
+    var ds = (d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+    var gc2 = gradeColors[h.grade] || 'var(--mut)';
+    var p2 = h.total > 0 ? Math.round(h.correct/h.total*100) : 0;
+    html += '<div class="arr-hist-row">';
+    html += '<div class="arr-hist-left"><span class="arr-hist-date">'+ds+'</span><span class="arr-hist-mode">'+modeNames[h.mode]+'</span><span class="arr-hist-grade" style="color:'+gc2+'">'+h.grade+'</span></div>';
+    html += '<div class="arr-hist-right"><span class="arr-hist-score">'+h.score+'</span><span style="font-size:11px;color:var(--mut)"> / 1000　'+p2+'%</span></div>';
+    html += '</div>';
+  }
+  el.innerHTML = html;
+}
 
-function initArr() { _renderArrBest(); }
+function initArr() { _renderArrBest(); _renderArrHist(); }
 
 /* 高速タッチ処理 */
 var _fns = { kp: kp, kd: kd, doOk: doOk, commit: commit,
