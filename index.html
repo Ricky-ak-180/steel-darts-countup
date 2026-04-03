@@ -302,7 +302,7 @@ canvas.schart { width: 100%; height: 100%; }
 .pr:last-child > div { border-bottom: none; }
 .plbl { color: var(--mut); font-size: 11px; display: flex; align-items: center; }
 .pbest { text-align: center; font-family: 'Bebas Neue', cursive; font-size: 28px; color: var(--acc); display: flex; align-items: center; justify-content: center; }
-.pavg  { text-align: center; font-family: 'Bebas Neue', cursive; font-size: 28px; color: var(--acc2); display: flex; align-items: center; justify-content: center; }
+.pavg  { text-align: center; font-family: 'Bebas Neue', cursive; font-size: 28px; color: #fff; display: flex; align-items: center; justify-content: center; }
 .pcnt  { text-align: center; font-size: 16px; font-weight: 700; color: var(--mut); display: flex; align-items: center; justify-content: center; }
 .p180  { text-align: center; font-family: 'Bebas Neue', cursive; font-size: 28px; color: #ffd700; display: flex; align-items: center; justify-content: center; }
 .pempty { padding: 14px 10px; font-size: 11px; color: var(--mut); grid-column: span 6; }
@@ -1282,8 +1282,9 @@ function getPer(h, u) {
     }
     var sc=games.map(function(x){return x.score;});
     var allR=[];
-    for(var i=0;i<games.length;i++) if(games[i].rounds) for(var j=0;j<games[i].rounds.length;j++) allR.push(games[i].rounds[j]);
-    return {label:k, best:Math.max.apply(null,sc), avg:Math.round(sum/games.length), count:games.length, c180:c180, rounds:allR};
+    var durSec=0;
+    for(var i=0;i<games.length;i++) { if(games[i].rounds) for(var j=0;j<games[i].rounds.length;j++) allR.push(games[i].rounds[j]); durSec+=(games[i].duration||0); }
+    return {label:k, best:Math.max.apply(null,sc), avg:Math.round(sum/games.length), count:games.length, c180:c180, rounds:allR, duration:durSec};
   });
 }
 function renderPer(h) {
@@ -1318,7 +1319,7 @@ function renderPer(h) {
   // タブに応じた合計プレイ時間
   var ptMap = { day: { sec: totalSecDay, lbl: '本日' }, week: { sec: totalSecWeek, lbl: '今週' }, month: { sec: totalSecMonth, lbl: '今月' } };
   var ptInfo = ptMap[pTab] || ptMap['day'];
-  var ptFooter = ptInfo.sec > 0 ? '<div style="text-align:right;padding:4px 10px 4px;font-size:11px;color:var(--mut);line-height:1.4;">🕐 合計プレイ時間（'+ptInfo.lbl+'）<span style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:var(--acc2);margin-left:6px;letter-spacing:1px;vertical-align:middle;">'+fmtTime(ptInfo.sec)+'</span></div>' : '';
+  var ptFooter = '';
   var s=getPer(h,pTab);
   var tabs=[['day','日別'],['week','週別'],['month','月別']].map(function(t){
     return '<div class="ptab'+(pTab===t[0]?' on':'')+'" data-t="'+t[0]+'">'+t[1]+'</div>';
@@ -1336,7 +1337,10 @@ function renderPer(h) {
     if(m100>0) mp.push('<span style="color:#ff6b35;">100+:'+m100+'</span>');
     if(m60>0)  mp.push('<span style="color:#4fc3f7;">60+:'+m60+'</span>');
     if(m59>0)  mp.push('<span style="color:#6b6b88;">59-:'+m59+'</span>');
-    var mHtml=mp.length?'<div style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;padding:3px 6px 4px;border-top:1px solid var(--bdr);font-size:12px;font-weight:700;opacity:0.9;">'+mp.join('')+'</div>':'';
+    var durM=Math.floor((r.duration||0)/60), durS=(r.duration||0)%60;
+    var durStr=r.duration>0?(durM>0?durM+'分'+(durS>0?durS+'秒':''):durS+'秒'):'';
+    var timeTag=durStr?'<span style="color:var(--grn);margin-left:auto;">⏱ '+durStr+'</span>':'';
+    var mHtml=(mp.length||durStr)?'<div style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:3px 6px 4px;border-top:1px solid var(--bdr);font-size:12px;font-weight:700;opacity:0.9;">'+mp.join('')+timeTag+'</div>':'';
     // 3-Dart Avg計算
     var tda = (r.avg / 8).toFixed(2);
     var tdaArrow = '';
