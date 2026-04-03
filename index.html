@@ -230,7 +230,6 @@ body::before {
 .chart-tab { font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 3px 10px; border-radius: 5px; cursor: pointer; color: var(--mut); background: transparent; border: 1px solid var(--bdr); }
 .chart-tab.on-score { background: var(--acc); color: #000; border-color: var(--acc); }
 .chart-tab.on-avg { background: var(--acc2); color: #000; border-color: var(--acc2); }
-.chart-tab.on-3da { background: #b47fff; color: #000; border-color: #b47fff; }
 .chart-tab.on-time { background: var(--grn); color: #000; border-color: var(--grn); }
 .chart-canvas-wrap { position: relative; height: 80px; }
 canvas.schart { width: 100%; height: 100%; }
@@ -439,7 +438,6 @@ canvas.schart { width: 100%; height: 100%; }
       <div class="chart-tabs">
         <button class="chart-tab on-score" id="ct-score">スコア推移</button>
         <button class="chart-tab" id="ct-avg">平均推移</button>
-        <button class="chart-tab" id="ct-3da">3ダーツ平均</button>
         <button class="chart-tab" id="ct-time">合計プレイ時間</button>
       </div>
       <div class="chart-canvas-wrap">
@@ -1010,7 +1008,6 @@ function switchChart(mode) {
   _chartMode = mode;
   document.getElementById('ct-score').className = 'chart-tab' + (mode === 'score' ? ' on-score' : '');
   document.getElementById('ct-avg').className = 'chart-tab' + (mode === 'avg' ? ' on-avg' : '');
-  document.getElementById('ct-3da').className = 'chart-tab' + (mode === '3da' ? ' on-3da' : '');
   document.getElementById('ct-time').className = 'chart-tab' + (mode === 'time' ? ' on-time' : '');
   drawChart(getH());
 }
@@ -1095,15 +1092,6 @@ function drawChart(hist) {
       for (var j = 0; j < window10.length; j++) sum += window10[j].score;
       return Math.round(sum / window10.length);
     });
-  } else if (_chartMode === '3da') {
-    // 直近30ゲーム分、各ゲーム時点での過去10ゲーム移動平均を8で割った3-Dart Avg
-    var base = hist.slice(0, 30).reverse();
-    scores = base.map(function(h, i) {
-      var window10 = base.slice(Math.max(0, i - 9), i + 1);
-      var sum = 0;
-      for (var j = 0; j < window10.length; j++) sum += window10[j].score;
-      return Math.round((sum / window10.length) / 8 * 100) / 100;
-    });
   } else {
     scores = hist.slice(0, 30).reverse().map(function(h){ return h.score; });
   }
@@ -1144,7 +1132,7 @@ function drawChart(hist) {
   });
 
   var grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + gh);
-  var gc = _chartMode === 'avg' ? '255,107,53' : _chartMode === '3da' ? '180,127,255' : '232,255,71';
+  var gc = _chartMode === 'avg' ? '255,107,53' : '232,255,71';
   grad.addColorStop(0, 'rgba('+gc+',0.3)');
   grad.addColorStop(1, 'rgba('+gc+',0)');
   ctx.beginPath();
@@ -1157,7 +1145,7 @@ function drawChart(hist) {
 
   // 折れ線
   ctx.beginPath();
-  ctx.strokeStyle = _chartMode === 'avg' ? '#ff6b35' : _chartMode === '3da' ? '#b47fff' : '#e8ff47';
+  ctx.strokeStyle = _chartMode === 'avg' ? '#ff6b35' : '#e8ff47';
   ctx.lineWidth = 2;
   pts.forEach(function(p, i){ if (i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); });
   ctx.stroke();
@@ -1166,7 +1154,7 @@ function drawChart(hist) {
   pts.forEach(function(p, i) {
     ctx.beginPath();
     ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
-    ctx.fillStyle = _chartMode === 'avg' ? '#ff6b35' : _chartMode === '3da' ? '#b47fff' : '#e8ff47';
+    ctx.fillStyle = _chartMode === 'avg' ? '#ff6b35' : '#e8ff47';
     ctx.fill();
   });
 
@@ -1653,7 +1641,6 @@ document.getElementById('sc-edit-cancel').addEventListener('click', toggleScEdit
 document.getElementById('sc-edit-save').addEventListener('click', saveScEditor);
 document.getElementById('ct-score').addEventListener('click', function(){ switchChart('score'); });
 document.getElementById('ct-avg').addEventListener('click', function(){ switchChart('avg'); });
-document.getElementById('ct-3da').addEventListener('click', function(){ switchChart('3da'); });
 document.getElementById('ct-time').addEventListener('click', function(){ switchChart('time'); });
 document.getElementById('btn-export').addEventListener('click', exportData);
 document.getElementById('btn-import').addEventListener('click', triggerImport);
