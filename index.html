@@ -258,6 +258,32 @@ canvas.schart { width: 100%; height: 100%; }
 .rrate-cnt { font-family: 'Bebas Neue', cursive; font-size: 20px; width: 36px; text-align: right; flex-shrink: 0; }
 .rrate-pct { font-family: 'Bebas Neue', cursive; font-size: 20px; width: 44px; text-align: right; flex-shrink: 0; color: var(--mut); }
 
+/* Profile card */
+.pcard { margin: 0 0 8px; padding: 20px 16px 16px; background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f0f1a 100%); border: 1px solid rgba(232,255,71,0.2); border-radius: 16px; position: relative; overflow: hidden; text-align: center; }
+.pcard::before { content: ''; position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(232,255,71,0.08) 0%, transparent 70%); pointer-events: none; }
+.pcard-brand { font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; }
+.pcard-score { font-family: 'Bebas Neue', cursive; font-size: 80px; line-height: 1; color: var(--acc); text-shadow: 0 0 40px rgba(232,255,71,0.5); letter-spacing: 2px; }
+.pcard-score-label { font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 3px; text-transform: uppercase; margin-top: 2px; margin-bottom: 6px; }
+.pcard-rank { display: inline-block; font-family: 'Bebas Neue', cursive; font-size: 15px; letter-spacing: 2px; padding: 3px 12px; border-radius: 20px; margin-bottom: 16px; }
+.pcard-divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 0 0 14px; }
+.pcard-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.pcard-stat { text-align: center; }
+.pcard-stat-val { font-family: 'Bebas Neue', cursive; font-size: 28px; line-height: 1; letter-spacing: 1px; }
+.pcard-stat-lbl { font-size: 8px; color: rgba(255,255,255,0.35); letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
+
+/* Today card */
+.tcard { margin: 0 0 8px; padding: 14px 16px 14px; background: linear-gradient(145deg, #1a1a1a 0%, #141420 100%); border: 1px solid rgba(255,107,53,0.25); border-radius: 16px; position: relative; overflow: hidden; text-align: center; }
+.tcard::before { content: ''; position: absolute; top: -30px; right: -30px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(255,107,53,0.07) 0%, transparent 70%); pointer-events: none; }
+.tcard-brand { font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; }
+.tcard-score { font-family: 'Bebas Neue', cursive; font-size: 64px; line-height: 1; color: var(--acc2); text-shadow: 0 0 30px rgba(255,107,53,0.4); letter-spacing: 2px; }
+.tcard-score-label { font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 3px; text-transform: uppercase; margin-top: 2px; margin-bottom: 6px; }
+.tcard-rank { display: inline-block; font-family: 'Bebas Neue', cursive; font-size: 13px; letter-spacing: 2px; padding: 2px 10px; border-radius: 20px; margin-bottom: 12px; }
+.tcard-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 0 0 12px; }
+.tcard-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.tcard-stat { text-align: center; }
+.tcard-stat-val { font-family: 'Bebas Neue', cursive; font-size: 22px; line-height: 1; letter-spacing: 1px; }
+.tcard-stat-lbl { font-size: 8px; color: rgba(255,255,255,0.35); letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+
 /* Period table */
 .pcrd { background: var(--sur); border: 1px solid var(--bdr); border-radius: 12px; overflow: hidden; }
 .ptabs { display: flex; gap: 4px; padding: 8px 10px 0; }
@@ -433,6 +459,8 @@ canvas.schart { width: 100%; height: 100%; }
 
   <!-- History view -->
   <div class="view hide" id="vhist" style="overflow-y:auto;-webkit-overflow-scrolling:touch;">
+    <div id="profile-card" style="display:none;"></div>
+    <div id="today-card" style="display:none;"></div>
     <div class="s3" id="hs3"></div>
     <div class="chart-wrap" id="chart-wrap" style="display:none;">
       <div class="chart-tabs">
@@ -1391,6 +1419,64 @@ function renderHist() {
   for(var i=0;i<h.length;i++) {
     var r=h[i].rounds||[];
     for(var j=0;j<r.length;j++) if(r[j]===180) total180++;
+  }
+  // プロフィールカード
+  var allSum = 0; for(var i=0;i<h.length;i++) allSum += h[i].score;
+  var allAvg3da = h.length ? (allSum / h.length / 8).toFixed(2) : '—';
+  var bestRankLabel = rank(best);
+  var rankColors = { 'S+': ['#ffd700','#000'], 'S': ['#e8ff47','#000'], 'A': ['#47ffb4','#000'], 'B': ['#4fc3f7','#000'], 'C': ['#ff6b35','#fff'], 'D': ['#6b6b88','#fff'] };
+  var rc2 = rankColors[bestRankLabel] || ['#444','#fff'];
+  var pc = document.getElementById('profile-card');
+  if (pc) {
+    pc.style.display = 'block';
+    pc.innerHTML =
+      '<div class="pcard">' +
+        '<div class="pcard-brand">🎯 Steel Darts Countup — Player Stats</div>' +
+        '<div class="pcard-score">' + best + '</div>' +
+        '<div class="pcard-score-label">Personal Best</div>' +
+        '<div class="pcard-rank" style="background:'+rc2[0]+';color:'+rc2[1]+';">' + bestRankLabel + ' RANK</div>' +
+        '<hr class="pcard-divider">' +
+        '<div class="pcard-stats">' +
+          '<div class="pcard-stat"><div class="pcard-stat-val" style="color:#b47fff;">' + allAvg3da + '</div><div class="pcard-stat-lbl">通算 3DA</div></div>' +
+          '<div class="pcard-stat"><div class="pcard-stat-val" style="color:#ffd700;">×' + total180 + '</div><div class="pcard-stat-lbl">通算 180</div></div>' +
+          '<div class="pcard-stat"><div class="pcard-stat-val" style="color:rgba(255,255,255,0.7);">' + h.length + '</div><div class="pcard-stat-lbl">Total Games</div></div>' +
+        '</div>' +
+      '</div>';
+  }
+  // 今日のカード
+  var todayStr2 = new Date().toISOString().slice(0,10);
+  var todayGames = h.filter(function(g){ return g.date && g.date.slice(0,10) === todayStr2; });
+  var tc = document.getElementById('today-card');
+  if (tc) {
+    if (todayGames.length > 0) {
+      tc.style.display = 'block';
+      var todayBest2 = Math.max.apply(null, todayGames.map(function(g){return g.score;}));
+      var todaySum2 = 0; for(var i=0;i<todayGames.length;i++) todaySum2 += todayGames[i].score;
+      var todayAvg3da = (todaySum2 / todayGames.length / 8).toFixed(2);
+      var today180 = 0;
+      for(var i=0;i<todayGames.length;i++){ var r2=todayGames[i].rounds||[]; for(var j=0;j<r2.length;j++) if(r2[j]===180) today180++; }
+      var todayDurSec = 0; for(var i=0;i<todayGames.length;i++) todayDurSec += (todayGames[i].duration||0);
+      var tdm=Math.floor(todayDurSec/60), tds=todayDurSec%60;
+      var todayTimeStr = tdm>0 ? tdm+'分'+(tds>0?tds+'秒':'') : (tds>0?tds+'秒':'—');
+      var todayRankLabel = rank(todayBest2);
+      var trc = rankColors[todayRankLabel] || ['#444','#fff'];
+      tc.innerHTML =
+        '<div class="tcard">' +
+          '<div class="tcard-brand">📅 Today — ' + todayStr2 + '</div>' +
+          '<div class="tcard-score">' + todayBest2 + '</div>' +
+          '<div class="tcard-score-label">Today\'s Best</div>' +
+          '<div class="tcard-rank" style="background:'+trc[0]+';color:'+trc[1]+';">' + todayRankLabel + ' RANK</div>' +
+          '<hr class="tcard-divider">' +
+          '<div class="tcard-stats">' +
+            '<div class="tcard-stat"><div class="tcard-stat-val" style="color:#b47fff;">' + todayAvg3da + '</div><div class="tcard-stat-lbl">3DA</div></div>' +
+            '<div class="tcard-stat"><div class="tcard-stat-val" style="color:#ffd700;">×' + today180 + '</div><div class="tcard-stat-lbl">180</div></div>' +
+            '<div class="tcard-stat"><div class="tcard-stat-val" style="color:rgba(255,255,255,0.7);">' + todayGames.length + '</div><div class="tcard-stat-lbl">Games</div></div>' +
+            '<div class="tcard-stat"><div class="tcard-stat-val" style="color:var(--grn);font-size:18px;">' + todayTimeStr + '</div><div class="tcard-stat-lbl">Time</div></div>' +
+          '</div>' +
+        '</div>';
+    } else {
+      tc.style.display = 'none';
+    }
   }
   s3.innerHTML=
     '<div class="sc3"><div class="sv">'+h.length+'</div><div class="sl">通算ゲーム数</div></div>'+
