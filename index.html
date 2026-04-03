@@ -1298,7 +1298,7 @@ function renderPer(h) {
   // タブに応じた合計プレイ時間
   var ptMap = { day: { sec: totalSecDay, lbl: '本日' }, week: { sec: totalSecWeek, lbl: '今週' }, month: { sec: totalSecMonth, lbl: '今月' } };
   var ptInfo = ptMap[pTab] || ptMap['day'];
-  var ptFooter = ptInfo.sec > 0 ? '<div style="text-align:right;padding:8px 10px 4px;font-size:11px;color:var(--mut);">🕐 合計プレイ時間（'+ptInfo.lbl+'）<span style="font-family:\'Bebas Neue\',cursive;font-size:20px;color:var(--acc2);margin-left:6px;letter-spacing:1px;">'+fmtTime(ptInfo.sec)+'</span></div>' : '';
+  var ptFooter = ptInfo.sec > 0 ? '<div style="text-align:right;padding:4px 10px 4px;font-size:11px;color:var(--mut);line-height:1.4;">🕐 合計プレイ時間（'+ptInfo.lbl+'）<span style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:var(--acc2);margin-left:6px;letter-spacing:1px;vertical-align:middle;">'+fmtTime(ptInfo.sec)+'</span></div>' : '';
   var s=getPer(h,pTab);
   var tabs=[['day','日別'],['week','週別'],['month','月別']].map(function(t){
     return '<div class="ptab'+(pTab===t[0]?' on':'')+'" data-t="'+t[0]+'">'+t[1]+'</div>';
@@ -1316,7 +1316,7 @@ function renderPer(h) {
     if(m100>0) mp.push('<span style="color:#ff6b35;">100+:'+m100+'</span>');
     if(m60>0)  mp.push('<span style="color:#4fc3f7;">60+:'+m60+'</span>');
     if(m59>0)  mp.push('<span style="color:#6b6b88;">59-:'+m59+'</span>');
-    var mHtml=mp.length?'<div style="grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;padding:3px 6px 5px;border-top:1px solid var(--bdr);font-size:9px;opacity:0.85;">'+mp.join('')+'</div>':'';
+    var mHtml=mp.length?'<div style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;padding:3px 6px 4px;border-top:1px solid var(--bdr);font-size:12px;font-weight:700;opacity:0.9;">'+mp.join('')+'</div>':'';
     // 3-Dart Avg計算
     var tda = (r.avg / 8).toFixed(2);
     var tdaArrow = '';
