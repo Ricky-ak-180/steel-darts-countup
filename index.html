@@ -47,9 +47,10 @@ body::before {
 }
 
 /* Tabs */
-.tabs { display: flex; gap: 4px; background: var(--sur); border-radius: 8px; padding: 3px; border: 1px solid var(--bdr); }
+.tabs { display: flex; gap: 4px; background: var(--sur); border-radius: 8px; padding: 3px; border: 1px solid var(--bdr); align-items: center; }
 .tab { flex: 1; padding: 6px; text-align: center; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; letter-spacing: 1px; color: var(--mut); transition: all 0.2s; }
 .tab.on { background: var(--acc); color: #000; }
+.btn-snd { background: transparent; border: none; font-size: 16px; cursor: pointer; padding: 4px 6px; border-radius: 6px; line-height: 1; color: var(--mut); flex-shrink: 0; }
 
 /* Views */
 .view { display: flex; flex-direction: column; gap: 5px; flex: 1; min-height: 0; overflow: hidden; }
@@ -419,6 +420,7 @@ canvas.schart { width: 100%; height: 100%; }
   <div class="tabs">
     <div class="tab on" id="tgame" data-fn="goTabGame">🎯 ゲーム</div>
     <div class="tab" id="thist" data-fn="goTabHist">📊 履歴</div>
+    <button class="btn-snd" id="btn-snd" data-fn="toggleSound">🔊</button>
   </div>
 
   <!-- Game view -->
@@ -1062,6 +1064,13 @@ function saveScEditor() {
    サウンド
    ============================================================ */
 var _actx = null;
+var _sndOn = localStorage.getItem('snd') !== '0';
+function toggleSound() {
+  _sndOn = !_sndOn;
+  localStorage.setItem('snd', _sndOn ? '1' : '0');
+  var btn = document.getElementById('btn-snd');
+  if (btn) btn.textContent = _sndOn ? '🔊' : '🔇';
+}
 function _ctx() { if (!_actx) { try { _actx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} } return _actx; }
 function _tone(freq, type, dur, vol, delay) {
   var ctx = _ctx(); if (!ctx) return;
@@ -1073,17 +1082,20 @@ function _tone(freq, type, dur, vol, delay) {
   gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
   osc.start(t); osc.stop(t + dur);
 }
-function soundTap() { _tone(880, 'sine', 0.04, 0.07); }
-function soundDel() { _tone(420, 'triangle', 0.06, 0.06); }
+function soundTap() { if (!_sndOn) return; _tone(880, 'sine', 0.04, 0.07); }
+function soundDel() { if (!_sndOn) return; _tone(420, 'triangle', 0.06, 0.06); }
 function soundCommit(score) {
+  if (!_sndOn) return;
   if (score === 0) { _tone(220, 'triangle', 0.18, 0.1); return; }
   _tone(660, 'sine', 0.06, 0.12); _tone(880, 'sine', 0.09, 0.1, 0.05);
 }
 function sound180() {
+  if (!_sndOn) return;
   _tone(880, 'sine', 0.1, 0.16); _tone(1109, 'sine', 0.1, 0.16, 0.08);
   _tone(1320, 'sine', 0.12, 0.18, 0.17); _tone(1760, 'sine', 0.14, 0.2, 0.28);
 }
 function soundFinish(isPB) {
+  if (!_sndOn) return;
   if (isPB) {
     _tone(523, 'sine', 0.14, 0.16); _tone(659, 'sine', 0.14, 0.16, 0.12);
     _tone(784, 'sine', 0.14, 0.16, 0.24); _tone(1047, 'sine', 0.28, 0.22, 0.38);
@@ -1890,6 +1902,7 @@ buildScRow();
 drawDots();
 drawRoundGrid();
 updDisp();
+(function(){ var btn = document.getElementById('btn-snd'); if (btn) btn.textContent = _sndOn ? '🔊' : '🔇'; })();
 
 // イベントリスナー登録（onclick属性の代替）
 document.getElementById('gs-btn').addEventListener('click', gameStart);
