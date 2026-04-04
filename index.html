@@ -3888,22 +3888,19 @@ function _z01PlayerName(idx) {
 }
 
 function _z01Render() {
-  var n = _z01.players===1?1:2;
-  var h = '';
-  for (var i = 0; i < n; i++) {
-    var st = _z01.stats[i];
-    var avg = st.rounds>0 ? (st.total/st.rounds).toFixed(1) : '-';
-    var legs = _z01.legs>1 ? ' <span class="z01-p-legs">'+_z01.legWins[i]+'W</span>' : '';
-    h += '<div class="z01-player'+(_z01.currentPlayer===i?' active':'')+'">';
-    h += '<div class="z01-p-name">'+_z01PlayerName(i)+legs+'</div>';
-    h += '<div class="z01-p-remain">'+_z01.remain[i]+'</div>';
-    h += '<div class="z01-p-avg">AVG '+avg+'</div></div>';
+  var cp = _z01.currentPlayer;
+  var st = _z01.stats[cp];
+  var avg = st.rounds>0 ? (st.total/st.rounds).toFixed(1) : '-';
+  var turnEl = document.getElementById('z01-turn-info');
+  if (turnEl) {
+    var nameStr = _z01PlayerName(cp);
+    if (_z01.legs > 1) nameStr += ' (' + _z01.legWins[cp] + 'W)';
+    turnEl.innerHTML = '<span style="color:var(--txt);font-weight:700;">' + nameStr + '</span><span style="color:var(--mut);font-size:10px;margin-left:5px;">AVG ' + avg + '</span>';
   }
-  document.getElementById('z01-players').innerHTML = h;
   document.getElementById('z01-leg-info').textContent =
     _z01.legs>1 ? 'Leg '+_z01.currentLeg+' / '+_z01.legs : 'Leg 1';
   var isCpu = _z01.players===3 && _z01.currentPlayer===1;
-  document.getElementById('z01-cpu-area').style.display = isCpu?'':'none';
+  document.getElementById('z01-cpu-area').style.display = isCpu?'flex':'none';
   document.getElementById('z01-input-area').style.display = isCpu?'none':'';
   _z01BufUpdate('');
 }
