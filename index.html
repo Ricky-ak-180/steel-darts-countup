@@ -2988,11 +2988,14 @@ function _renderTeiseki() {
     var n = e.path.length;
     var is3 = n === 3;
     var mainLabel = _dartCountLabel(n);
+    // 3本持ちと2本持ちの1本目が同じなら2本持ち行を省略
+    var h2data = CHECKOUT_2H[e.score];
+    var show2h = is3 && h2data && h2data.dart !== e.path[0];
     html += '<div class="arr-t-row" data-score="' + e.score + '">' +
       '<div class="arr-t-score">' + e.score + '</div>' +
       '<div class="arr-t-routes">' +
         '<div class="arr-t-path arr-t-main">' + mainLabel + _pathHtml(e.path) + '</div>' +
-        (is3 ? _2hHtml(e.score) : '') +
+        (show2h ? _2hHtml(e.score) : '') +
         (CHECKOUT_TIPS[e.score] ? '<div class="arr-t-tip">' + CHECKOUT_TIPS[e.score] + '</div>' : '') +
         alts.map(function(a) {
           return '<div class="arr-t-path arr-t-alt">' + _dartCountLabel(a.length) + _pathHtml(a) + '</div>';
