@@ -3017,7 +3017,7 @@ function _renderTeiseki() {
         (CHECKOUT_TIPS[e.score] ? '<div class="arr-t-tip">' + CHECKOUT_TIPS[e.score] + '</div>' : '') +
         alts.map(function(a, i) {
           var ctx = (!is3 && hasCtxMix) ? _holdLabel(altCtxs[i]) : '';
-          return '<div class="arr-t-path arr-t-alt">' + _dartCountLabel(a.length) + ctx + _pathHtml(a) + '</div>';
+          return '<div class="arr-t-path arr-t-alt">' + ctx + _pathHtml(a) + '</div>';
         }).join('') +
         userRoutes.map(function(a, i) {
           return '<div class="arr-t-user">' +
