@@ -2801,16 +2801,32 @@ function _renderTactics() {
       warningLine = '<span style="color:#ff6b6b;">⚠ ' + ex.reason + '</span>';
     } else if (zone === '300s') {
       var p300 = TACTICS_300s_PATHS[n];
-      function fmtPath(darts) {
-        return darts.map(function(x){
-          return '<span style="font-size:16px;font-weight:700;">' + x.d + '</span>' +
-                 '<span style="color:var(--mut);font-size:12px;margin-left:2px;">(' + x.l + '残)</span>';
-        }).join('<span style="color:var(--mut);font-size:14px;margin:0 4px;">→</span>');
+      function fmtPath(darts, color) {
+        var cells = darts.map(function(x){
+          return '<div style="display:flex;flex-direction:column;align-items:center;flex:1;">' +
+            '<span style="font-size:18px;font-weight:700;color:' + color + ';">' + x.d + '</span>' +
+            '<span style="font-size:11px;color:var(--mut);">(' + x.l + '残)</span>' +
+          '</div>';
+        });
+        var arrow = '<div style="color:var(--mut);font-size:18px;padding:0 2px;margin-top:2px;">›</div>';
+        var inner = '';
+        for(var i=0;i<cells.length;i++){ inner += cells[i]; if(i<cells.length-1) inner += arrow; }
+        return '<div style="display:flex;align-items:center;width:100%;">' + inner + '</div>';
       }
       if (p300) {
-        actionLines.push('<span style="color:#66bb6a;display:block;padding:3px 0;">🎯 ' + fmtPath(p300.ideal) + '</span>');
+        actionLines.push(
+          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
+            '<span style="font-size:16px;">🎯</span>' +
+            fmtPath(p300.ideal, '#66bb6a') +
+          '</div>'
+        );
         var missColor = (p300.miss[p300.miss.length-1].l === 170) ? '#80cbc4' : '#aaa';
-        actionLines.push('<span style="color:' + missColor + ';display:block;padding:3px 0;">🔄 ' + fmtPath(p300.miss) + '</span>');
+        actionLines.push(
+          '<div style="display:flex;align-items:center;gap:6px;">' +
+            '<span style="font-size:16px;">🔄</span>' +
+            fmtPath(p300.miss, missColor) +
+          '</div>'
+        );
       }
       var bogeyLeave = n - 140;
       warningLine = '<span style="color:#ff6b6b;">⚠ T20+T20+S20 → ' + bogeyLeave + '（ボギー）</span>';
