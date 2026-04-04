@@ -1176,6 +1176,13 @@ canvas.schart { width: 100%; height: 100%; }
           <div class="z01-cpu-dot"></div>
         </div>
       </div>
+      <!-- Bottom action bar -->
+      <div class="z01-bottom-bar">
+        <button class="z01-bb-btn" data-fn="z01ConfirmExit">Exit</button>
+        <button class="z01-bb-btn z01-bb-dim" id="z01-bb-finish" data-fn="z01FinishBtn">Finish</button>
+        <button class="z01-bb-btn" data-fn="z01OpenStats">Stats</button>
+        <button class="z01-bb-btn" data-fn="toggleScEditor">⚙</button>
+      </div>
       <!-- Input area -->
       <div class="z01-input" id="z01-input-area">
         <div class="z01-presets" id="z01-presets"></div>
@@ -1185,13 +1192,6 @@ canvas.schart { width: 100%; height: 100%; }
           <div class="z01-tk" data-fn="z01Kp" data-arg="7">7</div><div class="z01-tk" data-fn="z01Kp" data-arg="8">8</div><div class="z01-tk" data-fn="z01Kp" data-arg="9">9</div>
           <div class="z01-tk del" data-fn="z01Kd">⌫</div><div class="z01-tk" data-fn="z01Kp" data-arg="0">0</div><div class="z01-tk enter" id="z01-enter" data-fn="z01Ok">Enter</div>
         </div>
-      </div>
-      <!-- Bottom action bar -->
-      <div class="z01-bottom-bar">
-        <button class="z01-bb-btn" data-fn="z01BackSetup">Exit</button>
-        <button class="z01-bb-btn z01-bb-dim" id="z01-bb-finish">Finish</button>
-        <button class="z01-bb-btn" data-fn="z01OpenStats">Stats</button>
-        <button class="z01-bb-btn" data-fn="toggleScEditor">⚙</button>
       </div>
     </div>
     <!-- Result screen -->
