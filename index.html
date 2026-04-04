@@ -3110,10 +3110,11 @@ function _renderTeiseki() {
     var altCtxs = (!is3) ? alts.map(function(a){ return _routeHoldCtx(a); }) : [];
     var hasCtxMix = (!is3) && (alts.length > 0) &&
       altCtxs.some(function(c){ return c !== null && c !== mainCtx; });
+    var showRem = (_teisekiFilter === 99 || _teisekiFilter === 41) ? e.score : 0;
     html += '<div class="arr-t-row" data-score="' + e.score + '">' +
       '<div class="arr-t-score">' + e.score + '</div>' +
       '<div class="arr-t-routes">' +
-        '<div class="arr-t-path arr-t-main">' + mainLabel + (hasCtxMix ? _holdLabel(mainCtx) : '') + _pathHtml(e.path) + '</div>' +
+        '<div class="arr-t-path arr-t-main">' + mainLabel + (hasCtxMix ? _holdLabel(mainCtx) : '') + _pathHtml(e.path, false, showRem) + '</div>' +
         (show2h ? _2hHtml(e.score) : '') +
         (CHECKOUT_TIPS[e.score] ? '<div class="arr-t-tip">' + CHECKOUT_TIPS[e.score] + '</div>' : '') +
         alts.map(function(a, i) {
