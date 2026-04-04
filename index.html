@@ -2743,7 +2743,65 @@ function _renderTactics() {
 
   // ヘッダー
   html += '<div style="font-size:18px;font-weight:700;color:var(--fg);margin-bottom:4px;">基本は <span style="color:var(--acc);">T20</span></div>';
-  html += '<div style="font-size:12px;color:var(--mut);margin-bottom:16px;line-height:1.6;">以下のスコアだけ例外。それ以外はすべてT20を狙う。</div>';
+  html += '<div style="font-size:12px;color:var(--mut);margin-bottom:16px;line-height:1.6;">以下のスコアだけ例外。それ以外はすべてT20を狙う。末尾ルール: 末尾2・5・8→T18、末尾3・6・9→T19。</div>';
+
+  function scoreBlock(n) {
+    var ex = TACTICS_EXCEPTIONS[n];
+    var d = n % 10;
+    var isT20 = (d===0||d===1||d===4||d===7);
+    if (ex) {
+      return '<div style="background:rgba(255,213,79,0.15);border:1px solid rgba(255,213,79,0.4);border-radius:8px;padding:5px 9px;text-align:center;min-width:54px;">' +
+        '<div style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:#ffd54f;">' + n + '</div>' +
+        '<div style="font-size:9px;color:#ffd54f;">' + ex.target + '</div>' +
+      '</div>';
+    }
+    if (d===3||d===6||d===9) {
+      var miss = n - 19;
+      return '<div style="background:rgba(255,138,101,0.12);border:1px solid rgba(255,138,101,0.3);border-radius:8px;padding:5px 9px;text-align:center;min-width:54px;">' +
+        '<div style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:#ff8a65;">' + n + '</div>' +
+        '<div style="font-size:9px;color:var(--mut);">→' + miss + '</div>' +
+      '</div>';
+    }
+    if (d===2||d===5||d===8) {
+      var miss = n - 18;
+      return '<div style="background:rgba(79,195,247,0.12);border:1px solid rgba(79,195,247,0.3);border-radius:8px;padding:5px 9px;text-align:center;min-width:54px;">' +
+        '<div style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:#4fc3f7;">' + n + '</div>' +
+        '<div style="font-size:9px;color:var(--mut);">→' + miss + '</div>' +
+      '</div>';
+    }
+    return ''; // T20 scores not shown
+  }
+
+  function rangeSection(label, desc, from, to) {
+    var blocks = '';
+    for (var n = to; n >= from; n--) {  // 降順
+      blocks += scoreBlock(n);
+    }
+    // 特殊ケース詳細（この範囲内）
+    var exHtml = '';
+    for (var n = to; n >= from; n--) {
+      var ex = TACTICS_EXCEPTIONS[n];
+      if (!ex) continue;
+      var d = n % 10;
+      var defTgt = (d===0||d===1||d===4||d===7)?'T20':(d===2||d===5||d===8)?'T18':'T19';
+      exHtml += '<div style="background:rgba(255,213,79,0.08);border:1px solid rgba(255,213,79,0.25);border-radius:8px;padding:8px 12px;margin-top:6px;display:flex;flex-direction:column;gap:3px;">' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<span style="font-family:\'Bebas Neue\',cursive;font-size:20px;color:#ffd54f;">' + n + '</span>' +
+          '<span style="font-size:11px;color:var(--mut);text-decoration:line-through;">' + defTgt + '</span>' +
+          '<span style="color:var(--mut);">→</span>' +
+          '<span style="font-size:13px;font-weight:700;color:#ffd54f;">' + ex.target + '</span>' +
+          '<span style="font-size:12px;color:var(--fg);">→ <strong>' + ex.hitLeave + '</strong>残し</span>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--mut);line-height:1.6;">' + ex.reason + '</div>' +
+      '</div>';
+    }
+    return '<div style="margin-bottom:20px;">' +
+      '<div style="font-size:13px;font-weight:700;color:var(--fg);margin-bottom:2px;">' + label + '</div>' +
+      '<div style="font-size:11px;color:var(--mut);margin-bottom:8px;line-height:1.5;">' + desc + '</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:5px;">' + blocks + '</div>' +
+      exHtml +
+    '</div>';
+  }
 
   // 高スコア帯
   html += '<div style="background:rgba(232,255,71,0.07);border:1px solid rgba(232,255,71,0.15);border-radius:10px;padding:10px 14px;margin-bottom:16px;">' +
