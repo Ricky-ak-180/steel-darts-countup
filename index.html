@@ -3373,7 +3373,11 @@ function _renderTrainMap() {
       var sub = '';
       if (cls === 'bogey') sub = '<div class="t-sub">×</div>';
       else if (cls === 'locked') sub = '<div class="t-sub">🔒</div>';
-      else if (c > 0) sub = '<div class="t-sub">' + (c >= _TRAIN_PERFECT ? '★' : c + '/' + _TRAIN_MASTER) + '</div>';
+      else if (c > 0) {
+        var entry2 = _trainEntry(t.s, d);
+        var rate = entry2.a ? Math.round(entry2.c / entry2.a * 100) : 100;
+        sub = '<div class="t-sub">' + (c >= _TRAIN_PERFECT ? '★' : c + '/' + _TRAIN_MASTER) + ' ' + rate + '%</div>';
+      }
       html += '<div class="arr-train-tile ' + cls + '"' + fn + '><div class="t-num">' + t.s + '</div>' + sub + '</div>';
     });
     html += '</div></div>';
