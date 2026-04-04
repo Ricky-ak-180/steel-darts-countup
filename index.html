@@ -4291,15 +4291,26 @@ function _z01LogCell(data, pIdx, isLive, isEditable, rowIdx, colIdx) {
   var scId = isLive ? ' id="z01-log-live"' : '';
   var tcId = isLive ? ' id="z01-log-live-togo"' : '';
   if (!data) return '<div class="' + sc + '"' + scId + '></div><div class="' + tc + '"' + tcId + '></div>';
-  var scoredHtml;
-  if (data.scored >= 100) {
-    scoredHtml = '<span class="z01-lc-hi">' + data.scored + '</span>';
-  } else {
-    scoredHtml = String(data.scored);
-  }
+  var scoredHtml = data.scored >= 100 ? '<span class="z01-lc-hi">' + data.scored + '</span>' : String(data.scored);
   var editAttr = isEditable ? ' data-fn="z01EditScore" data-arg="' + (rowIdx * 10 + colIdx) + '"' : '';
   var editCls = isEditable ? ' editable' : '';
   return '<div class="' + sc + editCls + '"' + scId + editAttr + '>' + scoredHtml + '</div><div class="' + tc + '"' + tcId + '>' + data.remain + '</div>';
+}
+// For 1P layout (scored | visit | togo): output scored and togo separately
+function _z01LogCellS(data, pIdx, isLive, isEditable, rowIdx) {
+  var sc = 'z01-lc-s' + pIdx;
+  var scId = isLive ? ' id="z01-log-live"' : '';
+  if (!data) return '<div class="' + sc + '"' + scId + '></div>';
+  var scoredHtml = data.scored >= 100 ? '<span class="z01-lc-hi">' + data.scored + '</span>' : String(data.scored);
+  var editAttr = isEditable ? ' data-fn="z01EditScore" data-arg="' + (rowIdx * 10) + '"' : '';
+  var editCls = isEditable ? ' editable' : '';
+  return '<div class="' + sc + editCls + '"' + scId + editAttr + '>' + scoredHtml + '</div>';
+}
+function _z01LogCellT(data, pIdx, isLive) {
+  var tc = 'z01-lc-t' + pIdx;
+  var tcId = isLive ? ' id="z01-log-live-togo"' : '';
+  if (!data) return '<div class="' + tc + '"' + tcId + '></div>';
+  return '<div class="' + tc + '"' + tcId + '>' + data.remain + '</div>';
 }
 
 function _z01LogRender() {
