@@ -2977,13 +2977,17 @@ function _renderTeiseki() {
       alts = alts.filter(function(a){ return a.length === _teisekiFilter; });
       userRoutes = userRoutes.filter(function(a){ return a.length === _teisekiFilter; });
     }
+    var n = e.path.length;
+    var is3 = n === 3;
+    var mainLabel = _dartCountLabel(n);
     html += '<div class="arr-t-row" data-score="' + e.score + '">' +
       '<div class="arr-t-score">' + e.score + '</div>' +
       '<div class="arr-t-routes">' +
-        '<div class="arr-t-path arr-t-main">' + _pathHtml(e.path) + '</div>' +
+        '<div class="arr-t-path arr-t-main">' + mainLabel + _pathHtml(e.path) + '</div>' +
+        (is3 ? _2hHtml(e.score) : '') +
         (CHECKOUT_TIPS[e.score] ? '<div class="arr-t-tip">' + CHECKOUT_TIPS[e.score] + '</div>' : '') +
         alts.map(function(a) {
-          return '<div class="arr-t-path arr-t-alt">' + _pathHtml(a) + '</div>';
+          return '<div class="arr-t-path arr-t-alt">' + _dartCountLabel(a.length) + _pathHtml(a) + '</div>';
         }).join('') +
         userRoutes.map(function(a, i) {
           return '<div class="arr-t-user">' +
