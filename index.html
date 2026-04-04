@@ -4185,7 +4185,7 @@ function _z01InitLog() {
   _z01.log = [{visit: 3, p: p}];
 }
 
-function _z01LogCell(data, pIdx, isLive) {
+function _z01LogCell(data, pIdx, isLive, isEditable, rowIdx, colIdx) {
   var sc = 'z01-lc-s' + pIdx, tc = 'z01-lc-t' + pIdx;
   var scId = isLive ? ' id="z01-log-live"' : '';
   var tcId = isLive ? ' id="z01-log-live-togo"' : '';
@@ -4196,7 +4196,9 @@ function _z01LogCell(data, pIdx, isLive) {
   } else {
     scoredHtml = String(data.scored);
   }
-  return '<div class="' + sc + '"' + scId + '>' + scoredHtml + '</div><div class="' + tc + '"' + tcId + '>' + data.remain + '</div>';
+  var editAttr = isEditable ? ' data-fn="z01EditScore" data-arg="' + (rowIdx * 10 + colIdx) + '"' : '';
+  var editCls = isEditable ? ' editable' : '';
+  return '<div class="' + sc + editCls + '"' + scId + editAttr + '>' + scoredHtml + '</div><div class="' + tc + '"' + tcId + '>' + data.remain + '</div>';
 }
 
 function _z01LogRender() {
