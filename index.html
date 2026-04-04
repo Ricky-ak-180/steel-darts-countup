@@ -3524,7 +3524,9 @@ function _renderTrainPrac(score, entry) {
   if (c >= _TRAIN_PERFECT) stars = '🌟 PERFECT';
   document.getElementById('arr-tp-stars').textContent = stars;
   document.getElementById('arr-tp-rate').textContent = _trainRateText(entry);
-  var path = score <= 40 ? ['D' + (score / 2)] : CHECKOUT[score];
+  var path = (_userRoutes && _userRoutes[score] && _userRoutes[score].length > 0)
+    ? _userRoutes[score][0]
+    : (score <= 40 ? ['D' + (score / 2)] : CHECKOUT[score]);
   document.getElementById('arr-tp-hint-box').innerHTML = _pathHtml(path);
   var hintBtn = document.getElementById('arr-tp-hint-btn');
   hintBtn.style.display = c >= _TRAIN_HINT_HIDE ? '' : 'none';
