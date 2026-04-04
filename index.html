@@ -3088,7 +3088,7 @@ function _2hHtml(score) {
 function _renderTeiseki() {
   var entries = _buildTeisekiEntries();
   if (_teisekiFilter === 99) entries = entries.filter(function(e){ return e.score >= 99 && e.score <= 170 && e.score !== 100; });
-  else if (_teisekiFilter === 41) entries = entries.filter(function(e){ return e.score >= 2 && e.score <= 100 && e.score !== 99; });
+  else if (_teisekiFilter === 41) entries = entries.filter(function(e){ return e.score >= 3 && e.score <= 100 && e.score !== 99 && (e.score % 2 !== 0 || e.score >= 41); });
   var html = '';
   entries.forEach(function(e) {
     if (!e.path) {
