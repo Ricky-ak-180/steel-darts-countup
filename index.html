@@ -3849,8 +3849,10 @@ function z01Start() {
   document.getElementById('z01-result-wrap').style.display = 'none';
   document.getElementById('z01-game-wrap').style.display = 'flex';
   _z01BuildPresets();
+  _z01InitLog();
   _z01Render();
   _z01HintUpdate();
+  _z01LogRender();
   if (_z01.players===3 && _z01.currentPlayer===1) _z01CpuTurn();
 }
 
