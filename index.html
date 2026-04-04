@@ -4361,7 +4361,7 @@ function _z01LogRender() {
   }
   // Future padding rows (15 rounds = 45 darts ahead)
   var lastVisit = log[log.length - 1].visit;
-  for (var k = 1; k <= 15; k++) {
+  for (var k = 1; k <= 5; k++) {
     var fv = lastVisit + k * 3;
     if (isP2) {
       h += '<div class="z01-log-row"><div class="z01-lc-s0"></div><div class="z01-lc-t0"></div><div class="z01-lc-v">' + fv + '</div><div class="z01-lc-s1"></div><div class="z01-lc-t1"></div></div>';
