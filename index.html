@@ -725,6 +725,44 @@ canvas.schart { width: 100%; height: 100%; }
 .z01-result-again:active{opacity:.8;}
 .z01-result-back{background:transparent;border:1px solid var(--bdr);color:var(--mut);border-radius:12px;padding:12px;font-size:14px;cursor:pointer;width:100%;touch-action:manipulation;}
 .z01-result-back:active{opacity:.7;}
+/* 01 score log */
+.z01-log-wrap{flex:1;min-height:0;overflow-y:auto;}
+.z01-log.p1 .z01-log-hdr,.z01-log.p1 .z01-log-row{grid-template-columns:36px 1fr 0.85fr;}
+.z01-log.p2 .z01-log-hdr,.z01-log.p2 .z01-log-row{grid-template-columns:1fr 0.85fr 36px 1fr 0.85fr;}
+.z01-log-hdr,.z01-log-row{display:grid;border-bottom:1px solid rgba(255,255,255,0.05);}
+.z01-log-hdr{position:sticky;top:0;z-index:1;background:var(--bg);padding:3px 0;font-size:9px;color:var(--mut);letter-spacing:1px;border-bottom:1px solid var(--bdr);}
+.z01-log-hdr>div{text-align:center;padding:2px 0;}
+.z01-log-row{min-height:40px;}
+.z01-lc-s0,.z01-lc-s1{display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:21px;color:var(--txt);}
+.z01-lc-t0,.z01-lc-t1{display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--mut);}
+.z01-lc-t0.init,.z01-lc-t1.init{font-family:'Bebas Neue',cursive;font-size:22px;}
+.z01-lc-v{display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:14px;color:rgba(255,255,255,0.25);border-left:1px solid rgba(255,255,255,0.05);border-right:1px solid rgba(255,255,255,0.05);}
+.z01-lc-hi{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;border-radius:50%;border:1.5px solid var(--acc);color:var(--acc);font-size:18px;padding:0 3px;}
+.z01-log-row.cur0 .z01-lc-s0{background:rgba(232,255,71,0.1);}
+.z01-log-row.cur1 .z01-lc-s1{background:rgba(232,255,71,0.1);}
+/* 01 finish dart modal */
+.z01-finish-modal{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:460;display:flex;flex-direction:column;justify-content:flex-end;}
+.z01-finish-inner{background:#1c1c28;border-radius:18px 18px 0 0;padding:16px 0 32px;}
+.z01-finish-title{font-size:11px;color:var(--mut);letter-spacing:2px;text-align:center;padding:0 16px 12px;border-bottom:1px solid var(--bdr);}
+.z01-finish-btn{display:block;width:100%;background:transparent;border:none;border-bottom:1px solid var(--bdr);padding:16px;font-size:17px;color:var(--acc);cursor:pointer;font-weight:700;letter-spacing:1px;touch-action:manipulation;}
+.z01-finish-btn:last-child{border-bottom:none;}
+.z01-finish-btn:active{background:rgba(232,255,71,0.08);}
+/* 01 mid-game stats */
+.z01-midstats{position:fixed;inset:0;background:var(--bg);z-index:450;display:flex;flex-direction:column;}
+.z01-midstats-hdr{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--bdr);flex-shrink:0;}
+.z01-midstats-back{background:transparent;border:none;color:var(--acc);font-size:14px;font-weight:700;cursor:pointer;padding:4px 0;letter-spacing:1px;touch-action:manipulation;min-width:60px;}
+.z01-midstats-title{flex:1;text-align:center;font-size:14px;font-weight:700;letter-spacing:2px;color:var(--txt);}
+.z01-midstats-body{flex:1;overflow-y:auto;padding:14px;}
+.z01-midstats-pnames{display:grid;grid-template-columns:1fr 1fr;font-size:13px;font-weight:700;padding:0 0 8px;color:var(--txt);}
+.z01-midstats-pnames .r{text-align:right;}
+.z01-midstats-sect{background:var(--acc2);border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;color:#fff;letter-spacing:2px;margin:8px 0 2px;}
+.z01-midstats-row{display:grid;grid-template-columns:1fr 2fr 1fr;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.z01-midstats-row:last-child{border-bottom:none;}
+.z01-midstats-lv{font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1px;color:var(--txt);}
+.z01-midstats-mk{text-align:center;color:var(--mut);font-size:12px;letter-spacing:1px;display:flex;align-items:center;justify-content:center;}
+.z01-midstats-rv{font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1px;color:var(--txt);text-align:right;}
+.z01-stats-btn{background:transparent;border:1px solid var(--bdr);border-radius:6px;color:var(--mut);font-size:11px;padding:3px 8px;cursor:pointer;letter-spacing:1px;touch-action:manipulation;}
+.z01-stats-btn:active{opacity:.7;}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYXJ1LZ2J1"></script>
