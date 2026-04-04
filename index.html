@@ -2974,7 +2974,7 @@ function _renderTactics() {
       '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;position:relative;">' +
         '<span style="font-family:\'Bebas Neue\',cursive;font-size:36px;color:' + scoreColor + ';line-height:1;">' + n + '</span>' +
         '<span style="font-size:20px;color:var(--mut);">→</span>' +
-        (isSpecial ? '<span style="font-size:13px;color:var(--mut);text-decoration:line-through;margin-right:2px;">' + defTgt + '</span>' : '') +
+        (isSpecial && defTgt !== 'T18' ? '<span style="font-size:13px;color:var(--mut);text-decoration:line-through;margin-right:2px;">' + defTgt + '</span>' : '') +
         '<span style="font-size:18px;font-weight:700;color:' + scoreColor + ';">' + target + (zone === '300s' ? 'から狙う' : 'を狙う') + '</span>' +
       '</div>' +
       '<div style="display:flex;flex-direction:column;gap:8px;line-height:1.6;position:relative;">' +
