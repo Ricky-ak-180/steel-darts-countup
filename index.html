@@ -3077,9 +3077,8 @@ function _2hHtml(score) {
 
 function _renderTeiseki() {
   var entries = _buildTeisekiEntries();
-  if (_teisekiFilter === 99) entries = entries.filter(function(e){ return e.score >= 99 && e.score <= 170; });
-  else if (_teisekiFilter === 41) entries = entries.filter(function(e){ return e.score >= 41 && e.score <= 100; });
-  // 99はfilter=99に含む（上記で>=99なので含まれる）、100はfilter=41に含む（上記で<=100なので含まれる）
+  if (_teisekiFilter === 99) entries = entries.filter(function(e){ return e.score >= 99 && e.score <= 170 && e.score !== 100; });
+  else if (_teisekiFilter === 41) entries = entries.filter(function(e){ return e.score >= 41 && e.score <= 100 && e.score !== 99; });
   var html = '';
   entries.forEach(function(e) {
     if (!e.path) {
