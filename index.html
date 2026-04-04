@@ -3919,35 +3919,36 @@ function _z01HintUpdate() {
 
 function _z01BufUpdate(v) {
   _z01._buf = v;
-  var el = document.getElementById('z01-tkv');
-  var hint = document.getElementById('z01-tkh');
   var enter = document.getElementById('z01-enter');
-  if (!el) return;
-  el.style.color = '';
-  if (v === '') {
-    el.textContent = '—'; el.className = 'z01-tkv empty';
-    hint.textContent = 'このラウンドの合計を入力';
-    enter.className = 'z01-tk enter'; return;
+  var liveS = document.getElementById('z01-log-live');
+  var liveT = document.getElementById('z01-log-live-togo');
+  if (liveS) {
+    liveS.textContent = v || '';
+    liveS.classList.remove('typing', 'bust', 'finish');
+    if (v) {
+      var n = parseInt(v, 10), rem = _z01.remain[_z01.currentPlayer];
+      var after = rem - n;
+      var bust = _z01.outRule===0 ? (after<0||after===1) : (after<0);
+      if (bust) {
+        liveS.classList.add('bust');
+        if (liveT) liveT.innerHTML = '<span style="color:#ff4757;font-size:11px;">BUST</span>';
+      } else if (after === 0) {
+        liveS.classList.add('finish');
+        if (liveT) liveT.textContent = '🎯';
+      } else {
+        liveS.classList.add('typing');
+        if (liveT) liveT.textContent = n >= 0 && n <= 180 ? String(after) : '';
+      }
+    } else {
+      if (liveT) liveT.textContent = '';
+    }
   }
-  el.className = 'z01-tkv';
-  el.textContent = v;
-  var n = parseInt(v, 10), rem = _z01.remain[_z01.currentPlayer];
-  var after = rem - n;
-  if (n < 0 || n > 180) {
-    hint.textContent = '無効 (0〜180)'; el.style.color = '#ff4757';
-    enter.className = 'z01-tk enter'; return;
-  }
-  var bust = _z01.outRule===0 ? (after<0||after===1) : (after<0);
-  if (after === 0 && !bust) {
-    hint.textContent = '🎯 フィニッシュ！';
-    enter.className = 'z01-tk enter ready';
-  } else if (bust) {
-    hint.textContent = '💥 バスト！'; el.style.color = '#ff4757';
-    enter.className = 'z01-tk enter ready';
-  } else {
-    hint.textContent = '残り ' + after;
-    enter.className = 'z01-tk enter ready';
-  }
+  if (!enter) return;
+  if (!v) { enter.className = 'z01-tk enter'; return; }
+  var nv = parseInt(v, 10), rv = _z01.remain[_z01.currentPlayer];
+  if (isNaN(nv) || nv < 0 || nv > 180) { enter.className = 'z01-tk enter'; return; }
+  var bv = _z01.outRule===0 ? (rv-nv<0||rv-nv===1) : (rv-nv<0);
+  enter.className = 'z01-tk enter ready' + (bv ? ' bust' : '');
 }
 
 function z01Pre(arg) { _z01BufUpdate(String(arg)); z01Ok(); soundCommit(arg); }
