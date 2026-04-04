@@ -3883,6 +3883,8 @@ function z01SetLegs(arg) {
   document.querySelectorAll('#z01-setup-wrap [data-fn="z01SetLegs"]').forEach(function(el){
     el.classList.toggle('on', parseInt(el.getAttribute('data-arg'),10)===arg);
   });
+  var customRow = document.getElementById('z01-legs-custom-row');
+  if (customRow) customRow.style.display = (arg===0) ? '' : 'none';
 }
 function z01SetIn(arg) {
   _z01.inRule = arg;
