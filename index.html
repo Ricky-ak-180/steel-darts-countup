@@ -890,31 +890,42 @@ canvas.schart { width: 100%; height: 100%; }
   <div class="view hide" id="varr" style="overflow-y:auto;-webkit-overflow-scrolling:touch;">
     <!-- セットアップ画面 -->
     <div id="arr-setup">
-      <div class="arr-modes">
-        <button class="arr-mode on" data-fn="setArrMode" data-arg="0">初級</button>
-        <button class="arr-mode" data-fn="setArrMode" data-arg="1">中級</button>
-        <button class="arr-mode" data-fn="setArrMode" data-arg="2">上級</button>
-        <button class="arr-mode" data-fn="setArrMode" data-arg="3">全部</button>
+      <div class="arr-roadmap-hdr">
+        <div class="arr-roadmap-hdr-title">アレンジ習得ロードマップ</div>
       </div>
-      <div class="arr-start-wrap">
-        <div class="arr-start-title">10問チャレンジ</div>
-        <div class="arr-start-sub">アレンジを素早く判断する<br>多段式クイズ</div>
-        <div class="arr-start-rules">
-          <div>✦ 1本目の狙いを4択で答える（7秒制限）</div>
-          <div>✦ 外れたシナリオが続き2投・3投も問われる</div>
-          <div>✦ 速さ × 正確さでスコア算出</div>
+      <!-- STEP 1 -->
+      <div class="arr-step-card">
+        <div class="arr-step-badge">
+          <div class="arr-step-num">STEP 1</div>
+          <div class="arr-step-title">アレンジ表</div>
         </div>
-        <button class="arr-start-btn" data-fn="startArrSession">チャレンジ開始 →</button>
+        <div class="arr-step-sub">まずは表を眺めて基礎知識を学ぼう。削り戦術・ボギー回避も確認できる。</div>
+        <button class="arr-step-btn arr-step-btn-primary" data-fn="showTeiseki">表を開く →</button>
+      </div>
+      <!-- STEP 2 -->
+      <div class="arr-step-card">
+        <div class="arr-step-badge">
+          <div class="arr-step-num">STEP 2</div>
+          <div class="arr-step-title">10問チャレンジ</div>
+        </div>
+        <div class="arr-step-sub">クイズ形式でアレンジを素早く判断する力を養う。速さ × 正確さでスコア算出。</div>
+        <div class="arr-modes">
+          <button class="arr-mode on" data-fn="setArrMode" data-arg="0">初級</button>
+          <button class="arr-mode" data-fn="setArrMode" data-arg="1">中級</button>
+          <button class="arr-mode" data-fn="setArrMode" data-arg="2">上級</button>
+          <button class="arr-mode" data-fn="setArrMode" data-arg="3">全部</button>
+        </div>
+        <button class="arr-step-btn" data-fn="startArrSession">チャレンジ開始 →</button>
         <div class="arr-best-disp" id="arr-best-disp"></div>
-        <button class="arr-teiseki-btn" data-fn="showTeiseki">📋 アレンジ表を見る</button>
       </div>
-      <div class="arr-training-entry">
-        <div class="arr-divider">または</div>
-        <div class="arr-training-entry-inner">
-          <div class="arr-training-entry-title">🎯 アレンジトレーニング</div>
-          <div class="arr-training-entry-sub">実際に投げて身体に覚えさせよう<br>2 → 170 順番に制覇</div>
-          <button class="arr-training-start-btn" data-fn="showTraining">トレーニングを始める →</button>
+      <!-- STEP 3 -->
+      <div class="arr-step-card" style="margin-bottom:24px;">
+        <div class="arr-step-badge">
+          <div class="arr-step-num">STEP 3</div>
+          <div class="arr-step-title">アレンジトレーニング</div>
         </div>
+        <div class="arr-step-sub">実際にダーツを投げて身体に覚えさせよう。2 → 170 順番に制覇。</div>
+        <button class="arr-step-btn" data-fn="showTraining">トレーニングを始める →</button>
       </div>
     </div>
     <!-- トレーニングホーム -->
