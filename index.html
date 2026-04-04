@@ -3883,7 +3883,6 @@ function _z01Render() {
   document.getElementById('z01-players').innerHTML = h;
   document.getElementById('z01-leg-info').textContent =
     _z01.legs>1 ? 'Leg '+_z01.currentLeg+' / '+_z01.legs : 'Leg 1';
-  document.getElementById('z01-turn-info').textContent = _z01PlayerName(_z01.currentPlayer)+' のターン';
   var isCpu = _z01.players===3 && _z01.currentPlayer===1;
   document.getElementById('z01-cpu-area').style.display = isCpu?'':'none';
   document.getElementById('z01-input-area').style.display = isCpu?'none':'';
