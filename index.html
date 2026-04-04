@@ -3026,12 +3026,17 @@ function _delUserRoute(score, idx) {
   _renderTeiseki();
 }
 
-function _pathHtml(path, noFinish) {
+function _pathHtml(path, noFinish, startScore) {
   var h = '';
+  var rem = startScore || 0;
   path.forEach(function(d, i) {
     if (i > 0) h += '<span class="arr-t-arr">→</span>';
     var isFinish = !noFinish && i === path.length - 1;
     h += '<span class="arr-t-dart' + (isFinish ? ' finish' : '') + '">' + d + '</span>';
+    if (startScore && !isFinish) {
+      rem -= _dartVal(d);
+      h += '<span class="arr-t-remain">(' + rem + '残)</span>';
+    }
   });
   return h;
 }
