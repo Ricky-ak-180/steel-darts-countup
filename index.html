@@ -4209,7 +4209,10 @@ var _z01HintOn = false;
 function z01ToggleHint() {
   _z01HintOn = !_z01HintOn;
   var btn = document.getElementById('z01-hint-toggle');
-  if (btn) btn.classList.toggle('on', _z01HintOn);
+  if (btn) {
+    btn.classList.toggle('on', _z01HintOn);
+    btn.textContent = _z01HintOn ? 'アレンジ非表示' : 'アレンジ表示';
+  }
   _z01HintUpdate();
 }
 // Score edit state
