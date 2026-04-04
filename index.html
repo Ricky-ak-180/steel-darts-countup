@@ -4354,8 +4354,9 @@ function _z01LogRender() {
       h += '</div>';
     } else {
       h += '<div class="z01-log-row' + cls + '">';
-      h += _z01LogCell(row.p[0], 0, isCur, !isCur && row.p[0]!==null, i, 0);
+      h += _z01LogCellS(row.p[0], 0, isCur, !isCur && row.p[0]!==null, i);
       h += '<div class="z01-lc-v">' + row.visit + '</div>';
+      h += _z01LogCellT(row.p[0], 0, isCur);
       h += '</div>';
     }
   }
