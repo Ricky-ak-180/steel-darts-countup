@@ -3790,7 +3790,7 @@ function _z01CpuScore(remain) {
 function _z01InitStats(n) {
   var a = [];
   for (var i = 0; i < n; i++)
-    a.push({rounds:0, total:0, first9:[], c100:0, c140:0, c180:0, hiFin:0, bestLeg:999, legRounds:0});
+    a.push({rounds:0, total:0, first9:[], c100:0, c140:0, c180:0, hiFin:0, bestLeg:999, worstLeg:0, legRounds:0, finishDarts:0, totalFinishDarts:0});
   return a;
 }
 
