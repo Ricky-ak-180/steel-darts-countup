@@ -3223,12 +3223,18 @@ function _arrScrollChain() {
 
 function _arrBuildChoices(st) {
   var correct = st.path[0];
-  var isFinish = st.path.length === 1;
-  var correctChoice = isFinish ? correct : String(_dartVal(correct));
-  var pool = isFinish ? _ARR_FINISH_POOL : _ARR_VAL_POOL;
-  var decoys = _arrShuffle(pool.filter(function(d){ return d !== correctChoice; })).slice(0, 3);
-  _arrG.choices = _arrShuffle([correctChoice].concat(decoys));
-  _arrG.isFinish = isFinish;
+  var pool;
+  if (correct === 'Bull' || correct === '25') {
+    pool = ["Bull","25","T20","T19","T18","T17","D20","D16"];
+  } else if (correct[0] === 'T') {
+    pool = _ARR_TRIPLE_POOL;
+  } else if (correct[0] === 'D') {
+    pool = _ARR_DOUBLE_POOL;
+  } else {
+    pool = _ARR_SINGLE_POOL;
+  }
+  var decoys = _arrShuffle(pool.filter(function(d){ return d !== correct; })).slice(0, 3);
+  _arrG.choices = _arrShuffle([correct].concat(decoys));
   var choicesEl = document.getElementById('arr-choices');
   choicesEl.innerHTML = '';
   _arrG.choices.forEach(function(val, i) {
@@ -3242,124 +3248,18 @@ function _arrBuildChoices(st) {
   });
 }
 
-/* 現在のターンのステージ範囲を返す {start, end} */
-function _getTurnRange() {
-  var start = _arrG.stgIdx;
-  while (start > 0 && _arrG.stages[start].turnDart !== 1) start--;
-  var ts = _arrG.stages[start].turnScore;
-  var end = start;
-  while (end + 1 < _arrG.stages.length && _arrG.stages[end + 1].turnScore === ts) end++;
-  return { start: start, end: end };
-}
-
-/* ターンブロック（3段スロット）を描画 */
-function _renderTurnBlock() {
-  var range = _getTurnRange();
-  var st0 = _arrG.stages[range.start];
-  var totalInTurn = range.end - range.start + 1;
-  var html = '<div class="arr-turn-score-hdr">' +
-    '<span class="arr-turn-score-num">' + st0.turnScore + '</span>' +
-    '<span class="arr-turn-score-sub">' + totalInTurn + '本残り</span>' +
-    '</div>';
-  for (var i = range.start; i <= range.end; i++) {
-    var s = _arrG.stages[i];
-    var slotState, badgeClass = '', label;
-    if (i < _arrG.stgIdx) {
-      var no = s.nextOutcome;
-      slotState = 'done';
-      badgeClass = no ? (no.type === 'success' ? 'success' : 'miss') : '';
-      label = no ? '<span class="arr-slot-aim">' + no.dart + '</span> → ' + no.label : '完了';
-    } else if (i === _arrG.stgIdx) {
-      slotState = 'active';
-      var isFinish = s.path.length === 1;
-      label = isFinish ? 'フィニッシュ！ダブルは？' : (s.turnDart === 1 ? '何点入れる？' : '次は何点？');
-    } else {
-      slotState = 'pending';
-      label = '─';
-    }
-    html += '<div class="arr-dart-slot ' + slotState + (badgeClass ? ' ' + badgeClass : '') + '">' +
-      '<span class="arr-slot-num">第' + s.turnDart + '投</span>' +
-      '<span class="arr-slot-label">' + label + '</span>' +
-      '</div>';
-  }
-  document.getElementById('arr-turn-block').innerHTML = html;
-}
-
-/* 完了したターンを過去履歴HTMLとして生成 */
-function _buildPastTurnHtml() {
-  var range = _getTurnRange();
-  var st0 = _arrG.stages[range.start];
-  var html = '<div class="arr-past-turn"><div class="arr-past-turn-score">' + st0.turnScore + '</div>';
-  for (var i = range.start; i <= range.end; i++) {
-    var no = _arrG.stages[i].nextOutcome;
-    if (no) {
-      var cls = no.type === 'success' ? 'success' : 'miss';
-      html += '<div class="arr-chain-entry ' + cls + '">' +
-        '<span class="arr-chain-aim">' + no.dart + ' →</span> ' + no.label +
-        '</div>';
-    }
-  }
-  html += '</div>';
-  return html;
-}
-
 function _arrShowStage() {
   var st = _arrG.stages[_arrG.stgIdx];
-  var stageNames = ['第1投','第2投','第3投'];
-  var stageName = stageNames[st.turnDart - 1] || ('第' + st.turnDart + '投');
-  var isNewTurn = _arrG.stgIdx > 0 && st.turnDart === 1;
-
-  document.getElementById('arr-hud-q').textContent = '問題 ' + (_arrG.qIdx+1) + ' / 10';
-  document.getElementById('arr-hud-stage').textContent = stageName;
+  document.getElementById('arr-hud-q').textContent = '問題 ' + (_arrG.qIdx + 1) + ' / 10';
   document.getElementById('arr-hud-score').textContent = _arrG.totalScore;
+  document.getElementById('arr-q-score').textContent = st.score;
   document.getElementById('arr-result').className = 'arr-result hide';
-  document.getElementById('arr-result').textContent = '';
+  document.getElementById('arr-answer-path').className = 'arr-answer-path hide';
   document.getElementById('arr-next-row').className = 'arr-next-row hide';
-
   _arrBuildChoices(st);
-  var choicesEl = document.getElementById('arr-choices');
-
-  // ボードに「今の狙い」をセット（答える前）
-  _updateBoardPanel(st.path[0], null, null);
-
-  if (_arrG.stgIdx === 0) {
-    // 最初：チェーンリセット、ターンブロック描画
-    _arrG.chainHtml = '';
-    document.getElementById('arr-chain').innerHTML = '';
-    _renderTurnBlock();
-    choicesEl.style.display = '';
-    document.getElementById('arr-timer-bar').style.width = '100%';
-    _arrG.stageStart = Date.now();
-    _startArrTimer();
-    _arrScrollChain();
-  } else if (isNewTurn) {
-    // ターン終了→新ターン: 完了ターンを過去へ移動、1.2s後に新スコア表示
-    var pastHtml = _buildPastTurnHtml();
-    _arrG.chainHtml += pastHtml + '<div class="arr-chain-turn-sep">— ラウンド終了 —</div>';
-    document.getElementById('arr-chain').innerHTML = _arrG.chainHtml;
-    document.getElementById('arr-turn-block').innerHTML = '';
-    choicesEl.style.display = 'none';
-    document.getElementById('arr-timer-bar').style.width = '0%';
-    _arrScrollChain();
-    _arrG.advTimeout = setTimeout(function() {
-      _arrG.advTimeout = null;
-      _renderTurnBlock();
-      _updateBoardPanel(st.path[0], null, null);
-      choicesEl.style.display = '';
-      document.getElementById('arr-timer-bar').style.width = '100%';
-      _arrG.stageStart = Date.now();
-      _startArrTimer();
-      _arrScrollChain();
-    }, 1200);
-  } else {
-    // ターン内継続：ターンブロックを更新（済みスロット反映）
-    _renderTurnBlock();
-    choicesEl.style.display = '';
-    document.getElementById('arr-timer-bar').style.width = '100%';
-    _arrG.stageStart = Date.now();
-    _startArrTimer();
-    _arrScrollChain();
-  }
+  document.getElementById('arr-timer-bar').style.width = '100%';
+  _arrG.stageStart = Date.now();
+  _startArrTimer();
 }
 
 /* タイマー（5秒） */
