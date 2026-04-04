@@ -3165,6 +3165,210 @@ function _renderArrHist() {
 
 function initArr() { _renderArrBest(); _renderArrHist(); }
 
+/* ============================================================
+   アレンジトレーニング
+   ============================================================ */
+var _TRAIN_HINT_HIDE = 3;
+var _TRAIN_MASTER    = 3;
+var _TRAIN_PERFECT   = 5;
+
+var _TRAIN_SCORES = (function() {
+  var arr = [];
+  for (var i = 2; i <= 40; i += 2) arr.push(i);
+  for (var n = 41; n <= 170; n++) {
+    if (CHECKOUT[n] || BOGEY_NUMS.indexOf(n) >= 0) arr.push(n);
+  }
+  return arr;
+})();
+
+var _trainCurrent = null;
+var _trainHintVis  = false;
+
+function _trainLoad() {
+  try { return JSON.parse(localStorage.getItem('arr_train_v1') || '{}'); } catch(e) { return {}; }
+}
+function _trainSave(d) { localStorage.setItem('arr_train_v1', JSON.stringify(d)); }
+function _trainEntry(score, d) { return d[score] || {c:0, a:0}; }
+function _trainIsBogey(score) { return BOGEY_NUMS.indexOf(score) >= 0; }
+
+function _trainUnlocked(idx, d) {
+  if (idx === 0) return true;
+  var prev = _TRAIN_SCORES[idx - 1];
+  if (_trainIsBogey(prev)) return _trainUnlocked(idx - 1, d);
+  return (_trainEntry(prev, d).c >= 1);
+}
+
+function _trainTileClass(score, idx, d) {
+  if (!_trainUnlocked(idx, d)) return 'locked';
+  if (_trainIsBogey(score)) return 'bogey';
+  var c = _trainEntry(score, d).c;
+  if (c >= _TRAIN_PERFECT) return 'perfect';
+  if (c >= _TRAIN_MASTER)  return 'mastered';
+  if (c >= 1)              return 'started';
+  return 'unstarted';
+}
+
+function _trainNextScore(current) {
+  var idx = _TRAIN_SCORES.indexOf(current);
+  for (var i = idx + 1; i < _TRAIN_SCORES.length; i++) {
+    if (!_trainIsBogey(_TRAIN_SCORES[i])) return _TRAIN_SCORES[i];
+  }
+  return null;
+}
+
+function showTraining() {
+  document.getElementById('arr-setup').style.display = 'none';
+  document.getElementById('arr-hist-wrap').style.display = 'none';
+  document.getElementById('arr-train-home').style.display = 'flex';
+  document.getElementById('arr-train-prac').style.display = 'none';
+  _renderTrainMap();
+}
+
+function trainBackToMap() {
+  document.getElementById('arr-train-prac').style.display = 'none';
+  document.getElementById('arr-train-home').style.display = 'flex';
+  _renderTrainMap();
+}
+
+function trainContinue() {
+  var d = _trainLoad();
+  for (var i = 0; i < _TRAIN_SCORES.length; i++) {
+    if (!_trainUnlocked(i, d)) break;
+    var s = _TRAIN_SCORES[i];
+    if (!_trainIsBogey(s) && _trainEntry(s, d).c < _TRAIN_MASTER) { trainStart(s); return; }
+  }
+  trainStart(_TRAIN_SCORES[_TRAIN_SCORES.length - 1]);
+}
+
+function trainStart(score) {
+  score = parseInt(score, 10);
+  if (_trainIsBogey(score)) return;
+  _trainCurrent = score;
+  var d = _trainLoad();
+  var entry = _trainEntry(score, d);
+  _trainHintVis = entry.c < _TRAIN_HINT_HIDE;
+  document.getElementById('arr-train-home').style.display = 'none';
+  document.getElementById('arr-train-prac').style.display = 'flex';
+  _renderTrainPrac(score, entry);
+}
+
+function trainToggleHint() {
+  _trainHintVis = !_trainHintVis;
+  _applyTrainHintVis();
+}
+
+function _applyTrainHintVis() {
+  var box = document.getElementById('arr-tp-hint-box');
+  var btn = document.getElementById('arr-tp-hint-btn');
+  box.style.display = _trainHintVis ? '' : 'none';
+  if (btn) btn.textContent = _trainHintVis ? '🙈 ヒントを隠す' : '👁 ヒントを見る';
+}
+
+function _renderTrainPrac(score, entry) {
+  if (!entry) { var d = _trainLoad(); entry = _trainEntry(score, d); }
+  var c = entry.c;
+  document.getElementById('arr-tp-header-score').textContent = score;
+  document.getElementById('arr-tp-header-clears').textContent = c + '回クリア';
+  document.getElementById('arr-tp-score-big').textContent = score;
+  var stars = '';
+  for (var i = 0; i < _TRAIN_MASTER; i++) stars += (i < Math.min(c, _TRAIN_MASTER)) ? '★' : '☆';
+  if (c >= _TRAIN_PERFECT) stars = '🌟 PERFECT';
+  document.getElementById('arr-tp-stars').textContent = stars;
+  var path = score <= 40 ? ['D' + (score / 2)] : CHECKOUT[score];
+  document.getElementById('arr-tp-hint-box').innerHTML = _pathHtml(path);
+  var hintBtn = document.getElementById('arr-tp-hint-btn');
+  hintBtn.style.display = c >= _TRAIN_HINT_HIDE ? '' : 'none';
+  _applyTrainHintVis();
+  var tip = document.getElementById('arr-tp-tip');
+  if (CHECKOUT_TIPS[score]) { tip.textContent = CHECKOUT_TIPS[score]; tip.style.display = ''; }
+  else { tip.style.display = 'none'; }
+  document.getElementById('arr-tp-result-row').style.display = 'none';
+}
+
+function trainResult(ok) {
+  ok = (parseInt(ok, 10) === 1);
+  var d = _trainLoad();
+  if (!d[_trainCurrent]) d[_trainCurrent] = {c:0, a:0};
+  d[_trainCurrent].a++;
+  if (ok) d[_trainCurrent].c++;
+  _trainSave(d);
+  var entry = d[_trainCurrent];
+  var c = entry.c;
+  var stars = '';
+  for (var i = 0; i < _TRAIN_MASTER; i++) stars += (i < Math.min(c, _TRAIN_MASTER)) ? '★' : '☆';
+  if (c >= _TRAIN_PERFECT) stars = '🌟 PERFECT';
+  document.getElementById('arr-tp-stars').textContent = stars;
+  document.getElementById('arr-tp-header-clears').textContent = c + '回クリア';
+  if (ok && c === _TRAIN_HINT_HIDE) {
+    _trainHintVis = false;
+    document.getElementById('arr-tp-hint-btn').style.display = '';
+    _applyTrainHintVis();
+  }
+  var unlockEl = document.getElementById('arr-tp-unlock-msg');
+  var next = _trainNextScore(_trainCurrent);
+  if (ok && c === 1 && next) unlockEl.textContent = '🔓 ' + next + ' をアンロック！';
+  else if (ok && c === _TRAIN_HINT_HIDE) unlockEl.textContent = '✨ ヒントが自動非表示になりました';
+  else if (ok && c >= _TRAIN_PERFECT && c === _TRAIN_PERFECT) unlockEl.textContent = '🌟 PERFECTマスター！';
+  else unlockEl.textContent = '';
+  document.getElementById('arr-tp-next-btn').textContent = next ? '次のスコアへ →' : '一覧へ戻る';
+  document.getElementById('arr-tp-result-row').style.display = '';
+}
+
+function trainNext() {
+  var next = _trainNextScore(_trainCurrent);
+  if (next) trainStart(next);
+  else trainBackToMap();
+}
+
+function _renderTrainMap() {
+  var d = _trainLoad();
+  var total = 0, mastered = 0;
+  _TRAIN_SCORES.forEach(function(s) {
+    if (!_trainIsBogey(s)) { total++; if (_trainEntry(s, d).c >= _TRAIN_MASTER) mastered++; }
+  });
+  document.getElementById('arr-train-progress').textContent = mastered + ' / ' + total + ' マスター';
+  var continueScore = null;
+  for (var j = 0; j < _TRAIN_SCORES.length; j++) {
+    if (!_trainUnlocked(j, d)) break;
+    var sc = _TRAIN_SCORES[j];
+    if (!_trainIsBogey(sc) && _trainEntry(sc, d).c < _TRAIN_MASTER) { continueScore = sc; break; }
+  }
+  var contWrap = document.getElementById('arr-train-continue-wrap');
+  if (continueScore !== null) {
+    document.getElementById('arr-train-continue-score').textContent = continueScore;
+    contWrap.style.display = '';
+  } else {
+    contWrap.style.display = 'none';
+  }
+  var sections = [
+    {lbl:'DOUBLES — 2〜40', from:2, to:40},
+    {lbl:'2本フィニッシュ — 41〜100', from:41, to:100},
+    {lbl:'3本フィニッシュ — 101〜170', from:101, to:170}
+  ];
+  var html = '';
+  sections.forEach(function(sec) {
+    var tiles = [];
+    for (var k = 0; k < _TRAIN_SCORES.length; k++) {
+      var s = _TRAIN_SCORES[k];
+      if (s >= sec.from && s <= sec.to) tiles.push({s:s, idx:k});
+    }
+    if (!tiles.length) return;
+    html += '<div class="arr-train-section"><div class="arr-train-section-lbl">' + sec.lbl + '</div><div class="arr-train-grid">';
+    tiles.forEach(function(t) {
+      var cls = _trainTileClass(t.s, t.idx, d);
+      var fn = (cls !== 'locked' && cls !== 'bogey') ? ' data-fn="trainStart" data-arg="' + t.s + '"' : '';
+      var c = _trainEntry(t.s, d).c;
+      var sub = '';
+      if (cls === 'bogey') sub = '<div class="t-sub">×</div>';
+      else if (cls === 'locked') sub = '<div class="t-sub">🔒</div>';
+      else if (c > 0) sub = '<div class="t-sub">' + (c >= _TRAIN_PERFECT ? '★' : c + '/' + _TRAIN_MASTER) + '</div>';
+      html += '<div class="arr-train-tile ' + cls + '"' + fn + '><div class="t-num">' + t.s + '</div>' + sub + '</div>';
+    });
+    html += '</div></div>';
+  });
+  document.getElementById('arr-train-map').innerHTML = html;
+}
+
 /* 高速タッチ処理 */
 var _fns = { kp: kp, kd: kd, doOk: doOk, commit: commit,
   undoRound: undoRound, resetGame: resetGame,
