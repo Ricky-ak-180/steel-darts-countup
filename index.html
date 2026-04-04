@@ -459,6 +459,10 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-hist-right { display:flex; align-items:baseline; gap:4px; }
 .arr-hist-score { font-family:'Bebas Neue',cursive; font-size:16px; color:var(--fg); }
 /* 定石表ボタン */
+/* ターン終了ラベル */
+.arr-turn-end-lbl { font-size:11px; letter-spacing:2px; color:var(--mut); margin:6px 0 2px; text-align:center; }
+/* ターン内スコア（ぼかさず元の点数を継続表示） */
+.arr-score-turn { opacity:0.5; }
 .arr-teiseki-btn { display:block; width:calc(100% - 24px); margin:8px 0 0; background:transparent; color:var(--mut); border:1px solid var(--bd); border-radius:12px; padding:10px; font-size:13px; cursor:pointer; }
 .arr-teiseki-btn:active { opacity:.7; }
 /* 定石表パネル */
@@ -2190,12 +2194,15 @@ function _buildArrStages(score) {
   var stages = [];
   var cur = score;
   var prevOutcome = null;
-  var MAX_DARTS = 9; // 最大9投（3ターン分）で安全停止
+  var MAX_DARTS = 12; // 最大12投（4ターン分）で安全停止
+  var turnDart = 1;   // 今のターン内の何投目か（1〜3）
+  var turnScore = score; // このターン開始時のスコア（プレイヤーに見せる数字）
 
   for (var i = 0; i < MAX_DARTS; i++) {
     var p = _getPath(cur);
     if (!p) break;
-    stages.push({ score: cur, path: p, prevOutcome: prevOutcome });
+    stages.push({ score: cur, path: p, prevOutcome: prevOutcome,
+                  turnDart: turnDart, turnScore: turnScore });
 
     var dart = p[0];
     var opts = _getMissOptions(dart, cur);
@@ -2205,13 +2212,11 @@ function _buildArrStages(score) {
     var successOpt = opts.filter(function(o){ return o.type === 'success'; })[0];
     var pick;
 
-    // 最後の安全投: 強制的に成功させてチェックアウト完了へ
     if (i >= MAX_DARTS - 1) {
       pick = successOpt || opts[0];
     } else if (missOpts.length === 0) {
       pick = successOpt;
     } else {
-      // 成功40% ミス60% でランダム選択（ミス多めで練習になる）
       var r = Math.random();
       pick = (r < 0.4 && successOpt) ? successOpt
            : missOpts[Math.floor(Math.random() * missOpts.length)];
@@ -2220,7 +2225,15 @@ function _buildArrStages(score) {
     stages[i].nextOutcome = pick;
     prevOutcome = pick;
     cur = pick.newScore;
-    if (cur === 0) break; // チェックアウト完了 → 1問終了
+    if (cur === 0) break; // チェックアウト完了
+
+    if (turnDart >= 3) {
+      // 3本使い切り → 次のターン開始（残り点数を新たに表示）
+      turnDart = 1;
+      turnScore = cur;
+    } else {
+      turnDart++;
+    }
   }
   return stages;
 }
@@ -2328,9 +2341,10 @@ function _arrShowStage() {
   var st = _arrG.stages[_arrG.stgIdx];
   var correct = st.path[0];
   var stageNames = ['第1投','第2投','第3投'];
-  var stageName = stageNames[_arrG.stgIdx] || ('第' + (_arrG.stgIdx+1) + '投');
-  var dartsLeft = st.path.length; // このスコアを仕上げるのに必要な本数
-  var isFinish = dartsLeft === 1; // ダブル or Bull でフィニッシュ
+  var stageName = stageNames[st.turnDart - 1] || ('第' + st.turnDart + '投');
+  var dartsLeft = st.path.length;
+  var isFinish = dartsLeft === 1;
+  var isNewTurn = _arrG.stgIdx > 0 && st.turnDart === 1; // ターン切り替わり
   var qLabel = isFinish ? 'フィニッシュ！ダブルは？' :
                _arrG.stgIdx === 0 ? '何点入れる？' : '次は何点？';
 
@@ -2339,8 +2353,7 @@ function _arrShowStage() {
   document.getElementById('arr-hud-stage').textContent = stageName;
   document.getElementById('arr-hud-score').textContent = _arrG.totalScore;
 
-  // 4択を事前生成（中間：値, フィニッシュ：ダブル記号）
-  var isFinish = dartsLeft === 1;
+  // 4択（中間：値, フィニッシュ：ダブル記号）
   var correctChoice = isFinish ? correct : String(_dartVal(correct));
   var pool = isFinish ? _ARR_FINISH_POOL : _ARR_VAL_POOL;
   var decoys = _arrShuffle(pool.filter(function(d){ return d !== correctChoice; })).slice(0, 3);
@@ -2361,12 +2374,12 @@ function _arrShowStage() {
   document.getElementById('arr-result').textContent = '';
   document.getElementById('arr-next-row').className = 'arr-next-row hide';
 
-  // シナリオ表示
   var scenEl = document.getElementById('arr-scenario');
+
   if (_arrG.stgIdx === 0) {
-    // ステージ0：即表示
+    // 最初のステージ：即表示
     scenEl.innerHTML =
-      '<span class="arr-remaining">' + st.score + '</span>' +
+      '<span class="arr-remaining">' + st.turnScore + '</span>' +
       '<span class="arr-darts-lbl">' + dartsLeft + '本残り</span>' +
       '<span class="arr-q-label">' + qLabel + '</span>';
     choicesEl.style.display = '';
@@ -2374,30 +2387,47 @@ function _arrShowStage() {
     _arrG.stageStart = Date.now();
     _startArrTimer();
   } else {
-    // ステージ1+：まず「どこに刺さったか」を見せてから、次の問いへ
     var po = st.prevOutcome;
     var badgeClass = po.type === 'success' ? 'success' : 'miss';
-    var revealText = po.label;
-    var badgeHtml = '<div class="arr-dart-result">' +
-      '<div class="arr-dart-result-badge ' + badgeClass + '" style="font-size:15px;padding:9px 18px">' + revealText + '</div>' +
-      '<div class="arr-dart-result-score">' + st.score + '</div>' +
-      '<span class="arr-darts-lbl">' + dartsLeft + '本残り</span>' +
-      '</div>';
+    var badgeHtml;
 
-    // フェーズ1: 刺さった場所を見せる（選択肢なし）
-    scenEl.innerHTML = badgeHtml;
-    choicesEl.style.display = 'none';
-    document.getElementById('arr-timer-bar').style.width = '0%';
-
-    // フェーズ2: 800ms後に問いと選択肢を表示してタイマー開始
-    _arrG.advTimeout = setTimeout(function() {
-      _arrG.advTimeout = null;
-      scenEl.innerHTML = badgeHtml +
-        '<span class="arr-q-label" style="margin-top:4px">' + qLabel + '</span>';
-      choicesEl.style.display = '';
-      _arrG.stageStart = Date.now();
-      _startArrTimer();
-    }, 800);
+    if (isNewTurn) {
+      // ターン切り替わり：「ラウンド終了」＋残り点数を明かす
+      badgeHtml = '<div class="arr-dart-result">' +
+        '<div class="arr-dart-result-badge ' + badgeClass + '" style="font-size:15px;padding:9px 18px">' + po.label + '</div>' +
+        '<div class="arr-turn-end-lbl">— ラウンド終了 —</div>' +
+        '<div class="arr-dart-result-score">' + st.turnScore + '</div>' +
+        '<span class="arr-darts-lbl">' + dartsLeft + '本残り</span>' +
+        '</div>';
+      scenEl.innerHTML = badgeHtml;
+      choicesEl.style.display = 'none';
+      document.getElementById('arr-timer-bar').style.width = '0%';
+      _arrG.advTimeout = setTimeout(function() {
+        _arrG.advTimeout = null;
+        scenEl.innerHTML = badgeHtml +
+          '<span class="arr-q-label" style="margin-top:4px">' + qLabel + '</span>';
+        choicesEl.style.display = '';
+        _arrG.stageStart = Date.now();
+        _startArrTimer();
+      }, 1400);
+    } else {
+      // ターン内：残り点数は隠したまま（turnScoreを表示し続ける）
+      badgeHtml = '<div class="arr-dart-result">' +
+        '<div class="arr-dart-result-badge ' + badgeClass + '" style="font-size:15px;padding:9px 18px">' + po.label + '</div>' +
+        '<div class="arr-dart-result-score arr-score-turn">' + st.turnScore + '</div>' +
+        '</div>';
+      scenEl.innerHTML = badgeHtml;
+      choicesEl.style.display = 'none';
+      document.getElementById('arr-timer-bar').style.width = '0%';
+      _arrG.advTimeout = setTimeout(function() {
+        _arrG.advTimeout = null;
+        scenEl.innerHTML = badgeHtml +
+          '<span class="arr-q-label" style="margin-top:4px">' + qLabel + '</span>';
+        choicesEl.style.display = '';
+        _arrG.stageStart = Date.now();
+        _startArrTimer();
+      }, 800);
+    }
   }
 }
 
@@ -2431,8 +2461,8 @@ function chooseArr(idx) {
   var chosen = isTimeout ? null : _arrG.choices[idx];
   var isCorrect = !isTimeout && chosen === correct;
 
-  // 得点計算
-  var base = _ARR_BASE_PTS[Math.min(_arrG.stgIdx, 2)];
+  // 得点計算（ターン内の投数に応じた基本点）
+  var base = _ARR_BASE_PTS[Math.min(st.turnDart - 1, 2)];
   var speed = isCorrect ? Math.max(0, 1 - elapsed / _arrG.STAGE_MS) : 0;
   var pts = Math.round(base * speed);
   _arrG.totalScore += pts;
