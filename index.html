@@ -2803,77 +2803,40 @@ function _renderTactics() {
     '</div>';
   }
 
-  // 高スコア帯
-  html += '<div style="background:rgba(232,255,71,0.07);border:1px solid rgba(232,255,71,0.15);border-radius:10px;padding:10px 14px;margin-bottom:16px;">' +
-    '<div style="font-size:12px;font-weight:700;color:var(--acc);margin-bottom:2px;">351〜501</div>' +
-    '<div style="font-size:13px;color:var(--fg);">常に <strong>T20</strong></div>' +
-    '<div style="font-size:11px;color:var(--mut);margin-top:4px;">ボギーナンバーに当たる可能性がなく、最大得点を狙うのが正解。</div>' +
+  // 351〜501: T20のみ
+  html += '<div style="background:rgba(232,255,71,0.07);border:1px solid rgba(232,255,71,0.15);border-radius:10px;padding:10px 14px;margin-bottom:20px;">' +
+    '<div style="font-size:13px;font-weight:700;color:var(--acc);margin-bottom:2px;">351〜501点台</div>' +
+    '<div style="font-size:15px;font-weight:700;color:var(--fg);">常に T20</div>' +
+    '<div style="font-size:11px;color:var(--mut);margin-top:4px;">ボギーナンバーに当たる可能性がなく、最大得点を狙うのが正解。末尾ルール不要。</div>' +
   '</div>';
 
-  // T19を使う（171〜350）
-  html += '<div class="tac-section-title" style="color:#ff8a65;">T19 を使うスコア 171〜350（末尾 3・6・9）</div>';
-  html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">';
-  for (var n = 171; n <= 350; n++) {
-    if (TACTICS_EXCEPTIONS[n]) continue;
-    var d = n % 10;
-    if (d===3||d===6||d===9) {
-      var miss = n - 19;
-      var missNote = BOGEY_NUMS.indexOf(miss) >= 0 ? '⚠' : '';
-      html += '<div style="background:rgba(255,138,101,0.12);border:1px solid rgba(255,138,101,0.3);border-radius:8px;padding:5px 10px;text-align:center;">' +
-        '<div style="font-family:\'Bebas Neue\',cursive;font-size:17px;color:#ff8a65;">' + n + missNote + '</div>' +
-        '<div style="font-size:9px;color:var(--mut);">S19→' + miss + '</div>' +
-      '</div>';
-    }
-  }
-  html += '</div>';
+  // 300〜350
+  html += rangeSection(
+    '300〜350点台',
+    'T20を基本に末尾ルールを適用。1〜2ラウンドで200点台へ。ボギーナンバーからはまだ遠く比較的安全だが、パターンを身体に染み込ませる練習として活用。',
+    300, 350
+  );
 
-  // T18を使う（171〜350）
-  html += '<div class="tac-section-title" style="color:#4fc3f7;">T18 を使うスコア 171〜350（末尾 2・5・8）</div>';
-  html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">';
-  for (var n = 171; n <= 350; n++) {
-    var ex = TACTICS_EXCEPTIONS[n];
-    var d = n % 10;
-    if (d===2||d===5||d===8) {
-      if (ex) {
-        html += '<div style="background:rgba(255,213,79,0.15);border:1px solid rgba(255,213,79,0.4);border-radius:8px;padding:5px 10px;text-align:center;">' +
-          '<div style="font-family:\'Bebas Neue\',cursive;font-size:17px;color:#ffd54f;">' + n + '★</div>' +
-          '<div style="font-size:9px;color:#ffd54f;">' + ex.target + '</div>' +
-        '</div>';
-      } else {
-        var miss = n - 18;
-        var missNote = BOGEY_NUMS.indexOf(miss) >= 0 ? '⚠' : '';
-        html += '<div style="background:rgba(79,195,247,0.12);border:1px solid rgba(79,195,247,0.3);border-radius:8px;padding:5px 10px;text-align:center;">' +
-          '<div style="font-family:\'Bebas Neue\',cursive;font-size:17px;color:#4fc3f7;">' + n + missNote + '</div>' +
-          '<div style="font-size:9px;color:var(--mut);">S18→' + miss + '</div>' +
-        '</div>';
-      }
-    }
-  }
-  html += '</div>';
+  // 200〜299
+  html += rangeSection(
+    '200〜299点台',
+    '末尾ルールが重要になる。特に219〜226付近はルール通りに打つとヒット後にボギーになる危険スコアが存在する（★マーク）。1ラウンドでチェックアウト圏（170以内）に入れる可能性が出てくる。',
+    200, 299
+  );
 
-  // 特殊ケース説明
-  html += '<div class="tac-section-title" style="color:#ffd54f;">★ 特殊ケース</div>';
-  Object.keys(TACTICS_EXCEPTIONS).forEach(function(k) {
-    var n = +k; var ex = TACTICS_EXCEPTIONS[n];
-    var d = n % 10;
-    var defTgt = (d===0||d===1||d===4||d===7)?'T20':(d===2||d===5||d===8)?'T18':'T19';
-    html += '<div class="tac-special-row">' +
-      '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
-        '<span class="tac-special-score">' + n + '</span>' +
-        '<span style="font-size:12px;color:var(--mut);text-decoration:line-through;">' + defTgt + '</span>' +
-        '<span style="color:var(--mut);">→</span>' +
-        '<span class="tac-rule-target tac-special">' + ex.target + '</span>' +
-        '<span style="font-size:13px;color:var(--fg);">→ <strong>' + ex.hitLeave + '</strong>残し</span>' +
-      '</div>' +
-      '<div class="tac-special-reason" style="margin-top:4px;">' + ex.reason + '</div>' +
-    '</div>';
-  });
+  // 171〜199
+  html += rangeSection(
+    '100〜199点台（アプローチゾーン）',
+    'チェックアウト圏に最も近い。179・186・189などはT19で打てばシングルミスしても160・167・170と上がり目が残る。ミス後のスコアを意識して狙う。',
+    171, 199
+  );
 
   // ボギーナンバー
-  html += '<div class="tac-section-title" style="margin-top:16px;">ボギーナンバー（3本で上がれない）</div>' +
+  html += '<div style="margin-top:8px;">' +
+    '<div style="font-size:11px;font-weight:700;letter-spacing:2px;color:var(--mut);margin-bottom:6px;">ボギーナンバー（3本で上がれない）</div>' +
     '<div class="tac-bogey-row">';
   BOGEY_NUMS.forEach(function(n){ html += '<span class="tac-bogey-badge">' + n + '</span>'; });
-  html += '</div>';
+  html += '</div></div>';
 
   document.getElementById('arr-teiseki-list').innerHTML = html;
 }
