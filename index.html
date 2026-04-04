@@ -398,6 +398,7 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-dart-result-badge { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; padding:6px 14px; border-radius:20px; }
 .arr-dart-result-badge.success { background:rgba(71,255,180,0.1); border:1px solid rgba(71,255,180,0.3); color:#47ffb4; }
 .arr-dart-result-badge.miss { background:rgba(255,107,53,0.1); border:1px solid rgba(255,107,53,0.3); color:var(--acc2); }
+.arr-badge-aim { opacity:0.7; font-weight:400; }
 .arr-dart-result-score { font-family:'Bebas Neue',cursive; font-size:64px; color:var(--acc); letter-spacing:3px; line-height:1; }
 /* タイマーバー */
 .arr-timer-wrap { width:100%; height:5px; background:var(--bd); border-radius:3px; overflow:hidden; }
@@ -2394,7 +2395,7 @@ function _arrShowStage() {
     if (isNewTurn) {
       // ターン切り替わり：「ラウンド終了」＋残り点数を明かす
       badgeHtml = '<div class="arr-dart-result">' +
-        '<div class="arr-dart-result-badge ' + badgeClass + '" style="font-size:15px;padding:9px 18px">' + po.label + '</div>' +
+        '<div class="arr-dart-result-badge ' + badgeClass + '" style="font-size:15px;padding:9px 18px"><span class="arr-badge-aim">' + po.dart + ' →</span> ' + po.label + '</div>' +
         '<div class="arr-turn-end-lbl">— ラウンド終了 —</div>' +
         '<div class="arr-dart-result-score">' + st.turnScore + '</div>' +
         '<span class="arr-darts-lbl">' + dartsLeft + '本残り</span>' +
@@ -2413,7 +2414,7 @@ function _arrShowStage() {
     } else {
       // ターン内：残り点数は隠したまま（turnScoreを表示し続ける）
       badgeHtml = '<div class="arr-dart-result">' +
-        '<div class="arr-dart-result-badge ' + badgeClass + '" style="font-size:15px;padding:9px 18px">' + po.label + '</div>' +
+        '<div class="arr-dart-result-badge ' + badgeClass + '" style="font-size:15px;padding:9px 18px"><span class="arr-badge-aim">' + po.dart + ' →</span> ' + po.label + '</div>' +
         '<div class="arr-dart-result-score arr-score-turn">' + st.turnScore + '</div>' +
         '</div>';
       scenEl.innerHTML = badgeHtml;
