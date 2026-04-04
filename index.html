@@ -2846,8 +2846,9 @@ function _renderTactics() {
       actionLines.push('<span style="color:#66bb6a;font-size:15px;">✓ ' + target + 'を狙えばS' + singleNum + 'ミスでも → ' + missLeave + '残し（安全）</span>');
     }
 
-    return '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:12px;padding:14px 16px;margin-bottom:10px;">' +
-      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">' +
+    return '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:12px;padding:14px 16px;margin-bottom:10px;position:relative;overflow:hidden;">' +
+      '<div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:\'Bebas Neue\',cursive;font-size:64px;color:' + borderColor + ';line-height:1;pointer-events:none;user-select:none;">' + target + '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;position:relative;">' +
         '<span style="font-family:\'Bebas Neue\',cursive;font-size:36px;color:' + scoreColor + ';line-height:1;">' + n + '</span>' +
         '<span style="font-size:20px;color:var(--mut);">→</span>' +
         (isSpecial ? '<span style="font-size:13px;color:var(--mut);text-decoration:line-through;margin-right:2px;">' + defTgt + '</span>' : '') +
