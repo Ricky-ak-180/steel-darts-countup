@@ -3580,6 +3580,325 @@ function _renderTrainMap() {
   document.getElementById('arr-train-map').innerHTML = html;
 }
 
+/* ====================== 01 GAME ====================== */
+var _z01 = {
+  mode: 501, legs: 1, inRule: 0, outRule: 0, players: 1, cpuLevel: 2,
+  names: ['Player 1', 'Player 2'],
+  remain: [501, 501], legWins: [0, 0], currentPlayer: 0, currentLeg: 1,
+  stats: null, _buf: ''
+};
+var _Z01_CPU_AVG = [0, 28, 48, 68, 82, 98];
+var _Z01_CPU_SD  = [0, 14, 17, 19, 16, 14];
+
+function _z01Norm() {
+  var u = 1 - Math.random(), v = 1 - Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+function _z01CpuScore(remain) {
+  if (remain <= 170 && CHECKOUT[remain]) {
+    var hp = [0, 0.04, 0.09, 0.2, 0.4, 0.65][_z01.cpuLevel];
+    if (Math.random() < hp) return remain;
+  }
+  var sc = Math.round(_Z01_CPU_AVG[_z01.cpuLevel] + _Z01_CPU_SD[_z01.cpuLevel] * _z01Norm());
+  sc = Math.max(0, Math.min(180, sc));
+  if (_z01.outRule === 0) {
+    if (remain - sc < 0 || remain - sc === 1) sc = Math.max(0, remain - 2);
+    if (remain - sc < 0 || remain - sc === 1) sc = 0;
+  } else {
+    if (remain - sc < 0) sc = 0;
+  }
+  return sc;
+}
+
+function _z01InitStats(n) {
+  var a = [];
+  for (var i = 0; i < n; i++)
+    a.push({rounds:0, total:0, first9:[], c100:0, c140:0, c180:0, hiFin:0, bestLeg:999, legRounds:0});
+  return a;
+}
+
+function z01SetMode(arg) {
+  _z01.mode = arg;
+  document.querySelectorAll('#z01-setup-wrap [data-fn="z01SetMode"]').forEach(function(el){
+    el.classList.toggle('on', parseInt(el.getAttribute('data-arg'),10)===arg);
+  });
+  document.getElementById('z01-custom-row').style.display = (arg===0)?'':'none';
+}
+function z01SetLegs(arg) {
+  _z01.legs = arg;
+  document.querySelectorAll('#z01-setup-wrap [data-fn="z01SetLegs"]').forEach(function(el){
+    el.classList.toggle('on', parseInt(el.getAttribute('data-arg'),10)===arg);
+  });
+}
+function z01SetIn(arg) {
+  _z01.inRule = arg;
+  document.querySelectorAll('#z01-setup-wrap [data-fn="z01SetIn"]').forEach(function(el){
+    el.classList.toggle('on', parseInt(el.getAttribute('data-arg'),10)===arg);
+  });
+}
+function z01SetOut(arg) {
+  _z01.outRule = arg;
+  document.querySelectorAll('#z01-setup-wrap [data-fn="z01SetOut"]').forEach(function(el){
+    el.classList.toggle('on', parseInt(el.getAttribute('data-arg'),10)===arg);
+  });
+}
+function z01SetPlayers(arg) {
+  _z01.players = arg;
+  document.querySelectorAll('#z01-setup-wrap [data-fn="z01SetPlayers"]').forEach(function(el){
+    el.classList.toggle('on', parseInt(el.getAttribute('data-arg'),10)===arg);
+  });
+  document.getElementById('z01-name2').style.display = (arg===2)?'':'none';
+  document.getElementById('z01-cpu-section').style.display = (arg===3)?'':'none';
+}
+function z01SetCpu(arg) {
+  _z01.cpuLevel = arg;
+  document.querySelectorAll('#z01-setup-wrap [data-fn="z01SetCpu"]').forEach(function(el){
+    el.classList.toggle('on', parseInt(el.getAttribute('data-arg'),10)===arg);
+  });
+}
+
+function z01Start() {
+  var m = _z01.mode;
+  if (m === 0) { m = parseInt(document.getElementById('z01-custom-val').value,10)||501; _z01.mode = m; }
+  _z01.names[0] = document.getElementById('z01-name1').value.trim()||'Player 1';
+  _z01.names[1] = document.getElementById('z01-name2').value.trim()||(_z01.players===3?'CPU':'Player 2');
+  _z01.remain = [m, m];
+  _z01.legWins = [0, 0];
+  _z01.currentPlayer = 0;
+  _z01.currentLeg = 1;
+  _z01._buf = '';
+  _z01.stats = _z01InitStats(_z01.players===1?1:2);
+  document.getElementById('z01-setup-wrap').style.display = 'none';
+  document.getElementById('z01-result-wrap').style.display = 'none';
+  document.getElementById('z01-game-wrap').style.display = 'flex';
+  _z01BuildPresets();
+  _z01Render();
+  _z01HintUpdate();
+  if (_z01.players===3 && _z01.currentPlayer===1) _z01CpuTurn();
+}
+
+function _z01BuildPresets() {
+  var pre = [0, 26, 45, 60, 85, 100, 140, 180];
+  var h = '';
+  for (var i = 0; i < pre.length; i++) {
+    var v = pre[i];
+    h += '<div class="z01-pre" data-fn="z01Pre" data-arg="'+v+'">'+(v===0?'MISS':v)+'</div>';
+  }
+  document.getElementById('z01-presets').innerHTML = h;
+}
+
+function _z01PlayerName(idx) {
+  return (_z01.players===3 && idx===1) ? ('CPU Lv.'+_z01.cpuLevel) : _z01.names[idx];
+}
+
+function _z01Render() {
+  var n = _z01.players===1?1:2;
+  var h = '';
+  for (var i = 0; i < n; i++) {
+    var st = _z01.stats[i];
+    var avg = st.rounds>0 ? (st.total/st.rounds).toFixed(1) : '-';
+    var legs = _z01.legs>1 ? ' <span class="z01-p-legs">'+_z01.legWins[i]+'W</span>' : '';
+    h += '<div class="z01-player'+(_z01.currentPlayer===i?' active':'')+'">';
+    h += '<div class="z01-p-name">'+_z01PlayerName(i)+legs+'</div>';
+    h += '<div class="z01-p-remain">'+_z01.remain[i]+'</div>';
+    h += '<div class="z01-p-avg">AVG '+avg+'</div></div>';
+  }
+  document.getElementById('z01-players').innerHTML = h;
+  document.getElementById('z01-leg-info').textContent =
+    _z01.legs>1 ? 'Leg '+_z01.currentLeg+' / '+_z01.legs : 'Leg 1';
+  document.getElementById('z01-turn-info').textContent = _z01PlayerName(_z01.currentPlayer)+' のターン';
+  var isCpu = _z01.players===3 && _z01.currentPlayer===1;
+  document.getElementById('z01-cpu-area').style.display = isCpu?'':'none';
+  document.getElementById('z01-input-area').style.display = isCpu?'none':'';
+  _z01BufUpdate('');
+}
+
+function _z01HintUpdate() {
+  var el = document.getElementById('z01-checkout-hint');
+  var rem = _z01.remain[_z01.currentPlayer];
+  if (rem > 0 && rem <= 170 && CHECKOUT[rem]) {
+    el.textContent = '🎯 ' + CHECKOUT[rem].join(' → ');
+    el.classList.add('show');
+  } else {
+    el.classList.remove('show');
+  }
+}
+
+function _z01BufUpdate(v) {
+  _z01._buf = v;
+  var el = document.getElementById('z01-tkv');
+  var hint = document.getElementById('z01-tkh');
+  var enter = document.getElementById('z01-enter');
+  if (!el) return;
+  el.style.color = '';
+  if (v === '') {
+    el.textContent = '—'; el.className = 'z01-tkv empty';
+    hint.textContent = 'このラウンドの合計を入力';
+    enter.className = 'z01-tk enter'; return;
+  }
+  el.className = 'z01-tkv';
+  el.textContent = v;
+  var n = parseInt(v, 10), rem = _z01.remain[_z01.currentPlayer];
+  var after = rem - n;
+  if (n < 0 || n > 180) {
+    hint.textContent = '無効 (0〜180)'; el.style.color = '#ff4757';
+    enter.className = 'z01-tk enter'; return;
+  }
+  var bust = _z01.outRule===0 ? (after<0||after===1) : (after<0);
+  if (after === 0 && !bust) {
+    hint.textContent = '🎯 フィニッシュ！';
+    enter.className = 'z01-tk enter ready';
+  } else if (bust) {
+    hint.textContent = '💥 バスト！'; el.style.color = '#ff4757';
+    enter.className = 'z01-tk enter ready';
+  } else {
+    hint.textContent = '残り ' + after;
+    enter.className = 'z01-tk enter ready';
+  }
+}
+
+function z01Pre(arg) { _z01BufUpdate(String(arg)); z01Ok(); }
+
+function z01Kp(arg) {
+  var v = _z01._buf + String(arg);
+  if (v.length > 3 || parseInt(v,10) > 180) return;
+  _z01BufUpdate(v);
+}
+function z01Kd() { if (!_z01._buf) return; _z01BufUpdate(_z01._buf.slice(0,-1)); }
+
+function z01Ok() {
+  if (_z01._buf === '') return;
+  var sc = parseInt(_z01._buf, 10);
+  if (isNaN(sc) || sc < 0 || sc > 180) return;
+  _z01Commit(sc);
+}
+
+function _z01Commit(sc) {
+  var p = _z01.currentPlayer, st = _z01.stats[p];
+  var rem = _z01.remain[p], after = rem - sc;
+  var bust = _z01.outRule===0 ? (after<0||after===1) : (after<0);
+  if (bust) {
+    var f = document.createElement('div');
+    f.className = 'z01-bust-flash';
+    document.body.appendChild(f);
+    setTimeout(function(){ f.parentNode&&f.parentNode.removeChild(f); }, 500);
+    _z01BufUpdate(''); return;
+  }
+  _z01.remain[p] = after;
+  st.rounds++; st.total += sc; st.legRounds++;
+  if (st.rounds <= 3) st.first9.push(sc);
+  if (sc >= 180) st.c180++; else if (sc >= 140) st.c140++; else if (sc >= 100) st.c100++;
+  _z01BufUpdate('');
+  if (after === 0) {
+    if (sc > st.hiFin) st.hiFin = sc;
+    if (st.legRounds < st.bestLeg) st.bestLeg = st.legRounds;
+    _z01.legWins[p]++;
+    _z01LegEnd(p); return;
+  }
+  _z01NextTurn();
+}
+
+function _z01NextTurn() {
+  var n = _z01.players===1 ? 1 : 2;
+  _z01.currentPlayer = (_z01.currentPlayer + 1) % n;
+  _z01Render(); _z01HintUpdate();
+  if (_z01.players===3 && _z01.currentPlayer===1) _z01CpuTurn();
+}
+
+function _z01CpuTurn() {
+  document.getElementById('z01-cpu-area').style.display = '';
+  document.getElementById('z01-input-area').style.display = 'none';
+  setTimeout(function() {
+    _z01Commit(_z01CpuScore(_z01.remain[1]));
+  }, 700 + Math.random()*900);
+}
+
+function _z01LegEnd(winner) {
+  var winsNeeded = Math.ceil(_z01.legs / 2);
+  var matchOver = _z01.legWins[winner] >= winsNeeded;
+  document.getElementById('z01-leg-title').textContent = matchOver ? 'MATCH WIN!' : 'LEG WIN!';
+  document.getElementById('z01-leg-winner-name').textContent = _z01PlayerName(winner) + ' の勝利！';
+  document.getElementById('z01-leg-stats').textContent = (_z01.stats[winner].legRounds * 3) + ' darts';
+  var btn = document.getElementById('z01-leg-btn');
+  if (matchOver) { btn.setAttribute('data-fn','z01ShowResult'); btn.textContent = '結果を見る →'; }
+  else { btn.setAttribute('data-fn','z01NextLeg'); btn.textContent = '次のLegへ →'; }
+  document.getElementById('z01-leg-overlay').style.display = 'flex';
+  _z01Render();
+}
+
+function z01NextLeg() {
+  document.getElementById('z01-leg-overlay').style.display = 'none';
+  _z01.currentLeg++;
+  if (_z01.players !== 1) _z01.currentPlayer = (_z01.currentLeg - 1) % 2;
+  else _z01.currentPlayer = 0;
+  var m = _z01.mode;
+  _z01.remain = [m, m];
+  for (var i = 0; i < _z01.stats.length; i++) { _z01.stats[i].legRounds = 0; }
+  _z01Render(); _z01HintUpdate();
+  if (_z01.players===3 && _z01.currentPlayer===1) _z01CpuTurn();
+}
+
+function z01ShowResult() {
+  document.getElementById('z01-leg-overlay').style.display = 'none';
+  document.getElementById('z01-game-wrap').style.display = 'none';
+  document.getElementById('z01-result-wrap').style.display = '';
+  var winner = -1;
+  if (_z01.legWins[0] > _z01.legWins[1]) winner = 0;
+  else if (_z01.legWins[1] > _z01.legWins[0]) winner = 1;
+  document.getElementById('z01-result-title').textContent = 'GAME OVER';
+  document.getElementById('z01-result-winner').textContent =
+    winner >= 0 ? '🏆 ' + _z01PlayerName(winner) + ' の勝利！' : '引き分け';
+  var rows = [
+    ['3ダーツ平均', function(s,i){ return s.rounds>0?(s.total/s.rounds).toFixed(1):'-'; }],
+    ['First 9 avg', function(s){ if(!s.first9.length)return'-'; var t=0; for(var j=0;j<s.first9.length;j++)t+=s.first9[j]; return(t/s.first9.length).toFixed(1); }],
+    ['100+', function(s){ return s.c100; }],
+    ['140+', function(s){ return s.c140; }],
+    ['180s', function(s){ return s.c180; }],
+    ['ハイフィニッシュ', function(s){ return s.hiFin||'-'; }],
+    ['ベストレグ(本数)', function(s){ return s.bestLeg<999?(s.bestLeg*3)+' darts':'-'; }],
+    ['Legs Won', function(s,i){ return _z01.legWins[i]; }]
+  ];
+  var n = _z01.stats.length;
+  var h = '';
+  if (n === 2) {
+    h += '<div class="z01-stats-hdr" style="grid-template-columns:2fr 1fr 1fr;">';
+    h += '<div></div><div style="text-align:center;color:var(--txt);font-weight:700;">'+_z01PlayerName(0)+'</div>';
+    h += '<div style="text-align:center;color:var(--txt);font-weight:700;">'+_z01PlayerName(1)+'</div></div>';
+  }
+  for (var k = 0; k < rows.length; k++) {
+    var lbl = rows[k][0], fn = rows[k][1];
+    if (n === 1) {
+      h += '<div class="z01-stats-row" style="grid-template-columns:2fr 1fr;">';
+      h += '<div class="z01-stats-label">'+lbl+'</div>';
+      h += '<div class="z01-stats-val" style="text-align:right;">'+fn(_z01.stats[0],0)+'</div></div>';
+    } else {
+      var v0=fn(_z01.stats[0],0), v1=fn(_z01.stats[1],1);
+      h += '<div class="z01-stats-row" style="grid-template-columns:2fr 1fr 1fr;">';
+      h += '<div class="z01-stats-label">'+lbl+'</div>';
+      h += '<div class="z01-stats-val'+((winner===0)?' hl':'')+'">'+v0+'</div>';
+      h += '<div class="z01-stats-val'+((winner===1)?' hl':'')+'">'+v1+'</div></div>';
+    }
+  }
+  document.getElementById('z01-stats-table').innerHTML = h;
+}
+
+function z01Again() {
+  var m = _z01.mode;
+  _z01.remain = [m, m]; _z01.legWins = [0, 0];
+  _z01.currentPlayer = 0; _z01.currentLeg = 1; _z01._buf = '';
+  _z01.stats = _z01InitStats(_z01.players===1?1:2);
+  document.getElementById('z01-result-wrap').style.display = 'none';
+  document.getElementById('z01-game-wrap').style.display = 'flex';
+  _z01Render(); _z01HintUpdate();
+  if (_z01.players===3 && _z01.currentPlayer===1) _z01CpuTurn();
+}
+function z01BackSetup() {
+  document.getElementById('z01-result-wrap').style.display = 'none';
+  document.getElementById('z01-game-wrap').style.display = 'none';
+  document.getElementById('z01-setup-wrap').style.display = '';
+}
+
 /* 高速タッチ処理 */
 var _fns = { kp: kp, kd: kd, doOk: doOk, commit: commit,
   undoRound: undoRound, resetGame: resetGame,
