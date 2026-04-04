@@ -3874,12 +3874,11 @@ function z01Start() {
 }
 
 function _z01BuildPresets() {
-  var pre = [0, 26, 45, 60, 85, 100, 140, 180];
+  var sc = getSC();
   var h = '';
-  for (var i = 0; i < pre.length; i++) {
-    var v = pre[i];
-    h += '<div class="z01-pre" data-fn="z01Pre" data-arg="'+v+'">'+(v===0?'MISS':v)+'</div>';
-  }
+  sc.forEach(function(v) {
+    h += '<div class="z01-pre" data-fn="z01Pre" data-arg="' + v + '">' + v + '</div>';
+  });
   document.getElementById('z01-presets').innerHTML = h;
 }
 
