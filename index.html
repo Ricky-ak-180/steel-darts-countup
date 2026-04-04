@@ -3304,6 +3304,7 @@ function trainResult(ok) {
   ok = (parseInt(ok, 10) === 1);
   var d = _trainLoad();
   if (!d[_trainCurrent]) d[_trainCurrent] = {c:0, a:0};
+  if (typeof d[_trainCurrent].a !== 'number') d[_trainCurrent].a = d[_trainCurrent].c || 0;
   d[_trainCurrent].a++;
   if (ok) d[_trainCurrent].c++;
   _trainSave(d);
