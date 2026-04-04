@@ -2800,9 +2800,12 @@ function _buildTeisekiEntries() {
 }
 
 function showTeiseki() {
-  _teisekiFilter = 0;
-  document.querySelectorAll('.arr-t-tab').forEach(function(t, i){ t.className = 'arr-t-tab' + (i === 0 ? ' on' : ''); });
-  _renderTeiseki();
+  _teisekiFilter = 501;
+  document.querySelectorAll('.arr-t-tab').forEach(function(t){
+    var arg = +t.getAttribute('data-arg');
+    t.className = 'arr-t-tab' + (arg === _teisekiFilter ? ' on' : '');
+  });
+  _renderTactics();
   document.getElementById('arr-teiseki-panel').className = 'arr-teiseki-panel';
 }
 
