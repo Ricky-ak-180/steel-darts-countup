@@ -2674,8 +2674,120 @@ function goArrSetup() {
   _renderArrHist();
 }
 
+/* 戦術データ: 末尾ルールの例外 */
+var TACTICS_EXCEPTIONS = {
+  195: { target:"25", hitLeave:170, reason:"25→170残し。T20×2+Bull で一気にチェックアウト可能。" }
+};
+
+// 末尾ルールで推奨ターゲットを返す
+function _tacticsTarget(n) {
+  if (TACTICS_EXCEPTIONS[n]) return TACTICS_EXCEPTIONS[n].target;
+  var d = n % 10;
+  if (d===0||d===1||d===4||d===7) return "T20";
+  if (d===2||d===5||d===8) return "T18";
+  return "T19";
+}
+
+function _tacticsTargetVal(t) {
+  if (t==="T20") return 60;
+  if (t==="T19") return 57;
+  if (t==="T18") return 54;
+  if (t==="25")  return 25;
+  return 0;
+}
+function _tacticsMissVal(t) {
+  if (t==="T20") return 20;
+  if (t==="T19") return 19;
+  if (t==="T18") return 18;
+  return 0;
+}
+function _isBogeyOrBad(n) {
+  if (BOGEY_NUMS.indexOf(n) >= 0) return true;
+  return false;
+}
+function _isCheckable(n) {
+  if (n <= 0 || n > 170) return false;
+  if (n === 50) return true;
+  if (n <= 40 && n % 2 === 0) return true;
+  return !!CHECKOUT[n];
+}
+
+function _renderTactics() {
+  var html = '';
+
+  // 末尾ルールカード
+  html += '<div class="tac-rule-card">' +
+    '<div class="tac-rule-title">基本ルール（末尾で決める）</div>' +
+    '<div class="tac-rule-row"><span class="tac-rule-suffix">末尾 0,1,4,7</span><span class="tac-rule-target tac-t20">T20</span><span class="tac-rule-note">例: 180,181,184,187,190…</span></div>' +
+    '<div class="tac-rule-row"><span class="tac-rule-suffix">末尾 2,5,8</span><span class="tac-rule-target tac-t18">T18</span><span class="tac-rule-note">例: 172,175,178,182,185…</span></div>' +
+    '<div class="tac-rule-row"><span class="tac-rule-suffix">末尾 3,6,9</span><span class="tac-rule-target tac-t19">T19</span><span class="tac-rule-note">例: 173,176,179,183,186…</span></div>' +
+  '</div>';
+
+  // ボギーナンバー
+  html += '<div class="tac-section-title">3本チェックアウト不可（ボギーナンバー）</div>' +
+    '<div class="tac-bogey-row">';
+  BOGEY_NUMS.forEach(function(n){ html += '<span class="tac-bogey-badge">' + n + '</span>'; });
+  html += '</div>' +
+    '<div style="font-size:11px;color:var(--mut);margin-bottom:12px;">このスコアになると必ず次ラウンドに持ち越し。末尾ルールでミスしてもボギーにならないよう設計されている。</div>';
+
+  // 特殊ケース
+  html += '<div class="tac-section-title">特殊ケース（末尾ルール以外）</div>';
+  var hasException = false;
+  Object.keys(TACTICS_EXCEPTIONS).forEach(function(k) {
+    hasException = true;
+    var n = +k;
+    var ex = TACTICS_EXCEPTIONS[n];
+    var defaultTarget = (function(){
+      var d = n % 10;
+      if (d===0||d===1||d===4||d===7) return "T20";
+      if (d===2||d===5||d===8) return "T18";
+      return "T19";
+    })();
+    html += '<div class="tac-special-row">' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<span class="tac-special-score">' + n + '</span>' +
+        '<span style="font-size:12px;color:var(--mut);text-decoration:line-through;">' + defaultTarget + '</span>' +
+        '<span style="color:var(--mut);font-size:11px;">→</span>' +
+        '<span class="tac-rule-target tac-special">' + ex.target + '</span>' +
+      '</div>' +
+      '<div class="tac-special-detail">ヒット後: <strong>' + ex.hitLeave + '</strong>残し</div>' +
+      '<div class="tac-special-reason">' + ex.reason + '</div>' +
+    '</div>';
+  });
+  if (!hasException) {
+    html += '<div style="font-size:12px;color:var(--mut);">特殊ケースなし</div>';
+  }
+
+  // 注意スコア帯（ボギーへの近接帯）
+  html += '<div class="tac-section-title">注意スコア帯（シングルミス確認）</div>';
+  var warnScores = [];
+  for (var n = 171; n <= 501; n++) {
+    var target = _tacticsTarget(n);
+    var ex = TACTICS_EXCEPTIONS[n];
+    var missLeave = ex ? null : (n - _tacticsMissVal(target));
+    if (!ex && missLeave && _isBogeyOrBad(missLeave)) {
+      warnScores.push({score:n, target:target, missLeave:missLeave});
+    }
+  }
+  if (warnScores.length === 0) {
+    html += '<div style="font-size:12px;color:#66bb6a;">末尾ルール通りに打てば、シングルミスでボギーになるスコアはありません。</div>';
+  } else {
+    warnScores.forEach(function(w){
+      html += '<div class="tac-special-row" style="border-color:rgba(255,107,107,0.3);">' +
+        '<div style="display:flex;align-items:center;gap:10px;">' +
+          '<span class="tac-special-score" style="color:#ff6b6b;">' + w.score + '</span>' +
+          '<span class="tac-rule-target" style="background:rgba(255,107,107,0.12);color:#ff6b6b;border-color:rgba(255,107,107,0.3);">' + w.target + '</span>' +
+        '</div>' +
+        '<div class="tac-miss-warn">S' + w.target.slice(1) + 'ミス → ' + w.missLeave + '（ボギー）</div>' +
+      '</div>';
+    });
+  }
+
+  document.getElementById('arr-teiseki-list').innerHTML = html;
+}
+
 /* アレンジ表 */
-var _teisekiFilter = 0; // 0=全部, 41=41〜100, 99=99〜170
+var _teisekiFilter = 501; // 501=戦術, 41=41〜100, 99=99〜170
 
 function _buildTeisekiEntries() {
   var entries = Object.keys(CHECKOUT).map(function(k){ return {score: +k, path: CHECKOUT[k]}; });
