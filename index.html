@@ -520,6 +520,15 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-t-dart { font-size:13px; background:var(--bg); border:1px solid var(--bd); border-radius:6px; padding:3px 8px; }
 .arr-t-dart.finish { color:var(--acc); border-color:var(--acc); }
 .arr-t-arr { color:var(--mut); font-size:11px; }
+/* ユーザーカスタムルート */
+.arr-t-user { opacity:0.85; padding-left:4px; border-left:2px solid rgba(232,255,71,0.4); display:flex; align-items:center; gap:6px; }
+.arr-t-user-del { background:transparent; border:none; color:var(--mut); font-size:13px; cursor:pointer; padding:0 2px; line-height:1; flex-shrink:0; }
+.arr-t-user-del:active { color:#ef5350; }
+.arr-t-add-btn { background:transparent; border:1px dashed var(--bd); border-radius:8px; color:var(--mut); font-size:12px; padding:5px 10px; cursor:pointer; width:100%; text-align:left; margin-top:2px; }
+.arr-t-add-btn:active { opacity:.6; }
+.arr-t-input-row { display:flex; gap:6px; margin-top:4px; }
+.arr-t-input { flex:1; background:var(--bg); border:1px solid rgba(232,255,71,0.4); border-radius:8px; color:var(--fg); font-size:13px; padding:6px 10px; outline:none; font-family:monospace; }
+.arr-t-input-ok { background:var(--acc); color:#000; border:none; border-radius:8px; padding:6px 12px; font-size:13px; font-weight:700; cursor:pointer; }
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYXJ1LZ2J1"></script>
@@ -2376,6 +2385,64 @@ function filterTeiseki(n) {
   _renderTeiseki();
 }
 
+/* ── ユーザーカスタムルート ── */
+var _userRoutes = (function() {
+  try { return JSON.parse(localStorage.getItem('arr_user_routes') || '{}'); } catch(e) { return {}; }
+})();
+
+function _saveUserRoutes() {
+  try { localStorage.setItem('arr_user_routes', JSON.stringify(_userRoutes)); } catch(e) {}
+}
+
+function _parseRouteInput(str) {
+  // "T20 D20" or "T20,D20" or "T20, D20" → ["T20","D20"]
+  var parts = str.trim().toUpperCase().split(/[\s,]+/).filter(Boolean);
+  // 簡易バリデーション: T/D/S+数字 or Bull
+  var valid = parts.every(function(p) {
+    return /^(T|D|S)\d{1,2}$/.test(p) || p === 'BULL';
+  });
+  return valid && parts.length >= 1 ? parts : null;
+}
+
+function _addUserRoute(score) {
+  var row = document.querySelector('.arr-t-row[data-score="' + score + '"]');
+  if (!row) return;
+  // 入力欄を展開
+  var existing = row.querySelector('.arr-t-input-row');
+  if (existing) { existing.querySelector('.arr-t-input').focus(); return; }
+  var inputRow = document.createElement('div');
+  inputRow.className = 'arr-t-input-row';
+  inputRow.innerHTML =
+    '<input class="arr-t-input" placeholder="例: T16 D14" maxlength="30">' +
+    '<button class="arr-t-input-ok">追加</button>';
+  row.querySelector('.arr-t-routes').appendChild(inputRow);
+  var inp = inputRow.querySelector('.arr-t-input');
+  inp.focus();
+  inputRow.querySelector('.arr-t-input-ok').addEventListener('click', function() {
+    var path = _parseRouteInput(inp.value);
+    if (!path) { inp.style.borderColor='#ef5350'; return; }
+    if (!_userRoutes[score]) _userRoutes[score] = [];
+    _userRoutes[score].push(path);
+    _saveUserRoutes();
+    _renderTeiseki();
+    // 追加後スクロール位置を維持
+    var newRow = document.querySelector('.arr-t-row[data-score="' + score + '"]');
+    if (newRow) newRow.scrollIntoView({block:'nearest'});
+  });
+  inp.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') inputRow.querySelector('.arr-t-input-ok').click();
+    if (e.key === 'Escape') inputRow.remove();
+  });
+}
+
+function _delUserRoute(score, idx) {
+  if (!_userRoutes[score]) return;
+  _userRoutes[score].splice(idx, 1);
+  if (!_userRoutes[score].length) delete _userRoutes[score];
+  _saveUserRoutes();
+  _renderTeiseki();
+}
+
 function _pathHtml(path) {
   var h = '';
   path.forEach(function(d, i) {
@@ -2392,15 +2459,25 @@ function _renderTeiseki() {
   var html = '';
   entries.forEach(function(e) {
     var alts = CHECKOUT_ALT[e.score] || [];
-    // フィルター適用時、代替ルートもフィルターに合わせる
-    if (_teisekiFilter > 0) alts = alts.filter(function(a){ return a.length === _teisekiFilter; });
-    html += '<div class="arr-t-row' + (alts.length ? ' has-alt' : '') + '">' +
+    var userRoutes = _userRoutes[e.score] || [];
+    if (_teisekiFilter > 0) {
+      alts = alts.filter(function(a){ return a.length === _teisekiFilter; });
+      userRoutes = userRoutes.filter(function(a){ return a.length === _teisekiFilter; });
+    }
+    html += '<div class="arr-t-row" data-score="' + e.score + '">' +
       '<div class="arr-t-score">' + e.score + '</div>' +
       '<div class="arr-t-routes">' +
         '<div class="arr-t-path arr-t-main">' + _pathHtml(e.path) + '</div>' +
         alts.map(function(a) {
           return '<div class="arr-t-path arr-t-alt">' + _pathHtml(a) + '</div>';
         }).join('') +
+        userRoutes.map(function(a, i) {
+          return '<div class="arr-t-user">' +
+            '<div class="arr-t-path" style="flex:1">' + _pathHtml(a) + '</div>' +
+            '<button class="arr-t-user-del" onclick="_delUserRoute(' + e.score + ',' + i + ')">✕</button>' +
+            '</div>';
+        }).join('') +
+        '<button class="arr-t-add-btn" onclick="_addUserRoute(' + e.score + ')">＋ 自分のルートを追加</button>' +
       '</div></div>';
   });
   document.getElementById('arr-teiseki-list').innerHTML = html;
@@ -2933,7 +3010,9 @@ var _fns = { kp: kp, kd: kd, doOk: doOk, commit: commit,
   advanceArr: advanceArr,
   showTeiseki: showTeiseki,
   hideTeiseki: hideTeiseki,
-  filterTeiseki: filterTeiseki
+  filterTeiseki: filterTeiseki,
+  _addUserRoute: _addUserRoute,
+  _delUserRoute: _delUserRoute
 };
 
 function _exec(el) {
