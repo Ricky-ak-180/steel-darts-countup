@@ -2739,10 +2739,17 @@ function _renderTactics() {
   html += '<div style="font-size:18px;font-weight:700;color:var(--fg);margin-bottom:4px;">基本は <span style="color:var(--acc);">T20</span></div>';
   html += '<div style="font-size:12px;color:var(--mut);margin-bottom:16px;line-height:1.6;">以下のスコアだけ例外。それ以外はすべてT20を狙う。</div>';
 
-  // T19を使う
-  html += '<div class="tac-section-title" style="color:#ff8a65;">T19 を使うスコア（末尾 3・6・9）</div>';
+  // 高スコア帯
+  html += '<div style="background:rgba(232,255,71,0.07);border:1px solid rgba(232,255,71,0.15);border-radius:10px;padding:10px 14px;margin-bottom:16px;">' +
+    '<div style="font-size:12px;font-weight:700;color:var(--acc);margin-bottom:2px;">351〜501</div>' +
+    '<div style="font-size:13px;color:var(--fg);">常に <strong>T20</strong></div>' +
+    '<div style="font-size:11px;color:var(--mut);margin-top:4px;">ボギーナンバーに当たる可能性がなく、最大得点を狙うのが正解。</div>' +
+  '</div>';
+
+  // T19を使う（171〜350）
+  html += '<div class="tac-section-title" style="color:#ff8a65;">T19 を使うスコア 171〜350（末尾 3・6・9）</div>';
   html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">';
-  for (var n = 171; n <= 501; n++) {
+  for (var n = 171; n <= 350; n++) {
     if (TACTICS_EXCEPTIONS[n]) continue;
     var d = n % 10;
     if (d===3||d===6||d===9) {
@@ -2756,15 +2763,14 @@ function _renderTactics() {
   }
   html += '</div>';
 
-  // T18を使う
-  html += '<div class="tac-section-title" style="color:#4fc3f7;">T18 を使うスコア（末尾 2・5・8）</div>';
+  // T18を使う（171〜350）
+  html += '<div class="tac-section-title" style="color:#4fc3f7;">T18 を使うスコア 171〜350（末尾 2・5・8）</div>';
   html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">';
-  for (var n = 171; n <= 501; n++) {
+  for (var n = 171; n <= 350; n++) {
     var ex = TACTICS_EXCEPTIONS[n];
     var d = n % 10;
     if (d===2||d===5||d===8) {
       if (ex) {
-        // 特殊ケース
         html += '<div style="background:rgba(255,213,79,0.15);border:1px solid rgba(255,213,79,0.4);border-radius:8px;padding:5px 10px;text-align:center;">' +
           '<div style="font-family:\'Bebas Neue\',cursive;font-size:17px;color:#ffd54f;">' + n + '★</div>' +
           '<div style="font-size:9px;color:#ffd54f;">' + ex.target + '</div>' +
