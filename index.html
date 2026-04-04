@@ -4568,5 +4568,15 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 <div class="arr-flash-overlay" id="arr-flash-overlay"></div>
+<!-- Shortcut editor (global fixed overlay, outside any view) -->
+<div class="sc-editor" id="sc-editor">
+  <div style="font-size:18px;font-weight:700;color:var(--acc);letter-spacing:2px;">⚙ ショートカット編集</div>
+  <div style="font-size:11px;color:var(--mut);">各ボタンの数値を入力してください（0〜180）</div>
+  <div class="sc-edit-grid" id="sc-edit-grid"></div>
+  <div class="sc-edit-btns" style="margin-top:8px;">
+    <button class="sc-edit-cancel" id="sc-edit-cancel">キャンセル</button>
+    <button class="sc-edit-save" id="sc-edit-save">保存</button>
+  </div>
+</div>
 </body>
 </html>
