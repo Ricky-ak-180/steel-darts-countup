@@ -4019,7 +4019,7 @@ function _z01LegEnd(winner) {
   var matchOver = _z01.legWins[winner] >= winsNeeded;
   document.getElementById('z01-leg-title').textContent = matchOver ? 'MATCH WIN!' : 'LEG WIN!';
   document.getElementById('z01-leg-winner-name').textContent = _z01PlayerName(winner) + ' の勝利！';
-  document.getElementById('z01-leg-stats').textContent = (_z01.stats[winner].legRounds * 3) + ' darts';
+  document.getElementById('z01-leg-stats').textContent = (_z01.stats[winner].finishDarts || (_z01.stats[winner].legRounds * 3)) + ' darts';
   var btn = document.getElementById('z01-leg-btn');
   if (matchOver) { btn.setAttribute('data-fn','z01ShowResult'); btn.textContent = '結果を見る →'; }
   else { btn.setAttribute('data-fn','z01NextLeg'); btn.textContent = '次のLegへ →'; }
