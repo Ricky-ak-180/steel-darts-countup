@@ -4377,6 +4377,32 @@ function _z01LogRender() {
   if (wrap) wrap.scrollTop = wrap.scrollHeight;
 }
 
+function _z01BuildFinishModal(finishedScore) {
+  var inner = document.querySelector('.z01-finish-inner');
+  if (!inner) return;
+  var dbl = _z01.outRule === 0;
+  // Determine which dart options are valid
+  // 1 dart: score must be reachable in 1 dart
+  //   double-out: must be a valid double (2,4,...,40,50) or single-out: ≤20 or 25 or 50
+  // 2 dart: CHECKOUT_2H table or score ≤ 99 (rough heuristic)
+  // 3 dart: always valid if score ≤ 170
+  var can1, can2;
+  if (dbl) {
+    var doubles = [2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,50];
+    can1 = doubles.indexOf(finishedScore) >= 0;
+    can2 = finishedScore <= 110; // rough: most 2-dart doubles exist up to ~110
+    if (CHECKOUT_2H && CHECKOUT_2H[finishedScore]) can2 = true;
+    if (finishedScore > 110 && !(CHECKOUT_2H && CHECKOUT_2H[finishedScore])) can2 = false;
+  } else {
+    can1 = finishedScore <= 20 || finishedScore === 25 || finishedScore === 50;
+    can2 = finishedScore <= 60;
+  }
+  var h = '<div class="z01-finish-title">何本目で上がりましたか？</div>';
+  if (can1) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="1">1本目で上がり</button>';
+  if (can2) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="2">2本目で上がり</button>';
+  h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="3">3本目で上がり</button>';
+  inner.innerHTML = h;
+}
 function z01FinishDart(dartNo) {
   document.getElementById('z01-finish-modal').style.display = 'none';
   var pf = _z01._pendingFinish;
