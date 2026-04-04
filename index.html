@@ -3310,6 +3310,7 @@ function trainResult(ok) {
   if (c >= _TRAIN_PERFECT) stars = '🌟 PERFECT';
   document.getElementById('arr-tp-stars').textContent = stars;
   document.getElementById('arr-tp-header-clears').textContent = c + '回クリア';
+  document.getElementById('arr-tp-rate').textContent = _trainRateText(entry);
   if (ok && c === _TRAIN_HINT_HIDE) {
     _trainHintVis = false;
     document.getElementById('arr-tp-hint-btn').style.display = '';
