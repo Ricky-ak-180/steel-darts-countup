@@ -2899,10 +2899,10 @@ function _renderTactics() {
   );
 
   // ボギーナンバー
-  html += '<div style="margin-top:8px;">' +
-    '<div style="font-size:11px;font-weight:700;letter-spacing:2px;color:var(--mut);margin-bottom:6px;">ボギーナンバー（3本で上がれない）</div>' +
-    '<div class="tac-bogey-row">';
-  BOGEY_NUMS.forEach(function(n){ html += '<span class="tac-bogey-badge">' + n + '</span>'; });
+  html += '<div style="margin-top:16px;">' +
+    '<div style="font-size:13px;font-weight:700;letter-spacing:2px;color:var(--mut);margin-bottom:10px;">ボギーナンバー（3本で上がれない）</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:8px;">';
+  BOGEY_NUMS.forEach(function(n){ html += '<span style="font-family:\'Bebas Neue\',cursive;font-size:28px;background:rgba(255,107,107,0.12);color:#ff6b6b;border:1px solid rgba(255,107,107,0.3);border-radius:8px;padding:4px 14px;">' + n + '</span>'; });
   html += '</div></div>';
 
   document.getElementById('arr-teiseki-list').innerHTML = html;
