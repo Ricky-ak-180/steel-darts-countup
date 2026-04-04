@@ -2810,24 +2810,24 @@ function _renderTactics() {
     '<div style="font-size:11px;color:var(--mut);margin-top:4px;">ボギーナンバーに当たる可能性がなく、最大得点を狙うのが正解。末尾ルール不要。</div>' +
   '</div>';
 
-  // 230〜350: T20基本
+  // 230〜501: T20のみ
   html += '<div style="background:rgba(232,255,71,0.07);border:1px solid rgba(232,255,71,0.15);border-radius:10px;padding:10px 14px;margin-bottom:20px;">' +
-    '<div style="font-size:13px;font-weight:700;color:var(--acc);margin-bottom:2px;">230〜350点台</div>' +
-    '<div style="font-size:15px;font-weight:700;color:var(--fg);">基本 T20</div>' +
-    '<div style="font-size:11px;color:var(--mut);margin-top:4px;">ボギーナンバーに当たる距離ではなく、T20とT19/T18の差は小さい。迷わずT20。</div>' +
+    '<div style="font-size:13px;font-weight:700;color:var(--acc);margin-bottom:2px;">230〜501</div>' +
+    '<div style="font-size:15px;font-weight:700;color:var(--fg);">常に T20</div>' +
+    '<div style="font-size:11px;color:var(--mut);margin-top:4px;">ボギーナンバーに当たる距離ではなく、T20以外を選ぶ理由なし。</div>' +
   '</div>';
 
   // 200〜229: 重要ゾーン
   html += rangeSection(
-    '200〜229点台（要注意ゾーン）',
-    'ここだけT19/T18を覚える価値がある。1ラウンドでチェックアウト圏に入れる距離。特に216・219・222・223・226（★）は末尾ルール通りに打つとヒット後がボギーになる危険スコア。',
+    '200〜229（要注意ゾーン）',
+    '1ラウンドでチェックアウト圏に入れる距離。★マークは特に危険なスコア（T20で打つとヒット後がボギーになる）。',
     200, 229
   );
 
   // 171〜199
   html += rangeSection(
-    '171〜199点台（アプローチゾーン）',
-    'チェックアウト圏まであと1本。179→T19でS19ミスでも160残し、186→T19でS19ミスでも167残し、189→T19でS19ミスでも170残し。ミス後のスコアを意識して打つ。',
+    '171〜199（アプローチゾーン）',
+    'ミス後のスコアを意識して打つ。小数字はシングルミス後の残り。',
     171, 199
   );
 
