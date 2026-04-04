@@ -473,6 +473,20 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-hist-grade { font-family:'Bebas Neue',cursive; font-size:16px; }
 .arr-hist-right { display:flex; align-items:baseline; gap:4px; }
 .arr-hist-score { font-family:'Bebas Neue',cursive; font-size:16px; color:var(--fg); }
+/* 結果フラッシュオーバーレイ */
+.arr-flash-overlay { position:fixed; inset:0; z-index:250; display:flex; align-items:center; justify-content:center; pointer-events:none; opacity:0; }
+.arr-flash-overlay.show { animation: arrFlash 0.55s ease-out forwards; }
+.arr-flash-overlay.success { background:rgba(71,255,180,0.18); }
+.arr-flash-overlay.miss { background:rgba(255,107,53,0.18); }
+.arr-flash-text { font-family:'Bebas Neue',cursive; font-size:88px; letter-spacing:6px; line-height:1; text-align:center; }
+.arr-flash-overlay.success .arr-flash-text { color:#47ffb4; text-shadow:0 0 40px rgba(71,255,180,0.7); }
+.arr-flash-overlay.miss .arr-flash-text { color:#ff6b35; text-shadow:0 0 40px rgba(255,107,53,0.7); }
+@keyframes arrFlash {
+  0%   { opacity:0; transform:scale(0.85); }
+  20%  { opacity:1; transform:scale(1.05); }
+  60%  { opacity:1; transform:scale(1); }
+  100% { opacity:0; transform:scale(1); }
+}
 /* 定石表ボタン */
 /* ターン終了ラベル */
 .arr-turn-end-lbl { font-size:11px; letter-spacing:2px; color:var(--mut); margin:6px 0 2px; text-align:center; }
@@ -712,6 +726,7 @@ canvas.schart { width: 100%; height: 100%; }
       <div class="arr-hud-score" id="arr-hud-score">0</div>
     </div>
     <!-- クイズカード -->
+    <div class="arr-flash-overlay" id="arr-flash-overlay"></div>
     <div class="arr-card hide" id="arr-card">
       <div class="arr-chain-scroll" id="arr-chain-scroll">
         <div class="arr-chain" id="arr-chain"></div>
@@ -2356,6 +2371,14 @@ function _arrNextQ() {
 }
 
 /* ステージ表示 */
+function _arrFlash(type, text) {
+  var el = document.getElementById('arr-flash-overlay');
+  el.className = 'arr-flash-overlay';
+  el.innerHTML = '<div class="arr-flash-text">' + text + '</div>';
+  void el.offsetWidth; // reflow
+  el.classList.add('show', type);
+}
+
 function _arrScrollChain() {
   var scr = document.getElementById('arr-chain-scroll');
   if (scr) scr.scrollTop = scr.scrollHeight;
@@ -2544,6 +2567,16 @@ function chooseArr(idx) {
 
   // タイマーバーを即クリア
   document.getElementById('arr-timer-bar').style.width = '0%';
+
+  // 結果フラッシュ（nextOutcome が確定している場合のみ）
+  var nextOutcome = st.nextOutcome;
+  if (nextOutcome) {
+    if (nextOutcome.type === 'success') {
+      _arrFlash('success', '入った！');
+    } else {
+      _arrFlash('miss', '外れた！');
+    }
+  }
 
   // ボタン色変え（全ボタン無効化）
   document.getElementById('arr-choices').querySelectorAll('.arr-choice').forEach(function(btn) {
