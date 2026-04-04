@@ -388,20 +388,32 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-hud-score { font-family:'Bebas Neue',cursive; font-size:32px; color:var(--acc); letter-spacing:2px; }
 /* クイズカード */
 .arr-card { margin:4px 12px 16px; background:var(--card); border:1px solid var(--bd); border-radius:16px; padding:14px 14px 16px; display:flex; flex-direction:column; align-items:center; gap:10px; }
-/* チェーン */
-.arr-chain-scroll { width:100%; max-height:220px; overflow-y:auto; display:flex; flex-direction:column; }
-.arr-chain { display:flex; flex-direction:column; gap:4px; width:100%; }
-/* 過去ダーツ履歴エントリ */
-.arr-chain-entry { display:flex; align-items:center; gap:8px; padding:5px 10px; border-radius:20px; font-size:13px; font-weight:600; }
-.arr-chain-entry.success { background:rgba(71,255,180,0.08); border:1px solid rgba(71,255,180,0.2); color:#47ffb4; }
-.arr-chain-entry.miss { background:rgba(255,107,53,0.08); border:1px solid rgba(255,107,53,0.2); color:var(--acc2); }
+/* チェーンスクロール */
+.arr-chain-scroll { width:100%; max-height:340px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; }
+.arr-chain { display:flex; flex-direction:column; gap:6px; width:100%; }
+/* 過去ターンブロック */
+.arr-past-turn { border:1px solid var(--bd); border-radius:12px; padding:8px 12px; opacity:0.5; }
+.arr-past-turn-score { font-family:'Bebas Neue',cursive; font-size:22px; color:var(--mut); margin-bottom:4px; }
+.arr-chain-entry { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:4px 0; }
+.arr-chain-entry.success { color:#47ffb4; }
+.arr-chain-entry.miss { color:var(--acc2); }
 .arr-chain-aim { opacity:0.65; font-weight:400; }
-.arr-chain-turn-sep { text-align:center; font-size:10px; color:var(--mut); letter-spacing:2px; padding:6px 0 4px; }
-/* 現在の問い */
-.arr-active-q { text-align:center; width:100%; padding-top:8px; }
-.arr-remaining { font-family:'Bebas Neue',cursive; font-size:80px; color:var(--acc); letter-spacing:4px; line-height:1; display:block; }
-.arr-darts-lbl { font-size:11px; color:var(--mut); display:block; letter-spacing:1px; margin-top:2px; }
-.arr-q-label { font-size:13px; color:var(--fg); font-weight:600; display:block; margin-top:6px; letter-spacing:0.5px; }
+.arr-chain-turn-sep { text-align:center; font-size:10px; color:var(--mut); letter-spacing:2px; padding:2px 0; }
+/* 現在のターンブロック（3段スロット） */
+.arr-turn-block { border:1px solid rgba(232,255,71,0.25); border-radius:14px; padding:10px 12px 12px; background:rgba(232,255,71,0.02); }
+.arr-turn-score-hdr { text-align:center; margin-bottom:8px; }
+.arr-turn-score-num { font-family:'Bebas Neue',cursive; font-size:52px; color:var(--acc); letter-spacing:3px; line-height:1; display:block; }
+.arr-turn-score-sub { font-size:10px; color:var(--mut); letter-spacing:1px; }
+/* ダーツスロット */
+.arr-dart-slot { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:10px; margin-bottom:4px; font-size:13px; }
+.arr-dart-slot:last-child { margin-bottom:0; }
+.arr-dart-slot.done.success { background:rgba(71,255,180,0.08); border:1px solid rgba(71,255,180,0.2); color:#47ffb4; }
+.arr-dart-slot.done.miss { background:rgba(255,107,53,0.08); border:1px solid rgba(255,107,53,0.2); color:var(--acc2); }
+.arr-dart-slot.active { background:rgba(232,255,71,0.06); border:1px solid rgba(232,255,71,0.4); color:var(--fg); }
+.arr-dart-slot.pending { background:var(--bg); border:1px solid var(--bd); color:var(--mut); opacity:0.4; }
+.arr-slot-num { font-size:10px; color:inherit; letter-spacing:1px; min-width:32px; opacity:0.7; }
+.arr-slot-label { flex:1; font-weight:600; }
+.arr-slot-aim { opacity:0.7; font-weight:400; }
 /* タイマーバー */
 .arr-timer-wrap { width:100%; height:5px; background:var(--bd); border-radius:3px; overflow:hidden; }
 .arr-timer-bar { height:100%; width:100%; background:var(--acc); border-radius:3px; }
@@ -703,7 +715,7 @@ canvas.schart { width: 100%; height: 100%; }
     <div class="arr-card hide" id="arr-card">
       <div class="arr-chain-scroll" id="arr-chain-scroll">
         <div class="arr-chain" id="arr-chain"></div>
-        <div class="arr-active-q" id="arr-active-q"></div>
+        <div class="arr-turn-block" id="arr-turn-block"></div>
       </div>
       <div class="arr-timer-wrap"><div class="arr-timer-bar" id="arr-timer-bar"></div></div>
       <div class="arr-choices" id="arr-choices"></div>
@@ -2370,24 +2382,65 @@ function _arrBuildChoices(st) {
   });
 }
 
-function _arrShowActiveQ(st) {
-  var dartsLeft = st.path.length;
-  var isFinish = dartsLeft === 1;
-  var isNewTurn = _arrG.stgIdx > 0 && st.turnDart === 1;
-  var qLabel = isFinish ? 'フィニッシュ！ダブルは？' :
-               _arrG.stgIdx === 0 ? '何点入れる？' : '次は何点？';
-  var activeEl = document.getElementById('arr-active-q');
-  // ターン開始またはステージ0: スコアを表示
-  if (_arrG.stgIdx === 0 || isNewTurn) {
-    activeEl.innerHTML =
-      '<span class="arr-remaining">' + st.turnScore + '</span>' +
-      '<span class="arr-darts-lbl">' + dartsLeft + '本残り</span>' +
-      '<span class="arr-q-label">' + qLabel + '</span>';
-  } else {
-    // ターン内継続：大きなスコアは表示せず問いだけ
-    activeEl.innerHTML =
-      '<span class="arr-q-label">' + qLabel + '</span>';
+/* 現在のターンのステージ範囲を返す {start, end} */
+function _getTurnRange() {
+  var start = _arrG.stgIdx;
+  while (start > 0 && _arrG.stages[start].turnDart !== 1) start--;
+  var ts = _arrG.stages[start].turnScore;
+  var end = start;
+  while (end + 1 < _arrG.stages.length && _arrG.stages[end + 1].turnScore === ts) end++;
+  return { start: start, end: end };
+}
+
+/* ターンブロック（3段スロット）を描画 */
+function _renderTurnBlock() {
+  var range = _getTurnRange();
+  var st0 = _arrG.stages[range.start];
+  var totalInTurn = range.end - range.start + 1;
+  var html = '<div class="arr-turn-score-hdr">' +
+    '<span class="arr-turn-score-num">' + st0.turnScore + '</span>' +
+    '<span class="arr-turn-score-sub">' + totalInTurn + '本残り</span>' +
+    '</div>';
+  for (var i = range.start; i <= range.end; i++) {
+    var s = _arrG.stages[i];
+    var slotState, badgeClass = '', label;
+    if (i < _arrG.stgIdx) {
+      var no = s.nextOutcome;
+      slotState = 'done';
+      badgeClass = no ? (no.type === 'success' ? 'success' : 'miss') : '';
+      label = no ? '<span class="arr-slot-aim">' + no.dart + '</span> → ' + no.label : '完了';
+    } else if (i === _arrG.stgIdx) {
+      slotState = 'active';
+      var isFinish = s.path.length === 1;
+      label = isFinish ? 'フィニッシュ！ダブルは？' : (s.turnDart === 1 ? '何点入れる？' : '次は何点？');
+    } else {
+      slotState = 'pending';
+      label = '─';
+    }
+    html += '<div class="arr-dart-slot ' + slotState + (badgeClass ? ' ' + badgeClass : '') + '">' +
+      '<span class="arr-slot-num">第' + s.turnDart + '投</span>' +
+      '<span class="arr-slot-label">' + label + '</span>' +
+      '</div>';
   }
+  document.getElementById('arr-turn-block').innerHTML = html;
+}
+
+/* 完了したターンを過去履歴HTMLとして生成 */
+function _buildPastTurnHtml() {
+  var range = _getTurnRange();
+  var st0 = _arrG.stages[range.start];
+  var html = '<div class="arr-past-turn"><div class="arr-past-turn-score">' + st0.turnScore + '</div>';
+  for (var i = range.start; i <= range.end; i++) {
+    var no = _arrG.stages[i].nextOutcome;
+    if (no) {
+      var cls = no.type === 'success' ? 'success' : 'miss';
+      html += '<div class="arr-chain-entry ' + cls + '">' +
+        '<span class="arr-chain-aim">' + no.dart + ' →</span> ' + no.label +
+        '</div>';
+    }
+  }
+  html += '</div>';
+  return html;
 }
 
 function _arrShowStage() {
@@ -2404,32 +2457,30 @@ function _arrShowStage() {
   document.getElementById('arr-next-row').className = 'arr-next-row hide';
 
   _arrBuildChoices(st);
-
-  var chainEl = document.getElementById('arr-chain');
   var choicesEl = document.getElementById('arr-choices');
 
   if (_arrG.stgIdx === 0) {
-    // 最初のステージ：チェーンをリセット、即表示
+    // 最初：チェーンリセット、ターンブロック描画
     _arrG.chainHtml = '';
-    chainEl.innerHTML = '';
-    _arrShowActiveQ(st);
+    document.getElementById('arr-chain').innerHTML = '';
+    _renderTurnBlock();
     choicesEl.style.display = '';
     document.getElementById('arr-timer-bar').style.width = '100%';
     _arrG.stageStart = Date.now();
     _startArrTimer();
+    _arrScrollChain();
   } else if (isNewTurn) {
-    // ターン切り替わり：「ラウンド終了」セパレータ表示後、新スコアを明かす
-    chainEl.innerHTML = _arrG.chainHtml +
-      '<div class="arr-chain-turn-sep">— ラウンド終了 —</div>';
-    document.getElementById('arr-active-q').innerHTML = '';
+    // ターン終了→新ターン: 完了ターンを過去へ移動、1.2s後に新スコア表示
+    var pastHtml = _buildPastTurnHtml();
+    _arrG.chainHtml += pastHtml + '<div class="arr-chain-turn-sep">— ラウンド終了 —</div>';
+    document.getElementById('arr-chain').innerHTML = _arrG.chainHtml;
+    document.getElementById('arr-turn-block').innerHTML = '';
     choicesEl.style.display = 'none';
     document.getElementById('arr-timer-bar').style.width = '0%';
     _arrScrollChain();
     _arrG.advTimeout = setTimeout(function() {
       _arrG.advTimeout = null;
-      _arrG.chainHtml += '<div class="arr-chain-turn-sep">— ラウンド終了 —</div>';
-      chainEl.innerHTML = _arrG.chainHtml;
-      _arrShowActiveQ(st);
+      _renderTurnBlock();
       choicesEl.style.display = '';
       document.getElementById('arr-timer-bar').style.width = '100%';
       _arrG.stageStart = Date.now();
@@ -2437,9 +2488,8 @@ function _arrShowStage() {
       _arrScrollChain();
     }, 1200);
   } else {
-    // ターン内継続：チェーンに前の結果が追加済みなのでそのまま問いを表示
-    chainEl.innerHTML = _arrG.chainHtml;
-    _arrShowActiveQ(st);
+    // ターン内継続：ターンブロックを更新（済みスロット反映）
+    _renderTurnBlock();
     choicesEl.style.display = '';
     document.getElementById('arr-timer-bar').style.width = '100%';
     _arrG.stageStart = Date.now();
@@ -2523,22 +2573,6 @@ function chooseArr(idx) {
 
   // スコアHUD更新
   document.getElementById('arr-hud-score').textContent = _arrG.totalScore;
-
-  // チェーンに今の投の結果を追記（次ステージへ引き継ぐ）
-  var nextOutcome = st.nextOutcome;
-  if (nextOutcome && hasNextStage) {
-    var badgeClass = nextOutcome.type === 'success' ? 'success' : 'miss';
-    var correctMark = isCorrect ? '' : '<span style="color:#ef5350;font-size:11px;margin-right:4px;">✕</span>';
-    _arrG.chainHtml +=
-      '<div class="arr-chain-entry ' + badgeClass + '">' +
-        correctMark +
-        '<span class="arr-chain-aim">' + nextOutcome.dart + ' →</span> ' +
-        nextOutcome.label +
-      '</div>';
-    document.getElementById('arr-chain').innerHTML = _arrG.chainHtml;
-    document.getElementById('arr-active-q').innerHTML = '';
-    _arrScrollChain();
-  }
 
   if (isSessionEnd) {
     var btn = document.getElementById('arr-next-btn');
