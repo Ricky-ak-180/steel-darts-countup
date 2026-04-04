@@ -2945,6 +2945,22 @@ function _dartCountLabel(n) {
   return '<span class="arr-t-label arr-t-label-3">3本</span>';
 }
 
+// ルートの先頭がトリプル→3本持ち向け、シングル数字orBull→2本持ち向け
+function _routeHoldCtx(path) {
+  if (!path || !path[0]) return null;
+  var f = path[0];
+  if (/^T/.test(f)) return '3本持ち';
+  if (f === '25') return null; // 外ブルは判定が難しいのでラベルなし
+  if (f === 'Bull' || /^\d+$/.test(f)) return '2本持ち';
+  return null;
+}
+
+function _holdLabel(ctx) {
+  if (ctx === '3本持ち') return '<span class="arr-t-label arr-t-label-3">3本持ち</span>';
+  if (ctx === '2本持ち') return '<span class="arr-t-label arr-t-label-2h">2本持ち</span>';
+  return '';
+}
+
 function _2hHtml(score) {
   var h2 = CHECKOUT_2H[score];
   if (!h2) return '';
