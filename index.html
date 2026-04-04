@@ -4374,7 +4374,22 @@ function _z01LogRender() {
   // Update live cell with current input
   if (_z01._buf) _z01BufUpdate(_z01._buf);
   var wrap = document.getElementById('z01-log-wrap');
-  if (wrap) wrap.scrollTop = wrap.scrollHeight;
+  if (wrap) {
+    // Scroll so current row is near bottom, keeping ~4 previous rows visible above
+    var liveEl = document.getElementById('z01-log-live');
+    if (liveEl) {
+      var row = liveEl.closest('.z01-log-row');
+      if (row) {
+        var rowBottom = row.offsetTop + row.offsetHeight;
+        var targetScroll = rowBottom - wrap.clientHeight + row.offsetHeight * 2;
+        wrap.scrollTop = Math.max(0, targetScroll);
+      } else {
+        wrap.scrollTop = wrap.scrollHeight;
+      }
+    } else {
+      wrap.scrollTop = wrap.scrollHeight;
+    }
+  }
 }
 
 function _z01BuildFinishModal(finishedScore) {
