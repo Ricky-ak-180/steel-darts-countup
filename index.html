@@ -2585,8 +2585,10 @@ function _missLabel(s) {
   return "0(完全ミス)";
 }
 
-// スコアから最短チェックアウトパスを返す（≤40の偶数にも対応）
+// スコアから最短チェックアウトパスを返す（ユーザールート優先、≤40の偶数にも対応）
 function _getPath(n) {
+  // ユーザーが登録したルートがあれば最優先
+  if (_userRoutes && _userRoutes[n] && _userRoutes[n].length > 0) return _userRoutes[n][0];
   if (CHECKOUT[n]) return CHECKOUT[n];
   if (n === 50) return ["Bull"];
   if (n > 0 && n <= 40 && n % 2 === 0) return ["D" + (n / 2)];
