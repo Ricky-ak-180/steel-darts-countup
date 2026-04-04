@@ -4177,6 +4177,96 @@ function z01BackSetup() {
   document.getElementById('z01-game-wrap').style.display = 'none';
   document.getElementById('z01-setup-wrap').style.display = '';
 }
+function z01ConfirmExit() {
+  document.getElementById('z01-exit-confirm').style.display = 'flex';
+}
+function z01ExitNo() {
+  document.getElementById('z01-exit-confirm').style.display = 'none';
+}
+function z01ExitYes() {
+  document.getElementById('z01-exit-confirm').style.display = 'none';
+  z01BackSetup();
+}
+function z01FinishBtn() {
+  var p = _z01.currentPlayer, rem = _z01.remain[p];
+  var finEl = document.getElementById('z01-bb-finish');
+  if (!finEl || finEl.classList.contains('z01-bb-dim')) return;
+  _z01BufUpdate(String(rem));
+  z01Ok();
+}
+var _z01HintOn = true;
+function z01ToggleHint() {
+  _z01HintOn = !_z01HintOn;
+  var btn = document.getElementById('z01-hint-toggle');
+  if (btn) btn.classList.toggle('on', _z01HintOn);
+  _z01HintUpdate();
+}
+// Score edit state
+var _z01EditState = {rowIdx: 0, colIdx: 0, buf: ''};
+function z01EditScore(arg) {
+  var rowIdx = Math.floor(arg / 10), colIdx = arg % 10;
+  var log = _z01.log;
+  if (rowIdx < 0 || rowIdx >= log.length) return;
+  var data = log[rowIdx].p[colIdx];
+  if (!data) return;
+  _z01EditState = {rowIdx: rowIdx, colIdx: colIdx, buf: String(data.scored)};
+  var cur = document.getElementById('z01-edit-cur');
+  if (cur) cur.textContent = String(data.scored);
+  document.getElementById('z01-edit-modal').style.display = 'flex';
+}
+function z01EditKp(arg) {
+  var v = _z01EditState.buf + String(arg);
+  if (v.length > 3 || parseInt(v,10) > 180) return;
+  _z01EditState.buf = v;
+  var cur = document.getElementById('z01-edit-cur');
+  if (cur) cur.textContent = v || '—';
+}
+function z01EditKd() {
+  _z01EditState.buf = _z01EditState.buf.slice(0,-1);
+  var cur = document.getElementById('z01-edit-cur');
+  if (cur) cur.textContent = _z01EditState.buf || '—';
+}
+function z01EditOk() {
+  var v = parseInt(_z01EditState.buf, 10);
+  if (isNaN(v) || v < 0 || v > 180) return;
+  document.getElementById('z01-edit-modal').style.display = 'none';
+  var rIdx = _z01EditState.rowIdx, cIdx = _z01EditState.colIdx;
+  var log = _z01.log;
+  // Recalculate remains from this row forward
+  // Find previous remain for this player
+  var prevRemain;
+  if (rIdx === 0) {
+    prevRemain = _z01.mode;
+  } else {
+    var prevData = log[rIdx-1].p[cIdx];
+    prevRemain = prevData ? prevData.remain : _z01.mode;
+  }
+  // Check if new score busts at edit point
+  var outDbl = _z01.outRule === 0;
+  var newRemain = prevRemain - v;
+  if (outDbl ? (newRemain < 0 || newRemain === 1) : (newRemain < 0)) return; // invalid
+  log[rIdx].p[cIdx].scored = v;
+  log[rIdx].p[cIdx].remain = newRemain;
+  // Recalculate subsequent rows for this player
+  for (var i = rIdx + 1; i < log.length; i++) {
+    var d = log[i].p[cIdx];
+    if (!d) break;
+    var pr = log[i-1].p[cIdx];
+    if (!pr) break;
+    var nr = pr.remain - d.scored;
+    if (outDbl ? (nr < 0 || nr === 1) : (nr < 0)) { d.remain = pr.remain; } // bust — keep scored but correct remain
+    else d.remain = nr;
+  }
+  // Update final remain in _z01.remain
+  var lastRow = log[log.length-1];
+  if (lastRow.p[cIdx]) {
+    _z01.remain[cIdx] = lastRow.p[cIdx].remain;
+  }
+  _z01LogRender(); _z01HintUpdate();
+}
+function z01EditCancel() {
+  document.getElementById('z01-edit-modal').style.display = 'none';
+}
 
 function _z01InitLog() {
   var n = _z01.players === 1 ? 1 : 2;
