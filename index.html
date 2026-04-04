@@ -2853,9 +2853,9 @@ function _renderTactics() {
         (isSpecial ? '<span style="font-size:13px;color:var(--mut);text-decoration:line-through;margin-right:2px;">' + defTgt + '</span>' : '') +
         '<span style="font-size:18px;font-weight:700;color:' + scoreColor + ';">' + target + (zone === '300s' ? 'から狙う' : 'を狙う') + '</span>' +
       '</div>' +
-      '<div style="display:flex;flex-direction:column;gap:6px;line-height:1.5;">' +
+      '<div style="display:flex;flex-direction:column;gap:8px;line-height:1.6;">' +
         actionLines.join('') +
-        (warningLine ? '<span style="display:block;font-size:13px;margin-top:4px;">' + warningLine + '</span>' : '') +
+        (warningLine ? '<div style="margin-top:4px;">' + warningLine + '</div>' : '') +
       '</div>' +
     '</div>';
   }
