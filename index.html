@@ -388,6 +388,14 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-hud-score { font-family:'Bebas Neue',cursive; font-size:32px; color:var(--acc); letter-spacing:2px; }
 /* クイズカード */
 .arr-card { margin:4px 12px 16px; background:var(--card); border:1px solid var(--bd); border-radius:16px; padding:14px 14px 16px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+.arr-card-body { display:flex; gap:10px; width:100%; align-items:flex-start; }
+.arr-card-body .arr-chain-scroll { flex:1; min-width:0; }
+/* ボードパネル */
+.arr-board-panel { width:150px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.arr-board-panel svg { width:150px; height:150px; }
+.arr-board-label { font-family:'Bebas Neue',cursive; font-size:16px; letter-spacing:2px; text-align:center; }
+.arr-board-label.success { color:#47ffb4; }
+.arr-board-label.miss { color:#ff6b35; }
 /* チェーンスクロール */
 .arr-chain-scroll { width:100%; max-height:340px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; }
 .arr-chain { display:flex; flex-direction:column; gap:6px; width:100%; }
@@ -728,9 +736,12 @@ canvas.schart { width: 100%; height: 100%; }
     </div>
     <!-- クイズカード -->
     <div class="arr-card hide" id="arr-card">
-      <div class="arr-chain-scroll" id="arr-chain-scroll">
-        <div class="arr-chain" id="arr-chain"></div>
-        <div class="arr-turn-block" id="arr-turn-block"></div>
+      <div class="arr-card-body">
+        <div class="arr-chain-scroll" id="arr-chain-scroll">
+          <div class="arr-chain" id="arr-chain"></div>
+          <div class="arr-turn-block" id="arr-turn-block"></div>
+        </div>
+        <div class="arr-board-panel" id="arr-board-panel"></div>
       </div>
       <div class="arr-timer-wrap"><div class="arr-timer-bar" id="arr-timer-bar"></div></div>
       <div class="arr-choices" id="arr-choices"></div>
@@ -2462,6 +2473,17 @@ function _buildBoardSVG(aimStr, landStr) {
   return svg;
 }
 
+/* ボードパネル更新 */
+function _updateBoardPanel(aimStr, landStr, type) {
+  var panel = document.getElementById('arr-board-panel');
+  if (!panel) return;
+  var svg = _buildBoardSVG(aimStr, landStr);
+  var labelHtml = type
+    ? '<div class="arr-board-label ' + type + '">' + (type === 'success' ? '入った！' : '外れた！') + '</div>'
+    : '';
+  panel.innerHTML = svg + labelHtml;
+}
+
 function _arrFlash(type, boardSvg, label) {
   var el = document.getElementById('arr-flash-overlay');
   el.className = 'arr-flash-overlay';
@@ -2574,6 +2596,9 @@ function _arrShowStage() {
   _arrBuildChoices(st);
   var choicesEl = document.getElementById('arr-choices');
 
+  // ボードに「今の狙い」をセット（答える前）
+  _updateBoardPanel(st.path[0], null, null);
+
   if (_arrG.stgIdx === 0) {
     // 最初：チェーンリセット、ターンブロック描画
     _arrG.chainHtml = '';
@@ -2596,6 +2621,7 @@ function _arrShowStage() {
     _arrG.advTimeout = setTimeout(function() {
       _arrG.advTimeout = null;
       _renderTurnBlock();
+      _updateBoardPanel(st.path[0], null, null);
       choicesEl.style.display = '';
       document.getElementById('arr-timer-bar').style.width = '100%';
       _arrG.stageStart = Date.now();
@@ -2660,14 +2686,12 @@ function chooseArr(idx) {
   // タイマーバーを即クリア
   document.getElementById('arr-timer-bar').style.width = '0%';
 
-  // ボードフラッシュ
+  // ボードを着弾位置に更新
   var nextOutcome = st.nextOutcome;
   if (nextOutcome) {
     var landStr = nextOutcome.type === 'success' ? nextOutcome.dart : nextOutcome.missTarget;
-    var boardSvg = _buildBoardSVG(nextOutcome.dart, landStr);
     var flashType = nextOutcome.type === 'success' ? 'success' : 'miss';
-    var flashLabel = nextOutcome.type === 'success' ? '入った！' : '外れた！';
-    _arrFlash(flashType, boardSvg, flashLabel);
+    _updateBoardPanel(nextOutcome.dart, landStr, flashType);
   }
 
   // ボタン色変え（全ボタン無効化）
