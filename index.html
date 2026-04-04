@@ -3284,6 +3284,7 @@ function _renderTrainPrac(score, entry) {
   for (var i = 0; i < _TRAIN_MASTER; i++) stars += (i < Math.min(c, _TRAIN_MASTER)) ? '★' : '☆';
   if (c >= _TRAIN_PERFECT) stars = '🌟 PERFECT';
   document.getElementById('arr-tp-stars').textContent = stars;
+  document.getElementById('arr-tp-rate').textContent = _trainRateText(entry);
   var path = score <= 40 ? ['D' + (score / 2)] : CHECKOUT[score];
   document.getElementById('arr-tp-hint-box').innerHTML = _pathHtml(path);
   var hintBtn = document.getElementById('arr-tp-hint-btn');
