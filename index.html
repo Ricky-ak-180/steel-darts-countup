@@ -2735,73 +2735,78 @@ function _isCheckable(n) {
 function _renderTactics() {
   var html = '';
 
-  // 末尾ルールカード
+  function cellClass(n) {
+    if (TACTICS_EXCEPTIONS[n]) return 'sp';
+    var d = n % 10;
+    if (d===0||d===1||d===4||d===7) return 't20';
+    if (d===2||d===5||d===8) return 't18';
+    return 't19';
+  }
+  function cellTarget(n) {
+    if (TACTICS_EXCEPTIONS[n]) return TACTICS_EXCEPTIONS[n].target;
+    var d = n % 10;
+    if (d===0||d===1||d===4||d===7) return 'T20';
+    if (d===2||d===5||d===8) return 'T18';
+    return 'T19';
+  }
+
+  // スコアグリッド 171〜220
+  html += '<div class="tac-section-title">171〜220 スコア別狙いどころ</div>';
+  html += '<div class="tac-grid-legend">' +
+    '<div class="tac-legend-item"><div class="tac-legend-dot" style="background:rgba(232,255,71,0.4);"></div><span style="color:var(--acc);">T20</span></div>' +
+    '<div class="tac-legend-item"><div class="tac-legend-dot" style="background:rgba(255,138,101,0.4);"></div><span style="color:#ff8a65;">T19</span></div>' +
+    '<div class="tac-legend-item"><div class="tac-legend-dot" style="background:rgba(79,195,247,0.4);"></div><span style="color:#4fc3f7;">T18</span></div>' +
+    '<div class="tac-legend-item"><div class="tac-legend-dot" style="background:rgba(255,213,79,0.4);"></div><span style="color:#ffd54f;">特殊</span></div>' +
+  '</div>';
+  html += '<div class="tac-grid">';
+  for (var n = 171; n <= 220; n++) {
+    var cls = cellClass(n);
+    var tgt = cellTarget(n);
+    html += '<div class="tac-cell ' + cls + '">' +
+      '<div class="tac-cell-score">' + n + '</div>' +
+      '<div class="tac-cell-target">' + tgt + '</div>' +
+    '</div>';
+  }
+  html += '</div>';
+
+  // 末尾ルール（グリッドを見た後に読む）
   html += '<div class="tac-rule-card">' +
-    '<div class="tac-rule-title">基本ルール（末尾で決める）</div>' +
-    '<div class="tac-rule-row"><span class="tac-rule-suffix">末尾 0,1,4,7</span><span class="tac-rule-target tac-t20">T20</span><span class="tac-rule-note">例: 180,181,184,187,190…</span></div>' +
-    '<div class="tac-rule-row"><span class="tac-rule-suffix">末尾 2,5,8</span><span class="tac-rule-target tac-t18">T18</span><span class="tac-rule-note">例: 172,175,178,182,185…</span></div>' +
-    '<div class="tac-rule-row"><span class="tac-rule-suffix">末尾 3,6,9</span><span class="tac-rule-target tac-t19">T19</span><span class="tac-rule-note">例: 173,176,179,183,186…</span></div>' +
+    '<div class="tac-rule-title">パターン（末尾の数字で決まる）</div>' +
+    '<div class="tac-rule-row"><span class="tac-rule-suffix">末尾 0,1,4,7</span><span class="tac-rule-target tac-t20">T20</span></div>' +
+    '<div class="tac-rule-row"><span class="tac-rule-suffix">末尾 2,5,8</span><span class="tac-rule-target tac-t18">T18</span></div>' +
+    '<div class="tac-rule-row"><span class="tac-rule-suffix">末尾 3,6,9</span><span class="tac-rule-target tac-t19">T19</span></div>' +
+    '<div style="font-size:11px;color:var(--mut);margin-top:8px;line-height:1.6;">T20を打ってシングルミスすると20点しか引けない。末尾ルールはシングルミス後も偶数（ダブルで上がれる数字）が残るよう設計されている。</div>' +
   '</div>';
 
-  // ボギーナンバー
-  html += '<div class="tac-section-title">3本チェックアウト不可（ボギーナンバー）</div>' +
-    '<div class="tac-bogey-row">';
-  BOGEY_NUMS.forEach(function(n){ html += '<span class="tac-bogey-badge">' + n + '</span>'; });
-  html += '</div>' +
-    '<div style="font-size:11px;color:var(--mut);margin-bottom:12px;">このスコアになると必ず次ラウンドに持ち越し。末尾ルールでミスしてもボギーにならないよう設計されている。</div>';
-
   // 特殊ケース
-  html += '<div class="tac-section-title">特殊ケース（末尾ルール以外）</div>';
-  var hasException = false;
+  html += '<div class="tac-section-title">特殊ケース</div>';
   Object.keys(TACTICS_EXCEPTIONS).forEach(function(k) {
-    hasException = true;
     var n = +k;
     var ex = TACTICS_EXCEPTIONS[n];
-    var defaultTarget = (function(){
+    var defTgt = cellClass(n) === 'sp' ? (function(){
       var d = n % 10;
       if (d===0||d===1||d===4||d===7) return "T20";
       if (d===2||d===5||d===8) return "T18";
       return "T19";
-    })();
+    })() : '';
     html += '<div class="tac-special-row">' +
       '<div style="display:flex;align-items:center;gap:10px;">' +
         '<span class="tac-special-score">' + n + '</span>' +
-        '<span style="font-size:12px;color:var(--mut);text-decoration:line-through;">' + defaultTarget + '</span>' +
+        '<span style="font-size:12px;color:var(--mut);text-decoration:line-through;">' + defTgt + '</span>' +
         '<span style="color:var(--mut);font-size:11px;">→</span>' +
         '<span class="tac-rule-target tac-special">' + ex.target + '</span>' +
+        '<span style="font-size:12px;color:var(--mut);">→ ' + ex.hitLeave + '残し</span>' +
       '</div>' +
-      '<div class="tac-special-detail">ヒット後: <strong>' + ex.hitLeave + '</strong>残し</div>' +
       '<div class="tac-special-reason">' + ex.reason + '</div>' +
     '</div>';
   });
-  if (!hasException) {
-    html += '<div style="font-size:12px;color:var(--mut);">特殊ケースなし</div>';
-  }
 
-  // 注意スコア帯（ボギーへの近接帯）
-  html += '<div class="tac-section-title">注意スコア帯（シングルミス確認）</div>';
-  var warnScores = [];
-  for (var n = 171; n <= 501; n++) {
-    var target = _tacticsTarget(n);
-    var ex = TACTICS_EXCEPTIONS[n];
-    var missLeave = ex ? null : (n - _tacticsMissVal(target));
-    if (!ex && missLeave && _isBogeyOrBad(missLeave)) {
-      warnScores.push({score:n, target:target, missLeave:missLeave});
-    }
-  }
-  if (warnScores.length === 0) {
-    html += '<div style="font-size:12px;color:#66bb6a;">末尾ルール通りに打てば、シングルミスでボギーになるスコアはありません。</div>';
-  } else {
-    warnScores.forEach(function(w){
-      html += '<div class="tac-special-row" style="border-color:rgba(255,107,107,0.3);">' +
-        '<div style="display:flex;align-items:center;gap:10px;">' +
-          '<span class="tac-special-score" style="color:#ff6b6b;">' + w.score + '</span>' +
-          '<span class="tac-rule-target" style="background:rgba(255,107,107,0.12);color:#ff6b6b;border-color:rgba(255,107,107,0.3);">' + w.target + '</span>' +
-        '</div>' +
-        '<div class="tac-miss-warn">S' + w.target.slice(1) + 'ミス → ' + w.missLeave + '（ボギー）</div>' +
-      '</div>';
-    });
-  }
+  // ボギーナンバー
+  html += '<div class="tac-section-title">ボギーナンバー（3本で上がれない）</div>' +
+    '<div class="tac-bogey-row">';
+  BOGEY_NUMS.forEach(function(n){ html += '<span class="tac-bogey-badge">' + n + '</span>'; });
+  html += '</div>' +
+    '<div style="font-size:11px;color:var(--mut);margin-bottom:16px;">このスコアに乗ると次ラウンドへ持ち越し確定。上のグリッドでT19/T18になっているのはこれらのボギーを避けるため。</div>';
 
   document.getElementById('arr-teiseki-list').innerHTML = html;
 }
