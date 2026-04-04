@@ -2800,19 +2800,17 @@ function _renderTactics() {
       actionLines.push('<span style="color:#66bb6a;">✓ ' + ex.target + 'を狙う → ' + hitLeave + '残し</span>');
       warningLine = '<span style="color:#ff6b6b;">⚠ ' + ex.reason + '</span>';
     } else if (zone === '300s') {
-      // ヒット後の2本で170へ持ち込む具体的なルート
-      var hit2dartPaths = { 309:'T19+25', 306:'T18+25', 303:'T19+19', 308:'T20+24', 305:'T20+21', 302:'T18+24' };
-      var hitPath2 = hit2dartPaths[n];
-      var hitNote = hitPath2 ? hitPath2 + '→170残し' : 'T20+T20で' + (hitLeave - 120) + '残し';
-      actionLines.push('<span style="color:#66bb6a;">✓ ' + target + 'ヒット → ' + hitLeave + '残し → ' + hitNote + '</span>');
-      // S-miss後 残り2本T20+T20
-      if (missLeave !== null) {
-        var missNext = missLeave - 120;
-        var missNote = (missNext === 170) ? 'T20+T20→170残し（チェックアウト最高値）' : 'T20+T20で' + missNext + '残し';
-        actionLines.push('<span style="color:#66bb6a;">✓ S' + singleNum + 'ミス（' + missLeave + '残り）→ ' + missNote + '</span>');
+      var p300 = TACTICS_300s_PATHS[n];
+      function fmtPath(darts) {
+        return darts.map(function(x){ return x.d + '<span style="color:var(--mut);font-size:10px;">(' + x.l + '残)</span>'; }).join(' → ');
+      }
+      if (p300) {
+        actionLines.push('<span style="color:#66bb6a;">🎯 ' + fmtPath(p300.ideal) + '</span>');
+        var missColor = (p300.miss[p300.miss.length-1].l === 170) ? '#66bb6a' : '#aaa';
+        actionLines.push('<span style="color:' + missColor + ';">🔄 ' + fmtPath(p300.miss) + '</span>');
       }
       var bogeyLeave = n - 140;
-      warningLine = '<span style="color:#ff6b6b;">⚠ T20+T20+S20=140点取得 → ' + bogeyLeave + '（ボギー）</span>';
+      warningLine = '<span style="color:#ff6b6b;">⚠ T20+T20+S20 → ' + bogeyLeave + '（ボギー）</span>';
     } else if (zone === '200s') {
       actionLines.push('<span style="color:#66bb6a;">✓ ' + target + 'ヒット → ' + hitLeave + '残し（チェックアウト圏）</span>');
       if (missLeave !== null) {
