@@ -956,6 +956,124 @@ canvas.schart { width: 100%; height: 100%; }
     </div>
   </div>
 
+  <!-- 01 Game view -->
+  <div class="view hide" id="v01" style="overflow:hidden;">
+    <!-- Setup screen -->
+    <div id="z01-setup-wrap" style="flex:1;min-height:0;overflow-y:auto;">
+      <div class="z01-setup">
+        <div class="z01-section">
+          <div class="z01-label">GAME MODE</div>
+          <div class="z01-chips">
+            <div class="z01-chip" data-fn="z01SetMode" data-arg="301">301</div>
+            <div class="z01-chip on" data-fn="z01SetMode" data-arg="501">501</div>
+            <div class="z01-chip" data-fn="z01SetMode" data-arg="701">701</div>
+            <div class="z01-chip" data-fn="z01SetMode" data-arg="0">カスタム</div>
+          </div>
+          <div class="z01-custom-row" id="z01-custom-row" style="display:none;">
+            <input type="number" class="z01-custom-input" id="z01-custom-val" min="1" max="9999" value="501" inputmode="numeric">
+            <span style="font-size:12px;color:var(--mut);">点スタート</span>
+          </div>
+        </div>
+        <div class="z01-section">
+          <div class="z01-label">LEGS</div>
+          <div class="z01-chips">
+            <div class="z01-chip on" data-fn="z01SetLegs" data-arg="1">1 LEG</div>
+            <div class="z01-chip" data-fn="z01SetLegs" data-arg="3">BEST OF 3</div>
+            <div class="z01-chip" data-fn="z01SetLegs" data-arg="5">BEST OF 5</div>
+          </div>
+        </div>
+        <div class="z01-section">
+          <div class="z01-label">IN / OUT</div>
+          <div class="z01-chips">
+            <div class="z01-chip on" data-fn="z01SetIn" data-arg="0">ストレートイン</div>
+            <div class="z01-chip" data-fn="z01SetIn" data-arg="1">ダブルイン</div>
+          </div>
+          <div class="z01-chips">
+            <div class="z01-chip on" data-fn="z01SetOut" data-arg="0">ダブルアウト</div>
+            <div class="z01-chip" data-fn="z01SetOut" data-arg="1">シングルアウト</div>
+          </div>
+        </div>
+        <div class="z01-section">
+          <div class="z01-label">PLAYERS</div>
+          <div class="z01-chips">
+            <div class="z01-chip on" data-fn="z01SetPlayers" data-arg="1">1P ソロ</div>
+            <div class="z01-chip" data-fn="z01SetPlayers" data-arg="2">2P 対戦</div>
+            <div class="z01-chip" data-fn="z01SetPlayers" data-arg="3">vs CPU</div>
+          </div>
+        </div>
+        <div class="z01-section" id="z01-names-section">
+          <div class="z01-label">PLAYER NAME</div>
+          <div class="z01-name-row">
+            <input type="text" class="z01-name-input" id="z01-name1" placeholder="Player 1" maxlength="12" value="Player 1">
+            <input type="text" class="z01-name-input" id="z01-name2" placeholder="Player 2" maxlength="12" value="Player 2" style="display:none;">
+          </div>
+        </div>
+        <div class="z01-section" id="z01-cpu-section" style="display:none;">
+          <div class="z01-label">CPU LEVEL</div>
+          <div class="z01-chips">
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="1">LV1 ビギナー</div>
+            <div class="z01-chip on" data-fn="z01SetCpu" data-arg="2">LV2 アマチュア</div>
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="3">LV3 中級</div>
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="4">LV4 上級</div>
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="5">LV5 プロ</div>
+          </div>
+        </div>
+        <button class="z01-start-btn" data-fn="z01Start">GAME START</button>
+      </div>
+    </div>
+    <!-- Game screen -->
+    <div class="z01-game-wrap" id="z01-game-wrap" style="display:none;">
+      <div class="z01-players" id="z01-players"></div>
+      <div class="z01-info-bar">
+        <div id="z01-leg-info">Leg 1</div>
+        <div id="z01-turn-info"></div>
+      </div>
+      <div class="z01-checkout-hint" id="z01-checkout-hint"></div>
+      <!-- CPU turn indicator -->
+      <div class="z01-cpu-area" id="z01-cpu-area" style="display:none;">
+        <div style="font-size:12px;color:var(--mut);letter-spacing:2px;">CPU THINKING...</div>
+        <div class="z01-cpu-dots">
+          <div class="z01-cpu-dot"></div>
+          <div class="z01-cpu-dot"></div>
+          <div class="z01-cpu-dot"></div>
+        </div>
+      </div>
+      <!-- Input area -->
+      <div class="z01-input" id="z01-input-area">
+        <div class="z01-presets" id="z01-presets"></div>
+        <div class="z01-tkd">
+          <div class="z01-tkv empty" id="z01-tkv">—</div>
+          <div class="z01-tkh" id="z01-tkh">このラウンドの合計を入力</div>
+        </div>
+        <div class="z01-tkg">
+          <div class="z01-tk" data-fn="z01Kp" data-arg="1">1</div><div class="z01-tk" data-fn="z01Kp" data-arg="2">2</div><div class="z01-tk" data-fn="z01Kp" data-arg="3">3</div>
+          <div class="z01-tk" data-fn="z01Kp" data-arg="4">4</div><div class="z01-tk" data-fn="z01Kp" data-arg="5">5</div><div class="z01-tk" data-fn="z01Kp" data-arg="6">6</div>
+          <div class="z01-tk" data-fn="z01Kp" data-arg="7">7</div><div class="z01-tk" data-fn="z01Kp" data-arg="8">8</div><div class="z01-tk" data-fn="z01Kp" data-arg="9">9</div>
+          <div class="z01-tk del" data-fn="z01Kd">⌫</div><div class="z01-tk" data-fn="z01Kp" data-arg="0">0</div><div class="z01-tk enter" id="z01-enter" data-fn="z01Ok">Enter</div>
+        </div>
+      </div>
+    </div>
+    <!-- Result screen -->
+    <div class="z01-result-wrap" id="z01-result-wrap" style="display:none;">
+      <div class="z01-result">
+        <div class="z01-result-title" id="z01-result-title">GAME OVER</div>
+        <div class="z01-result-winner" id="z01-result-winner"></div>
+        <div class="z01-stats-table" id="z01-stats-table"></div>
+        <div class="z01-result-btns">
+          <button class="z01-result-again" data-fn="z01Again">もう一度</button>
+          <button class="z01-result-back" data-fn="z01BackSetup">設定に戻る</button>
+        </div>
+      </div>
+    </div>
+    <!-- Leg end overlay -->
+    <div class="z01-leg-overlay" id="z01-leg-overlay" style="display:none;">
+      <div class="z01-leg-title" id="z01-leg-title">LEG WIN!</div>
+      <div class="z01-leg-winner-name" id="z01-leg-winner-name"></div>
+      <div class="z01-leg-stats" id="z01-leg-stats"></div>
+      <button class="z01-leg-btn" id="z01-leg-btn" data-fn="z01NextLeg">続ける →</button>
+    </div>
+  </div>
+
 </div>
 
 <!-- Result overlay -->
