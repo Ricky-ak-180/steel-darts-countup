@@ -4212,16 +4212,16 @@ function _z01LogRender() {
     var n0 = _z01PlayerName(0) + (_z01.legs>1?' ('+_z01.legWins[0]+'W)':'');
     var n1 = _z01PlayerName(1) + (_z01.legs>1?' ('+_z01.legWins[1]+'W)':'');
     h += '<div class="z01-log-names"><div class="z01-log-name-l' + (cp===0?' z01-log-name-act':'') + '">' + n0 + '</div><div></div><div class="z01-log-name-r' + (cp===1?' z01-log-name-act':'') + '">' + n1 + '</div></div>';
-    h += '<div class="z01-log-hdr"><div>Scored</div><div>To Go</div><div></div><div>Scored</div><div>To Go</div></div>';
+    h += '<div class="z01-log-hdr"><div>Scored</div><div>残り</div><div></div><div>Scored</div><div>残り</div></div>';
   } else {
-    h += '<div class="z01-log-hdr"><div></div><div>Scored</div><div>To Go</div></div>';
+    h += '<div class="z01-log-hdr"><div>Scored</div><div></div><div>残り</div></div>';
   }
   // Initial remaining row
   var startR = _z01.mode;
   if (isP2) {
     h += '<div class="z01-log-row"><div class="z01-lc-s0"></div><div class="z01-lc-t0 init">' + startR + '</div><div class="z01-lc-v"></div><div class="z01-lc-s1"></div><div class="z01-lc-t1 init">' + startR + '</div></div>';
   } else {
-    h += '<div class="z01-log-row"><div class="z01-lc-v"></div><div class="z01-lc-s0"></div><div class="z01-lc-t0 init">' + startR + '</div></div>';
+    h += '<div class="z01-log-row"><div class="z01-lc-s0"></div><div class="z01-lc-v"></div><div class="z01-lc-t0 init">' + startR + '</div></div>';
   }
   // Data rows
   var log = _z01.log, cp2 = _z01.currentPlayer;
@@ -4234,25 +4234,25 @@ function _z01LogRender() {
       var live0 = isCur && cp2===0 && row.p[0]===null;
       var live1 = isCur && cp2===1 && row.p[1]===null;
       h += '<div class="z01-log-row' + cls + '">';
-      h += _z01LogCell(row.p[0], 0, live0);
+      h += _z01LogCell(row.p[0], 0, live0, !isCur && row.p[0]!==null, i, 0);
       h += '<div class="z01-lc-v">' + row.visit + '</div>';
-      h += _z01LogCell(row.p[1], 1, live1);
+      h += _z01LogCell(row.p[1], 1, live1, !isCur && row.p[1]!==null, i, 1);
       h += '</div>';
     } else {
       h += '<div class="z01-log-row' + cls + '">';
+      h += _z01LogCell(row.p[0], 0, isCur, !isCur && row.p[0]!==null, i, 0);
       h += '<div class="z01-lc-v">' + row.visit + '</div>';
-      h += _z01LogCell(row.p[0], 0, isCur);
       h += '</div>';
     }
   }
-  // Future padding rows
+  // Future padding rows (15 rounds = 45 darts ahead)
   var lastVisit = log[log.length - 1].visit;
-  for (var k = 1; k <= 3; k++) {
+  for (var k = 1; k <= 15; k++) {
     var fv = lastVisit + k * 3;
     if (isP2) {
       h += '<div class="z01-log-row"><div class="z01-lc-s0"></div><div class="z01-lc-t0"></div><div class="z01-lc-v">' + fv + '</div><div class="z01-lc-s1"></div><div class="z01-lc-t1"></div></div>';
     } else {
-      h += '<div class="z01-log-row"><div class="z01-lc-v">' + fv + '</div><div class="z01-lc-s0"></div><div class="z01-lc-t0"></div></div>';
+      h += '<div class="z01-log-row"><div class="z01-lc-s0"></div><div class="z01-lc-v">' + fv + '</div><div class="z01-lc-t0"></div></div>';
     }
   }
   logEl.innerHTML = h;
