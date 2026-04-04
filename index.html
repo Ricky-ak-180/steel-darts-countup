@@ -2797,8 +2797,8 @@ function _renderTactics() {
     var warningLine = '';
 
     if (ex) {
-      actionLines.push('<span style="color:#66bb6a;">✓ ' + ex.target + 'を狙う → ' + hitLeave + '残し</span>');
-      warningLine = '<span style="color:#ff6b6b;">⚠ ' + ex.reason + '</span>';
+      actionLines.push('<span style="color:#66bb6a;font-size:15px;">✓ ' + ex.target + 'を狙う → ' + hitLeave + '残し</span>');
+      warningLine = '<span style="color:#ff6b6b;font-size:13px;">⚠ ' + ex.reason + '</span>';
     } else if (zone === '300s') {
       var p300 = TACTICS_300s_PATHS[n];
       function fmtPath(darts, color) {
