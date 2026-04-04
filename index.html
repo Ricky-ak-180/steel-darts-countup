@@ -1503,9 +1503,11 @@ function goTab(tab) {
   document.getElementById('tgame').className = 'tab' + (tab==='game'?' on':'');
   document.getElementById('thist').className = 'tab' + (tab==='hist'?' on':'');
   document.getElementById('tarr').className = 'tab' + (tab==='arr'?' on':'');
+  document.getElementById('t01').className = 'tab' + (tab==='01'?' on':'');
   document.getElementById('vgame').className = 'view' + (tab==='game'?'':' hide');
   document.getElementById('vhist').className = 'view' + (tab==='hist'?'':' hide');
   document.getElementById('varr').className = 'view' + (tab==='arr'?'':' hide');
+  document.getElementById('v01').className = 'view' + (tab==='01'?'':' hide');
   if (tab === 'game') {
     var rp = document.getElementById('round-popup');
     if (rp) rp.innerHTML = '';
