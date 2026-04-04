@@ -597,6 +597,27 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-t-input-row { display:flex; gap:6px; margin-top:4px; }
 .arr-t-input { flex:1; background:var(--bg); border:1px solid rgba(232,255,71,0.4); border-radius:8px; color:var(--fg); font-size:13px; padding:6px 10px; outline:none; font-family:monospace; }
 .arr-t-input-ok { background:var(--acc); color:#000; border:none; border-radius:8px; padding:6px 12px; font-size:13px; font-weight:700; cursor:pointer; }
+/* 戦術タブ */
+.tac-rule-card { background:var(--card); border:1px solid var(--bd); border-radius:12px; padding:14px 16px; margin-bottom:10px; }
+.tac-rule-title { font-size:11px; font-weight:700; letter-spacing:2px; color:var(--mut); margin-bottom:10px; }
+.tac-rule-row { display:flex; align-items:center; gap:10px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+.tac-rule-row:last-child { border-bottom:none; }
+.tac-rule-suffix { font-family:'Bebas Neue',cursive; font-size:18px; color:var(--fg); min-width:80px; }
+.tac-rule-target { font-size:14px; font-weight:700; padding:3px 10px; border-radius:6px; }
+.tac-t20 { background:rgba(232,255,71,0.15); color:var(--acc); border:1px solid rgba(232,255,71,0.3); }
+.tac-t19 { background:rgba(255,107,53,0.12); color:#ff8a65; border:1px solid rgba(255,107,53,0.3); }
+.tac-t18 { background:rgba(71,200,255,0.12); color:#4fc3f7; border:1px solid rgba(71,200,255,0.3); }
+.tac-special { background:rgba(255,200,0,0.15); color:#ffd54f; border:1px solid rgba(255,200,0,0.3); }
+.tac-rule-note { font-size:11px; color:var(--mut); margin-left:auto; }
+.tac-section-title { font-size:11px; font-weight:700; letter-spacing:2px; color:var(--mut); margin:14px 0 6px; }
+.tac-bogey-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:4px; }
+.tac-bogey-badge { font-family:'Bebas Neue',cursive; font-size:15px; background:rgba(255,107,107,0.12); color:#ff6b6b; border:1px solid rgba(255,107,107,0.3); border-radius:6px; padding:3px 8px; }
+.tac-special-row { background:var(--card); border:1px solid rgba(255,200,0,0.3); border-radius:10px; padding:10px 14px; display:flex; flex-direction:column; gap:4px; margin-bottom:6px; }
+.tac-special-score { font-family:'Bebas Neue',cursive; font-size:22px; color:#ffd54f; }
+.tac-special-detail { font-size:13px; color:var(--fg); }
+.tac-special-reason { font-size:12px; color:var(--mut); margin-top:2px; }
+.tac-miss-safe { color:#66bb6a; font-size:12px; }
+.tac-miss-warn { color:#ff8a65; font-size:12px; }
 /* === 01 GAME === */
 .z01-setup{padding:12px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;}
 .z01-section{display:flex;flex-direction:column;gap:7px;}
