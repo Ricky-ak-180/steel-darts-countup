@@ -3968,11 +3968,18 @@ function _z01HintUpdate() {
   var el = document.getElementById('z01-checkout-hint');
   var rem = _z01.remain[_z01.currentPlayer];
   var coPath = _getPath(rem);
-  if (rem > 0 && coPath) {
+  if (_z01HintOn && rem > 0 && coPath) {
     el.textContent = '🎯 ' + coPath.join(' → ');
     el.classList.add('show');
   } else {
     el.classList.remove('show');
+  }
+  // Update Finish button state
+  var finBtn = document.getElementById('z01-bb-finish');
+  if (finBtn) {
+    var canFinish = rem > 0 && rem <= 170 && !!coPath;
+    finBtn.classList.toggle('z01-bb-dim', !canFinish);
+    finBtn.classList.toggle('finish-ready', canFinish);
   }
 }
 
