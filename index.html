@@ -4315,7 +4315,8 @@ function _z01LogCellS(data, pIdx, isLive, isEditable, rowIdx) {
   var sc = 'z01-lc-s' + pIdx;
   var scId = isLive ? ' id="z01-log-live"' : '';
   if (!data) return '<div class="' + sc + '"' + scId + '></div>';
-  var scoredHtml = data.scored >= 100 ? '<span class="z01-lc-hi">' + data.scored + '</span>' : String(data.scored);
+  var hiCls = data.scored >= 140 ? ' gold' : '';
+  var scoredHtml = data.scored >= 100 ? '<span class="z01-lc-hi' + hiCls + '">' + data.scored + '</span>' : String(data.scored);
   var editAttr = isEditable ? ' data-fn="z01EditScore" data-arg="' + (rowIdx * 10) + '"' : '';
   var editCls = isEditable ? ' editable' : '';
   return '<div class="' + sc + editCls + '"' + scId + editAttr + '>' + scoredHtml + '</div>';
