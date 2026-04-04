@@ -4057,7 +4057,8 @@ function z01ShowResult() {
     ['140+', function(s){ return s.c140; }],
     ['180s', function(s){ return s.c180; }],
     ['ハイフィニッシュ', function(s){ return s.hiFin||'-'; }],
-    ['ベストレグ(本数)', function(s){ return s.bestLeg<999?(s.bestLeg*3)+' darts':'-'; }],
+    ['ベストレグ', function(s){ return s.bestLeg<999?s.bestLeg+' darts':'-'; }],
+    ['ワーストレグ', function(s){ return s.worstLeg>0?s.worstLeg+' darts':'-'; }],
     ['Legs Won', function(s,i){ return _z01.legWins[i]; }]
   ];
   var n = _z01.stats.length;
