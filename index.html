@@ -2819,6 +2819,7 @@ function filterTeiseki(n) {
     var arg = +t.getAttribute('data-arg');
     t.className = 'arr-t-tab' + (arg === _teisekiFilter ? ' on' : '');
   });
+  if (_teisekiFilter === 501) { _renderTactics(); return; }
   _renderTeiseki();
 }
 
