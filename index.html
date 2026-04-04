@@ -503,6 +503,61 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-score-turn { opacity:0.5; }
 .arr-teiseki-btn { display:block; width:calc(100% - 24px); margin:8px 0 0; background:transparent; color:var(--mut); border:1px solid var(--bd); border-radius:12px; padding:10px; font-size:13px; cursor:pointer; }
 .arr-teiseki-btn:active { opacity:.7; }
+/* トレーニングエントリー */
+.arr-training-entry { margin:0 12px 16px; }
+.arr-divider { display:flex; align-items:center; gap:10px; margin:4px 0 10px; color:var(--mut); font-size:11px; letter-spacing:2px; }
+.arr-divider::before,.arr-divider::after { content:''; flex:1; height:1px; background:var(--bd); }
+.arr-training-entry-inner { background:var(--card); border:1px solid var(--bd); border-radius:16px; padding:18px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+.arr-training-entry-title { font-size:16px; font-weight:700; color:var(--fg); }
+.arr-training-entry-sub { font-size:12px; color:var(--mut); text-align:center; line-height:1.7; }
+.arr-training-start-btn { background:transparent; color:var(--acc); border:1.5px solid var(--acc); border-radius:12px; padding:12px 0; font-size:15px; font-weight:700; cursor:pointer; width:100%; letter-spacing:1px; }
+.arr-training-start-btn:active { opacity:.7; }
+/* トレーニングホーム */
+.arr-train-home { position:fixed; inset:0; background:var(--bg); z-index:200; display:flex; flex-direction:column; overflow:hidden; }
+.arr-train-home-hdr { display:flex; align-items:center; padding:12px 14px; border-bottom:1px solid var(--bd); flex-shrink:0; gap:8px; }
+.arr-train-back { background:transparent; border:none; color:var(--mut); font-size:13px; padding:4px 8px 4px 0; cursor:pointer; flex-shrink:0; }
+.arr-train-home-title { font-size:15px; font-weight:700; letter-spacing:1px; flex:1; }
+.arr-train-progress { font-size:11px; color:var(--mut); }
+.arr-train-continue-wrap { padding:10px 14px 0; flex-shrink:0; }
+.arr-train-continue-btn { display:block; width:100%; background:var(--acc); color:#000; border:none; border-radius:12px; padding:13px; font-size:15px; font-weight:700; cursor:pointer; letter-spacing:1px; }
+.arr-train-continue-btn:active { opacity:.8; }
+.arr-train-map { flex:1; overflow-y:auto; padding:12px 14px 20px; }
+.arr-train-section { margin-bottom:18px; }
+.arr-train-section-lbl { font-size:10px; color:var(--mut); letter-spacing:2px; margin-bottom:8px; }
+.arr-train-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+.arr-train-tile { aspect-ratio:1; border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent; transition:transform .1s; }
+.arr-train-tile:active { transform:scale(.93); }
+.arr-train-tile .t-num { font-size:14px; font-weight:700; }
+.arr-train-tile .t-sub { font-size:9px; margin-top:2px; opacity:.7; }
+.arr-train-tile.locked { background:rgba(255,255,255,0.04); color:rgba(255,255,255,0.2); cursor:default; pointer-events:none; }
+.arr-train-tile.unstarted { background:rgba(255,255,255,0.08); color:var(--fg); }
+.arr-train-tile.started { background:rgba(255,183,77,0.15); border:1px solid rgba(255,183,77,0.35); color:#ffb74d; }
+.arr-train-tile.mastered { background:rgba(255,183,77,0.3); border:1px solid rgba(255,183,77,0.7); color:#ffe082; }
+.arr-train-tile.perfect { background:linear-gradient(135deg,rgba(255,183,77,0.7),rgba(255,143,0,0.7)); border:1px solid #ffb74d; color:#fff; }
+.arr-train-tile.bogey { background:rgba(255,80,80,0.07); color:rgba(255,80,80,0.3); cursor:default; pointer-events:none; font-size:11px; }
+/* トレーニング練習 */
+.arr-train-prac { position:fixed; inset:0; background:var(--bg); z-index:210; display:flex; flex-direction:column; overflow:hidden; }
+.arr-tp-hdr { display:flex; align-items:center; padding:12px 14px; border-bottom:1px solid var(--bd); flex-shrink:0; }
+.arr-tp-back { background:transparent; border:none; color:var(--mut); font-size:13px; padding:4px 8px 4px 0; cursor:pointer; flex-shrink:0; }
+.arr-tp-hdr-score { font-family:'Bebas Neue',cursive; font-size:24px; letter-spacing:2px; color:var(--acc); flex:1; text-align:center; }
+.arr-tp-hdr-clears { font-size:12px; color:var(--mut); flex-shrink:0; min-width:60px; text-align:right; }
+.arr-tp-body { flex:1; overflow-y:auto; padding:0 16px 24px; display:flex; flex-direction:column; align-items:center; }
+.arr-tp-score-big { font-family:'Bebas Neue',cursive; font-size:min(28vw,110px); color:var(--acc); letter-spacing:-2px; line-height:1; padding:16px 0 8px; }
+.arr-tp-stars { font-size:20px; letter-spacing:5px; color:#ffb74d; margin-bottom:14px; }
+.arr-tp-hint-box { width:100%; background:var(--card); border:1px solid var(--bd); border-radius:14px; padding:14px 16px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-bottom:8px; }
+.arr-tp-hint-toggle { background:transparent; border:1px solid var(--bd); border-radius:20px; color:var(--mut); font-size:12px; padding:6px 16px; cursor:pointer; margin-bottom:10px; }
+.arr-tp-hint-toggle:active { opacity:.7; }
+.arr-tp-instruction { font-size:12px; color:var(--mut); letter-spacing:1px; margin:4px 0 14px; text-align:center; }
+.arr-tp-btns { display:flex; gap:10px; width:100%; }
+.arr-tp-ok { flex:1; background:rgba(100,220,130,0.1); border:2px solid rgba(100,220,130,0.4); color:#a5d6a7; border-radius:14px; font-size:15px; font-weight:700; padding:20px 0; cursor:pointer; }
+.arr-tp-ok:active { background:rgba(100,220,130,0.25); }
+.arr-tp-ng { flex:1; background:rgba(255,100,100,0.08); border:2px solid rgba(255,100,100,0.3); color:#ef9a9a; border-radius:14px; font-size:15px; font-weight:700; padding:20px 0; cursor:pointer; }
+.arr-tp-ng:active { background:rgba(255,100,100,0.2); }
+.arr-tp-result-row { margin-top:16px; display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; }
+.arr-tp-unlock-msg { font-size:13px; color:#ffb74d; font-weight:700; min-height:20px; text-align:center; }
+.arr-tp-next { background:transparent; border:1.5px solid var(--bd); color:var(--fg); border-radius:12px; padding:12px 32px; font-size:14px; font-weight:600; cursor:pointer; }
+.arr-tp-next:active { opacity:.7; }
+.arr-tp-tip { width:100%; font-size:11px; color:rgba(255,255,255,0.45); line-height:1.6; margin-top:16px; padding:8px 10px; border-left:2px solid var(--acc); background:rgba(255,255,255,0.02); border-radius:0 6px 6px 0; }
 /* アレンジ表パネル */
 .arr-teiseki-panel { position:fixed; inset:0; background:var(--bg); z-index:300; display:flex; flex-direction:column; }
 .arr-teiseki-header { display:flex; align-items:center; padding:12px 12px 8px; gap:8px; border-bottom:1px solid var(--bd); flex-shrink:0; }
