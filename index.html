@@ -3966,6 +3966,7 @@ function z01Ok() {
   if (_z01._buf === '') return;
   var sc = parseInt(_z01._buf, 10);
   if (isNaN(sc) || sc < 0 || sc > 180) return;
+  soundCommit(sc);
   _z01Commit(sc);
 }
 
