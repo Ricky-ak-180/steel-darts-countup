@@ -475,19 +475,18 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-hist-score { font-family:'Bebas Neue',cursive; font-size:16px; color:var(--fg); }
 /* 結果フラッシュオーバーレイ */
 .arr-flash-overlay { position:fixed; inset:0; z-index:250; display:flex; align-items:center; justify-content:center; pointer-events:none; opacity:0; }
-.arr-flash-overlay.show { animation: arrFlash 0.8s ease-out forwards; }
-.arr-flash-overlay.success { background:rgba(71,255,180,0.18); }
-.arr-flash-overlay.miss { background:rgba(255,107,53,0.18); }
-.arr-flash-text { font-family:'Bebas Neue',cursive; letter-spacing:4px; line-height:1.1; text-align:center; display:flex; flex-direction:column; align-items:center; gap:6px; }
-.arr-flash-main { font-size:76px; }
-.arr-flash-sub { font-size:22px; opacity:0.75; letter-spacing:3px; }
-.arr-flash-overlay.success .arr-flash-text { color:#47ffb4; text-shadow:0 0 40px rgba(71,255,180,0.7); }
-.arr-flash-overlay.miss .arr-flash-text { color:#ff6b35; text-shadow:0 0 40px rgba(255,107,53,0.7); }
+.arr-flash-overlay.show { animation: arrFlash 1.4s ease-out forwards; }
+.arr-flash-overlay.success { background:rgba(5,20,12,0.88); }
+.arr-flash-overlay.miss { background:rgba(20,8,3,0.88); }
+.arr-flash-content { display:flex; flex-direction:column; align-items:center; gap:14px; }
+.arr-flash-label { font-family:'Bebas Neue',cursive; font-size:52px; letter-spacing:5px; text-align:center; }
+.arr-flash-overlay.success .arr-flash-label { color:#47ffb4; text-shadow:0 0 30px rgba(71,255,180,0.8); }
+.arr-flash-overlay.miss .arr-flash-label { color:#ff6b35; text-shadow:0 0 30px rgba(255,107,53,0.8); }
 @keyframes arrFlash {
-  0%   { opacity:0; transform:scale(0.85); }
-  20%  { opacity:1; transform:scale(1.05); }
-  60%  { opacity:1; transform:scale(1); }
-  100% { opacity:0; transform:scale(1); }
+  0%   { opacity:0; }
+  12%  { opacity:1; }
+  75%  { opacity:1; }
+  100% { opacity:0; }
 }
 /* 定石表ボタン */
 /* ターン終了ラベル */
@@ -2372,11 +2371,103 @@ function _arrNextQ() {
 }
 
 /* ステージ表示 */
-function _arrFlash(type, html) {
+/* ── ダーツボードSVG ─────────────────────────── */
+var _BOARD_SEGS = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+
+function _parseDartNotation(d) {
+  if (!d) return null;
+  if (d === 'Bull') return {n:50, ring:'Bull'};
+  if (d === '外ブル') return {n:25, ring:'SBull'};
+  if (d[0]==='T') return {n:parseInt(d.slice(1)), ring:'T'};
+  if (d[0]==='D') return {n:parseInt(d.slice(1)), ring:'D'};
+  if (d[0]==='S') return {n:parseInt(d.slice(1)), ring:'S'};
+  return {n:parseInt(d), ring:'S'};
+}
+
+function _buildBoardSVG(aimStr, landStr) {
+  var SEGS = _BOARD_SEGS;
+  var sz=240, cx=120, cy=120, R=100;
+  var RD=92, RT2=62, RT1=54, RB=16, RBull=7;
+  var aim = _parseDartNotation(aimStr);
+  var land = _parseDartNotation(landStr);
+
+  function rad(d){ return d * Math.PI / 180; }
+  function arc(ro, ri, a1, a2) {
+    var c1=Math.cos(rad(a1)), s1=Math.sin(rad(a1));
+    var c2=Math.cos(rad(a2)), s2=Math.sin(rad(a2));
+    return 'M'+(cx+ro*c1)+','+(cy+ro*s1)+
+           ' A'+ro+','+ro+',0,0,1,'+(cx+ro*c2)+','+(cy+ro*s2)+
+           ' L'+(cx+ri*c2)+','+(cy+ri*s2)+
+           ' A'+ri+','+ri+',0,0,0,'+(cx+ri*c1)+','+(cy+ri*s1)+'Z';
+  }
+
+  var svg = '<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 '+sz+' '+sz+'" style="display:block">';
+  svg += '<circle cx="'+cx+'" cy="'+cy+'" r="'+(R+2)+'" fill="#0a0a0a"/>';
+
+  for (var i=0; i<20; i++) {
+    var n=SEGS[i], a1=-90+i*18, a2=a1+18, ev=i%2===0;
+    var isAim  = aim  && aim.n  === n && aim.ring  !== 'Bull' && aim.ring  !== 'SBull';
+    var isLand = land && land.n === n && land.ring !== 'Bull' && land.ring !== 'SBull';
+
+    var cS = ev ? '#1c1c1c' : '#141414';
+    var cT = ev ? '#0d2e10' : '#2a0d0d';
+    var cD = ev ? '#0d2e10' : '#2a0d0d';
+
+    if (isLand) {
+      if (land.ring==='T') cT='#47ffb4';
+      else if (land.ring==='D') cD='#47ffb4';
+      else cS='#1e5c3a';
+    }
+    if (isAim && !(isLand && aim.ring===land.ring)) {
+      if (aim.ring==='T') cT='rgba(232,255,71,0.55)';
+      else if (aim.ring==='D') cD='rgba(232,255,71,0.55)';
+      else cS='rgba(232,255,71,0.28)';
+    }
+
+    svg += '<path d="'+arc(R,RD,a1,a2)+'" fill="'+cD+'"/>';
+    svg += '<path d="'+arc(RD,RT2,a1,a2)+'" fill="'+cS+'"/>';
+    svg += '<path d="'+arc(RT2,RT1,a1,a2)+'" fill="'+cT+'"/>';
+    svg += '<path d="'+arc(RT1,RB,a1,a2)+'" fill="'+cS+'"/>';
+
+    var wc=Math.cos(rad(a1)), ws=Math.sin(rad(a1));
+    svg += '<line x1="'+(cx+R*wc)+'" y1="'+(cy+R*ws)+'" x2="'+(cx+RB*wc)+'" y2="'+(cy+RB*ws)+'" stroke="#2a2a2a" stroke-width="1"/>';
+
+    var la=-90+(i+0.5)*18;
+    var tx=cx+113*Math.cos(rad(la)), ty=cy+113*Math.sin(rad(la));
+    svg += '<text x="'+tx+'" y="'+ty+'" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#666" font-family="Arial,sans-serif">'+n+'</text>';
+  }
+
+  var cBull='#1c1c1c', cBullseye='#141414';
+  if (land && land.ring==='SBull') cBull='#47ffb4';
+  if (land && land.ring==='Bull')  cBullseye='#47ffb4';
+  if (aim && aim.ring==='SBull' && !(land && land.ring==='SBull')) cBull='rgba(232,255,71,0.5)';
+  if (aim && aim.ring==='Bull'  && !(land && land.ring==='Bull'))  cBullseye='rgba(232,255,71,0.5)';
+  svg += '<circle cx="'+cx+'" cy="'+cy+'" r="'+RB+'" fill="'+cBull+'"/>';
+  svg += '<circle cx="'+cx+'" cy="'+cy+'" r="'+RBull+'" fill="'+cBullseye+'"/>';
+
+  // 着弾点（白丸）
+  if (land) {
+    var dx=cx, dy=cy;
+    if (land.ring!=='Bull' && land.ring!=='SBull') {
+      var li=SEGS.indexOf(land.n), la2=-90+(li+0.5)*18;
+      var lr = land.ring==='D' ? (R+RD)/2 : land.ring==='T' ? (RT2+RT1)/2 : (RT1+RB)/2;
+      dx=cx+lr*Math.cos(rad(la2)); dy=cy+lr*Math.sin(rad(la2));
+    } else if (land.ring==='SBull') { dx=cx+RB*0.55; }
+    svg += '<circle cx="'+dx+'" cy="'+dy+'" r="5" fill="white" stroke="#000" stroke-width="1.5"/>';
+    svg += '<circle cx="'+dx+'" cy="'+dy+'" r="2" fill="#000"/>';
+  }
+
+  svg += '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>';
+  svg += '</svg>';
+  return svg;
+}
+
+function _arrFlash(type, boardSvg, label) {
   var el = document.getElementById('arr-flash-overlay');
   el.className = 'arr-flash-overlay';
-  el.innerHTML = '<div class="arr-flash-text">' + html + '</div>';
-  void el.offsetWidth; // reflow
+  el.innerHTML = '<div class="arr-flash-content">' + boardSvg +
+    '<div class="arr-flash-label">' + label + '</div></div>';
+  void el.offsetWidth;
   el.classList.add('show', type);
 }
 
@@ -2569,14 +2660,14 @@ function chooseArr(idx) {
   // タイマーバーを即クリア
   document.getElementById('arr-timer-bar').style.width = '0%';
 
-  // 結果フラッシュ
+  // ボードフラッシュ
   var nextOutcome = st.nextOutcome;
   if (nextOutcome) {
-    if (nextOutcome.type === 'success') {
-      _arrFlash('success', '<div class="arr-flash-main">入った！</div>');
-    } else {
-      _arrFlash('miss', '<div class="arr-flash-main">外れた！</div>');
-    }
+    var landStr = nextOutcome.type === 'success' ? nextOutcome.dart : nextOutcome.missTarget;
+    var boardSvg = _buildBoardSVG(nextOutcome.dart, landStr);
+    var flashType = nextOutcome.type === 'success' ? 'success' : 'miss';
+    var flashLabel = nextOutcome.type === 'success' ? '入った！' : '外れた！';
+    _arrFlash(flashType, boardSvg, flashLabel);
   }
 
   // ボタン色変え（全ボタン無効化）
