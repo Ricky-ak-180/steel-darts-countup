@@ -4034,8 +4034,9 @@ function z01NextLeg() {
   else _z01.currentPlayer = 0;
   var m = _z01.mode;
   _z01.remain = [m, m];
-  for (var i = 0; i < _z01.stats.length; i++) { _z01.stats[i].legRounds = 0; }
-  _z01Render(); _z01HintUpdate();
+  for (var i = 0; i < _z01.stats.length; i++) { _z01.stats[i].legRounds = 0; _z01.stats[i].finishDarts = 0; }
+  _z01InitLog();
+  _z01Render(); _z01HintUpdate(); _z01LogRender();
   if (_z01.players===3 && _z01.currentPlayer===1) _z01CpuTurn();
 }
 
