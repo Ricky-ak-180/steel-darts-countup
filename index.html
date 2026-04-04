@@ -3956,11 +3956,20 @@ function _z01Render() {
   var turnEl = document.getElementById('z01-turn-info');
   if (turnEl) {
     var nameStr = _z01PlayerName(cp);
-    if (_z01.legs > 1) nameStr += ' (' + _z01.legWins[cp] + 'W)';
-    turnEl.innerHTML = '<span style="color:var(--txt);font-weight:700;">' + nameStr + '</span><span style="color:var(--mut);font-size:10px;margin-left:5px;">AVG ' + avg + '</span>';
+    turnEl.innerHTML = '<span style="color:var(--acc);font-size:15px;font-weight:700;letter-spacing:1px;">' + nameStr + '</span><span style="color:var(--mut);font-size:11px;margin-left:6px;">AVG <b style="color:var(--txt);">' + avg + '</b></span>';
   }
-  document.getElementById('z01-leg-info').textContent =
-    _z01.legs>1 ? 'Leg '+_z01.currentLeg+' / '+_z01.legs : 'Leg 1';
+  var legEl = document.getElementById('z01-leg-info');
+  if (_z01.legs > 1) {
+    var winsNeeded = Math.ceil(_z01.legs / 2);
+    var dots0 = '', dots1 = '';
+    for (var d = 0; d < winsNeeded; d++) {
+      dots0 += d < _z01.legWins[0] ? '<span style="color:var(--acc);">●</span>' : '<span style="color:var(--bdr);">○</span>';
+      dots1 += d < _z01.legWins[1] ? '<span style="color:var(--acc);">●</span>' : '<span style="color:var(--bdr);">○</span>';
+    }
+    legEl.innerHTML = dots0 + '<span style="margin:0 5px;color:var(--mut);font-size:10px;">Leg ' + _z01.currentLeg + '</span>' + dots1;
+  } else {
+    legEl.textContent = 'Leg 1';
+  }
   var isCpu = _z01.players===3 && _z01.currentPlayer===1;
   document.getElementById('z01-cpu-area').style.display = isCpu?'flex':'none';
   document.getElementById('z01-input-area').style.display = isCpu?'none':'';
