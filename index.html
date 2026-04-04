@@ -2743,7 +2743,7 @@ function _renderTactics() {
 
   // ヘッダー
   html += '<div style="font-size:18px;font-weight:700;color:var(--fg);margin-bottom:4px;">基本は <span style="color:var(--acc);">T20</span></div>';
-  html += '<div style="font-size:12px;color:var(--mut);margin-bottom:16px;line-height:1.6;">以下のスコアだけ例外。それ以外はすべてT20を狙う。末尾ルール: 末尾2・5・8→T18、末尾3・6・9→T19。</div>';
+  html += '<div style="font-size:12px;color:var(--mut);margin-bottom:16px;line-height:1.6;">以下のスコアのみ例外。それ以外はすべてT20を狙う。</div>';
 
   function scoreBlock(n) {
     var ex = TACTICS_EXCEPTIONS[n];
