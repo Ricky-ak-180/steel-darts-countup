@@ -2835,15 +2835,15 @@ function _renderTactics() {
       }
     }
 
-    return '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:10px;padding:10px 12px;margin-bottom:8px;">' +
-      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
-        '<span style="font-family:\'Bebas Neue\',cursive;font-size:26px;color:' + scoreColor + ';min-width:48px;">' + n + '</span>' +
-        (isSpecial ? '<span style="font-size:11px;color:var(--mut);text-decoration:line-through;">' + defTgt + '</span><span style="color:var(--mut);font-size:11px;">→</span>' : '') +
-        '<span style="font-size:15px;font-weight:700;color:' + scoreColor + ';">' + target + '</span>' +
+    return '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:12px;padding:14px 16px;margin-bottom:10px;">' +
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
+        '<span style="font-family:\'Bebas Neue\',cursive;font-size:36px;color:' + scoreColor + ';min-width:60px;line-height:1;">' + n + '</span>' +
+        (isSpecial ? '<span style="font-size:13px;color:var(--mut);text-decoration:line-through;">' + defTgt + '</span><span style="color:var(--mut);font-size:13px;">→</span>' : '') +
+        '<span style="font-size:20px;font-weight:700;color:' + scoreColor + ';">→ ' + target + '</span>' +
       '</div>' +
-      '<div style="display:flex;flex-direction:column;gap:3px;font-size:12px;line-height:1.6;">' +
+      '<div style="display:flex;flex-direction:column;gap:6px;line-height:1.5;">' +
         actionLines.join('') +
-        (warningLine ? warningLine : '') +
+        (warningLine ? '<span style="display:block;font-size:13px;margin-top:4px;">' + warningLine + '</span>' : '') +
       '</div>' +
     '</div>';
   }
