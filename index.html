@@ -2750,54 +2750,64 @@ function _renderTactics() {
     var d = n % 10;
     var isT19 = (d===3||d===6||d===9);
     var isT18 = (d===2||d===5||d===8);
-    if (!ex && !isT19 && !isT18) return ''; // T20スコアは表示しない
+    if (!ex && !isT19 && !isT18) return '';
 
     var target = ex ? ex.target : (isT19 ? 'T19' : 'T18');
-    var tVal = ex ? _tacticsTargetVal(ex.target) : (isT19 ? 57 : 54);
-    var hitLeave = ex ? ex.hitLeave : (n - tVal);
-    var missVal = isT19 ? 19 : (isT18 ? 18 : 0);
-    var missLeave = n - missVal;
+    var tVal = _tacticsTargetVal(target);
+    var hitLeave = n - tVal;
+    var singleNum = isT19 ? 19 : (isT18 ? 18 : 0);
+    var missLeave = singleNum > 0 ? (n - singleNum) : null;
 
     var isSpecial = !!ex;
-    var borderColor = isSpecial ? 'rgba(255,213,79,0.4)' : (isT19 ? 'rgba(255,138,101,0.3)' : 'rgba(79,195,247,0.3)');
-    var bgColor = isSpecial ? 'rgba(255,213,79,0.08)' : (isT19 ? 'rgba(255,138,101,0.07)' : 'rgba(79,195,247,0.07)');
+    var borderColor = isSpecial ? 'rgba(255,213,79,0.5)' : (isT19 ? 'rgba(255,138,101,0.35)' : 'rgba(79,195,247,0.35)');
+    var bgColor    = isSpecial ? 'rgba(255,213,79,0.08)' : (isT19 ? 'rgba(255,138,101,0.07)' : 'rgba(79,195,247,0.07)');
     var scoreColor = isSpecial ? '#ffd54f' : (isT19 ? '#ff8a65' : '#4fc3f7');
-    var targetColor = isSpecial ? '#ffd54f' : (isT19 ? '#ff8a65' : '#4fc3f7');
+    var defTgt = (d===0||d===1||d===4||d===7)?'T20':(d===2||d===5||d===8)?'T18':'T19';
 
-    // 理由文を生成
-    var reason = '';
+    // ── アクション文 ──
+    var actionLines = [];
+    var warningLine = '';
+
     if (ex) {
-      reason = ex.reason;
+      // 特殊ケース
+      actionLines.push('<span style="color:#66bb6a;">✓ ' + ex.target + 'を狙う → ' + hitLeave + '残し</span>');
+      warningLine = '<span style="color:#ff6b6b;">⚠ ' + ex.reason + '</span>';
     } else if (zone === '300s') {
+      var missAfterT20x2 = missLeave - 120; // S-miss → T20+T20 = leave
+      actionLines.push('<span style="color:#66bb6a;">✓ ' + target + 'を狙う → ' + hitLeave + '残し</span>');
+      if (missLeave !== null) {
+        actionLines.push('<span style="color:#66bb6a;">✓ S' + singleNum + 'ミスでも' + missLeave + '残し → T20+T20で' + missAfterT20x2 + '残し</span>');
+      }
       var bogeyLeave = n - 140;
-      reason = 'T20+T20+S20=140点取得 → <span style="color:#ff6b6b;font-weight:700;">' + bogeyLeave + '（ボギー）</span>';
+      warningLine = '<span style="color:#ff6b6b;">⚠ T20+T20+S20=140点取得すると' + bogeyLeave + '（ボギー）</span>';
     } else if (zone === '200s') {
-      // T20を1本打つと直接ボギーになるか？
+      actionLines.push('<span style="color:#66bb6a;">✓ ' + target + 'を狙う → ' + hitLeave + '残し（チェックアウト圏）</span>');
       var t20leave = n - 60;
       if (BOGEY_NUMS.indexOf(t20leave) >= 0) {
-        reason = 'T20を打つと → <span style="color:#ff6b6b;font-weight:700;">' + t20leave + '（ボギー）</span>';
+        warningLine = '<span style="color:#ff6b6b;">⚠ T20を打つと → ' + t20leave + '（ボギー）</span>';
       }
     } else if (zone === '170s') {
-      // T20のS20ミスがボギーになるか？
+      actionLines.push('<span style="color:#66bb6a;">✓ ' + target + 'を狙う → ' + hitLeave + '残し</span>');
+      if (missLeave !== null) {
+        var missCheckable = _isCheckable(missLeave) || missLeave <= 170;
+        actionLines.push('<span style="color:#66bb6a;">✓ S' + singleNum + 'ミスでも' + missLeave + '残し</span>');
+      }
       var s20leave = n - 20;
       if (BOGEY_NUMS.indexOf(s20leave) >= 0) {
-        reason = 'T20だとS20ミス → <span style="color:#ff6b6b;font-weight:700;">' + s20leave + '（ボギー）</span>';
+        warningLine = '<span style="color:#ff6b6b;">⚠ T20だとS20ミス → ' + s20leave + '（ボギー）</span>';
       }
     }
 
-    var defTgt = (d===0||d===1||d===4||d===7)?'T20':(d===2||d===5||d===8)?'T18':'T19';
-
-    return '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;margin-bottom:6px;">' +
-      '<div style="display:flex;align-items:center;gap:10px;">' +
-        '<span style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:' + scoreColor + ';min-width:44px;">' + n + '</span>' +
-        (isSpecial ? '<span style="font-size:11px;color:var(--mut);text-decoration:line-through;">' + defTgt + '</span><span style="color:var(--mut);">→</span>' : '') +
-        '<span style="font-size:14px;font-weight:700;color:' + targetColor + ';">' + target + '</span>' +
-        '<span style="font-size:12px;color:var(--mut);">ヒット→</span>' +
-        '<span style="font-size:13px;font-weight:700;color:var(--fg);">' + hitLeave + '残し</span>' +
+    return '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:10px;padding:10px 12px;margin-bottom:8px;">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
+        '<span style="font-family:\'Bebas Neue\',cursive;font-size:26px;color:' + scoreColor + ';min-width:48px;">' + n + '</span>' +
+        (isSpecial ? '<span style="font-size:11px;color:var(--mut);text-decoration:line-through;">' + defTgt + '</span><span style="color:var(--mut);font-size:11px;">→</span>' : '') +
+        '<span style="font-size:15px;font-weight:700;color:' + scoreColor + ';">' + target + '</span>' +
       '</div>' +
-      (reason ? '<div style="font-size:11px;color:var(--mut);line-height:1.6;padding-left:2px;">' + reason + '</div>' : '') +
-      (!isSpecial && missVal > 0 && zone !== '300s' ?
-        '<div style="font-size:11px;color:var(--mut);">S' + (target.slice(1)) + 'ミス → ' + missLeave + '残し</div>' : '') +
+      '<div style="display:flex;flex-direction:column;gap:3px;font-size:12px;line-height:1.6;">' +
+        actionLines.join('') +
+        (warningLine ? warningLine : '') +
+      '</div>' +
     '</div>';
   }
 
