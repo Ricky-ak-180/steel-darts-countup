@@ -3980,7 +3980,7 @@ function _z01Commit(sc) {
 function _z01NextTurn() {
   var n = _z01.players===1 ? 1 : 2;
   _z01.currentPlayer = (_z01.currentPlayer + 1) % n;
-  _z01Render(); _z01HintUpdate();
+  _z01Render(); _z01HintUpdate(); _z01LogRender();
   if (_z01.players===3 && _z01.currentPlayer===1) _z01CpuTurn();
 }
 
