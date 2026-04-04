@@ -2840,15 +2840,10 @@ function _renderTactics() {
         warningLine = '<span style="color:#ff6b6b;">⚠ T20を打つと → ' + t20leave + '（ボギー）</span>';
       }
     } else if (zone === '170s') {
-      actionLines.push('<span style="color:#66bb6a;">✓ ' + target + 'ヒット → ' + hitLeave + '残し</span>');
-      if (missLeave !== null) {
-        var missOk = missLeave <= 170 ? '（チェックアウト圏）' : '';
-        actionLines.push('<span style="color:#66bb6a;">✓ S' + singleNum + 'ミスでも → ' + missLeave + '残し' + missOk + '</span>');
-      }
       var s20leave = n - 20;
-      if (BOGEY_NUMS.indexOf(s20leave) >= 0) {
-        warningLine = '<span style="color:#ff6b6b;">⚠ T20だとS20ミス → ' + s20leave + '（ボギー）</span>';
-      }
+      if (BOGEY_NUMS.indexOf(s20leave) < 0) return ''; // S20ミスがボギーにならないスコアは表示しない
+      warningLine = '<span style="color:#ff6b6b;">⚠ S20に外すと → ' + s20leave + '（ボギー）</span>';
+      actionLines.push('<span style="color:#66bb6a;">✓ ' + target + 'を狙えばS' + singleNum + 'ミスでも → ' + missLeave + '残し（安全）</span>');
     }
 
     return '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:12px;padding:14px 16px;margin-bottom:10px;">' +
