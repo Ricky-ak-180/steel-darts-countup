@@ -2745,61 +2745,72 @@ function _renderTactics() {
   html += '<div style="font-size:18px;font-weight:700;color:var(--fg);margin-bottom:4px;">基本は <span style="color:var(--acc);">T20</span></div>';
   html += '<div style="font-size:12px;color:var(--mut);margin-bottom:16px;line-height:1.6;">以下のスコアのみ例外。それ以外はすべてT20を狙う。</div>';
 
-  function scoreBlock(n) {
+  function scoreCard(n, zone) {
     var ex = TACTICS_EXCEPTIONS[n];
     var d = n % 10;
-    var isT20 = (d===0||d===1||d===4||d===7);
+    var isT19 = (d===3||d===6||d===9);
+    var isT18 = (d===2||d===5||d===8);
+    if (!ex && !isT19 && !isT18) return ''; // T20スコアは表示しない
+
+    var target = ex ? ex.target : (isT19 ? 'T19' : 'T18');
+    var tVal = ex ? _tacticsTargetVal(ex.target) : (isT19 ? 57 : 54);
+    var hitLeave = ex ? ex.hitLeave : (n - tVal);
+    var missVal = isT19 ? 19 : (isT18 ? 18 : 0);
+    var missLeave = n - missVal;
+
+    var isSpecial = !!ex;
+    var borderColor = isSpecial ? 'rgba(255,213,79,0.4)' : (isT19 ? 'rgba(255,138,101,0.3)' : 'rgba(79,195,247,0.3)');
+    var bgColor = isSpecial ? 'rgba(255,213,79,0.08)' : (isT19 ? 'rgba(255,138,101,0.07)' : 'rgba(79,195,247,0.07)');
+    var scoreColor = isSpecial ? '#ffd54f' : (isT19 ? '#ff8a65' : '#4fc3f7');
+    var targetColor = isSpecial ? '#ffd54f' : (isT19 ? '#ff8a65' : '#4fc3f7');
+
+    // 理由文を生成
+    var reason = '';
     if (ex) {
-      return '<div style="background:rgba(255,213,79,0.15);border:1px solid rgba(255,213,79,0.4);border-radius:8px;padding:5px 9px;text-align:center;min-width:54px;">' +
-        '<div style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:#ffd54f;">' + n + '</div>' +
-        '<div style="font-size:9px;color:#ffd54f;">' + ex.target + '</div>' +
-      '</div>';
+      reason = ex.reason;
+    } else if (zone === '300s') {
+      var bogeyLeave = n - 140;
+      reason = 'T20+T20+S20=140点取得 → <span style="color:#ff6b6b;font-weight:700;">' + bogeyLeave + '（ボギー）</span>';
+    } else if (zone === '200s') {
+      // T20を1本打つと直接ボギーになるか？
+      var t20leave = n - 60;
+      if (BOGEY_NUMS.indexOf(t20leave) >= 0) {
+        reason = 'T20を打つと → <span style="color:#ff6b6b;font-weight:700;">' + t20leave + '（ボギー）</span>';
+      }
+    } else if (zone === '170s') {
+      // T20のS20ミスがボギーになるか？
+      var s20leave = n - 20;
+      if (BOGEY_NUMS.indexOf(s20leave) >= 0) {
+        reason = 'T20だとS20ミス → <span style="color:#ff6b6b;font-weight:700;">' + s20leave + '（ボギー）</span>';
+      }
     }
-    if (d===3||d===6||d===9) {
-      var miss = n - 19;
-      return '<div style="background:rgba(255,138,101,0.12);border:1px solid rgba(255,138,101,0.3);border-radius:8px;padding:5px 9px;text-align:center;min-width:54px;">' +
-        '<div style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:#ff8a65;">' + n + '</div>' +
-        '<div style="font-size:9px;color:var(--mut);">→' + miss + '</div>' +
-      '</div>';
-    }
-    if (d===2||d===5||d===8) {
-      var miss = n - 18;
-      return '<div style="background:rgba(79,195,247,0.12);border:1px solid rgba(79,195,247,0.3);border-radius:8px;padding:5px 9px;text-align:center;min-width:54px;">' +
-        '<div style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:#4fc3f7;">' + n + '</div>' +
-        '<div style="font-size:9px;color:var(--mut);">→' + miss + '</div>' +
-      '</div>';
-    }
-    return ''; // T20 scores not shown
+
+    var defTgt = (d===0||d===1||d===4||d===7)?'T20':(d===2||d===5||d===8)?'T18':'T19';
+
+    return '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;margin-bottom:6px;">' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<span style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:' + scoreColor + ';min-width:44px;">' + n + '</span>' +
+        (isSpecial ? '<span style="font-size:11px;color:var(--mut);text-decoration:line-through;">' + defTgt + '</span><span style="color:var(--mut);">→</span>' : '') +
+        '<span style="font-size:14px;font-weight:700;color:' + targetColor + ';">' + target + '</span>' +
+        '<span style="font-size:12px;color:var(--mut);">ヒット→</span>' +
+        '<span style="font-size:13px;font-weight:700;color:var(--fg);">' + hitLeave + '残し</span>' +
+      '</div>' +
+      (reason ? '<div style="font-size:11px;color:var(--mut);line-height:1.6;padding-left:2px;">' + reason + '</div>' : '') +
+      (!isSpecial && missVal > 0 && zone !== '300s' ?
+        '<div style="font-size:11px;color:var(--mut);">S' + (target.slice(1)) + 'ミス → ' + missLeave + '残し</div>' : '') +
+    '</div>';
   }
 
-  function rangeSection(label, desc, from, to) {
-    var blocks = '';
-    for (var n = to; n >= from; n--) {  // 降順
-      blocks += scoreBlock(n);
-    }
-    // 特殊ケース詳細（この範囲内）
-    var exHtml = '';
+  function rangeSection(label, desc, from, to, zone) {
+    var cards = '';
     for (var n = to; n >= from; n--) {
-      var ex = TACTICS_EXCEPTIONS[n];
-      if (!ex) continue;
-      var d = n % 10;
-      var defTgt = (d===0||d===1||d===4||d===7)?'T20':(d===2||d===5||d===8)?'T18':'T19';
-      exHtml += '<div style="background:rgba(255,213,79,0.08);border:1px solid rgba(255,213,79,0.25);border-radius:8px;padding:8px 12px;margin-top:6px;display:flex;flex-direction:column;gap:3px;">' +
-        '<div style="display:flex;align-items:center;gap:8px;">' +
-          '<span style="font-family:\'Bebas Neue\',cursive;font-size:20px;color:#ffd54f;">' + n + '</span>' +
-          '<span style="font-size:11px;color:var(--mut);text-decoration:line-through;">' + defTgt + '</span>' +
-          '<span style="color:var(--mut);">→</span>' +
-          '<span style="font-size:13px;font-weight:700;color:#ffd54f;">' + ex.target + '</span>' +
-          '<span style="font-size:12px;color:var(--fg);">→ <strong>' + ex.hitLeave + '</strong>残し</span>' +
-        '</div>' +
-        '<div style="font-size:11px;color:var(--mut);line-height:1.6;">' + ex.reason + '</div>' +
-      '</div>';
+      cards += scoreCard(n, zone);
     }
+    if (!cards) return '';
     return '<div style="margin-bottom:20px;">' +
       '<div style="font-size:13px;font-weight:700;color:var(--fg);margin-bottom:2px;">' + label + '</div>' +
       '<div style="font-size:11px;color:var(--mut);margin-bottom:8px;line-height:1.5;">' + desc + '</div>' +
-      '<div style="display:flex;flex-wrap:wrap;gap:5px;">' + blocks + '</div>' +
-      exHtml +
+      cards +
     '</div>';
   }
 
