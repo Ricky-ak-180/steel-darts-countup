@@ -3954,6 +3954,7 @@ function z01Ok() {
 
 function _z01Commit(sc) {
   var p = _z01.currentPlayer, st = _z01.stats[p];
+  var n = _z01.players === 1 ? 1 : 2;
   var rem = _z01.remain[p], after = rem - sc;
   var bust = _z01.outRule===0 ? (after<0||after===1) : (after<0);
   if (bust) {
@@ -3968,11 +3969,32 @@ function _z01Commit(sc) {
   if (st.rounds <= 3) st.first9.push(sc);
   if (sc >= 180) st.c180++; else if (sc >= 140) st.c140++; else if (sc >= 100) st.c100++;
   _z01BufUpdate('');
+  // Update score log
+  var logRow = _z01.log[_z01.log.length - 1];
+  logRow.p[p] = {scored: sc, remain: after};
+  var rowDone = true;
+  for (var i = 0; i < n; i++) { if (logRow.p[i] === null) { rowDone = false; break; } }
+  if (rowDone) {
+    var nextP = [];
+    for (var j = 0; j < n; j++) nextP.push(null);
+    _z01.log.push({visit: logRow.visit + 3, p: nextP});
+  }
   if (after === 0) {
     if (sc > st.hiFin) st.hiFin = sc;
-    if (st.legRounds < st.bestLeg) st.bestLeg = st.legRounds;
-    _z01.legWins[p]++;
-    _z01LegEnd(p); return;
+    if (_z01.players === 3 && p === 1) {
+      // CPU: count as 3 darts used
+      var ad = (st.legRounds - 1) * 3 + 3;
+      st.finishDarts = ad; st.totalFinishDarts += ad;
+      if (ad < st.bestLeg) st.bestLeg = ad;
+      if (ad > st.worstLeg) st.worstLeg = ad;
+      _z01.legWins[p]++;
+      _z01LogRender(); _z01LegEnd(p);
+    } else {
+      _z01._pendingFinish = {player: p};
+      _z01LogRender();
+      document.getElementById('z01-finish-modal').style.display = 'flex';
+    }
+    return;
   }
   _z01NextTurn();
 }
