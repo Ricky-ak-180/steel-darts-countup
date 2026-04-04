@@ -1137,12 +1137,16 @@ canvas.schart { width: 100%; height: 100%; }
       <div class="z01-players" id="z01-players"></div>
       <div class="z01-info-bar">
         <div id="z01-leg-info">Leg 1</div>
-        <div id="z01-turn-info"></div>
+        <button class="z01-stats-btn" data-fn="z01OpenStats">Stats</button>
+      </div>
+      <!-- Score log -->
+      <div class="z01-log-wrap" id="z01-log-wrap">
+        <div class="z01-log" id="z01-log"></div>
       </div>
       <div class="z01-checkout-hint" id="z01-checkout-hint"></div>
       <!-- CPU turn indicator -->
       <div class="z01-cpu-area" id="z01-cpu-area" style="display:none;">
-        <div style="font-size:12px;color:var(--mut);letter-spacing:2px;">CPU THINKING...</div>
+        <div style="font-size:11px;color:var(--mut);letter-spacing:2px;">CPU THINKING...</div>
         <div class="z01-cpu-dots">
           <div class="z01-cpu-dot"></div>
           <div class="z01-cpu-dot"></div>
