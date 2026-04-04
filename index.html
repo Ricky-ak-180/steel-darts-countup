@@ -3192,7 +3192,11 @@ function _trainLoad() {
   try { return JSON.parse(localStorage.getItem('arr_train_v1') || '{}'); } catch(e) { return {}; }
 }
 function _trainSave(d) { localStorage.setItem('arr_train_v1', JSON.stringify(d)); }
-function _trainEntry(score, d) { return d[score] || {c:0, a:0}; }
+function _trainEntry(score, d) {
+  var e = d[score] || {c:0, a:0};
+  if (typeof e.a !== 'number') e.a = e.c || 0;  // 旧データ移行
+  return e;
+}
 function _trainIsBogey(score) { return BOGEY_NUMS.indexOf(score) >= 0; }
 
 function _trainUnlocked(idx, d) {
