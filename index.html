@@ -3953,7 +3953,7 @@ function _z01BufUpdate(v) {
   }
 }
 
-function z01Pre(arg) { _z01BufUpdate(String(arg)); z01Ok(); }
+function z01Pre(arg) { _z01BufUpdate(String(arg)); z01Ok(); soundCommit(arg); }
 
 function z01Kp(arg) {
   var v = _z01._buf + String(arg);
