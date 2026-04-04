@@ -2804,11 +2804,11 @@ function _renderTactics() {
       function fmtPath(darts, color) {
         var cells = darts.map(function(x){
           return '<div style="display:flex;flex-direction:column;align-items:center;flex:1;">' +
-            '<span style="font-size:18px;font-weight:700;color:' + color + ';">' + x.d + '</span>' +
-            '<span style="font-size:11px;color:var(--mut);">(' + x.l + '残)</span>' +
+            '<span style="font-size:20px;font-weight:700;color:' + color + ';">' + x.d + '</span>' +
+            '<span style="font-size:13px;color:var(--mut);">(' + x.l + '残)</span>' +
           '</div>';
         });
-        var arrow = '<div style="color:var(--mut);font-size:18px;padding:0 2px;margin-top:2px;">›</div>';
+        var arrow = '<div style="color:var(--mut);font-size:20px;padding:0 2px;margin-top:2px;">›</div>';
         var inner = '';
         for(var i=0;i<cells.length;i++){ inner += cells[i]; if(i<cells.length-1) inner += arrow; }
         return '<div style="display:flex;align-items:center;width:100%;">' + inner + '</div>';
