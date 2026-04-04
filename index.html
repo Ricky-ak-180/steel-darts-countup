@@ -4102,6 +4102,140 @@ function z01BackSetup() {
   document.getElementById('z01-setup-wrap').style.display = '';
 }
 
+function _z01InitLog() {
+  var n = _z01.players === 1 ? 1 : 2;
+  var p = [];
+  for (var i = 0; i < n; i++) p.push(null);
+  _z01.log = [{visit: 3, p: p}];
+}
+
+function _z01LogCell(data, pIdx) {
+  var sc = 'z01-lc-s' + pIdx, tc = 'z01-lc-t' + pIdx;
+  if (!data) return '<div class="' + sc + '"></div><div class="' + tc + '"></div>';
+  var scoredHtml;
+  if (data.scored >= 100) {
+    scoredHtml = '<span class="z01-lc-hi">' + data.scored + '</span>';
+  } else if (data.scored === 0) {
+    scoredHtml = '<span style="color:var(--mut);font-size:13px;">MISS</span>';
+  } else {
+    scoredHtml = String(data.scored);
+  }
+  return '<div class="' + sc + '">' + scoredHtml + '</div><div class="' + tc + '">' + data.remain + '</div>';
+}
+
+function _z01LogRender() {
+  var logEl = document.getElementById('z01-log');
+  if (!logEl) return;
+  var n = _z01.players === 1 ? 1 : 2;
+  var isP2 = n === 2;
+  logEl.className = 'z01-log ' + (isP2 ? 'p2' : 'p1');
+  var h = '';
+  // Header
+  if (isP2) {
+    h += '<div class="z01-log-hdr"><div>Scored</div><div>To Go</div><div></div><div>Scored</div><div>To Go</div></div>';
+  } else {
+    h += '<div class="z01-log-hdr"><div></div><div>Scored</div><div>To Go</div></div>';
+  }
+  // Initial remaining row
+  var startR = _z01.mode;
+  if (isP2) {
+    h += '<div class="z01-log-row"><div class="z01-lc-s0"></div><div class="z01-lc-t0 init">' + startR + '</div><div class="z01-lc-v">•</div><div class="z01-lc-s1"></div><div class="z01-lc-t1 init">' + startR + '</div></div>';
+  } else {
+    h += '<div class="z01-log-row"><div class="z01-lc-v">•</div><div class="z01-lc-s0"></div><div class="z01-lc-t0 init">' + startR + '</div></div>';
+  }
+  // Data rows
+  var log = _z01.log, cur = _z01.currentPlayer;
+  for (var i = 0; i < log.length; i++) {
+    var row = log[i];
+    var isCur = i === log.length - 1;
+    var cls = '';
+    if (isCur) {
+      if (isP2) { cls = row.p[0] === null ? ' cur0' : (row.p[1] === null ? ' cur1' : ''); }
+      else { cls = ' cur0'; }
+    }
+    if (isP2) {
+      h += '<div class="z01-log-row' + cls + '">';
+      h += _z01LogCell(row.p[0], 0);
+      h += '<div class="z01-lc-v">' + row.visit + '</div>';
+      h += _z01LogCell(row.p[1], 1);
+      h += '</div>';
+    } else {
+      h += '<div class="z01-log-row' + cls + '">';
+      h += '<div class="z01-lc-v">' + row.visit + '</div>';
+      h += _z01LogCell(row.p[0], 0);
+      h += '</div>';
+    }
+  }
+  // Padding (future rows)
+  var lastVisit = log[log.length - 1].visit;
+  for (var k = 1; k <= 3; k++) {
+    var fv = lastVisit + k * 3;
+    if (isP2) {
+      h += '<div class="z01-log-row"><div class="z01-lc-s0"></div><div class="z01-lc-t0"></div><div class="z01-lc-v">' + fv + '</div><div class="z01-lc-s1"></div><div class="z01-lc-t1"></div></div>';
+    } else {
+      h += '<div class="z01-log-row"><div class="z01-lc-v">' + fv + '</div><div class="z01-lc-s0"></div><div class="z01-lc-t0"></div></div>';
+    }
+  }
+  logEl.innerHTML = h;
+  var wrap = document.getElementById('z01-log-wrap');
+  if (wrap) wrap.scrollTop = wrap.scrollHeight;
+}
+
+function z01FinishDart(dartNo) {
+  document.getElementById('z01-finish-modal').style.display = 'none';
+  var pf = _z01._pendingFinish;
+  if (!pf) return;
+  var p = pf.player, st = _z01.stats[p];
+  var actualDarts = (st.legRounds - 1) * 3 + dartNo;
+  st.finishDarts = actualDarts;
+  st.totalFinishDarts += actualDarts;
+  if (actualDarts < st.bestLeg) st.bestLeg = actualDarts;
+  if (actualDarts > st.worstLeg) st.worstLeg = actualDarts;
+  _z01._pendingFinish = null;
+  _z01.legWins[p]++;
+  _z01LegEnd(p);
+}
+
+function z01OpenStats() {
+  var n = _z01.players === 1 ? 1 : 2;
+  var h = '';
+  if (n === 2) {
+    h += '<div class="z01-midstats-pnames"><div>' + _z01PlayerName(0) + '</div><div class="r">' + _z01PlayerName(1) + '</div></div>';
+  } else {
+    h += '<div style="font-size:14px;font-weight:700;color:var(--txt);margin-bottom:8px;">' + _z01PlayerName(0) + '</div>';
+  }
+  h += '<div class="z01-midstats-sect">Totals</div>';
+  var totRows = [
+    ['Legs', function(s,i){ return _z01.legWins[i]; }],
+    ['100+', function(s){ return s.c100; }],
+    ['140+', function(s){ return s.c140; }],
+    ["180's", function(s){ return s.c180; }],
+    ['High Out', function(s){ return s.hiFin||0; }],
+    ['Best Leg', function(s){ return s.bestLeg<999?s.bestLeg+' darts':'-'; }],
+    ['Worst Leg', function(s){ return s.worstLeg>0?s.worstLeg+' darts':'-'; }]
+  ];
+  var avgRows = [
+    ['Darts', function(s,i){ var w=_z01.legWins[i]; return w>0?((s.totalFinishDarts/w).toFixed(2)):'-'; }],
+    ['Score', function(s){ return s.rounds>0?(s.total/s.rounds).toFixed(2):'-'; }],
+    ['First 9', function(s){ if(!s.first9.length)return'-'; var t=0; for(var j=0;j<s.first9.length;j++)t+=s.first9[j]; return(t/s.first9.length).toFixed(2); }]
+  ];
+  function makeRow(lbl, fn) {
+    if (n === 2) {
+      return '<div class="z01-midstats-row"><div class="z01-midstats-lv">' + fn(_z01.stats[0],0) + '</div><div class="z01-midstats-mk">' + lbl + '</div><div class="z01-midstats-rv">' + fn(_z01.stats[1],1) + '</div></div>';
+    }
+    return '<div class="z01-midstats-row"><div class="z01-midstats-lv">' + fn(_z01.stats[0],0) + '</div><div class="z01-midstats-mk">' + lbl + '</div><div class="z01-midstats-rv"></div></div>';
+  }
+  for (var k=0;k<totRows.length;k++) h += makeRow(totRows[k][0], totRows[k][1]);
+  h += '<div class="z01-midstats-sect">Averages</div>';
+  for (var m=0;m<avgRows.length;m++) h += makeRow(avgRows[m][0], avgRows[m][1]);
+  document.getElementById('z01-midstats-body').innerHTML = h;
+  document.getElementById('z01-midstats').style.display = 'flex';
+}
+
+function z01CloseStats() {
+  document.getElementById('z01-midstats').style.display = 'none';
+}
+
 /* 高速タッチ処理 */
 var _fns = { kp: kp, kd: kd, doOk: doOk, commit: commit,
   undoRound: undoRound, resetGame: resetGame,
