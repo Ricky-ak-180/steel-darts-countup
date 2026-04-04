@@ -478,7 +478,9 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-flash-overlay.show { animation: arrFlash 0.55s ease-out forwards; }
 .arr-flash-overlay.success { background:rgba(71,255,180,0.18); }
 .arr-flash-overlay.miss { background:rgba(255,107,53,0.18); }
-.arr-flash-text { font-family:'Bebas Neue',cursive; font-size:88px; letter-spacing:6px; line-height:1; text-align:center; }
+.arr-flash-text { font-family:'Bebas Neue',cursive; letter-spacing:4px; line-height:1.1; text-align:center; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.arr-flash-main { font-size:52px; }
+.arr-flash-sub { font-size:22px; opacity:0.75; letter-spacing:3px; }
 .arr-flash-overlay.success .arr-flash-text { color:#47ffb4; text-shadow:0 0 40px rgba(71,255,180,0.7); }
 .arr-flash-overlay.miss .arr-flash-text { color:#ff6b35; text-shadow:0 0 40px rgba(255,107,53,0.7); }
 @keyframes arrFlash {
@@ -726,7 +728,6 @@ canvas.schart { width: 100%; height: 100%; }
       <div class="arr-hud-score" id="arr-hud-score">0</div>
     </div>
     <!-- クイズカード -->
-    <div class="arr-flash-overlay" id="arr-flash-overlay"></div>
     <div class="arr-card hide" id="arr-card">
       <div class="arr-chain-scroll" id="arr-chain-scroll">
         <div class="arr-chain" id="arr-chain"></div>
@@ -2371,10 +2372,10 @@ function _arrNextQ() {
 }
 
 /* ステージ表示 */
-function _arrFlash(type, text) {
+function _arrFlash(type, html) {
   var el = document.getElementById('arr-flash-overlay');
   el.className = 'arr-flash-overlay';
-  el.innerHTML = '<div class="arr-flash-text">' + text + '</div>';
+  el.innerHTML = '<div class="arr-flash-text">' + html + '</div>';
   void el.offsetWidth; // reflow
   el.classList.add('show', type);
 }
@@ -2571,10 +2572,14 @@ function chooseArr(idx) {
   // 結果フラッシュ（nextOutcome が確定している場合のみ）
   var nextOutcome = st.nextOutcome;
   if (nextOutcome) {
+    var hasMore = (_arrG.stgIdx + 1) < _arrG.stages.length;
+    var nextLine = hasMore ? '<div class="arr-flash-sub">次はどこを狙う？</div>' : '';
     if (nextOutcome.type === 'success') {
-      _arrFlash('success', '入った！');
+      _arrFlash('success',
+        '<div class="arr-flash-main">' + nextOutcome.val + 'に入った！</div>' + nextLine);
     } else {
-      _arrFlash('miss', '外れた！');
+      _arrFlash('miss',
+        '<div class="arr-flash-main">' + nextOutcome.dart + '狙ったけど<br>' + nextOutcome.val + 'に外れた！</div>' + nextLine);
     }
   }
 
@@ -2901,5 +2906,6 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(function(){});
 }
 </script>
+<div class="arr-flash-overlay" id="arr-flash-overlay"></div>
 </body>
 </html>
