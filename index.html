@@ -2999,7 +2999,7 @@ function _renderTeiseki() {
     var userRoutes = _userRoutes[e.score] || [];
     var n = e.path.length;
     var is3 = n === 3;
-    var mainLabel = _dartCountLabel(n);
+    var mainLabel = '';
     // 3本持ちと2本持ちの1本目が同じなら2本持ち行を省略
     var h2data = CHECKOUT_2H[e.score];
     var h2first = h2data ? (h2data.fin ? h2data.path[0] : h2data.dart) : null;
