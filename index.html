@@ -2805,9 +2805,9 @@ function _renderTactics() {
         return darts.map(function(x){ return x.d + '<span style="color:var(--mut);font-size:10px;">(' + x.l + '残)</span>'; }).join(' → ');
       }
       if (p300) {
-        actionLines.push('<span style="color:#66bb6a;">🎯 ' + fmtPath(p300.ideal) + '</span>');
-        var missColor = (p300.miss[p300.miss.length-1].l === 170) ? '#66bb6a' : '#aaa';
-        actionLines.push('<span style="color:' + missColor + ';">🔄 ' + fmtPath(p300.miss) + '</span>');
+        actionLines.push('<span style="color:#66bb6a;display:block;padding:3px 0;">🎯 ' + fmtPath(p300.ideal) + '</span>');
+        var missColor = (p300.miss[p300.miss.length-1].l === 170) ? '#80cbc4' : '#aaa';
+        actionLines.push('<span style="color:' + missColor + ';display:block;padding:3px 0;">🔄 ' + fmtPath(p300.miss) + '</span>');
       }
       var bogeyLeave = n - 140;
       warningLine = '<span style="color:#ff6b6b;">⚠ T20+T20+S20 → ' + bogeyLeave + '（ボギー）</span>';
