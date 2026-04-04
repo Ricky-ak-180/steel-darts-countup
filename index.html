@@ -1136,8 +1136,8 @@ canvas.schart { width: 100%; height: 100%; }
     </div>
     <!-- Game screen -->
     <div class="z01-game-wrap" id="z01-game-wrap" style="display:none;">
-      <div class="z01-players" id="z01-players"></div>
       <div class="z01-info-bar">
+        <div id="z01-turn-info"></div>
         <div id="z01-leg-info">Leg 1</div>
         <button class="z01-stats-btn" data-fn="z01OpenStats">Stats</button>
       </div>
@@ -1157,11 +1157,10 @@ canvas.schart { width: 100%; height: 100%; }
       </div>
       <!-- Input area -->
       <div class="z01-input" id="z01-input-area">
-        <div class="z01-presets" id="z01-presets"></div>
-        <div class="z01-tkd">
-          <div class="z01-tkv empty" id="z01-tkv">—</div>
-          <div class="z01-tkh" id="z01-tkh">このラウンドの合計を入力</div>
+        <div style="display:flex;justify-content:flex-end;padding:0 2px 2px;">
+          <button class="sc-customize-btn" data-fn="toggleScEditor">⚙</button>
         </div>
+        <div class="z01-presets" id="z01-presets"></div>
         <div class="z01-tkg">
           <div class="z01-tk" data-fn="z01Kp" data-arg="1">1</div><div class="z01-tk" data-fn="z01Kp" data-arg="2">2</div><div class="z01-tk" data-fn="z01Kp" data-arg="3">3</div>
           <div class="z01-tk" data-fn="z01Kp" data-arg="4">4</div><div class="z01-tk" data-fn="z01Kp" data-arg="5">5</div><div class="z01-tk" data-fn="z01Kp" data-arg="6">6</div>
