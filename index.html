@@ -496,14 +496,14 @@ canvas.schart { width: 100%; height: 100%; }
   75%  { opacity:1; }
   100% { opacity:0; }
 }
-/* 定石表ボタン */
+/* アレンジ表ボタン */
 /* ターン終了ラベル */
 .arr-turn-end-lbl { font-size:11px; letter-spacing:2px; color:var(--mut); margin:6px 0 2px; text-align:center; }
 /* ターン内スコア（ぼかさず元の点数を継続表示） */
 .arr-score-turn { opacity:0.5; }
 .arr-teiseki-btn { display:block; width:calc(100% - 24px); margin:8px 0 0; background:transparent; color:var(--mut); border:1px solid var(--bd); border-radius:12px; padding:10px; font-size:13px; cursor:pointer; }
 .arr-teiseki-btn:active { opacity:.7; }
-/* 定石表パネル */
+/* アレンジ表パネル */
 .arr-teiseki-panel { position:fixed; inset:0; background:var(--bg); z-index:300; display:flex; flex-direction:column; }
 .arr-teiseki-header { display:flex; align-items:center; padding:12px 12px 8px; gap:8px; border-bottom:1px solid var(--bd); flex-shrink:0; }
 .arr-teiseki-tabs { display:flex; gap:6px; flex:1; }
@@ -721,10 +721,10 @@ canvas.schart { width: 100%; height: 100%; }
         </div>
         <button class="arr-start-btn" data-fn="startArrSession">チャレンジ開始 →</button>
         <div class="arr-best-disp" id="arr-best-disp"></div>
-        <button class="arr-teiseki-btn" data-fn="showTeiseki">📋 定石表を見る</button>
+        <button class="arr-teiseki-btn" data-fn="showTeiseki">📋 アレンジ表を見る</button>
       </div>
     </div>
-    <!-- 定石表 -->
+    <!-- アレンジ表 -->
     <div class="arr-teiseki-panel hide" id="arr-teiseki-panel">
       <div class="arr-teiseki-header">
         <div class="arr-teiseki-tabs">
@@ -2128,7 +2128,7 @@ var CHECKOUT = {
   167:["T20","T19","Bull"],170:["T20","T20","Bull"]
 };
 
-// アレンジ理論解説（定石表に表示）
+// アレンジ理論解説（アレンジ表に表示）
 var CHECKOUT_TIPS = {
   // 1本
   50: "Bull（ダブルブル＝50点）を直接狙う唯一の1本フィニッシュ。",
@@ -2172,7 +2172,7 @@ var CHECKOUT_TIPS = {
 // 3本以内でチェックアウト不可のボギーナンバー
 var BOGEY_NUMS = [159, 162, 163, 165, 166, 168, 169];
 
-// 代替アレンジルート（定石表に表示、クイズは上記メインルートを使用）
+// 代替アレンジルート（アレンジ表に表示、クイズは上記メインルートを使用）
 var CHECKOUT_ALT = {
   62:  [["T14","D10"]],
   65:  [["T15","D10"]],
@@ -2414,7 +2414,7 @@ function goArrSetup() {
   _renderArrHist();
 }
 
-/* 定石表 */
+/* アレンジ表 */
 var _teisekiFilter = 0; // 0=全部, 1=1本, 2=2本, 3=3本
 
 function _buildTeisekiEntries() {
