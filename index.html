@@ -765,6 +765,22 @@ canvas.schart { width: 100%; height: 100%; }
 .z01-midstats-rv{font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1px;color:var(--txt);text-align:right;}
 .z01-stats-btn{background:transparent;border:1px solid var(--bdr);border-radius:6px;color:var(--mut);font-size:11px;padding:3px 8px;cursor:pointer;letter-spacing:1px;touch-action:manipulation;}
 .z01-stats-btn:active{opacity:.7;}
+/* Live input cell in log */
+#z01-log-live{font-family:'Bebas Neue',cursive;font-size:21px;cursor:text;}
+#z01-log-live.typing{color:var(--acc);}
+#z01-log-live.bust{color:#ff4757;}
+#z01-log-live.finish{color:var(--acc);}
+#z01-log-live-togo{font-size:15px;}
+/* Log player name row (2P) */
+.z01-log-names{display:grid;border-bottom:1px solid rgba(255,255,255,0.05);padding:4px 0;}
+.z01-log.p2 .z01-log-names{grid-template-columns:1fr 0.85fr 36px 1fr 0.85fr;}
+.z01-log-name-l{grid-column:1/3;font-size:11px;color:var(--mut);font-weight:700;padding-left:6px;}
+.z01-log-name-r{grid-column:4/6;font-size:11px;color:var(--mut);font-weight:700;text-align:right;padding-right:6px;}
+.z01-log-name-act{color:var(--acc);}
+/* 01 input: fixed height, no competition with log */
+.z01-input{flex-shrink:0;display:flex;flex-direction:column;padding:0 8px 8px;gap:3px;}
+.z01-tkg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
+.z01-tk.enter.ready.bust{background:#c0392b;color:#fff;border-color:#c0392b;}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYXJ1LZ2J1"></script>
