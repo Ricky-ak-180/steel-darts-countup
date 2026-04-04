@@ -475,11 +475,11 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-hist-score { font-family:'Bebas Neue',cursive; font-size:16px; color:var(--fg); }
 /* 結果フラッシュオーバーレイ */
 .arr-flash-overlay { position:fixed; inset:0; z-index:250; display:flex; align-items:center; justify-content:center; pointer-events:none; opacity:0; }
-.arr-flash-overlay.show { animation: arrFlash 0.55s ease-out forwards; }
+.arr-flash-overlay.show { animation: arrFlash 0.8s ease-out forwards; }
 .arr-flash-overlay.success { background:rgba(71,255,180,0.18); }
 .arr-flash-overlay.miss { background:rgba(255,107,53,0.18); }
 .arr-flash-text { font-family:'Bebas Neue',cursive; letter-spacing:4px; line-height:1.1; text-align:center; display:flex; flex-direction:column; align-items:center; gap:6px; }
-.arr-flash-main { font-size:52px; }
+.arr-flash-main { font-size:76px; }
 .arr-flash-sub { font-size:22px; opacity:0.75; letter-spacing:3px; }
 .arr-flash-overlay.success .arr-flash-text { color:#47ffb4; text-shadow:0 0 40px rgba(71,255,180,0.7); }
 .arr-flash-overlay.miss .arr-flash-text { color:#ff6b35; text-shadow:0 0 40px rgba(255,107,53,0.7); }
@@ -2569,17 +2569,13 @@ function chooseArr(idx) {
   // タイマーバーを即クリア
   document.getElementById('arr-timer-bar').style.width = '0%';
 
-  // 結果フラッシュ（nextOutcome が確定している場合のみ）
+  // 結果フラッシュ
   var nextOutcome = st.nextOutcome;
   if (nextOutcome) {
-    var hasMore = (_arrG.stgIdx + 1) < _arrG.stages.length;
-    var nextLine = hasMore ? '<div class="arr-flash-sub">次はどこを狙う？</div>' : '';
     if (nextOutcome.type === 'success') {
-      _arrFlash('success',
-        '<div class="arr-flash-main">' + nextOutcome.val + 'に入った！</div>' + nextLine);
+      _arrFlash('success', '<div class="arr-flash-main">入った！</div>');
     } else {
-      _arrFlash('miss',
-        '<div class="arr-flash-main">' + nextOutcome.dart + '狙ったけど<br>' + nextOutcome.val + 'に外れた！</div>' + nextLine);
+      _arrFlash('miss', '<div class="arr-flash-main">外れた！</div>');
     }
   }
 
