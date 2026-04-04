@@ -3916,6 +3916,8 @@ function z01SetCpu(arg) {
 function z01Start() {
   var m = _z01.mode;
   if (m === 0) { m = parseInt(document.getElementById('z01-custom-val').value,10)||501; _z01.mode = m; }
+  var legs = _z01.legs;
+  if (legs === 0) { legs = parseInt(document.getElementById('z01-legs-custom-val').value,10)||9; _z01.legs = legs; }
   _z01.names[0] = document.getElementById('z01-name1').value.trim()||'Player 1';
   _z01.names[1] = document.getElementById('z01-name2').value.trim()||(_z01.players===3?'CPU':'Player 2');
   _z01.remain = [m, m];
