@@ -1760,6 +1760,7 @@ function saveScEditor() {
   }
   saveSC(sc);
   buildScRow();
+  _z01BuildPresets();
   document.getElementById('sc-editor').classList.remove('show');
   // isecを元に戻す
   var isec = document.getElementById('isec');
