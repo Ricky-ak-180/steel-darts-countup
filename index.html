@@ -2852,10 +2852,12 @@ function _renderTactics() {
     }
 
     return '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:12px;padding:14px 16px;margin-bottom:10px;">' +
-      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
-        '<span style="font-family:\'Bebas Neue\',cursive;font-size:36px;color:' + scoreColor + ';min-width:60px;line-height:1;">' + n + '</span>' +
-        (isSpecial ? '<span style="font-size:13px;color:var(--mut);text-decoration:line-through;">' + defTgt + '</span><span style="color:var(--mut);font-size:13px;">→</span>' : '') +
-        '<span style="font-size:20px;font-weight:700;color:' + scoreColor + ';">→ ' + target + '</span>' +
+      '<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;">' +
+        '<span style="font-family:\'Bebas Neue\',cursive;font-size:36px;color:' + scoreColor + ';line-height:1;">' + n + '</span>' +
+        '<div style="display:flex;flex-direction:column;line-height:1.2;">' +
+          (isSpecial ? '<span style="font-size:11px;color:var(--mut);text-decoration:line-through;">' + defTgt + '</span>' : '') +
+          '<span style="font-size:18px;font-weight:700;color:' + scoreColor + ';">' + target + 'から狙う</span>' +
+        '</div>' +
       '</div>' +
       '<div style="display:flex;flex-direction:column;gap:6px;line-height:1.5;">' +
         actionLines.join('') +
