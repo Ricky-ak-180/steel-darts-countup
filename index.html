@@ -2921,13 +2921,39 @@ function _delUserRoute(score, idx) {
   _renderTeiseki();
 }
 
-function _pathHtml(path) {
+function _pathHtml(path, noFinish) {
   var h = '';
   path.forEach(function(d, i) {
     if (i > 0) h += '<span class="arr-t-arr">→</span>';
-    var isFinish = i === path.length - 1;
+    var isFinish = !noFinish && i === path.length - 1;
     h += '<span class="arr-t-dart' + (isFinish ? ' finish' : '') + '">' + d + '</span>';
   });
+  return h;
+}
+
+function _dartCountLabel(n) {
+  if (n === 1) return '<span class="arr-t-label arr-t-label-1">1本</span>';
+  if (n === 2) return '<span class="arr-t-label arr-t-label-2">2本</span>';
+  return '<span class="arr-t-label arr-t-label-3">3本</span>';
+}
+
+function _2hHtml(score) {
+  var h2 = CHECKOUT_2H[score];
+  if (!h2) return '';
+  var h = '<div class="arr-t-path" style="margin-top:4px;">' +
+    '<span class="arr-t-label arr-t-label-2h">2本持ち</span>';
+  if (h2.fin) {
+    h += _pathHtml(h2.path);
+    h += '<span class="arr-t-leave" style="margin-left:4px;font-size:11px;">✓ フィニッシュ!</span>';
+  } else {
+    var nextPath = _getPath(h2.leave);
+    var nextStr = nextPath ? nextPath.join('+') : '';
+    h += '<span class="arr-t-dart">' + h2.dart + '</span>' +
+         '<span class="arr-t-arr">→</span>' +
+         '<span class="arr-t-leave">' + h2.leave + '残し</span>' +
+         (nextStr ? '<span class="arr-t-leave-next">（次: ' + nextStr + '）</span>' : '');
+  }
+  h += '</div>';
   return h;
 }
 
