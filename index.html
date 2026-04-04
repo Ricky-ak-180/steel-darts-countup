@@ -990,22 +990,17 @@ canvas.schart { width: 100%; height: 100%; }
       <button class="arr-hud-quit" data-fn="goArrSetup">✕</button>
       <div class="arr-hud-left">
         <div class="arr-hud-q" id="arr-hud-q">問題 1 / 10</div>
-        <div class="arr-hud-stage" id="arr-hud-stage">第1投</div>
       </div>
       <div class="arr-hud-score" id="arr-hud-score">0</div>
     </div>
     <!-- クイズカード -->
     <div class="arr-card hide" id="arr-card">
-      <div class="arr-card-body">
-        <div class="arr-chain-scroll" id="arr-chain-scroll">
-          <div class="arr-chain" id="arr-chain"></div>
-          <div class="arr-turn-block" id="arr-turn-block"></div>
-        </div>
-        <div class="arr-board-panel" id="arr-board-panel"></div>
-      </div>
+      <div class="arr-q-score" id="arr-q-score">170</div>
+      <div class="arr-q-label">1本目は何を狙う？</div>
       <div class="arr-timer-wrap"><div class="arr-timer-bar" id="arr-timer-bar"></div></div>
       <div class="arr-choices" id="arr-choices"></div>
       <div class="arr-result hide" id="arr-result"></div>
+      <div class="arr-answer-path hide" id="arr-answer-path"></div>
       <div class="arr-next-row hide" id="arr-next-row">
         <button class="arr-next arr-next-q" id="arr-next-btn" data-fn="advanceArr">次の問題 →</button>
       </div>
