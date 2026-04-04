@@ -4012,7 +4012,7 @@ function _z01BufUpdate(v) {
         if (liveT) liveT.textContent = n >= 0 && n <= 180 ? String(after) : '';
       }
     } else {
-      if (liveT) liveT.textContent = '';
+      if (liveT) liveT.textContent = String(_z01.remain[_z01.currentPlayer]);
     }
   }
   if (!enter) return;
