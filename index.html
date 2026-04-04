@@ -2803,12 +2803,19 @@ function _renderTactics() {
     '</div>';
   }
 
-  // 230〜501: T20のみ
+  // 310〜501: T20のみ
   html += '<div style="background:rgba(232,255,71,0.07);border:1px solid rgba(232,255,71,0.15);border-radius:10px;padding:10px 14px;margin-bottom:20px;">' +
-    '<div style="font-size:13px;font-weight:700;color:var(--acc);margin-bottom:2px;">230〜501</div>' +
+    '<div style="font-size:13px;font-weight:700;color:var(--acc);margin-bottom:2px;">310〜501</div>' +
     '<div style="font-size:15px;font-weight:700;color:var(--fg);">常に T20</div>' +
-    '<div style="font-size:11px;color:var(--mut);margin-top:4px;">ボギーナンバーに当たる距離ではなく、T20以外を選ぶ理由なし。</div>' +
+    '<div style="font-size:11px;color:var(--mut);margin-top:4px;">T20+T20+S20しても170以上残り、ボギーにならない。</div>' +
   '</div>';
+
+  // 300〜309
+  html += rangeSection(
+    '300〜309（要注意）',
+    'T20+T20+S20 = 140点取得 → 残りがボギーになるスコアが潜む。末尾2・3・5・6・8・9は要注意。',
+    300, 309
+  );
 
   // 200〜229: 重要ゾーン
   html += rangeSection(
