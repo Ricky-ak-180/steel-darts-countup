@@ -4380,9 +4380,12 @@ function _z01LogRender() {
     if (liveEl) {
       var row = liveEl.closest('.z01-log-row');
       if (row) {
-        var rowBottom = row.offsetTop + row.offsetHeight;
-        var targetScroll = rowBottom - wrap.clientHeight + row.offsetHeight * 2;
-        wrap.scrollTop = Math.max(0, targetScroll);
+        var rowRect = row.getBoundingClientRect();
+        var wrapRect = wrap.getBoundingClientRect();
+        var rowRelTop = rowRect.top - wrapRect.top + wrap.scrollTop;
+        var rowH = row.offsetHeight || 44;
+        // Scroll so 4 rows of history are visible above the current row
+        wrap.scrollTop = Math.max(0, rowRelTop - rowH * 4);
       } else {
         wrap.scrollTop = wrap.scrollHeight;
       }
