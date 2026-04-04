@@ -3287,37 +3287,22 @@ function chooseArr(idx) {
   var elapsed = Date.now() - _arrG.stageStart;
   var isTimeout = idx < 0;
   var st = _arrG.stages[_arrG.stgIdx];
-  var correctDart = st.path[0];
-  var correct = _arrG.isFinish ? correctDart : String(_dartVal(correctDart));
+  var correct = st.path[0];
   var chosen = isTimeout ? null : _arrG.choices[idx];
   var isCorrect = !isTimeout && chosen === correct;
 
-  // 得点計算（ターン内の投数に応じた基本点）
-  var base = _ARR_BASE_PTS[Math.min(st.turnDart - 1, 2)];
   var speed = isCorrect ? Math.max(0, 1 - elapsed / _arrG.STAGE_MS) : 0;
-  var pts = Math.round(base * speed);
+  var pts = Math.round(100 * speed);
   _arrG.totalScore += pts;
   _arrG.totalStages++;
   _arrG.totalTimeMs += elapsed;
   if (isCorrect) _arrG.correctCt++;
   _arrG.log.push({ q: _arrG.qIdx, qScore: _arrG.qList[_arrG.qIdx],
-    stgIdx: _arrG.stgIdx, stageScore: st.score,
-    correct: correctDart, correctDisplay: correct, chosen: chosen,
-    isCorrect: isCorrect, isTimeout: isTimeout,
-    prevOutcome: st.prevOutcome || null, pts: pts });
+    correct: correct, chosen: chosen,
+    isCorrect: isCorrect, isTimeout: isTimeout, pts: pts });
 
-  // タイマーバーを即クリア
   document.getElementById('arr-timer-bar').style.width = '0%';
 
-  // ボードを着弾位置に更新
-  var nextOutcome = st.nextOutcome;
-  if (nextOutcome) {
-    var landStr = nextOutcome.type === 'success' ? nextOutcome.dart : nextOutcome.missTarget;
-    var flashType = nextOutcome.type === 'success' ? 'success' : 'miss';
-    _updateBoardPanel(nextOutcome.dart, landStr, flashType);
-  }
-
-  // ボタン色変え（全ボタン無効化）
   document.getElementById('arr-choices').querySelectorAll('.arr-choice').forEach(function(btn) {
     btn.setAttribute('data-fn', '');
     var v = btn.getAttribute('data-val');
@@ -3326,51 +3311,36 @@ function chooseArr(idx) {
     else btn.style.opacity = '0.25';
   });
 
-  // 結果フラッシュ
   var resEl = document.getElementById('arr-result');
-  var hasNextStage = (_arrG.stgIdx + 1) < _arrG.stages.length;
-  var isLastQ = (_arrG.qIdx + 1) >= _arrG.qList.length;
-  var isSessionEnd = !hasNextStage && isLastQ;
-
   if (isCorrect) {
     resEl.className = 'arr-result arr-ok';
     resEl.textContent = pts > 0 ? '◯  +' + pts + ' pt' : '◯';
   } else if (isTimeout) {
     resEl.className = 'arr-result arr-ng';
-    resEl.textContent = '⏱  正解は ' + correct + (_arrG.isFinish ? '' : ' (' + correctDart + ')');
+    resEl.textContent = '⏱  時間切れ　正解: ' + correct;
   } else {
     resEl.className = 'arr-result arr-ng';
-    resEl.textContent = '✕  正解は ' + correct + (_arrG.isFinish ? '' : ' (' + correctDart + ')');
+    resEl.textContent = '✕  正解: ' + correct;
   }
 
-  // スコアHUD更新
+  // 正解ルートを全表示
+  var pathEl = document.getElementById('arr-answer-path');
+  pathEl.innerHTML = '<div class="arr-answer-path-label">正解ルート</div><div>' + _pathHtml(st.path, false, st.score) + '</div>';
+  pathEl.className = 'arr-answer-path';
+
   document.getElementById('arr-hud-score').textContent = _arrG.totalScore;
 
-  if (isSessionEnd) {
-    var btn = document.getElementById('arr-next-btn');
-    btn.textContent = '結果を見る';
-    document.getElementById('arr-next-row').className = 'arr-next-row';
-  } else if (!hasNextStage) {
-    var btn2 = document.getElementById('arr-next-btn');
-    btn2.textContent = '次の問題 →';
-    document.getElementById('arr-next-row').className = 'arr-next-row';
-  } else {
-    // チェーン更新後、少し待ってから次ステージ
-    var delay = isCorrect ? 700 : 1600;
-    _arrG.advTimeout = setTimeout(advanceArr, delay);
-  }
+  var isLastQ = (_arrG.qIdx + 1) >= _arrG.qList.length;
+  var nextBtn = document.getElementById('arr-next-btn');
+  nextBtn.textContent = isLastQ ? '結果を見る' : '次の問題 →';
+  document.getElementById('arr-next-row').className = 'arr-next-row';
 }
 
-/* 次ステージ or 次問題 */
+/* 次の問題へ */
 function advanceArr() {
   _clearArrTimer();
-  _arrG.stgIdx++;
-  if (_arrG.stgIdx < _arrG.stages.length) {
-    _arrShowStage();
-  } else {
-    _arrG.qIdx++;
-    _arrNextQ();
-  }
+  _arrG.qIdx++;
+  _arrNextQ();
 }
 
 /* セッション終了 */
