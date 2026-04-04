@@ -2997,10 +2997,6 @@ function _renderTeiseki() {
     }
     var alts = CHECKOUT_ALT[e.score] || [];
     var userRoutes = _userRoutes[e.score] || [];
-    if (_teisekiFilter > 0) {
-      alts = alts.filter(function(a){ return a.length === _teisekiFilter; });
-      userRoutes = userRoutes.filter(function(a){ return a.length === _teisekiFilter; });
-    }
     var n = e.path.length;
     var is3 = n === 3;
     var mainLabel = _dartCountLabel(n);
