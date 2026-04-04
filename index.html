@@ -4378,7 +4378,7 @@ function _z01LogRender() {
   }
   logEl.innerHTML = h;
   // Update live cell with current input
-  if (_z01._buf) _z01BufUpdate(_z01._buf);
+  _z01BufUpdate(_z01._buf);
   var wrap = document.getElementById('z01-log-wrap');
   if (wrap) {
     // Scroll so current row is near bottom, keeping ~4 previous rows visible above
