@@ -4125,18 +4125,18 @@ function _z01InitLog() {
   _z01.log = [{visit: 3, p: p}];
 }
 
-function _z01LogCell(data, pIdx) {
+function _z01LogCell(data, pIdx, isLive) {
   var sc = 'z01-lc-s' + pIdx, tc = 'z01-lc-t' + pIdx;
-  if (!data) return '<div class="' + sc + '"></div><div class="' + tc + '"></div>';
+  var scId = isLive ? ' id="z01-log-live"' : '';
+  var tcId = isLive ? ' id="z01-log-live-togo"' : '';
+  if (!data) return '<div class="' + sc + '"' + scId + '></div><div class="' + tc + '"' + tcId + '></div>';
   var scoredHtml;
   if (data.scored >= 100) {
     scoredHtml = '<span class="z01-lc-hi">' + data.scored + '</span>';
-  } else if (data.scored === 0) {
-    scoredHtml = '<span style="color:var(--mut);font-size:13px;">MISS</span>';
   } else {
     scoredHtml = String(data.scored);
   }
-  return '<div class="' + sc + '">' + scoredHtml + '</div><div class="' + tc + '">' + data.remain + '</div>';
+  return '<div class="' + sc + '"' + scId + '>' + scoredHtml + '</div><div class="' + tc + '"' + tcId + '>' + data.remain + '</div>';
 }
 
 function _z01LogRender() {
@@ -4146,8 +4146,12 @@ function _z01LogRender() {
   var isP2 = n === 2;
   logEl.className = 'z01-log ' + (isP2 ? 'p2' : 'p1');
   var h = '';
-  // Header
+  // Player names row (2P)
   if (isP2) {
+    var cp = _z01.currentPlayer;
+    var n0 = _z01PlayerName(0) + (_z01.legs>1?' ('+_z01.legWins[0]+'W)':'');
+    var n1 = _z01PlayerName(1) + (_z01.legs>1?' ('+_z01.legWins[1]+'W)':'');
+    h += '<div class="z01-log-names"><div class="z01-log-name-l' + (cp===0?' z01-log-name-act':'') + '">' + n0 + '</div><div></div><div class="z01-log-name-r' + (cp===1?' z01-log-name-act':'') + '">' + n1 + '</div></div>';
     h += '<div class="z01-log-hdr"><div>Scored</div><div>To Go</div><div></div><div>Scored</div><div>To Go</div></div>';
   } else {
     h += '<div class="z01-log-hdr"><div></div><div>Scored</div><div>To Go</div></div>';
@@ -4155,34 +4159,33 @@ function _z01LogRender() {
   // Initial remaining row
   var startR = _z01.mode;
   if (isP2) {
-    h += '<div class="z01-log-row"><div class="z01-lc-s0"></div><div class="z01-lc-t0 init">' + startR + '</div><div class="z01-lc-v">•</div><div class="z01-lc-s1"></div><div class="z01-lc-t1 init">' + startR + '</div></div>';
+    h += '<div class="z01-log-row"><div class="z01-lc-s0"></div><div class="z01-lc-t0 init">' + startR + '</div><div class="z01-lc-v"></div><div class="z01-lc-s1"></div><div class="z01-lc-t1 init">' + startR + '</div></div>';
   } else {
-    h += '<div class="z01-log-row"><div class="z01-lc-v">•</div><div class="z01-lc-s0"></div><div class="z01-lc-t0 init">' + startR + '</div></div>';
+    h += '<div class="z01-log-row"><div class="z01-lc-v"></div><div class="z01-lc-s0"></div><div class="z01-lc-t0 init">' + startR + '</div></div>';
   }
   // Data rows
-  var log = _z01.log, cur = _z01.currentPlayer;
+  var log = _z01.log, cp2 = _z01.currentPlayer;
   for (var i = 0; i < log.length; i++) {
     var row = log[i];
     var isCur = i === log.length - 1;
     var cls = '';
-    if (isCur) {
-      if (isP2) { cls = row.p[0] === null ? ' cur0' : (row.p[1] === null ? ' cur1' : ''); }
-      else { cls = ' cur0'; }
-    }
+    if (isCur) { cls = isP2 ? (row.p[0]===null&&cp2===0?' cur0':(row.p[1]===null&&cp2===1?' cur1':'')) : ' cur0'; }
     if (isP2) {
+      var live0 = isCur && cp2===0 && row.p[0]===null;
+      var live1 = isCur && cp2===1 && row.p[1]===null;
       h += '<div class="z01-log-row' + cls + '">';
-      h += _z01LogCell(row.p[0], 0);
+      h += _z01LogCell(row.p[0], 0, live0);
       h += '<div class="z01-lc-v">' + row.visit + '</div>';
-      h += _z01LogCell(row.p[1], 1);
+      h += _z01LogCell(row.p[1], 1, live1);
       h += '</div>';
     } else {
       h += '<div class="z01-log-row' + cls + '">';
       h += '<div class="z01-lc-v">' + row.visit + '</div>';
-      h += _z01LogCell(row.p[0], 0);
+      h += _z01LogCell(row.p[0], 0, isCur);
       h += '</div>';
     }
   }
-  // Padding (future rows)
+  // Future padding rows
   var lastVisit = log[log.length - 1].visit;
   for (var k = 1; k <= 3; k++) {
     var fv = lastVisit + k * 3;
@@ -4193,6 +4196,8 @@ function _z01LogRender() {
     }
   }
   logEl.innerHTML = h;
+  // Update live cell with current input
+  if (_z01._buf) _z01BufUpdate(_z01._buf);
   var wrap = document.getElementById('z01-log-wrap');
   if (wrap) wrap.scrollTop = wrap.scrollHeight;
 }
