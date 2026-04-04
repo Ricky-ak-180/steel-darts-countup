@@ -1231,6 +1231,31 @@ canvas.schart { width: 100%; height: 100%; }
       </div>
       <div class="z01-midstats-body" id="z01-midstats-body"></div>
     </div>
+    <!-- Exit confirmation overlay -->
+    <div class="z01-exit-confirm" id="z01-exit-confirm" style="display:none;">
+      <div class="z01-exit-box">
+        <div class="z01-exit-title">ゲームを終了しますか？</div>
+        <div class="z01-exit-sub">現在のゲームデータは保存されません</div>
+        <div class="z01-exit-btns">
+          <button class="z01-exit-btn-no" data-fn="z01ExitNo">続ける</button>
+          <button class="z01-exit-btn-yes" data-fn="z01ExitYes">終了する</button>
+        </div>
+      </div>
+    </div>
+    <!-- Score edit modal -->
+    <div class="z01-edit-modal" id="z01-edit-modal" style="display:none;">
+      <div class="z01-edit-inner">
+        <div class="z01-edit-title">スコア修正</div>
+        <div class="z01-edit-cur" id="z01-edit-cur"></div>
+        <div class="z01-edit-tkg">
+          <div class="z01-tk" data-fn="z01EditKp" data-arg="1">1</div><div class="z01-tk" data-fn="z01EditKp" data-arg="2">2</div><div class="z01-tk" data-fn="z01EditKp" data-arg="3">3</div>
+          <div class="z01-tk" data-fn="z01EditKp" data-arg="4">4</div><div class="z01-tk" data-fn="z01EditKp" data-arg="5">5</div><div class="z01-tk" data-fn="z01EditKp" data-arg="6">6</div>
+          <div class="z01-tk" data-fn="z01EditKp" data-arg="7">7</div><div class="z01-tk" data-fn="z01EditKp" data-arg="8">8</div><div class="z01-tk" data-fn="z01EditKp" data-arg="9">9</div>
+          <div class="z01-tk del" data-fn="z01EditKd">⌫</div><div class="z01-tk" data-fn="z01EditKp" data-arg="0">0</div><div class="z01-tk enter" data-fn="z01EditOk">OK</div>
+        </div>
+        <button class="z01-edit-cancel" data-fn="z01EditCancel">キャンセル</button>
+      </div>
+    </div>
   </div>
 
 </div>
