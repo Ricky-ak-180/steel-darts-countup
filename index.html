@@ -2829,7 +2829,7 @@ function _renderTactics() {
         );
       }
       var bogeyLeave = n - 140;
-      warningLine = '<span style="color:#ff6b6b;">⚠ T20+T20+S20 → ' + bogeyLeave + '（ボギー）</span>';
+      warningLine = '<span style="color:#ff6b6b;">⚠ 3本で140点（T20+T20+S20）を取ってしまうと → <strong>' + bogeyLeave + '</strong>（ボギー）</span>';
     } else if (zone === '200s') {
       actionLines.push('<span style="color:#66bb6a;">✓ ' + target + 'ヒット → ' + hitLeave + '残し（チェックアウト圏）</span>');
       if (missLeave !== null) {
