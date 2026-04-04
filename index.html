@@ -1191,7 +1191,10 @@ canvas.schart { width: 100%; height: 100%; }
       <div class="z01-log-wrap" id="z01-log-wrap">
         <div class="z01-log" id="z01-log"></div>
       </div>
-      <div class="z01-checkout-hint" id="z01-checkout-hint"></div>
+      <div style="display:flex;align-items:center;gap:6px;padding:0 10px 2px;flex-shrink:0;">
+        <div class="z01-checkout-hint" id="z01-checkout-hint" style="flex:1;margin:0;"></div>
+        <button class="z01-hint-toggle on" id="z01-hint-toggle" data-fn="z01ToggleHint">アレンジ表示</button>
+      </div>
       <!-- CPU turn indicator -->
       <div class="z01-cpu-area" id="z01-cpu-area" style="display:none;">
         <div style="font-size:11px;color:var(--mut);letter-spacing:2px;">CPU THINKING...</div>
