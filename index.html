@@ -2802,7 +2802,10 @@ function _renderTactics() {
     } else if (zone === '300s') {
       var p300 = TACTICS_300s_PATHS[n];
       function fmtPath(darts) {
-        return darts.map(function(x){ return x.d + '<span style="color:var(--mut);font-size:10px;">(' + x.l + '残)</span>'; }).join(' → ');
+        return darts.map(function(x){
+          return '<span style="font-size:16px;font-weight:700;">' + x.d + '</span>' +
+                 '<span style="color:var(--mut);font-size:12px;margin-left:2px;">(' + x.l + '残)</span>';
+        }).join('<span style="color:var(--mut);font-size:14px;margin:0 4px;">→</span>');
       }
       if (p300) {
         actionLines.push('<span style="color:#66bb6a;display:block;padding:3px 0;">🎯 ' + fmtPath(p300.ideal) + '</span>');
