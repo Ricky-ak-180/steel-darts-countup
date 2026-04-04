@@ -3974,6 +3974,7 @@ function _z01Commit(sc) {
   var rem = _z01.remain[p], after = rem - sc;
   var bust = _z01.outRule===0 ? (after<0||after===1) : (after<0);
   if (bust) {
+    soundCommit(0);
     var f = document.createElement('div');
     f.className = 'z01-bust-flash';
     document.body.appendChild(f);
