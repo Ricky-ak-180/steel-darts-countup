@@ -3764,8 +3764,9 @@ function _z01Render() {
 function _z01HintUpdate() {
   var el = document.getElementById('z01-checkout-hint');
   var rem = _z01.remain[_z01.currentPlayer];
-  if (rem > 0 && rem <= 170 && CHECKOUT[rem]) {
-    el.textContent = '🎯 ' + CHECKOUT[rem].join(' → ');
+  var coPath = _getPath(rem);
+  if (rem > 0 && coPath) {
+    el.textContent = '🎯 ' + coPath.join(' → ');
     el.classList.add('show');
   } else {
     el.classList.remove('show');
