@@ -2838,7 +2838,7 @@ function goArrSetup() {
 }
 
 /* アレンジ表 */
-var _teisekiFilter = 0; // 0=全部, 1=1本, 2=2本, 3=3本
+var _teisekiFilter = 0; // 0=全部, 41=41〜100, 99=99〜170
 
 function _buildTeisekiEntries() {
   var entries = Object.keys(CHECKOUT).map(function(k){ return {score: +k, path: CHECKOUT[k]}; });
