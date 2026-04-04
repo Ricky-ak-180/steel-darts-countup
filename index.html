@@ -3101,10 +3101,6 @@ function _arrNextQ() {
   if (_arrG.qIdx >= _arrG.qList.length) { _arrFinish(); return; }
   _arrG.stages = _buildArrStages(_arrG.qList[_arrG.qIdx]);
   _arrG.stgIdx = 0;
-  _arrG.chainHtml = '';
-  for (var i = 0; i < _arrG.stages.length; i++) {
-    _arrG.maxScore += _ARR_BASE_PTS[Math.min(i, 2)];
-  }
   _arrShowStage();
 }
 
