@@ -723,6 +723,50 @@ canvas.schart { width: 100%; height: 100%; }
         <div class="arr-best-disp" id="arr-best-disp"></div>
         <button class="arr-teiseki-btn" data-fn="showTeiseki">📋 アレンジ表を見る</button>
       </div>
+      <div class="arr-training-entry">
+        <div class="arr-divider">または</div>
+        <div class="arr-training-entry-inner">
+          <div class="arr-training-entry-title">🎯 アレンジトレーニング</div>
+          <div class="arr-training-entry-sub">実際に投げて身体に覚えさせよう<br>2 → 170 順番に制覇</div>
+          <button class="arr-training-start-btn" data-fn="showTraining">トレーニングを始める →</button>
+        </div>
+      </div>
+    </div>
+    <!-- トレーニングホーム -->
+    <div class="arr-train-home" id="arr-train-home" style="display:none;">
+      <div class="arr-train-home-hdr">
+        <button class="arr-train-back" data-fn="goArrSetup">← 戻る</button>
+        <div class="arr-train-home-title">アレンジトレーニング</div>
+        <div class="arr-train-progress" id="arr-train-progress">0 / 0</div>
+      </div>
+      <div class="arr-train-continue-wrap" id="arr-train-continue-wrap" style="display:none;">
+        <button class="arr-train-continue-btn" data-fn="trainContinue">続きから → <span id="arr-train-continue-score"></span></button>
+      </div>
+      <div class="arr-train-map" id="arr-train-map"></div>
+    </div>
+    <!-- トレーニング練習 -->
+    <div class="arr-train-prac" id="arr-train-prac" style="display:none;">
+      <div class="arr-tp-hdr">
+        <button class="arr-tp-back" data-fn="trainBackToMap">← 一覧へ</button>
+        <div class="arr-tp-hdr-score" id="arr-tp-header-score">-</div>
+        <div class="arr-tp-hdr-clears" id="arr-tp-header-clears">0回クリア</div>
+      </div>
+      <div class="arr-tp-body">
+        <div class="arr-tp-score-big" id="arr-tp-score-big">-</div>
+        <div class="arr-tp-stars" id="arr-tp-stars">☆☆☆</div>
+        <div class="arr-tp-hint-box" id="arr-tp-hint-box"></div>
+        <button class="arr-tp-hint-toggle" id="arr-tp-hint-btn" data-fn="trainToggleHint" style="display:none;">👁 ヒントを見る</button>
+        <div class="arr-tp-instruction">実際にダーツを投げて結果を入力</div>
+        <div class="arr-tp-btns">
+          <button class="arr-tp-ok" data-fn="trainResult" data-arg="1">✓ できた</button>
+          <button class="arr-tp-ng" data-fn="trainResult" data-arg="0">✗ できなかった</button>
+        </div>
+        <div class="arr-tp-result-row" id="arr-tp-result-row" style="display:none;">
+          <div class="arr-tp-unlock-msg" id="arr-tp-unlock-msg"></div>
+          <button class="arr-tp-next" id="arr-tp-next-btn" data-fn="trainNext">次のスコアへ →</button>
+        </div>
+        <div class="arr-tp-tip" id="arr-tp-tip" style="display:none;"></div>
+      </div>
     </div>
     <!-- アレンジ表 -->
     <div class="arr-teiseki-panel hide" id="arr-teiseki-panel">
