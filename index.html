@@ -4595,8 +4595,8 @@ if ('serviceWorker' in navigator) {
   <div style="font-size:11px;color:var(--mut);">各ボタンの数値を入力してください（0〜180）</div>
   <div class="sc-edit-grid" id="sc-edit-grid"></div>
   <div class="sc-edit-btns" style="margin-top:8px;">
-    <button class="sc-edit-cancel" id="sc-edit-cancel">キャンセル</button>
-    <button class="sc-edit-save" id="sc-edit-save">保存</button>
+    <button class="sc-edit-cancel" id="sc-edit-cancel" data-fn="toggleScEditor">キャンセル</button>
+    <button class="sc-edit-save" id="sc-edit-save" data-fn="saveScEditor">保存</button>
   </div>
 </div>
 </body>
