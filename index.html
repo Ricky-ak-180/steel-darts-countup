@@ -4078,6 +4078,7 @@ function _z01Commit(sc) {
     } else {
       _z01._pendingFinish = {player: p};
       _z01LogRender();
+      _z01BuildFinishModal(sc);
       document.getElementById('z01-finish-modal').style.display = 'flex';
     }
     return;
