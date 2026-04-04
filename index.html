@@ -3958,9 +3958,9 @@ function z01Pre(arg) { _z01BufUpdate(String(arg)); z01Ok(); }
 function z01Kp(arg) {
   var v = _z01._buf + String(arg);
   if (v.length > 3 || parseInt(v,10) > 180) return;
-  _z01BufUpdate(v);
+  _z01BufUpdate(v); soundTap();
 }
-function z01Kd() { if (!_z01._buf) return; _z01BufUpdate(_z01._buf.slice(0,-1)); }
+function z01Kd() { if (!_z01._buf) return; _z01BufUpdate(_z01._buf.slice(0,-1)); soundDel(); }
 
 function z01Ok() {
   if (_z01._buf === '') return;
