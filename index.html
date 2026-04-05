@@ -2241,6 +2241,54 @@ function importData(input) {
   reader.readAsText(file);
 }
 
+/* 01 Export / Import */
+function exportZ01Data() {
+  var h = _z01GetH();
+  if (!h.length) { alert('01の履歴がありません'); return; }
+  var json = JSON.stringify({ version: 1, exported: new Date().toISOString(), data: h }, null, 2);
+  var blob = new Blob([json], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'darts01_history_' + localDateStr(new Date()) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function triggerImportZ01() {
+  var input = document.getElementById('imp-z01-file');
+  input.value = '';
+  input.click();
+}
+function importZ01Data(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var obj = JSON.parse(e.target.result);
+      var incoming = obj.data || obj;
+      if (!Array.isArray(incoming)) throw new Error('形式が違います');
+      var current = _z01GetH();
+      var dates = {};
+      current.forEach(function(x){ dates[x.date] = true; });
+      var newGames = [];
+      incoming.forEach(function(x) {
+        if (!dates[x.date]) { current.push(x); newGames.push(x); }
+      });
+      current.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+      localStorage.setItem('dh01', JSON.stringify(current.slice(0, 300)));
+      renderZ01Hist();
+      alert(newGames.length + '件のデータを追加しました（重複は除外）');
+    } catch(err) {
+      alert('読み込みに失敗しました: ' + err.message);
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
 /* Period stats */
 var pTab = 'day';
 function pad(n){ return n<10?'0'+n:''+n; }
