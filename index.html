@@ -5096,7 +5096,8 @@ function renderZ01Hist() {
     ];
     var total = allRounds.length;
     html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px;">';
-    html += '<div style="font-size:10px;color:var(--mut);letter-spacing:2px;margin-bottom:10px;">削りスコア分布（直近30G / ' + total + 'ラウンド）</div>';
+    html += '<div style="font-size:10px;color:var(--mut);letter-spacing:2px;margin-bottom:2px;">削りスコア分布（直近30G / ' + total + 'ラウンド）</div>';
+    html += '<div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:10px;">残り171以上のラウンドのみ集計（上がり目が出たラウンドは除く）</div>';
     bands.forEach(function(b){
       var cnt = allRounds.filter(function(s){ return s>=b.min && s<=b.max; }).length;
       var pct = total > 0 ? Math.round(cnt/total*100) : 0;
