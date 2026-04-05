@@ -2868,18 +2868,18 @@ var _ARR_KEZURI_QS = [
    exp:"262−18−60−20=164残し。S18で下の桁を18に整え、T20+S20=80点でぴったり164に収める"},
   // ── 271〜275帯：S-BULL（25点）でつなぐ ──
   {q:"残り275点。S20(20)+T20(60)の後（残り195点）、3本目にS-BULL（25点）を打つと？",
-   choices:["170点残し（チェックアウト圏）","175点残し","165点（ボギー！）","170点残し（でも外ブルは難しい）"],ans:0,
+   choices:["170点残し（チェックアウト圏）","175点残し","165点（ボギー！）","170点残し（でもS-BULLは難しい）"],ans:0,
    exp:"275−20−60−25=170残し！S-BULL（25点）でチェックアウト圏に収めるのがこのゾーンの定石"},
   {q:"残り272点。S20(20)+T20(60)の後（残り192点）、3本目にS-BULL（25点）を打つと？",
    choices:["167点残し（チェックアウト圏）","168点（ボギー！）","170点残し","162点（ボギー！）"],ans:0,
    exp:"272−20−60−25=167残し。167=T20+T19+Bull でアウト可能なチェックアウト圏！"},
   {q:"271〜275帯で「S-BULL（25点）」を3本目に使う利点は？",
-   choices:["167か170の上がり目に収められるから","ブルは得点が高いから","外ブルは入りやすいから","ダブルアウトに使えるから"],ans:0,
+   choices:["167か170の上がり目に収められるから","ブルは得点が高いから","S-BULLは入りやすいから","ダブルアウトに使えるから"],ans:0,
    exp:"このゾーンはS+T20+25=167か170に収まる設計。S-BULL(25点)でキレイな上がり目を作れるのが最大の強み"},
   // ── 296〜300帯：ブル狙いでつなぐ ──
   {q:"残り296〜300点。1本目に何を狙うのが正しい戦術？",
    choices:["ブル（50点）→S-BULLミス(25点)でも271〜275帯に収まる","T20（60点）→残り236〜240点","T19（57点）→残り239〜243点","S20（20点）→まず削る"],ans:0,
-   exp:"ブル(50)が入れば残り246〜250。S-BULL(25)ミスでも残り271〜275帯に収まり、S+T20+外ブルの戦術がそのまま使える！"},
+   exp:"ブル(50)が入れば残り246〜250。S-BULL(25)ミスでも残り271〜275帯に収まり、S+T20+S-BULLの戦術がそのまま使える！"},
   // ── 基本戦略 ──
   {q:"501〜310帯の基本戦略は？",
    choices:["T20ファースト（S20に外れてもボギーにならない）","T19で削る","常にT18を狙う","ブルを積極的に狙う"],ans:0,
@@ -2922,7 +2922,7 @@ function _dartVal(s) {
 
 // 外れてシングルに当たった場合の得点
 function _missVal(s) {
-  if (s === "Bull") return 25;       // 外ブル
+  if (s === "Bull") return 25;       // S-BULL
   if (s[0] === "T") return parseInt(s.slice(1));
   if (s[0] === "D") return parseInt(s.slice(1));
   return 0;                          // シングル完全ミス
@@ -2969,7 +2969,7 @@ function _getMissOptions(dart, cur) {
   var sv = _dartVal(dart);
   tryAdd('success', sv, null);
   if (dart === 'Bull') {
-    tryAdd('miss', 25, '外ブル');
+    tryAdd('miss', 25, 'S-BULL');
   } else {
     var num = parseInt(dart[0]==='T'||dart[0]==='D' ? dart.slice(1) : dart);
     var ring = dart[0]==='T' ? 'T' : dart[0]==='D' ? 'D' : 'S';
@@ -3309,11 +3309,11 @@ function _renderTactics() {
   // ── 271〜275帯：S-BULL（25）でつなぐ ──
   (function(){
     var rows275 = [
-      {score:275, d1:'S20', v1:20, d2:'T20', v2:60, d3:'外ブル', v3:25, leave:170},
-      {score:274, d1:'S19', v1:19, d2:'T20', v2:60, d3:'外ブル', v3:25, leave:170},
-      {score:273, d1:'S18', v1:18, d2:'T20', v2:60, d3:'外ブル', v3:25, leave:170},
-      {score:272, d1:'S20', v1:20, d2:'T20', v2:60, d3:'外ブル', v3:25, leave:167},
-      {score:271, d1:'S19', v1:19, d2:'T20', v2:60, d3:'外ブル', v3:25, leave:167}
+      {score:275, d1:'S20', v1:20, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:170},
+      {score:274, d1:'S19', v1:19, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:170},
+      {score:273, d1:'S18', v1:18, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:170},
+      {score:272, d1:'S20', v1:20, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:167},
+      {score:271, d1:'S19', v1:19, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:167}
     ];
     var tbl275 = '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;">' +
       '<tr style="color:var(--mut);font-size:11px;letter-spacing:0.5px;">' +
@@ -3564,7 +3564,7 @@ function _routeHoldCtx(path) {
   if (!path || !path[0]) return null;
   var f = path[0];
   if (/^T/.test(f)) return '3本持ち';
-  if (f === '25') return null; // 外ブルは判定が難しいのでラベルなし
+  if (f === '25') return null; // S-BULLは判定が難しいのでラベルなし
   if (f === 'Bull' || /^\d+$/.test(f)) return '2本持ち';
   return null;
 }
@@ -3666,7 +3666,7 @@ var _BOARD_SEGS = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 function _parseDartNotation(d) {
   if (!d) return null;
   if (d === 'Bull') return {n:50, ring:'Bull'};
-  if (d === '25' || d === 'SBull' || d === '外ブル') return {n:25, ring:'SBull'};
+  if (d === '25' || d === 'SBull' || d === 'S-BULL') return {n:25, ring:'SBull'};
   if (d[0]==='T') return {n:parseInt(d.slice(1)), ring:'T'};
   if (d[0]==='D') return {n:parseInt(d.slice(1)), ring:'D'};
   if (d[0]==='S') return {n:parseInt(d.slice(1)), ring:'S'};
