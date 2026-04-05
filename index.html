@@ -3295,16 +3295,18 @@ function _renderTactics() {
     var has300sPath = (zone === '300s' && !!TACTICS_300s_PATHS[n]);
     if (!ex && !isT19 && !isT18 && !has300sPath) return '';
 
-    var target = ex ? ex.target : (has300sPath ? 'T20' : (isT19 ? 'T19' : 'T18'));
+    // 300s safe scores (300/301/304/307) use T20; bogey scores (302/303/305/306/308/309) use T19/T18
+    var isSafe300s = has300sPath && !isT19 && !isT18;
+    var target = ex ? ex.target : (isT19 ? 'T19' : isT18 ? 'T18' : 'T20');
     var tVal = _tacticsTargetVal(target);
     var hitLeave = n - tVal;
     var singleNum = isT19 ? 19 : (isT18 ? 18 : 0);
     var missLeave = singleNum > 0 ? (n - singleNum) : null;
 
     var isSpecial = !!ex;
-    var borderColor = isSpecial ? 'rgba(255,213,79,0.5)' : has300sPath ? 'rgba(102,187,106,0.35)' : (isT19 ? 'rgba(255,138,101,0.35)' : 'rgba(79,195,247,0.35)');
-    var bgColor    = isSpecial ? 'rgba(255,213,79,0.08)' : has300sPath ? 'rgba(102,187,106,0.07)' : (isT19 ? 'rgba(255,138,101,0.07)' : 'rgba(79,195,247,0.07)');
-    var scoreColor = isSpecial ? '#ffd54f' : has300sPath ? '#66bb6a' : (isT19 ? '#ff8a65' : '#4fc3f7');
+    var borderColor = isSpecial ? 'rgba(255,213,79,0.5)' : isSafe300s ? 'rgba(102,187,106,0.35)' : (isT19 ? 'rgba(255,138,101,0.35)' : 'rgba(79,195,247,0.35)');
+    var bgColor    = isSpecial ? 'rgba(255,213,79,0.08)' : isSafe300s ? 'rgba(102,187,106,0.07)' : (isT19 ? 'rgba(255,138,101,0.07)' : 'rgba(79,195,247,0.07)');
+    var scoreColor = isSpecial ? '#ffd54f' : isSafe300s ? '#66bb6a' : (isT19 ? '#ff8a65' : '#4fc3f7');
     var defTgt = (d===0||d===1||d===4||d===7)?'T20':(d===2||d===5||d===8)?'T18':'T19';
 
     // ── アクション文 ──
