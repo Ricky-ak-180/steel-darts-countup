@@ -4312,6 +4312,38 @@ function _z01UndoStats(p, sc) {
   else if (sc >= 100) st.c100 = Math.max(0, st.c100 - 1);
 }
 function z01Undo() {
+  // Find what would be undone and show confirmation
+  var log = _z01.log;
+  var n = _z01.players === 1 ? 1 : 2;
+  var scored = null, playerName = null;
+  if (n === 1) {
+    if (log.length < 2) return;
+    var prev = log[log.length - 2];
+    if (!prev.p[0]) return;
+    scored = prev.p[0].scored;
+    playerName = _z01PlayerName(0);
+  } else {
+    var cp = _z01.currentPlayer, other = 1 - cp;
+    var curRow = log[log.length - 1];
+    if (curRow.p[other] !== null) {
+      scored = curRow.p[other].scored;
+      playerName = _z01PlayerName(other);
+    } else if (log.length >= 2) {
+      var prev = log[log.length - 2];
+      for (var pi = n - 1; pi >= 0; pi--) {
+        if (prev.p[pi] !== null) { scored = prev.p[pi].scored; playerName = _z01PlayerName(pi); break; }
+      }
+    }
+  }
+  if (scored === null) return;
+  var sub = document.getElementById('z01-undo-sub');
+  if (sub) sub.textContent = playerName + ' の ' + scored + ' 点を取り消します';
+  document.getElementById('z01-undo-confirm').style.display = 'flex';
+}
+function z01UndoNo() {
+  document.getElementById('z01-undo-confirm').style.display = 'none';
+}
+function _z01UndoExec() {
   var log = _z01.log;
   var n = _z01.players === 1 ? 1 : 2;
   if (n === 1) {
