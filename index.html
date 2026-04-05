@@ -1115,6 +1115,11 @@ canvas.schart { width: 100%; height: 100%; }
     </div>
   </div><!-- /varr -->
     <div id="v01-hist-wrap" style="display:none;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+      <div style="display:flex;gap:8px;padding:10px 12px 0;flex-shrink:0;">
+        <button class="bexp" id="btn-z01-export">📤 エクスポート</button>
+        <button class="bexp" id="btn-z01-import">📥 インポート</button>
+        <input type="file" id="imp-z01-file" accept=".json" style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px;">
+      </div>
       <div id="z01-hist-content" style="padding:12px;display:flex;flex-direction:column;gap:12px;"></div>
     </div>
     <div id="v01-game-wrap" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;">
