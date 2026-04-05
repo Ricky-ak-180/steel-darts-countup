@@ -1741,12 +1741,24 @@ function goSubHist() {
   document.getElementById('vhist').style.flexDirection = 'column';
   renderHist();
 }
+function goSub01Game() {
+  document.getElementById('sub01-game').className = 'cu-subtab on';
+  document.getElementById('sub01-arr').className = 'cu-subtab';
+  document.getElementById('v01-game-wrap').style.display = 'flex';
+  document.getElementById('varr').style.display = 'none';
+}
+function goSub01Arr() {
+  document.getElementById('sub01-game').className = 'cu-subtab';
+  document.getElementById('sub01-arr').className = 'cu-subtab on';
+  document.getElementById('v01-game-wrap').style.display = 'none';
+  document.getElementById('varr').style.display = 'flex';
+  document.getElementById('varr').style.flexDirection = 'column';
+  if (!_arrInited) { _arrInited = true; initArr(); }
+}
 function goTab(tab) {
   document.getElementById('tgame').className = 'tab' + (tab==='game'?' on':'');
-  document.getElementById('tarr').className = 'tab' + (tab==='arr'?' on':'');
   document.getElementById('t01').className = 'tab' + (tab==='01'?' on':'');
   document.getElementById('vgame').className = 'view' + (tab==='game'?'':' hide');
-  document.getElementById('varr').className = 'view' + (tab==='arr'?'':' hide');
   document.getElementById('v01').className = 'view' + (tab==='01'?'':' hide');
   if (tab === 'game') {
     goSubGame();
