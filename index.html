@@ -3277,6 +3277,7 @@ function _isBogeyOrBad(n) {
 function _isCheckable(n) {
   if (n <= 0 || n > 170) return false;
   if (n === 50) return true;
+  if (n === 25) return true;
   if (n <= 40 && n % 2 === 0) return true;
   return !!CHECKOUT[n];
 }
