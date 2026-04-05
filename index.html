@@ -3948,7 +3948,7 @@ function _z01Norm() {
 
 function _z01CpuScore(remain) {
   if (remain <= 170 && CHECKOUT[remain]) {
-    var hp = [0, 0.04, 0.09, 0.2, 0.4, 0.65][_z01.cpuLevel];
+    var hp = [0, 0.01, 0.02, 0.04, 0.07, 0.11, 0.17, 0.25, 0.35, 0.46, 0.58, 0.70, 0.82][_z01.cpuLevel];
     if (Math.random() < hp) return remain;
   }
   var sc = Math.round(_Z01_CPU_AVG[_z01.cpuLevel] + _Z01_CPU_SD[_z01.cpuLevel] * _z01Norm());
