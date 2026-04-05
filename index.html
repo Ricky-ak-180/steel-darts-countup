@@ -4627,6 +4627,7 @@ function _z01Commit(sc) {
   var rem = _z01.remain[p], after = rem - sc;
   var bust = _z01.outRule===0 ? (after<0||after===1) : (after<0);
   if (bust) {
+    if (rem <= 170 && _z01.checkoutAttempts) _z01.checkoutAttempts[p].push({score: rem, success: false});
     soundCommit(0);
     var f = document.createElement('div');
     f.className = 'z01-bust-flash';
@@ -4635,6 +4636,8 @@ function _z01Commit(sc) {
     _z01BufUpdate(''); return;
   }
   _z01.remain[p] = after;
+  if (rem > 170) { if (_z01.roundScores) _z01.roundScores[p].push(sc); }
+  else { if (_z01.checkoutAttempts) _z01.checkoutAttempts[p].push({score: rem, success: after === 0}); }
   st.rounds++; st.total += sc; st.legRounds++;
   if (st.rounds <= 3) st.first9.push(sc);
   if (sc >= 180) st.c180++; else if (sc >= 140) st.c140++; else if (sc >= 100) st.c100++;
