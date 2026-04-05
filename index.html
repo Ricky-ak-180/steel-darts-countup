@@ -3668,6 +3668,20 @@ function _arrFinish() {
   if (hist.length > 30) hist.length = 30;
   try { localStorage.setItem('arr_history', JSON.stringify(hist)); } catch(e) {}
 
+  // arr_quiz_v1 精度更新
+  var qd = _arrGetQuizData();
+  for (var li = 0; li < _arrG.log.length; li++) {
+    var le = _arrG.log[li];
+    var key = String(le.qScore);
+    if (!qd[key]) qd[key] = {c: 0, a: 0};
+    qd[key].a++;
+    if (le.isCorrect) qd[key].c++;
+  }
+  _arrSaveQuizData(qd);
+
+  // 苦手問題表示
+  document.getElementById('arr-weak').innerHTML = _renderArrWeak(qd, _arrG.mode);
+
   // 答え合わせ
   _renderArrReview();
 
