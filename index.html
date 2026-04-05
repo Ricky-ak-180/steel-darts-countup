@@ -4012,11 +4012,14 @@ function z01SetPlayers(arg) {
   document.getElementById('z01-name2').style.display = (arg===2)?'':'none';
   document.getElementById('z01-cpu-section').style.display = (arg===3)?'':'none';
 }
+var _Z01_CPU_NAMES = ['','入門','初心者','ビギナー','初級','アマチュア','中級','中級+','上級','上級+','準プロ','プロ','エリート'];
 function z01SetCpu(arg) {
   _z01.cpuLevel = arg;
   document.querySelectorAll('#z01-setup-wrap [data-fn="z01SetCpu"]').forEach(function(el){
     el.classList.toggle('on', parseInt(el.getAttribute('data-arg'),10)===arg);
   });
+  var desc = document.getElementById('z01-cpu-desc');
+  if (desc) desc.textContent = 'LV'+arg+' '+_Z01_CPU_NAMES[arg]+' — AVG '+_Z01_CPU_AVG[arg];
 }
 
 function _z01SaveDefaults() {
