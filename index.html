@@ -3615,15 +3615,25 @@ function _arrBuildChoices(st) {
 
 function _arrShowStage() {
   var st = _arrG.stages[_arrG.stgIdx];
-  document.getElementById('arr-hud-q').textContent = '問題 ' + (_arrG.qIdx + 1) + ' / 10';
+  document.getElementById('arr-hud-q').textContent = '問題 ' + (_arrG.qIdx + 1) + ' / ' + _arrG.qList.length;
   document.getElementById('arr-hud-score').textContent = _arrG.totalScore;
-  document.getElementById('arr-q-score').textContent = st.score;
   document.getElementById('arr-result').className = 'arr-result hide';
   document.getElementById('arr-answer-path').className = 'arr-answer-path hide';
   document.getElementById('arr-next-row').className = 'arr-next-row hide';
-  _arrBuildChoices(st);
   document.getElementById('arr-timer-bar').style.width = '100%';
   _arrG.stageStart = Date.now();
+  if (st.kezuri) {
+    var kq = _ARR_KEZURI_QS[st.kIdx];
+    document.getElementById('arr-card').classList.add('kezuri-mode');
+    document.getElementById('arr-q-score').textContent = kq.q;
+    document.getElementById('arr-q-label').style.display = 'none';
+    _arrBuildKezuriChoices(kq);
+  } else {
+    document.getElementById('arr-card').classList.remove('kezuri-mode');
+    document.getElementById('arr-q-score').textContent = st.score;
+    document.getElementById('arr-q-label').style.display = '';
+    _arrBuildChoices(st);
+  }
   _startArrTimer();
 }
 
