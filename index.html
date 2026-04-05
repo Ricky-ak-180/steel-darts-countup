@@ -4265,7 +4265,7 @@ function _renderArrHist() {
   if (!el) return;
   var hist = _arrGetHistory();
   if (hist.length === 0) { el.innerHTML = '<div style="font-size:12px;color:var(--mut);text-align:center;padding:8px">まだ記録がありません</div>'; return; }
-  var modeNames = ['初級','中級','上級','全部'];
+  var modeNames = ['初級','中級','上級','全部','削り戦術'];
   var gradeColors = { S:'#e8ff47', A:'#4fc3f7', B:'#47ffb4', C:'#ff6b35', D:'var(--mut)' };
   var html = '';
   for (var i = 0; i < Math.min(hist.length, 10); i++) {
