@@ -3543,7 +3543,7 @@ function _pathHtml(path, noFinish, startScore) {
   path.forEach(function(d, i) {
     if (i > 0) h += '<span class="arr-t-arr">→</span>';
     var isFinish = !noFinish && i === path.length - 1;
-    var dLabel = (d === 'Bull') ? 'D-BULL' : d;
+    var dLabel = (d === 'Bull') ? 'D-BULL' : (d === '25') ? 'S-BULL' : d;
     h += '<span class="arr-t-dart' + (isFinish ? ' finish' : '') + '">' + dLabel + '</span>';
     if (startScore && !isFinish) {
       rem -= _dartVal(d);
