@@ -3326,13 +3326,14 @@ function _renderTactics() {
         '<th style="padding:4px 6px;text-align:right;font-weight:400;">残り</th>' +
       '</tr>';
     rows275.forEach(function(r){
+      var r1=r.score-r.v1, r2=r.score-r.v1-r.v2;
       tbl275 += '<tr style="border-top:1px solid rgba(255,255,255,0.06);">' +
         '<td style="padding:6px 6px;font-family:\'Bebas Neue\',cursive;font-size:22px;color:#4fc3f7;">' + r.score + '</td>' +
-        '<td style="padding:6px;text-align:center;color:var(--fg);">' + r.d1 + '<span style="color:var(--mut);font-size:11px;"> (' + r.v1 + ')</span></td>' +
+        '<td style="padding:6px;text-align:center;color:var(--fg);">' + r.d1 + '<span style="color:var(--mut);font-size:11px;"> (' + r1 + '残)</span></td>' +
         '<td style="padding:6px 2px;text-align:center;color:var(--mut);">›</td>' +
-        '<td style="padding:6px;text-align:center;color:var(--acc);font-weight:700;">' + r.d2 + '<span style="color:var(--mut);font-size:11px;font-weight:400;"> (' + r.v2 + ')</span></td>' +
+        '<td style="padding:6px;text-align:center;color:var(--acc);font-weight:700;">' + r.d2 + '<span style="color:var(--mut);font-size:11px;font-weight:400;"> (' + r2 + '残)</span></td>' +
         '<td style="padding:6px 2px;text-align:center;color:var(--mut);">›</td>' +
-        '<td style="padding:6px;text-align:center;color:#ff8a65;font-weight:700;">' + r.d3 + '<span style="color:var(--mut);font-size:11px;font-weight:400;"> (' + r.v3 + ')</span></td>' +
+        '<td style="padding:6px;text-align:center;color:#ff8a65;font-weight:700;">' + r.d3 + '<span style="color:var(--mut);font-size:11px;font-weight:400;"> (' + r.leave + '残)</span></td>' +
         '<td style="padding:6px;text-align:right;font-weight:700;color:#66bb6a;">' + r.leave + '残し</td>' +
       '</tr>';
     });
