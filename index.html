@@ -4942,7 +4942,12 @@ function _z01ShowCpuDart(i, label) {
   var el = document.getElementById('z01-cpud-'+i);
   if (!el) return;
   el.textContent = label;
-  el.className = 'z01-cpu-dart ' + (label==='—'?'dash':label==='MISS'?'miss':'hit');
+  var cls = label==='—' ? 'dash' : label==='MISS' ? 'miss' : 'hit';
+  el.className = 'z01-cpu-dart ' + cls;
+  if (cls === 'hit') {
+    el.style.transform = 'scale(1.12)';
+    setTimeout(function(){ el.style.transform = ''; }, 180);
+  }
 }
 // チェックアウト失敗時の戦略的1本シミュレーション
 // 残り点数に応じて「次のビジットに向けた最適セグメント」を狙う
