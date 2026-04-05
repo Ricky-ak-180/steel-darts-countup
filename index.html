@@ -5131,8 +5131,8 @@ function renderZ01Hist() {
     cats.forEach(function(c){
       var attempts = allCOs.filter(function(a){ return a.score>=c.min && a.score<=c.max; });
       var wins = attempts.filter(function(a){ return a.success; }).length;
-      var pct = Math.round(wins/attempts.length*100);
-      var barColor = pct>=70?'#66bb6a':pct>=40?'#ffd54f':'#ff6b6b';
+      var pct = attempts.length ? Math.round(wins/attempts.length*100) : 0;
+      var barColor = attempts.length===0?'var(--mut)':pct>=70?'#66bb6a':pct>=40?'#ffd54f':'#ff6b6b';
       html += '<div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04);">';
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
       html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:18px;color:var(--acc);min-width:70px;">' + c.label + '</div>';
