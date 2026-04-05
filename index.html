@@ -3690,6 +3690,38 @@ function _arrFinish() {
   document.getElementById('arr-finish').className = 'arr-finish';
 }
 
+/* 苦手問題ランキング */
+function _renderArrWeak(qd, mode) {
+  var modeScores = _ARR_SCORES[mode];
+  var entries = [];
+  for (var i = 0; i < modeScores.length; i++) {
+    var key = String(modeScores[i]);
+    if (qd[key] && qd[key].a > 0) {
+      entries.push({ score: modeScores[i], c: qd[key].c, a: qd[key].a, acc: qd[key].c / qd[key].a });
+    }
+  }
+  if (entries.length === 0) return '';
+  entries.sort(function(a, b) { return a.acc - b.acc || b.a - a.a; });
+  var worst = entries.slice(0, 5);
+  var html = '<div class="arr-weak-wrap">';
+  html += '<div class="arr-weak-title">📌 苦手チェックアウト</div>';
+  html += '<div class="arr-weak-list">';
+  for (var j = 0; j < worst.length; j++) {
+    var e = worst[j];
+    var pct = Math.round(e.acc * 100);
+    var barW = Math.max(4, pct);
+    var barColor = pct <= 30 ? '#ef5350' : pct <= 60 ? '#ffa726' : '#66bb6a';
+    var path = (CHECKOUT[e.score] || []).join(' → ');
+    html += '<div class="arr-weak-row">';
+    html += '<span class="arr-weak-score">' + e.score + '</span>';
+    html += '<span class="arr-weak-path">' + path + '</span>';
+    html += '<span class="arr-weak-pct" style="color:' + barColor + '">' + pct + '%</span>';
+    html += '</div>';
+  }
+  html += '</div></div>';
+  return html;
+}
+
 function _renderArrReview() {
   var modeNames = ['初級','中級','上級','全部'];
   var html = '<div class="arr-review-toggle" onclick="var b=document.getElementById(\'arr-review-body\');b.classList.toggle(\'open\');this.textContent=b.classList.contains(\'open\')?\'答え合わせ ▴\':\'答え合わせ ▾\'">答え合わせ ▾</div>';
