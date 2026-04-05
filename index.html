@@ -3458,7 +3458,13 @@ function _renderTeiseki() {
 /* 次の問題へ */
 function _arrNextQ() {
   if (_arrG.qIdx >= _arrG.qList.length) { _arrFinish(); return; }
-  _arrG.stages = _buildArrStages(_arrG.qList[_arrG.qIdx]);
+  if (_arrG.isKezuri) {
+    var kIdx = _arrG.qList[_arrG.qIdx];
+    var kq = _ARR_KEZURI_QS[kIdx];
+    _arrG.stages = [{ kezuri: true, kIdx: kIdx, score: null, path: ['__k' + kq.ans] }];
+  } else {
+    _arrG.stages = _buildArrStages(_arrG.qList[_arrG.qIdx]);
+  }
   _arrG.stgIdx = 0;
   _arrShowStage();
 }
