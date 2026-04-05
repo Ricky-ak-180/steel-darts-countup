@@ -5518,7 +5518,7 @@ function renderZ01Hist() {
         html += '<div style="font-size:11px;color:' + (isW?'var(--acc)':'var(--mut)') + ';font-weight:700;margin-bottom:4px;">' + p.name + ' ' + p.legWins + 'W</div>';
         html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">';
         html += '<div style="text-align:center;"><div style="font-family:\'Bebas Neue\',cursive;font-size:20px;color:var(--acc);">' + (p.avg>0?p.avg.toFixed(2):'-') + '</div><div style="font-size:8px;color:var(--mut);">AVG</div></div>';
-        html += '<div style="text-align:center;"><div style="font-family:\'Bebas Neue\',cursive;font-size:18px;color:var(--grn);">' + (p.bestLeg>0?p.bestLeg+' darts':'-') + '</div><div style="font-size:8px;color:var(--mut);">Best Leg</div></div>';
+        html += '<div style="text-align:center;"><div style="font-family:\'Bebas Neue\',cursive;font-size:18px;color:var(--grn);">' + (p.bestLeg>0?p.bestLeg+' 本':'-') + '</div><div style="font-size:8px;color:var(--mut);">Best Leg</div></div>';
         html += '</div></div>';
       });
       html += '</div>';
