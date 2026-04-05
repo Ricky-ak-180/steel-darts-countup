@@ -2544,46 +2544,6 @@ function renderRrateRows() {
 }
 
 /* Render history */
-/* ── ダーツ日記 ── */
-function _diaryDateStr(d) {
-  return d.getFullYear() + '-' +
-    ('0'+(d.getMonth()+1)).slice(-2) + '-' +
-    ('0'+d.getDate()).slice(-2);
-}
-function _diaryKey(dateStr) { return 'diary_' + dateStr; }
-function diarySave() {
-  var today = _diaryDateStr(new Date());
-  var input = document.getElementById('diary-input');
-  var text = input ? input.value.trim() : '';
-  if (!text) return;
-  localStorage.setItem(_diaryKey(today), text);
-  diaryRender();
-  // 保存フィードバック
-  var btn = document.querySelector('.diary-save-btn');
-  if (btn) { btn.textContent = '✓ 保存しました'; setTimeout(function(){ btn.textContent = '💾 保存'; }, 1200); }
-}
-function diaryRender() {
-  var today = _diaryDateStr(new Date());
-  var todayLabel = document.getElementById('diary-today-label');
-  if (todayLabel) todayLabel.textContent = today;
-  var input = document.getElementById('diary-input');
-  if (input && !input._dirtyByUser) input.value = localStorage.getItem(_diaryKey(today)) || '';
-  var entriesEl = document.getElementById('diary-entries');
-  if (!entriesEl) return;
-  var html = '';
-  for (var i = 1; i <= 14; i++) {
-    var d = new Date(); d.setDate(d.getDate() - i);
-    var dateStr = _diaryDateStr(d);
-    var entry = localStorage.getItem(_diaryKey(dateStr));
-    if (entry) {
-      html += '<div class="diary-entry">' +
-        '<div class="diary-entry-date">' + dateStr + '</div>' +
-        '<div class="diary-entry-text">' + entry.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>' +
-        '</div>';
-    }
-  }
-  entriesEl.innerHTML = html;
-}
 function renderHist() {
   diaryRender();
   migrateTotals();
