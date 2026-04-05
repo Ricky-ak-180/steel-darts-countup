@@ -3794,7 +3794,7 @@ function _arrFinish() {
   var qd = _arrGetQuizData();
   for (var li = 0; li < _arrG.log.length; li++) {
     var le = _arrG.log[li];
-    var key = String(le.qScore);
+    var key = le.kezuri ? ('kz_' + String(le.kIdx)) : String(le.qScore);
     if (!qd[key]) qd[key] = {c: 0, a: 0};
     qd[key].a++;
     if (le.isCorrect) qd[key].c++;
