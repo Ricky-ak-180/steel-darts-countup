@@ -5137,7 +5137,7 @@ function renderZ01Hist() {
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
       html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:18px;color:var(--acc);min-width:70px;">' + c.label + '</div>';
       html += '<div style="font-size:10px;color:var(--mut);flex:1;">' + c.desc + '</div>';
-      html += '<div style="font-size:14px;font-weight:700;color:' + barColor + ';">' + pct + '%</div>';
+      html += '<div style="font-size:14px;font-weight:700;color:' + barColor + ';">' + (attempts.length?pct+'%':'—') + '</div>';
       html += '<div style="font-size:10px;color:var(--mut);">(' + wins + '/' + attempts.length + ')</div>';
       html += '</div>';
       html += '<div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px;overflow:hidden;">';
