@@ -5415,7 +5415,7 @@ function renderZ01Hist() {
   // === 4c. チェックアウト成功率 ===
   (function(){
     var allCOs = [];
-    soloGames.slice(0, 50).forEach(function(g){
+    soloGames.forEach(function(g){
       if (g.data[0].checkouts && g.data[0].checkouts.length) allCOs = allCOs.concat(g.data[0].checkouts);
     });
     var cats = [
