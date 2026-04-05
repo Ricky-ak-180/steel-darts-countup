@@ -4302,21 +4302,9 @@ function _z01GenDartLabels(total, remain) {
     return labels.slice(0, 3);
   }
 
-  // チェックアウト失敗: セットアップを打ったがダブルを外した演出
-  if (remain > 0 && remain <= 170 && CHECKOUT[remain] && total < remain) {
-    var path = CHECKOUT[remain];
-    var labels = [];
-    for (var i = 0; i < path.length - 1; i++) {
-      labels.push(/^\d+$/.test(path[i]) ? 'S'+path[i] : path[i]);
-    }
-    labels.push('MISS');
-    while (labels.length < 3) labels.push(_z01SimDartLabel(lv));
-    return labels.slice(0, 3);
-  }
-
   if (total <= 0) return ['MISS','MISS','MISS'];
 
-  // 高スコア削り: total に合計が一致するよう T20 エリア優先で分解
+  // 削り・チェックアウト失敗ともに: total に合計が一致するよう T20 エリア優先で分解
   return _z01SplitDarts(total);
 }
 
