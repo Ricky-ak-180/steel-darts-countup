@@ -711,6 +711,12 @@ canvas.schart { width: 100%; height: 100%; }
 .z01-tk.enter.ready{background:var(--acc2);color:#fff;border-color:var(--acc2);}
 .z01-bust-flash{position:fixed;inset:0;background:rgba(255,71,71,0.22);z-index:500;pointer-events:none;animation:z01BF 0.45s ease-out forwards;}
 @keyframes z01BF{0%{opacity:1;}100%{opacity:0;}}
+.z01-agari-flash{position:fixed;inset:0;background:rgba(100,220,120,0.18);z-index:500;pointer-events:none;animation:z01BF 0.7s ease-out forwards;}
+.z01-bogey-flash{position:fixed;inset:0;background:rgba(180,60,220,0.20);z-index:500;pointer-events:none;animation:z01BF 0.6s ease-out forwards;}
+.z01-event-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.7);font-family:'Bebas Neue',cursive;font-size:48px;letter-spacing:4px;border-radius:16px;padding:14px 36px;z-index:600;pointer-events:none;opacity:0;animation:z01ET 1.6s cubic-bezier(0.22,1,0.36,1) forwards;}
+.z01-event-toast.agari{background:rgba(30,40,20,0.92);color:#66bb6a;border:2px solid #66bb6a;box-shadow:0 0 32px rgba(102,187,106,0.5);}
+.z01-event-toast.bogey{background:rgba(30,10,40,0.95);color:#ce93d8;border:2px solid #ce93d8;box-shadow:0 0 32px rgba(180,60,220,0.5);}
+@keyframes z01ET{0%{opacity:0;transform:translate(-50%,-50%) scale(0.7);}15%{opacity:1;transform:translate(-50%,-50%) scale(1.08);}30%{transform:translate(-50%,-50%) scale(1);}75%{opacity:1;}100%{opacity:0;transform:translate(-50%,-50%) scale(1);}}
 .z01-cpu-area{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px 36px 28px;background:rgba(10,10,15,0.95);backdrop-filter:blur(12px);border:1px solid var(--bdr);border-radius:16px;z-index:200;min-width:220px;}
 .z01-cpu-dart{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:7px 14px;font-family:'Bebas Neue',cursive;font-size:22px;color:var(--mut);min-width:64px;text-align:center;transition:border-color .15s,color .15s;}
 .z01-cpu-dart.hit{border-color:var(--acc);color:var(--acc);}
