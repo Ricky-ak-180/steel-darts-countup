@@ -4336,14 +4336,28 @@ function z01ShowResult() {
   else if (_z01.legWins[1] > _z01.legWins[0]) winner = 1;
   var titleEl = document.getElementById('z01-result-title');
   var winnerEl = document.getElementById('z01-result-winner');
-  if (_z01.players === 1) {
-    titleEl.textContent = 'FINISH';
+  if (_z01.players === 3) {
+    // vs CPU
+    if (winner === 0) {
+      titleEl.textContent = 'YOU WIN!';
+      titleEl.style.color = 'var(--acc)';
+      winnerEl.textContent = '';
+    } else if (winner === 1) {
+      titleEl.textContent = 'YOU LOSE...';
+      titleEl.style.color = 'rgba(255,100,100,0.9)';
+      winnerEl.innerHTML = '🤖 CPU Lv.' + _z01.cpuLevel + ' の勝利';
+    } else {
+      titleEl.textContent = 'DRAW'; titleEl.style.color = '';
+      winnerEl.textContent = '';
+    }
+  } else if (_z01.players === 1) {
+    titleEl.textContent = 'FINISH'; titleEl.style.color = '';
     winnerEl.textContent = '';
   } else if (winner >= 0) {
-    titleEl.textContent = _z01PlayerName(winner);
+    titleEl.textContent = _z01PlayerName(winner); titleEl.style.color = 'var(--acc)';
     winnerEl.innerHTML = '🏆&nbsp;WINNER';
   } else {
-    titleEl.textContent = 'DRAW';
+    titleEl.textContent = 'DRAW'; titleEl.style.color = '';
     winnerEl.textContent = '';
   }
   var rows = [
