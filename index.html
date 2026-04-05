@@ -6079,6 +6079,14 @@ if (v01hist) {
 }
 var impZ01File = document.getElementById('imp-z01-file');
 if (impZ01File) impZ01File.addEventListener('change', function(){ importZ01Data(this); });
+// 目標スコアをlocalStorageと同期
+(function(){
+  var sel = document.getElementById('gs-goal');
+  if (!sel) return;
+  var saved = localStorage.getItem('cu_goal') || '0';
+  sel.value = saved;
+  sel.addEventListener('change', function(){ localStorage.setItem('cu_goal', this.value); });
+})();
 // スタート画面にベストスコアを表示
 (function(){
   var gb = document.getElementById('gs-best');
