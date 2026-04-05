@@ -5128,7 +5128,8 @@ function renderZ01Hist() {
       {min:2,   max:40,  label:'2〜40',    desc:'ダブル1投フィニッシュ'}
     ];
     html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
-    html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">チェックアウト成功率（難易度別）</div>';
+    html += '<div style="padding:10px 12px 4px;font-size:10px;color:var(--mut);letter-spacing:2px;">チェックアウト成功率（難易度別）</div>';
+    html += '<div style="padding:0 12px 8px;font-size:10px;color:rgba(255,255,255,0.25);border-bottom:1px solid var(--bdr);">残り170以下（上がり目あり）になったラウンドを集計</div>';
     cats.forEach(function(c){
       var attempts = allCOs.filter(function(a){ return a.score>=c.min && a.score<=c.max; });
       var wins = attempts.filter(function(a){ return a.success; }).length;
