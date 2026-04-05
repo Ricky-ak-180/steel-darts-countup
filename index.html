@@ -4990,29 +4990,62 @@ function _z01CheckoutSimDart(lv, remain) {
   return _z01SimT20Dart(lv);
 }
 
+function _z01CpuCommentary(text, cls) {
+  var el = document.createElement('div');
+  el.className = 'z01-cpu-commentary ' + cls;
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(function(){ el.parentNode && el.parentNode.removeChild(el); }, 1900);
+}
+
 function _z01CpuTurn() {
   var cpuArea = document.getElementById('z01-cpu-area');
   cpuArea.style.display = 'flex';
-  var status = document.getElementById('z01-cpu-status');
-  [0,1,2].forEach(function(i){ _z01ShowCpuDart(i,'—'); });
-  if (status) status.textContent = 'THINKING...';
-
   var remain = _z01.remain[1];
   var lv = _z01.cpuLevel;
+  var isCheckout = remain <= 170 && remain >= 2 && CHECKOUT[remain];
+
+  // パネル初期化
+  [0,1,2].forEach(function(i){ _z01ShowCpuDart(i,'—'); });
+  var lvBadge = document.getElementById('z01-cpu-lv-badge');
+  var nameLabel = document.getElementById('z01-cpu-name-label');
+  var remainNum = document.getElementById('z01-cpu-remain-num');
+  var targetRow = document.getElementById('z01-cpu-target-row');
+  var totalEl = document.getElementById('z01-cpu-total');
+  if (lvBadge) lvBadge.textContent = 'CPU Lv.' + lv;
+  if (nameLabel) nameLabel.textContent = _Z01_CPU_NAMES[lv] || 'CPU';
+  if (remainNum) remainNum.textContent = remain;
+  if (totalEl) { totalEl.textContent = ''; totalEl.className = 'z01-cpu-total'; }
+
+  // チェックアウト演出
+  cpuArea.classList.toggle('checkout-mode', !!isCheckout);
+  var targetText = isCheckout ? '⚠ チェックアウト挑戦！' : '— T20 狙い —';
+  if (targetRow) {
+    targetRow.innerHTML = targetText + (isCheckout ? '' : '<span class="z01-cpu-thinking-dots" id="z01-cpu-dots"></span>');
+    targetRow.className = 'z01-cpu-target-row' + (isCheckout ? ' checkout' : '');
+  }
+
+  // 思考中ドットアニメーション
+  var dotPhase = 0, dotTimer = null;
+  if (!isCheckout) {
+    dotTimer = setInterval(function(){
+      var dotsEl = document.getElementById('z01-cpu-dots');
+      if (dotsEl) dotsEl.textContent = ['.','..','...'][dotPhase % 3];
+      dotPhase++;
+    }, 300);
+  }
+
   var labels, total;
 
-  if (remain <= 170 && remain >= 2 && CHECKOUT[remain]) {
-    // チェックアウト範囲: 成功確率でアレンジ試行
+  if (isCheckout) {
     var hp = [0,0.01,0.02,0.04,0.07,0.11,0.17,0.25,0.35,0.46,0.58,0.70,0.82][lv];
     if (Math.random() < hp) {
-      // 成功: 標準アレンジ表示
       total = remain;
       var path = CHECKOUT[remain];
       labels = path.map(function(l){ return /^\d+$/.test(l) ? 'S'+l : l; });
       while (labels.length < 3) labels.push('—');
       labels = labels.slice(0, 3);
     } else {
-      // 失敗: 1本ずつシミュレートしてバスト保護（戦略的ターゲット選択）
       var accum = 0, lbs = [], busted = false;
       for (var di = 0; di < 3; di++) {
         var dart = _z01CheckoutSimDart(lv, remain - accum);
@@ -5024,33 +5057,67 @@ function _z01CpuTurn() {
         if (remain - accum === 0) break;
       }
       while (lbs.length < 3) lbs.push('—');
-      // バストは全スコア無効（01ルール）
       total = busted ? 0 : accum;
       labels = busted ? ['MISS','MISS','MISS'] : lbs;
     }
   } else {
-    // 通常スコアリング: 3本独立シミュレート
-    // 約10%の確率でT19にスイッチ（人間らしいゆらぎ）
     var simDart = (Math.random() < 0.10) ? _z01SimT19Dart : _z01SimT20Dart;
     var d0 = simDart(lv);
     var d1 = simDart(lv);
     var d2 = simDart(lv);
     total = d0.score + d1.score + d2.score;
     labels = [d0.label, d1.label, d2.label];
-    var isBust = (_z01.outRule === 0) ?
+    var isBust2 = (_z01.outRule === 0) ?
       (remain - total < 0 || remain - total === 1) : (remain - total < 0);
-    if (isBust) { total = 0; labels = ['MISS','MISS','MISS']; }
+    if (isBust2) { total = 0; labels = ['MISS','MISS','MISS']; }
   }
 
-  var t = 600 + Math.random()*400;
-  var gap = 550 + Math.random()*150;
+  // スコア計算（ラベルから）
+  function _scoreFromLabel(lbl) {
+    if (!lbl || lbl === '—' || lbl === 'MISS') return 0;
+    if (lbl === 'BULL' || lbl === 'D-BULL') return lbl === 'D-BULL' ? 50 : 25;
+    var m = lbl.match(/^([TDS]?)(\d+)$/);
+    if (!m) return 0;
+    var n = parseInt(m[2], 10);
+    return m[1] === 'T' ? n*3 : m[1] === 'D' ? n*2 : n;
+  }
+
+  var t = 700 + Math.random()*400;
+  var gap = 520 + Math.random()*160;
+
   setTimeout(function(){
-    _z01ShowCpuDart(0, labels[0]); if(status) status.textContent = '1本目';
+    if (dotTimer) clearInterval(dotTimer);
+    var cumScore = 0;
+    if (targetRow) { targetRow.textContent = isCheckout ? '⚠ チェックアウト挑戦！' : ''; targetRow.className = 'z01-cpu-target-row' + (isCheckout?' checkout':''); }
+
+    _z01ShowCpuDart(0, labels[0]);
+    cumScore += _scoreFromLabel(labels[0]);
+    if (totalEl && labels[0] !== '—') { totalEl.textContent = cumScore > 0 ? '+' + cumScore : ''; }
+
     setTimeout(function(){
-      _z01ShowCpuDart(1, labels[1]); if(status) status.textContent = '2本目';
+      _z01ShowCpuDart(1, labels[1]);
+      cumScore += _scoreFromLabel(labels[1]);
+      if (totalEl && labels[1] !== '—') { totalEl.textContent = cumScore > 0 ? '+' + cumScore : ''; }
+
       setTimeout(function(){
-        _z01ShowCpuDart(2, labels[2]); if(status) status.textContent = '3本目';
-        setTimeout(function(){ _z01Commit(total); }, 750);
+        _z01ShowCpuDart(2, labels[2]);
+        cumScore += _scoreFromLabel(labels[2]);
+
+        // スコアコメンタリー
+        if (total === 180) {
+          _z01CpuCommentary('🤖 CPU 180!', 'great');
+        } else if (total >= 140) {
+          _z01CpuCommentary('🤖 CPU ' + total + '!', 'great');
+        } else if (isCheckout && total === remain) {
+          _z01CpuCommentary('🤖 CPU CHECKOUT!', 'checkout');
+        }
+
+        if (totalEl) {
+          totalEl.textContent = total > 0 ? total + ' pts' : labels[0]==='MISS' ? 'BUST' : '';
+          totalEl.className = 'z01-cpu-total' + (total >= 100 ? ' high' : '');
+        }
+
+        setTimeout(function(){ _z01Commit(total); }, 850);
       }, gap);
     }, gap);
   }, t);
