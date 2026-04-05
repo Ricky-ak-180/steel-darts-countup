@@ -1652,6 +1652,19 @@ function updatePace() {
       pbText += ' <span style="color:var(--mut);">自己ベスト:' + best + '点</span>';
     }
   }
+  // 目標スコア進捗
+  var goal = parseInt(localStorage.getItem('cu_goal') || '0', 10);
+  if (goal > 0) {
+    var pct = Math.min(100, Math.round(pred / goal * 100));
+    var goalColor = pct >= 100 ? '#66bb6a' : pct >= 80 ? '#ffd54f' : '#ff6b6b';
+    pbText += '<div style="margin-top:4px;display:flex;align-items:center;gap:6px;">'
+      + '<span style="font-size:10px;color:var(--mut);">目標 ' + goal + '点</span>'
+      + '<div style="flex:1;background:rgba(255,255,255,0.08);border-radius:4px;height:5px;overflow:hidden;">'
+      + '<div style="width:' + pct + '%;height:100%;background:' + goalColor + ';border-radius:4px;transition:width 0.4s;"></div>'
+      + '</div>'
+      + '<span style="font-size:10px;color:' + goalColor + ';font-weight:700;">' + pct + '%</span>'
+      + '</div>';
+  }
   pb.innerHTML = pbText;
   pb.style.display = 'block';
 }
