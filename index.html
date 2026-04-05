@@ -4261,21 +4261,35 @@ function _z01DartLabel(sc) {
   }
   return 'MISS';
 }
-// CPUが T20 狙いで1本投げたときの結果ラベルを返す（表示用）
-// レベルが高いほど T20 に集中、低いほどバラける
+// ボード配列 時計回り: 20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5
+// T20隣接: 右=1(T1/S1/D1), 左=5(T5/S5/D5), 2つ右=18, 2つ左=12
+// [スコア, ラベル] — 物理的に T20 エリアから届く場所のみ（優先順）
+var _Z01_T20_POOL = [
+  [60,'T20'], [20,'S20'], [40,'D20'],   // T20セグメント内
+  [15,'T5'],  [5,'S5'],  [10,'D5'],     // 左隣 (5セグメント)
+  [3,'T1'],   [1,'S1'],  [2,'D1'],      // 右隣 (1セグメント)
+  [36,'T12'], [12,'S12'],[24,'D12'],    // 2つ左 (12セグメント)
+  [54,'T18'], [18,'S18'],               // 2つ右 (18セグメント)
+  [0,'MISS'],                           // 完全ミス
+  [25,'BULL']                           // まれにブルエリア
+];
+
+// T20狙いで1本投げたときのラベル（チェックアウト失敗の補完用）
 function _z01SimDartLabel(level) {
   var hitProb = [0, 0.05, 0.10, 0.15, 0.22, 0.30, 0.38, 0.47, 0.56, 0.64, 0.72, 0.80, 0.87];
   if (Math.random() < hitProb[level]) return 'T20';
   var m = Math.random();
-  // T20 ミス分布: 隣接 (S20/T5/T1) が多く、外れるほど少ない
-  if (m < 0.32) return 'S20';
-  if (m < 0.52) return 'T5';
-  if (m < 0.67) return 'T1';
-  if (m < 0.77) return 'S5';
-  if (m < 0.85) return 'S1';
-  if (m < 0.89) return 'BULL';
-  var others = ['S12','S18','S4','S9','T12','S3','T3'];
-  return others[Math.floor(Math.random() * others.length)];
+  // ボード隣接順: S20 > T5(左) > T1(右) > S5 > S1 > D20 > D5 > D1 > S12 > S18 > T12 > MISS
+  if (m < 0.30) return 'S20';
+  if (m < 0.47) return 'T5';
+  if (m < 0.62) return 'T1';
+  if (m < 0.72) return 'S5';
+  if (m < 0.80) return 'S1';
+  if (m < 0.85) return 'D20';
+  if (m < 0.89) return 'S12';
+  if (m < 0.92) return 'S18';
+  var ext = ['T12','T18','D5','D1','D12'];
+  return ext[Math.floor(Math.random() * ext.length)];
 }
 
 function _z01GenDartLabels(total, remain) {
@@ -4293,42 +4307,56 @@ function _z01GenDartLabels(total, remain) {
   if (remain > 0 && remain <= 170 && CHECKOUT[remain] && total < remain) {
     var path = CHECKOUT[remain];
     var labels = [];
-    // セットアップダーツはヒット扱い
     for (var i = 0; i < path.length - 1; i++) {
       labels.push(/^\d+$/.test(path[i]) ? 'S'+path[i] : path[i]);
     }
-    labels.push('MISS'); // 最後のダブル/ブルを外した
+    labels.push('MISS');
     while (labels.length < 3) labels.push(_z01SimDartLabel(lv));
     return labels.slice(0, 3);
   }
 
   if (total <= 0) return ['MISS','MISS','MISS'];
 
-  // 高スコア削り: total に合計が一致するよう T20 優先でダーツを割り付け
+  // 高スコア削り: total に合計が一致するよう T20 エリア優先で分解
   return _z01SplitDarts(total);
 }
 
-// total を 3本のダーツに分解してラベル配列を返す
-// T20ファミリー優先（T20→S20→T5→T1→S5→S1→他の有効スコア）
-var _Z01_DART_POOL = (function(){
-  var p = [];
-  [60,20,15,5,3,1,0,50,25,57,54,51,48,45,42,39,36,33,30,27,24,21,18,12,9,6].forEach(function(v){if(p.indexOf(v)<0)p.push(v);});
-  for(var n=20;n>=1;n--){var v=n*3;if(p.indexOf(v)<0)p.push(v);}
-  for(var n=20;n>=1;n--){var v=n*2;if(p.indexOf(v)<0)p.push(v);}
-  for(var n=20;n>=1;n--){if(p.indexOf(n)<0)p.push(n);}
-  return p;
-})();
+// total を T20 エリアのダーツ3本に分解してラベル配列を返す
+// ボード上の隣接セグメントのみ使用（T20→T5→T1→S20→S5→S1→D20→...）
 function _z01SplitDarts(total) {
-  var p = _Z01_DART_POOL;
-  for(var i=0;i<p.length;i++){
-    var a=p[i]; if(a>total) continue;
-    for(var j=0;j<p.length;j++){
-      var b=p[j]; if(a+b>total) continue;
+  var pool = _Z01_T20_POOL;
+  var n = pool.length;
+  for(var i=0;i<n;i++){
+    var a=pool[i][0]; if(a>total) continue;
+    for(var j=0;j<n;j++){
+      var b=pool[j][0]; if(a+b>total) continue;
       var c=total-a-b;
-      if(p.indexOf(c)>=0) return [_z01DartLabel(a),_z01DartLabel(b),_z01DartLabel(c)];
+      for(var k=0;k<n;k++){
+        if(pool[k][0]===c) return [pool[i][1],pool[j][1],pool[k][1]];
+      }
     }
   }
-  return [_z01DartLabel(total),'—','—']; // フォールバック
+  // フォールバック: 有効なダーツスコアすべてで再試行
+  var all=[[60,'T20'],[57,'T19'],[54,'T18'],[51,'T17'],[48,'T16'],[45,'T15'],[42,'T14'],
+           [39,'T13'],[36,'T12'],[33,'T11'],[30,'T10'],[27,'T9'],[24,'T8'],[21,'T7'],
+           [18,'T6'],[15,'T5'],[12,'T4'],[9,'T3'],[6,'T2'],[3,'T1'],
+           [50,'D-BULL'],[40,'D20'],[38,'D19'],[36,'D18'],[34,'D17'],[32,'D16'],
+           [30,'D15'],[28,'D14'],[26,'D13'],[24,'D12'],[22,'D11'],[20,'D10'],
+           [18,'D9'],[16,'D8'],[14,'D7'],[12,'D6'],[10,'D5'],[8,'D4'],[6,'D3'],[4,'D2'],[2,'D1'],
+           [25,'BULL'],[20,'S20'],[19,'S19'],[18,'S18'],[17,'S17'],[16,'S16'],[15,'S15'],
+           [14,'S14'],[13,'S13'],[12,'S12'],[11,'S11'],[10,'S10'],[9,'S9'],[8,'S8'],
+           [7,'S7'],[6,'S6'],[5,'S5'],[4,'S4'],[3,'S3'],[2,'S2'],[1,'S1'],[0,'MISS']];
+  for(var i=0;i<all.length;i++){
+    var a=all[i][0]; if(a>total) continue;
+    for(var j=0;j<all.length;j++){
+      var b=all[j][0]; if(a+b>total) continue;
+      var c=total-a-b;
+      for(var k=0;k<all.length;k++){
+        if(all[k][0]===c) return [all[i][1],all[j][1],all[k][1]];
+      }
+    }
+  }
+  return ['MISS','MISS','MISS'];
 }
 function _z01ShowCpuDart(i, label) {
   var el = document.getElementById('z01-cpud-'+i);
