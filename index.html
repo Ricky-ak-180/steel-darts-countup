@@ -3613,6 +3613,23 @@ function _arrBuildChoices(st) {
   });
 }
 
+/* 削り戦術選択肢ビルド */
+function _arrBuildKezuriChoices(kq) {
+  var origIndices = _arrShuffle([0, 1, 2, 3]);
+  _arrG.choices = origIndices.map(function(i){ return '__k' + i; });
+  var choicesEl = document.getElementById('arr-choices');
+  choicesEl.innerHTML = '';
+  origIndices.forEach(function(origIdx, dispIdx) {
+    var btn = document.createElement('button');
+    btn.className = 'arr-choice kezuri-choice';
+    btn.textContent = kq.choices[origIdx];
+    btn.setAttribute('data-fn', 'chooseArr');
+    btn.setAttribute('data-arg', String(dispIdx));
+    btn.setAttribute('data-val', '__k' + origIdx);
+    choicesEl.appendChild(btn);
+  });
+}
+
 function _arrShowStage() {
   var st = _arrG.stages[_arrG.stgIdx];
   document.getElementById('arr-hud-q').textContent = '問題 ' + (_arrG.qIdx + 1) + ' / ' + _arrG.qList.length;
