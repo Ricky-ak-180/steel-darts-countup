@@ -1772,7 +1772,7 @@ function goTab(tab) {
     if (rp) rp.innerHTML = '';
     if (g.scores.length >= ROUNDS) document.getElementById('ngp').className = 'ngp show';
   }
-  if (tab === '01') goSub01Game();
+  if (tab === '01') { goSub01Game(); _z01LoadDefaults(); }
 }
 
 /* Storage */
