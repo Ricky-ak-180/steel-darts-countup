@@ -490,6 +490,12 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-weak-score { font-family:'Bebas Neue',cursive; font-size:18px; color:var(--fg); min-width:36px; }
 .arr-weak-path { flex:1; color:var(--mut); font-size:11px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .arr-weak-pct { font-weight:700; font-size:13px; min-width:34px; text-align:right; }
+/* 削り戦術クイズ */
+.arr-kezuri-btn { background:rgba(232,255,71,0.08) !important; border:1.5px solid var(--acc) !important; color:var(--acc) !important; }
+.arr-kezuri-btn.on { background:var(--acc) !important; color:#000 !important; }
+.arr-card.kezuri-mode .arr-q-score { font-size:16px; font-family:inherit; letter-spacing:0; line-height:1.5; padding:10px 4px 8px; text-align:left; color:var(--fg); }
+.arr-card.kezuri-mode .arr-choices { grid-template-columns:1fr; }
+.kezuri-choice { font-family:inherit !important; font-size:14px !important; padding:13px 14px !important; text-align:left !important; letter-spacing:0 !important; }
 /* 答え合わせ */
 .arr-review { width:100%; }
 .arr-review-toggle { font-size:11px; color:var(--mut); letter-spacing:2px; text-align:center; padding:4px 0 8px; cursor:pointer; user-select:none; }
