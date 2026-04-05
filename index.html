@@ -4406,7 +4406,74 @@ function renderZ01Hist() {
     html += '<canvas id="z01-hist-chart" height="80" style="width:100%;display:block;"></canvas>';
     html += '</div>';
   }
-  // === 5. Game list ===
+  // === 5. 期間別成績 ===
+  (function(){
+    var bk = {};
+    for (var i=0;i<h.length;i++) {
+      var d2=new Date(h[i].date), k=d2.getFullYear()+'/'+('0'+(d2.getMonth()+1)).slice(-2)+'/'+('0'+d2.getDate()).slice(-2);
+      if (!bk[k]) bk[k]=[];
+      bk[k].push(h[i]);
+    }
+    var days = Object.keys(bk).sort(function(a,b){return b.localeCompare(a);}).slice(0,14);
+    if (!days.length) return;
+    html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
+    html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">期間別成績（直近14日）</div>';
+    days.forEach(function(day){
+      var games = bk[day];
+      var solo = games.filter(function(g){return g.players===1;});
+      var avgs2 = solo.map(function(g){return g.data[0].avg;}).filter(function(v){return v>0;});
+      var dayAvg = avgs2.length ? (avgs2.reduce(function(a,b){return a+b;},0)/avgs2.length).toFixed(2) : '-';
+      var day180 = games.reduce(function(acc,g){return acc+g.data.reduce(function(a,p){return a+p.c180;},0);},0);
+      var bestLegDay = solo.map(function(g){return g.data[0].bestLeg;}).filter(function(v){return v>0;});
+      var blDay = bestLegDay.length ? Math.min.apply(null,bestLegDay) : 0;
+      html += '<div style="display:flex;align-items:center;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04);gap:8px;">';
+      html += '<div style="font-size:11px;color:var(--mut);min-width:80px;">' + day + '</div>';
+      html += '<div style="font-size:10px;color:var(--mut);min-width:28px;">' + games.length + 'G</div>';
+      html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:20px;color:var(--acc);flex:1;">' + dayAvg + '</div>';
+      html += '<div style="font-size:10px;color:var(--mut);">AVG</div>';
+      if (blDay) html += '<div style="font-size:10px;color:var(--grn);margin-left:8px;">' + blDay + ' darts</div>';
+      if (day180) html += '<div style="font-size:10px;color:#ffd700;margin-left:8px;">×' + day180 + ' 180</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  })();
+  // === 5b. 対戦成績 ===
+  (function(){
+    var twoP = h.filter(function(g){return g.players===2 && g.winner>=0;});
+    if (!twoP.length) return;
+    var records = {};
+    twoP.forEach(function(g){
+      var p0=g.data[0].name, p1=g.data[1].name;
+      var key = [p0,p1].sort().join(' vs ');
+      if (!records[key]) records[key]={key:key,games:0,wins:{}};
+      records[key].games++;
+      var wName = g.data[g.winner].name;
+      records[key].wins[wName] = (records[key].wins[wName]||0) + 1;
+    });
+    var keys = Object.keys(records);
+    if (!keys.length) return;
+    html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
+    html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">対戦成績</div>';
+    keys.forEach(function(key){
+      var rec = records[key];
+      var names = rec.key.split(' vs ');
+      html += '<div style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04);">';
+      html += '<div style="font-size:11px;color:var(--acc);margin-bottom:6px;">' + rec.key + ' (' + rec.games + '戦)</div>';
+      html += '<div style="display:flex;gap:8px;">';
+      names.forEach(function(name){
+        var w = rec.wins[name]||0;
+        var pct = Math.round(w/rec.games*100);
+        html += '<div style="flex:1;text-align:center;background:var(--bg);border-radius:8px;padding:6px;">';
+        html += '<div style="font-size:11px;color:var(--mut);margin-bottom:2px;">' + name + '</div>';
+        html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:26px;color:' + (w===Math.max.apply(null,names.map(function(n){return rec.wins[n]||0;}))&&w>0?'var(--acc)':'var(--txt)') + ';">' + w + 'W</div>';
+        html += '<div style="font-size:9px;color:var(--mut);">' + pct + '%</div>';
+        html += '</div>';
+      });
+      html += '</div></div>';
+    });
+    html += '</div>';
+  })();
+  // === 6. Game list ===
   html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
   html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">ゲーム履歴</div>';
   h.slice(0,50).forEach(function(g, idx) {
