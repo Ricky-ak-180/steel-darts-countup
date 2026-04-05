@@ -5084,10 +5084,11 @@ function renderZ01Hist() {
     });
     if (!allRounds.length) return;
     var bands = [
-      {label:'140+', min:140, max:999, color:'#ffd700'},
-      {label:'100〜139', min:100, max:139, color:'#47ffb4'},
-      {label:'60〜99', min:60, max:99, color:'#ff8a65'},
-      {label:'〜59', min:0, max:59, color:'#6b7280'}
+      {label:'180', min:180, max:180, color:'#ffd700'},
+      {label:'140+', min:140, max:179, color:'#47ffb4'},
+      {label:'100+', min:100, max:139, color:'#ff6b35'},
+      {label:'60+', min:60, max:99, color:'#4fc3f7'},
+      {label:'59-', min:0, max:59, color:'#6b6b88'}
     ];
     var total = allRounds.length;
     html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px;">';
