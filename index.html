@@ -3882,6 +3882,17 @@ function chooseArr(idx) {
 
   var speed = isCorrect ? Math.max(0, 1 - elapsed / _arrG.STAGE_MS) : 0;
   var pts = Math.round(100 * speed);
+  // コンボボーナス
+  var comboBonus = 1;
+  if (isCorrect) {
+    _arrG.combo++;
+    if (_arrG.combo >= 5) comboBonus = 2.0;
+    else if (_arrG.combo >= 3) comboBonus = 1.5;
+  } else {
+    _arrG.combo = 0;
+  }
+  var ptsRaw = pts;
+  pts = Math.round(pts * comboBonus);
   _arrG.totalScore += pts;
   _arrG.totalStages++;
   _arrG.totalTimeMs += elapsed;
