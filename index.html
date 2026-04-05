@@ -2903,10 +2903,40 @@ function setArrMode(mode) {
   _renderArrBest();
 }
 
+/* arr_quiz_v1 読み書き */
+function _arrGetQuizData() {
+  try { return JSON.parse(localStorage.getItem('arr_quiz_v1') || '{}'); } catch(e) { return {}; }
+}
+function _arrSaveQuizData(qd) {
+  try { localStorage.setItem('arr_quiz_v1', JSON.stringify(qd)); } catch(e) {}
+}
+
+/* 重み付きサンプリング（非復元） */
+function _arrWeightedSample(pool, weightFn, n) {
+  var items = pool.slice();
+  var result = [];
+  while (result.length < n && items.length > 0) {
+    var weights = items.map(weightFn);
+    var total = weights.reduce(function(s, w) { return s + w; }, 0);
+    var r = Math.random() * total, cum = 0, picked = 0;
+    for (var i = 0; i < weights.length; i++) { cum += weights[i]; if (r < cum) { picked = i; break; } }
+    result.push(items[picked]);
+    items.splice(picked, 1);
+  }
+  return result;
+}
+
 /* セッション開始 */
 function startArrSession() {
-  var pool = _arrShuffle(_ARR_SCORES[_arrG.mode].slice());
-  _arrG.qList = pool.slice(0, 10);
+  var allPool = _ARR_SCORES[_arrG.mode].slice();
+  var qd = _arrGetQuizData();
+  var weightFn = function(score) {
+    var key = String(score);
+    if (!qd[key] || qd[key].a === 0) return 1.0;
+    var acc = qd[key].c / qd[key].a;
+    return Math.max(0.25, 2.0 - 2.0 * acc);
+  };
+  _arrG.qList = _arrWeightedSample(allPool, weightFn, Math.min(10, allPool.length));
   _arrG.qIdx = 0;
   _arrG.totalScore = 0; _arrG.maxScore = 0;
   _arrG.correctCt = 0; _arrG.totalStages = 0; _arrG.totalTimeMs = 0;
