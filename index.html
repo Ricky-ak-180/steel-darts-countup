@@ -3921,13 +3921,25 @@ function chooseArr(idx) {
   var resEl = document.getElementById('arr-result');
   if (isCorrect) {
     resEl.className = 'arr-result arr-ok';
-    resEl.textContent = pts > 0 ? '◯  +' + pts + ' pt' : '◯';
+    var comboLabel = _arrG.combo >= 5 ? ' 🔥 COMBO ×' + _arrG.combo + '！(×2.0)' :
+                     _arrG.combo >= 3 ? ' ⚡ COMBO ×' + _arrG.combo + '！(×1.5)' : '';
+    resEl.innerHTML = pts > 0 ? '◯&nbsp; <strong>+' + pts + ' pt</strong><span style="color:#ffd54f;font-size:13px;">' + comboLabel + '</span>' : '◯';
   } else if (isTimeout) {
     resEl.className = 'arr-result arr-ng';
     resEl.textContent = '⏱  時間切れ　正解: ' + correctDisplay;
   } else {
     resEl.className = 'arr-result arr-ng';
     resEl.textContent = '✕  正解: ' + correctDisplay;
+  }
+  // コンボカウント表示更新
+  var comboEl = document.getElementById('arr-combo-badge');
+  if (comboEl) {
+    if (_arrG.combo >= 3) {
+      comboEl.textContent = '🔥 ' + _arrG.combo + ' COMBO';
+      comboEl.style.display = 'inline-block';
+    } else {
+      comboEl.style.display = 'none';
+    }
   }
 
   // 正解ルート / 解説を表示
