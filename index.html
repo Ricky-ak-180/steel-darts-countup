@@ -4368,8 +4368,9 @@ function trainWeakMode() {
     alert('苦手スコアが見つかりません。もっとトレーニングを積んでから試してみましょう！');
     return;
   }
-  // 最も苦手なスコアからスタート
-  trainStart(weak[0]);
+  // 苦手スコアキューをセットして最初のスコアからスタート
+  _trainWeakQueue = weak.slice();
+  trainStart(_trainWeakQueue[0]);
   // 練習画面に苦手リストを表示
   setTimeout(function(){
     var info = document.getElementById('arr-train-weak-info');
