@@ -4300,8 +4300,31 @@ function _z01GenDartLabels(total, remain) {
 
   if (total <= 0) return ['MISS','MISS','MISS'];
 
-  // 高スコア削り: T20 狙いシミュレーション（表示専用）
-  return [_z01SimDartLabel(lv), _z01SimDartLabel(lv), _z01SimDartLabel(lv)];
+  // 高スコア削り: total に合計が一致するよう T20 優先でダーツを割り付け
+  return _z01SplitDarts(total);
+}
+
+// total を 3本のダーツに分解してラベル配列を返す
+// T20ファミリー優先（T20→S20→T5→T1→S5→S1→他の有効スコア）
+var _Z01_DART_POOL = (function(){
+  var p = [];
+  [60,20,15,5,3,1,0,50,25,57,54,51,48,45,42,39,36,33,30,27,24,21,18,12,9,6].forEach(function(v){if(p.indexOf(v)<0)p.push(v);});
+  for(var n=20;n>=1;n--){var v=n*3;if(p.indexOf(v)<0)p.push(v);}
+  for(var n=20;n>=1;n--){var v=n*2;if(p.indexOf(v)<0)p.push(v);}
+  for(var n=20;n>=1;n--){if(p.indexOf(n)<0)p.push(n);}
+  return p;
+})();
+function _z01SplitDarts(total) {
+  var p = _Z01_DART_POOL;
+  for(var i=0;i<p.length;i++){
+    var a=p[i]; if(a>total) continue;
+    for(var j=0;j<p.length;j++){
+      var b=p[j]; if(a+b>total) continue;
+      var c=total-a-b;
+      if(p.indexOf(c)>=0) return [_z01DartLabel(a),_z01DartLabel(b),_z01DartLabel(c)];
+    }
+  }
+  return [_z01DartLabel(total),'—','—']; // フォールバック
 }
 function _z01ShowCpuDart(i, label) {
   var el = document.getElementById('z01-cpud-'+i);
