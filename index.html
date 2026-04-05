@@ -1177,13 +1177,21 @@ canvas.schart { width: 100%; height: 100%; }
         </div>
         <div class="z01-section" id="z01-cpu-section" style="display:none;">
           <div class="z01-label">CPU LEVEL</div>
-          <div class="z01-chips">
-            <div class="z01-chip" data-fn="z01SetCpu" data-arg="1">LV1 ビギナー</div>
-            <div class="z01-chip on" data-fn="z01SetCpu" data-arg="2">LV2 アマチュア</div>
-            <div class="z01-chip" data-fn="z01SetCpu" data-arg="3">LV3 中級</div>
-            <div class="z01-chip" data-fn="z01SetCpu" data-arg="4">LV4 上級</div>
-            <div class="z01-chip" data-fn="z01SetCpu" data-arg="5">LV5 プロ</div>
+          <div class="z01-chips" style="flex-wrap:wrap;">
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="1">LV1</div>
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="2">LV2</div>
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="3">LV3</div>
+            <div class="z01-chip on" data-fn="z01SetCpu" data-arg="4">LV4</div>
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="5">LV5</div>
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="6">LV6</div>
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="7">LV7</div>
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="8">LV8</div>
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="9">LV9</div>
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="10">LV10</div>
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="11">LV11</div>
+            <div class="z01-chip" data-fn="z01SetCpu" data-arg="12">LV12</div>
           </div>
+          <div id="z01-cpu-desc" style="font-size:11px;color:var(--mut);padding:4px 2px;letter-spacing:0.5px;"></div>
         </div>
         <button class="z01-start-btn" data-fn="z01Start">GAME START</button>
       </div>
