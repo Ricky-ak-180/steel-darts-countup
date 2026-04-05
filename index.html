@@ -4235,6 +4235,122 @@ function z01ShowResult() {
   document.getElementById('z01-stats-table').innerHTML = h;
 }
 
+// ---- 01 History Render ----
+function renderZ01Hist() {
+  var wrap = document.getElementById('z01-hist-content');
+  if (!wrap) return;
+  var h = _z01GetH();
+  if (!h.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--mut);font-size:13px;">まだ記録がありません。<br>ゲームを完了すると自動で保存されます。</div>';
+    return;
+  }
+  // Summary stats
+  var total = h.length;
+  var p1games = h.filter(function(g){ return g.players===1; });
+  var allAvgs = p1games.map(function(g){ return g.data[0].avg; }).filter(function(v){return v>0;});
+  var overallAvg = allAvgs.length ? (allAvgs.reduce(function(a,b){return a+b;},0)/allAvgs.length).toFixed(2) : '-';
+  var bestAvg = allAvgs.length ? Math.max.apply(null,allAvgs).toFixed(2) : '-';
+  var all140 = h.reduce(function(acc,g){ return acc + g.data.reduce(function(a,p){return a+p.c140;},0); },0);
+  var all180 = h.reduce(function(acc,g){ return acc + g.data.reduce(function(a,p){return a+p.c180;},0); },0);
+  var bestLegs = p1games.map(function(g){return g.data[0].bestLeg;}).filter(function(v){return v>0;});
+  var bestLeg = bestLegs.length ? Math.min.apply(null,bestLegs) : 0;
+  // AVG trend (last 30 solo games)
+  var trend30 = p1games.slice(0,30).map(function(g){return g.data[0].avg;}).reverse();
+  // Summary card
+  var html = '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px;">';
+  html += '<div style="font-size:10px;color:var(--mut);letter-spacing:2px;margin-bottom:10px;">TOTAL STATS</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;">';
+  var sCards = [
+    [total+'G', '総ゲーム数'],
+    [overallAvg, 'AVG (全体)'],
+    [bestAvg, 'AVG (ベスト)'],
+    [bestLeg ? bestLeg+' darts' : '-', 'ベストレグ'],
+    [all140, '140+'],
+    [all180, '180s']
+  ];
+  sCards.forEach(function(c){
+    html += '<div style="background:var(--bg);border-radius:8px;padding:8px 4px;">';
+    html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:26px;color:var(--acc);">'+c[0]+'</div>';
+    html += '<div style="font-size:9px;color:var(--mut);letter-spacing:1px;">'+c[1]+'</div></div>';
+  });
+  html += '</div></div>';
+  // AVG trend chart (canvas)
+  if (trend30.length > 1) {
+    html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px;">';
+    html += '<div style="font-size:10px;color:var(--mut);letter-spacing:2px;margin-bottom:8px;">AVG 推移（直近'+trend30.length+'G）</div>';
+    html += '<canvas id="z01-hist-chart" height="80" style="width:100%;display:block;"></canvas>';
+    html += '</div>';
+  }
+  // Game list
+  html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
+  html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">ゲーム履歴</div>';
+  h.slice(0,50).forEach(function(g, idx){
+    var d = new Date(g.date);
+    var dateStr = d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+    var modeStr = g.mode + ' (' + (g.outRule===0?'ダブルアウト':'シングルアウト') + ')';
+    var legsStr = g.legs > 1 ? ' Best of '+g.legs : '';
+    var p0 = g.data[0];
+    var avgStr = p0.avg > 0 ? p0.avg.toFixed(2) : '-';
+    var legStr = p0.bestLeg > 0 ? p0.bestLeg+' darts' : '-';
+    html += '<div style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;gap:4px;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+    html += '<div style="font-size:11px;color:var(--mut);">'+dateStr+'</div>';
+    html += '<div style="font-size:11px;color:var(--acc);font-weight:700;">'+modeStr+legsStr+'</div>';
+    html += '</div>';
+    if (g.players === 2) {
+      var p1 = g.data[1];
+      var wName = g.winner >= 0 ? g.data[g.winner].name : '-';
+      html += '<div style="font-size:12px;color:var(--txt);font-weight:700;">🏆 '+wName+'</div>';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;">';
+      [p0,p1].forEach(function(p){
+        html += '<div style="background:var(--bg);border-radius:6px;padding:6px 8px;">';
+        html += '<div style="color:var(--acc);font-weight:700;margin-bottom:2px;">'+p.name+'</div>';
+        html += '<div style="color:var(--mut);">AVG: <span style="color:var(--txt);">'+p.avg.toFixed(2)+'</span></div>';
+        html += '<div style="color:var(--mut);">Legs: <span style="color:var(--txt);">'+p.legWins+'</span></div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    } else {
+      html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:11px;">';
+      var cells = [['AVG',avgStr],['Best Leg',legStr],['140+',p0.c140],['180s',p0.c180]];
+      cells.forEach(function(c){
+        html += '<div style="text-align:center;background:var(--bg);border-radius:6px;padding:5px 2px;">';
+        html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:var(--txt);">'+c[1]+'</div>';
+        html += '<div style="font-size:9px;color:var(--mut);">'+c[0]+'</div></div>';
+      });
+      html += '</div>';
+    }
+    html += '<div style="text-align:right;"><button style="background:transparent;border:none;color:var(--mut);font-size:10px;cursor:pointer;padding:2px 4px;" data-fn="_z01DelH" data-arg="'+idx+'">削除</button></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  wrap.innerHTML = html;
+  // Draw trend chart
+  if (trend30.length > 1) {
+    var canvas = document.getElementById('z01-hist-chart');
+    if (canvas) {
+      var ctx = canvas.getContext('2d');
+      var W = canvas.offsetWidth || 300, H = 80;
+      canvas.width = W; canvas.height = H;
+      var mn = Math.min.apply(null,trend30)-10, mx = Math.max.apply(null,trend30)+10;
+      if (mn < 0) mn = 0;
+      ctx.clearRect(0,0,W,H);
+      ctx.beginPath();
+      trend30.forEach(function(v,i){
+        var x = i/(trend30.length-1)*W, y = H - (v-mn)/(mx-mn)*H*0.85 - H*0.05;
+        i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      });
+      ctx.strokeStyle = 'rgba(232,255,71,0.8)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // Fill under
+      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+      ctx.fillStyle = 'rgba(232,255,71,0.08)';
+      ctx.fill();
+    }
+  }
+}
+// ---- end 01 History Render ----
 // ---- 01 History Storage ----
 function _z01GetH() { try { return JSON.parse(localStorage.getItem('dh01')||'[]'); } catch(e){ return []; } }
 function _z01SaveH(entry) {
