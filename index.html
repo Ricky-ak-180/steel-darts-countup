@@ -4110,7 +4110,7 @@ function _z01Render() {
     legEl.textContent = 'Leg 1';
   }
   var isCpu = _z01.players===3 && _z01.currentPlayer===1;
-  if (!isCpu) document.getElementById('z01-cpu-area').style.display = 'none';
+  document.getElementById('z01-cpu-area').style.visibility = isCpu ? 'visible' : 'hidden';
   document.getElementById('z01-input-area').style.opacity = isCpu ? '0.25' : '';
   document.getElementById('z01-input-area').style.pointerEvents = isCpu ? 'none' : '';
   _z01BufUpdate('');
