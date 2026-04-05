@@ -5130,11 +5130,15 @@ var impFile = document.getElementById('imp-file');
 if (impFile) {
   impFile.addEventListener('change', function(){ importData(this); });
 }
-// 01 export/import ボタン
-var btnZ01Export = document.getElementById('btn-z01-export');
-if (btnZ01Export) btnZ01Export.addEventListener('click', exportZ01Data);
-var btnZ01Import = document.getElementById('btn-z01-import');
-if (btnZ01Import) btnZ01Import.addEventListener('click', triggerImportZ01);
+// 01 export/import（innerHTML再生成後も動くようデリゲーション）
+var v01hist = document.getElementById('v01-hist-wrap');
+if (v01hist) {
+  v01hist.addEventListener('click', function(e){
+    var t = e.target;
+    if (t.id === 'btn-z01-export') exportZ01Data();
+    if (t.id === 'btn-z01-import') triggerImportZ01();
+  });
+}
 var impZ01File = document.getElementById('imp-z01-file');
 if (impZ01File) impZ01File.addEventListener('change', function(){ importZ01Data(this); });
 // スタート画面にベストスコアを表示
