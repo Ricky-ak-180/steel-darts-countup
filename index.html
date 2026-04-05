@@ -870,6 +870,11 @@ canvas.schart { width: 100%; height: 100%; }
 
   <!-- Game view -->
   <div class="view" id="vgame" style="overflow:hidden;">
+    <div class="cu-subtabs">
+      <div class="cu-subtab on" id="cust-game" data-fn="goSubGame">🎯 ゲーム</div>
+      <div class="cu-subtab" id="cust-hist" data-fn="goSubHist">📊 履歴</div>
+    </div>
+    <div id="cu-game-wrap" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;">
     <div class="ngp" id="ngp">
       <div class="ngp-t">ゲーム終了</div>
       <div class="ngp-s">次のゲームを始めますか？</div>
