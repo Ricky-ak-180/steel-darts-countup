@@ -5837,8 +5837,10 @@ function _z01UndoExec() {
     var prev = log[log.length - 2];
     var data = prev.p[0];
     if (!data) return;
-    _z01.remain[0] = data.scored + data.remain;
+    var prevRem0 = data.scored + data.remain;
+    _z01.remain[0] = prevRem0;
     _z01UndoStats(0, data.scored);
+    _z01UndoCheckout(0, prevRem0);
     log.pop();
     prev.p[0] = null;
   } else {
@@ -5848,8 +5850,10 @@ function _z01UndoExec() {
     if (curRow.p[other] !== null) {
       // Other player just scored in current row
       var data = curRow.p[other];
-      _z01.remain[other] = data.scored + data.remain;
+      var prevRemOther = data.scored + data.remain;
+      _z01.remain[other] = prevRemOther;
       _z01UndoStats(other, data.scored);
+      _z01UndoCheckout(other, prevRemOther);
       curRow.p[other] = null;
       _z01.currentPlayer = other;
     } else if (log.length >= 2) {
@@ -5859,8 +5863,10 @@ function _z01UndoExec() {
       for (var pi = n - 1; pi >= 0; pi--) {
         if (prev.p[pi] !== null) {
           var data = prev.p[pi];
-          _z01.remain[pi] = data.scored + data.remain;
+          var prevRemPi = data.scored + data.remain;
+          _z01.remain[pi] = prevRemPi;
           _z01UndoStats(pi, data.scored);
+          _z01UndoCheckout(pi, prevRemPi);
           log.pop();
           prev.p[pi] = null;
           _z01.currentPlayer = pi;
