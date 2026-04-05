@@ -6086,8 +6086,8 @@ function z01OpenStats() {
     ['140+', function(s){ return s.c140; }],
     ["180's", function(s){ return s.c180; }],
     ['High Out', function(s){ return s.hiFin||0; }],
-    ['Best Leg', function(s){ return s.bestLeg<999?s.bestLeg+' darts':'-'; }],
-    ['Worst Leg', function(s){ return s.worstLeg>0?s.worstLeg+' darts':'-'; }]
+    ['Best Leg', function(s){ return s.bestLeg<999?s.bestLeg+' 本':'-'; }],
+    ['Worst Leg', function(s){ return s.worstLeg>0?s.worstLeg+' 本':'-'; }]
   ];
   var avgRows = [
     ['Darts', function(s,i){ var w=_z01.legWins[i]; return w>0?((s.totalFinishDarts/w).toFixed(2)):'-'; }],
