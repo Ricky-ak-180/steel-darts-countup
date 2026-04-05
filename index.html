@@ -2607,6 +2607,7 @@ function diaryRender() {
   entriesEl.innerHTML = html;
 }
 function renderHist() {
+  diaryRender();
   migrateTotals();
   var h=getH();
   var s3=document.getElementById('hs3');
