@@ -4363,10 +4363,10 @@ function _z01CpuTurn() {
       while (labels.length < 3) labels.push('—');
       labels = labels.slice(0, 3);
     } else {
-      // 失敗: 1本ずつシミュレートしてバスト保護
+      // 失敗: 1本ずつシミュレートしてバスト保護（戦略的ターゲット選択）
       var accum = 0, lbs = [], busted = false;
       for (var di = 0; di < 3; di++) {
-        var dart = _z01SimT20Dart(lv);
+        var dart = _z01CheckoutSimDart(lv, remain - accum);
         var newRem = remain - accum - dart.score;
         var isBust = (_z01.outRule === 0) ? (newRem < 0 || newRem === 1) : (newRem < 0);
         if (isBust) { lbs.push('MISS'); busted = true; break; }
