@@ -858,6 +858,19 @@ canvas.schart { width: 100%; height: 100%; }
 <div class="game-start" id="game-start">
   <div class="gs-icon">🎯</div>
   <div class="gs-title">STEEL DARTS PRO</div>
+  <div id="gs-best" class="gs-best"></div>
+  <div style="margin:10px 0 14px;display:flex;align-items:center;gap:8px;">
+    <span style="font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:1px;">目標スコア</span>
+    <select id="gs-goal" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.7);font-size:12px;padding:4px 8px;outline:none;">
+      <option value="0">設定なし</option>
+      <option value="400">400 (B)</option>
+      <option value="500">500 (B+)</option>
+      <option value="600">600 (A)</option>
+      <option value="700">700 (A+)</option>
+      <option value="800">800 (S)</option>
+      <option value="1000">1000 (S+)</option>
+    </select>
+  </div>
   <button class="gs-btn" id="gs-btn">GAME START</button>
 </div>
 
