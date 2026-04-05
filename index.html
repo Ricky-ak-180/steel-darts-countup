@@ -4317,9 +4317,50 @@ function _z01CpuTurn() {
   var status = document.getElementById('z01-cpu-status');
   [0,1,2].forEach(function(i){ _z01ShowCpuDart(i,'—'); });
   if (status) status.textContent = 'THINKING...';
+
   var remain = _z01.remain[1];
-  var total = _z01CpuScore(remain);
-  var labels = _z01GenDartLabels(total, remain);
+  var lv = _z01.cpuLevel;
+  var labels, total;
+
+  if (remain <= 170 && remain >= 2 && CHECKOUT[remain]) {
+    // チェックアウト範囲: 成功確率でアレンジ試行
+    var hp = [0,0.01,0.02,0.04,0.07,0.11,0.17,0.25,0.35,0.46,0.58,0.70,0.82][lv];
+    if (Math.random() < hp) {
+      // 成功: 標準アレンジ表示
+      total = remain;
+      var path = CHECKOUT[remain];
+      labels = path.map(function(l){ return /^\d+$/.test(l) ? 'S'+l : l; });
+      while (labels.length < 3) labels.push('—');
+      labels = labels.slice(0, 3);
+    } else {
+      // 失敗: 1本ずつシミュレートしてバスト保護
+      var accum = 0, lbs = [], busted = false;
+      for (var di = 0; di < 3; di++) {
+        var dart = _z01SimT20Dart(lv);
+        var newRem = remain - accum - dart.score;
+        var isBust = (_z01.outRule === 0) ? (newRem < 0 || newRem === 1) : (newRem < 0);
+        if (isBust) { lbs.push('MISS'); busted = true; break; }
+        lbs.push(dart.label);
+        accum += dart.score;
+        if (remain - accum === 0) break;
+      }
+      while (lbs.length < 3) lbs.push('—');
+      // バストは全スコア無効（01ルール）
+      total = busted ? 0 : accum;
+      labels = busted ? ['MISS','MISS','MISS'] : lbs;
+    }
+  } else {
+    // 通常スコアリング: 3本独立シミュレート
+    var d0 = _z01SimT20Dart(lv);
+    var d1 = _z01SimT20Dart(lv);
+    var d2 = _z01SimT20Dart(lv);
+    total = d0.score + d1.score + d2.score;
+    labels = [d0.label, d1.label, d2.label];
+    var isBust = (_z01.outRule === 0) ?
+      (remain - total < 0 || remain - total === 1) : (remain - total < 0);
+    if (isBust) { total = 0; labels = ['MISS','MISS','MISS']; }
+  }
+
   var t = 600 + Math.random()*400;
   var gap = 550 + Math.random()*150;
   setTimeout(function(){
