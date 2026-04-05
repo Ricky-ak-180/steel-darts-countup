@@ -4772,6 +4772,14 @@ function _z01Commit(sc) {
   var n = _z01.players === 1 ? 1 : 2;
   var rem = _z01.remain[p], after = rem - sc;
   var bust = _z01.outRule===0 ? (after<0||after===1) : (after<0);
+  if (_z01.inRule === 1 && st.rounds === 0 && sc === 0) {
+    (function(){
+      var t = document.createElement('div'); t.className = 'z01-event-toast bogey';
+      t.textContent = 'ダブルインが必要です'; document.body.appendChild(t);
+      setTimeout(function(){ t.parentNode && t.parentNode.removeChild(t); }, 1800);
+    })();
+    _z01BufUpdate(''); return;
+  }
   if (bust) {
     if (rem <= 170 && _z01.checkoutAttempts) _z01.checkoutAttempts[p].push({score: rem, success: false});
     soundCommit(0);
