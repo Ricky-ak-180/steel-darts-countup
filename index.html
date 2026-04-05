@@ -1211,12 +1211,12 @@ canvas.schart { width: 100%; height: 100%; }
         <button class="z01-hint-toggle" id="z01-hint-toggle" data-fn="z01ToggleHint">アレンジ表示</button>
       </div>
       <!-- CPU turn indicator -->
-      <div class="z01-cpu-area" id="z01-cpu-area" style="display:none;">
-        <div style="font-size:11px;color:var(--mut);letter-spacing:2px;">CPU THINKING...</div>
-        <div class="z01-cpu-dots">
-          <div class="z01-cpu-dot"></div>
-          <div class="z01-cpu-dot"></div>
-          <div class="z01-cpu-dot"></div>
+      <div class="z01-cpu-area" id="z01-cpu-area" style="display:none;flex-direction:column;align-items:center;gap:8px;padding:8px 0;">
+        <div id="z01-cpu-status" style="font-size:11px;color:var(--mut);letter-spacing:2px;">THINKING...</div>
+        <div style="display:flex;gap:8px;">
+          <div class="z01-cpu-dart" id="z01-cpud-0">—</div>
+          <div class="z01-cpu-dart" id="z01-cpud-1">—</div>
+          <div class="z01-cpu-dart" id="z01-cpud-2">—</div>
         </div>
       </div>
       <!-- Bottom action bar -->
