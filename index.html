@@ -4386,6 +4386,10 @@ function _z01UndoExec() {
   }
   _z01Render(); _z01HintUpdate(); _z01LogRender();
 }
+function z01UndoYes() {
+  document.getElementById('z01-undo-confirm').style.display = 'none';
+  _z01UndoExec();
+}
 function _z01InitLog() {
   var n = _z01.players === 1 ? 1 : 2;
   var p = [];
