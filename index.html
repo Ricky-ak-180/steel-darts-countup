@@ -1280,12 +1280,21 @@ canvas.schart { width: 100%; height: 100%; }
       </div>
       <!-- CPU turn indicator -->
       <div class="z01-cpu-area" id="z01-cpu-area" style="display:none;">
-        <div id="z01-cpu-status" style="font-size:11px;color:var(--mut);letter-spacing:2px;">THINKING...</div>
-        <div style="display:flex;gap:8px;">
+        <div class="z01-cpu-header">
+          <div class="z01-cpu-badge" id="z01-cpu-lv-badge">CPU Lv.4</div>
+          <div class="z01-cpu-name-label" id="z01-cpu-name-label">CPU</div>
+        </div>
+        <div class="z01-cpu-remain-row">
+          <div class="z01-cpu-remain-num" id="z01-cpu-remain-num">501</div>
+          <div class="z01-cpu-remain-label">REMAINING</div>
+        </div>
+        <div class="z01-cpu-target-row" id="z01-cpu-target-row">— THINKING<span class="z01-cpu-thinking-dots" id="z01-cpu-dots"></span></div>
+        <div style="display:flex;gap:8px;margin-top:2px;">
           <div class="z01-cpu-dart" id="z01-cpud-0">—</div>
           <div class="z01-cpu-dart" id="z01-cpud-1">—</div>
           <div class="z01-cpu-dart" id="z01-cpud-2">—</div>
         </div>
+        <div class="z01-cpu-total" id="z01-cpu-total"></div>
       </div>
       <!-- Bottom action bar -->
       <div class="z01-bottom-bar">
