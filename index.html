@@ -3689,8 +3689,14 @@ function chooseArr(idx) {
   _arrG.totalStages++;
   _arrG.totalTimeMs += elapsed;
   if (isCorrect) _arrG.correctCt++;
+  // kezuri: correctDisplayText for feedback
+  var correctDisplay = correct;
+  if (st.kezuri) {
+    var _kq0 = _ARR_KEZURI_QS[st.kIdx];
+    correctDisplay = _kq0.choices[_kq0.ans];
+  }
   _arrG.log.push({ q: _arrG.qIdx, qScore: _arrG.qList[_arrG.qIdx],
-    stgIdx: _arrG.stgIdx,
+    stgIdx: _arrG.stgIdx, kezuri: !!st.kezuri, kIdx: st.kIdx,
     correct: correct, chosen: chosen,
     isCorrect: isCorrect, isTimeout: isTimeout, pts: pts });
 
@@ -3699,8 +3705,8 @@ function chooseArr(idx) {
   document.getElementById('arr-choices').querySelectorAll('.arr-choice').forEach(function(btn) {
     btn.setAttribute('data-fn', '');
     var v = btn.getAttribute('data-val');
-    if (v === correct) btn.className = 'arr-choice arr-choice-correct';
-    else if (v === chosen) btn.className = 'arr-choice arr-choice-wrong';
+    if (v === correct) btn.className = (st.kezuri ? 'arr-choice kezuri-choice' : 'arr-choice') + ' arr-choice-correct';
+    else if (v === chosen) btn.className = (st.kezuri ? 'arr-choice kezuri-choice' : 'arr-choice') + ' arr-choice-wrong';
     else btn.style.opacity = '0.25';
   });
 
@@ -3710,10 +3716,10 @@ function chooseArr(idx) {
     resEl.textContent = pts > 0 ? '◯  +' + pts + ' pt' : '◯';
   } else if (isTimeout) {
     resEl.className = 'arr-result arr-ng';
-    resEl.textContent = '⏱  時間切れ　正解: ' + correct;
+    resEl.textContent = '⏱  時間切れ　正解: ' + correctDisplay;
   } else {
     resEl.className = 'arr-result arr-ng';
-    resEl.textContent = '✕  正解: ' + correct;
+    resEl.textContent = '✕  正解: ' + correctDisplay;
   }
 
   // 正解ルート / 解説を表示
