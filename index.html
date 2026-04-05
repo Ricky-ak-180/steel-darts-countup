@@ -4835,6 +4835,87 @@ function _z01BuildHistEntry() {
     data: players
   };
 }
+// ---- AVG推移グラフ ----
+function _z01RenderAvgGraph() {
+  var el = document.getElementById('z01-avg-graph');
+  if (!el) return;
+  var hist = _z01GetH();
+  // player0のavgを時系列順（古い→新しい）で最大20件取得
+  var pts = [];
+  for (var i = hist.length - 1; i >= 0; i--) {
+    var g = hist[i];
+    if (g.data && g.data[0] && g.data[0].avg > 0) pts.push(g.data[0].avg);
+  }
+  pts = pts.slice(-20);
+  if (pts.length < 2) {
+    el.innerHTML = '<div class="z01-avg-graph-hdr"><span class="z01-avg-graph-label">AVG推移</span></div>' +
+      '<div class="z01-avg-graph-empty">あと' + (2 - pts.length) + 'ゲームでグラフが表示されます</div>';
+    return;
+  }
+  var n = pts.length;
+  var minV = Math.min.apply(null, pts), maxV = Math.max.apply(null, pts);
+  var span = Math.max(maxV - minV, 15);
+  var yMin = Math.max(0, minV - span * 0.25), yMax = maxV + span * 0.25;
+  var W = 300, H = 100, pL = 30, pR = 8, pT = 14, pB = 18;
+  var gW = W - pL - pR, gH = H - pT - pB;
+  function xp(i) { return pL + (n < 2 ? 0 : i / (n - 1)) * gW; }
+  function yp(v) { return pT + gH - ((v - yMin) / (yMax - yMin)) * gH; }
+  // ライン・エリアパス
+  var line = '', area = 'M' + xp(0) + ',' + (pT + gH);
+  for (var i = 0; i < n; i++) {
+    var x = xp(i).toFixed(1), y = yp(pts[i]).toFixed(1);
+    line += (i ? 'L' : 'M') + x + ',' + y + ' ';
+    area += ' L' + x + ',' + y;
+  }
+  area += ' L' + xp(n - 1).toFixed(1) + ',' + (pT + gH) + ' Z';
+  // 全体平均
+  var mean = pts.reduce(function(a,b){return a+b;},0) / n;
+  var meanY = yp(mean).toFixed(1);
+  // トレンド（最新 vs 最古）
+  var diff = pts[n-1] - pts[0];
+  var trendTxt = (diff > 0 ? '↗ +' : diff < 0 ? '↘ ' : '→ ') + diff.toFixed(1);
+  var trendCol = diff > 1 ? '#4ade80' : diff < -1 ? '#f87171' : '#94a3b8';
+  // 最新点のラベル位置
+  var lastX = xp(n-1).toFixed(1), lastY = yp(pts[n-1]).toFixed(1);
+  var lblAnchor = n > 3 ? 'end' : 'middle';
+  // Y軸ラベル用の目盛り（2本）
+  var yTickTop = yMax.toFixed(0), yTickBot = yMin.toFixed(0);
+  var svg =
+    '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;display:block;" xmlns="http://www.w3.org/2000/svg">' +
+    '<defs><linearGradient id="z01ag" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0%" stop-color="var(--acc)" stop-opacity="0.5"/>' +
+    '<stop offset="100%" stop-color="var(--acc)" stop-opacity="0"/>' +
+    '</linearGradient></defs>' +
+    // ベースライン
+    '<line x1="' + pL + '" y1="' + (pT+gH) + '" x2="' + (pL+gW) + '" y2="' + (pT+gH) + '" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>' +
+    // 平均破線
+    '<line x1="' + pL + '" y1="' + meanY + '" x2="' + (pL+gW) + '" y2="' + meanY + '" stroke="rgba(255,255,255,0.18)" stroke-width="1" stroke-dasharray="4,3"/>' +
+    // エリア塗り
+    '<path d="' + area + '" fill="url(#z01ag)"/>' +
+    // メインライン
+    '<path d="' + line + '" fill="none" stroke="var(--acc)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>' +
+    // 各データ点（小）
+    pts.slice(0,-1).map(function(v,i){
+      return '<circle cx="' + xp(i).toFixed(1) + '" cy="' + yp(v).toFixed(1) + '" r="2.5" fill="rgba(255,255,255,0.35)"/>';
+    }).join('') +
+    // 最新点（大・強調）
+    '<circle cx="' + lastX + '" cy="' + lastY + '" r="5" fill="var(--acc)"/>' +
+    '<circle cx="' + lastX + '" cy="' + lastY + '" r="8" fill="var(--acc)" opacity="0.25"/>' +
+    // 最新AVGラベル
+    '<text x="' + (parseFloat(lastX) - 2) + '" y="' + (parseFloat(lastY) - 10) + '" fill="var(--acc)" font-size="11" font-weight="700" text-anchor="' + lblAnchor + '">' + pts[n-1].toFixed(1) + '</text>' +
+    // Y軸ラベル
+    '<text x="' + (pL-4) + '" y="' + (pT+5) + '" fill="rgba(255,255,255,0.35)" font-size="8.5" text-anchor="end">' + yTickTop + '</text>' +
+    '<text x="' + (pL-4) + '" y="' + (pT+gH) + '" fill="rgba(255,255,255,0.35)" font-size="8.5" text-anchor="end">' + yTickBot + '</text>' +
+    // 平均ラベル
+    '<text x="' + (pL+4) + '" y="' + (parseFloat(meanY)-3) + '" fill="rgba(255,255,255,0.3)" font-size="8" text-anchor="start">avg ' + mean.toFixed(1) + '</text>' +
+    '</svg>';
+  el.innerHTML =
+    '<div class="z01-avg-graph-hdr">' +
+      '<span class="z01-avg-graph-label">AVG推移（直近' + n + 'ゲーム）</span>' +
+      '<span class="z01-avg-graph-trend" style="color:' + trendCol + ';">' + trendTxt + '</span>' +
+    '</div>' + svg;
+}
+// ---- end AVG推移グラフ ----
 // ---- end 01 History Storage ----
 function z01Again() {
   var m = _z01.mode;
