@@ -5076,6 +5076,74 @@ function renderZ01Hist() {
     html += '<canvas id="z01-hist-chart" height="80" style="width:100%;display:block;"></canvas>';
     html += '</div>';
   }
+  // === 4b. 削りスコア分布 ===
+  (function(){
+    var allRounds = [];
+    soloGames.slice(0, 30).forEach(function(g){
+      if (g.data[0].rounds && g.data[0].rounds.length) allRounds = allRounds.concat(g.data[0].rounds);
+    });
+    if (!allRounds.length) return;
+    var bands = [
+      {label:'140+', min:140, max:999, color:'#ffd700'},
+      {label:'100〜139', min:100, max:139, color:'#47ffb4'},
+      {label:'60〜99', min:60, max:99, color:'#ff8a65'},
+      {label:'〜59', min:0, max:59, color:'#6b7280'}
+    ];
+    var total = allRounds.length;
+    html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px;">';
+    html += '<div style="font-size:10px;color:var(--mut);letter-spacing:2px;margin-bottom:10px;">削りスコア分布（直近30G / ' + total + 'ラウンド）</div>';
+    bands.forEach(function(b){
+      var cnt = allRounds.filter(function(s){ return s>=b.min && s<=b.max; }).length;
+      var pct = total > 0 ? Math.round(cnt/total*100) : 0;
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+      html += '<div style="font-size:11px;color:var(--mut);min-width:60px;text-align:right;">' + b.label + '</div>';
+      html += '<div style="flex:1;background:rgba(255,255,255,0.06);border-radius:4px;height:20px;overflow:hidden;">';
+      html += '<div style="width:' + pct + '%;height:100%;background:' + b.color + ';border-radius:4px;transition:width 0.3s;"></div>';
+      html += '</div>';
+      html += '<div style="font-size:12px;font-weight:700;color:' + b.color + ';min-width:38px;text-align:right;">' + pct + '%</div>';
+      html += '<div style="font-size:10px;color:var(--mut);min-width:30px;">(' + cnt + ')</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  })();
+  // === 4c. チェックアウト成功率 ===
+  (function(){
+    var allCOs = [];
+    soloGames.slice(0, 50).forEach(function(g){
+      if (g.data[0].checkouts && g.data[0].checkouts.length) allCOs = allCOs.concat(g.data[0].checkouts);
+    });
+    if (!allCOs.length) return;
+    var cats = [
+      {min:2,   max:40,  label:'2〜40',    desc:'1投フィニッシュ圏'},
+      {min:41,  max:60,  label:'41〜60',   desc:'2本フィニッシュ圏'},
+      {min:61,  max:100, label:'61〜100',  desc:'標準アレンジ圏'},
+      {min:101, max:110, label:'101〜110', desc:'リカバリー可'},
+      {min:111, max:120, label:'111〜120', desc:'2本T狙い'},
+      {min:121, max:130, label:'121〜130', desc:'シングル絡み'},
+      {min:131, max:160, label:'131〜160', desc:'トリプル必須'},
+      {min:161, max:170, label:'161〜170', desc:'DBull必須'}
+    ];
+    html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
+    html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">チェックアウト成功率（難易度別）</div>';
+    cats.forEach(function(c){
+      var attempts = allCOs.filter(function(a){ return a.score>=c.min && a.score<=c.max; });
+      if (!attempts.length) return;
+      var wins = attempts.filter(function(a){ return a.success; }).length;
+      var pct = Math.round(wins/attempts.length*100);
+      var barColor = pct>=70?'#66bb6a':pct>=40?'#ffd54f':'#ff6b6b';
+      html += '<div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04);">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+      html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:18px;color:var(--acc);min-width:70px;">' + c.label + '</div>';
+      html += '<div style="font-size:10px;color:var(--mut);flex:1;">' + c.desc + '</div>';
+      html += '<div style="font-size:14px;font-weight:700;color:' + barColor + ';">' + pct + '%</div>';
+      html += '<div style="font-size:10px;color:var(--mut);">(' + wins + '/' + attempts.length + ')</div>';
+      html += '</div>';
+      html += '<div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px;overflow:hidden;">';
+      html += '<div style="width:' + pct + '%;height:100%;background:' + barColor + ';border-radius:4px;"></div>';
+      html += '</div></div>';
+    });
+    html += '</div>';
+  })();
   // === 5. 期間別成績 ===
   (function(){
     var bk = {};
