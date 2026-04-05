@@ -3716,9 +3716,17 @@ function chooseArr(idx) {
     resEl.textContent = '✕  正解: ' + correct;
   }
 
-  // 正解ルートを全表示
+  // 正解ルート / 解説を表示
   var pathEl = document.getElementById('arr-answer-path');
-  pathEl.innerHTML = '<div class="arr-answer-path-label">正解ルート</div><div>' + _pathHtml(st.path, false, st.score) + '</div>';
+  if (st.kezuri) {
+    var kq = _ARR_KEZURI_QS[st.kIdx];
+    var correctText = kq.choices[kq.ans];
+    pathEl.innerHTML = '<div class="arr-answer-path-label">解説</div><div style="font-size:13px;line-height:1.6;color:var(--fg)">'
+      + '<span style="color:#66bb6a;font-weight:700">✓ ' + correctText + '</span><br>'
+      + kq.exp + '</div>';
+  } else {
+    pathEl.innerHTML = '<div class="arr-answer-path-label">正解ルート</div><div>' + _pathHtml(st.path, false, st.score) + '</div>';
+  }
   pathEl.className = 'arr-answer-path';
 
   document.getElementById('arr-hud-score').textContent = _arrG.totalScore;
