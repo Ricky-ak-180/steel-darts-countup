@@ -2998,15 +2998,19 @@ function _arrWeightedSample(pool, weightFn, n) {
 
 /* セッション開始 */
 function startArrSession() {
-  var allPool = _ARR_SCORES[_arrG.mode].slice();
+  var isKezuri = (_arrG.mode === 4);
+  var allPool = isKezuri
+    ? _ARR_KEZURI_QS.map(function(_, i){ return i; })
+    : _ARR_SCORES[_arrG.mode].slice();
   var qd = _arrGetQuizData();
-  var weightFn = function(score) {
-    var key = String(score);
+  var weightFn = function(key_val) {
+    var key = (isKezuri ? 'kz_' : '') + String(key_val);
     if (!qd[key] || qd[key].a === 0) return 1.0;
     var acc = qd[key].c / qd[key].a;
     return Math.max(0.25, 2.0 - 2.0 * acc);
   };
   _arrG.qList = _arrWeightedSample(allPool, weightFn, Math.min(10, allPool.length));
+  _arrG.isKezuri = isKezuri;
   _arrG.qIdx = 0;
   _arrG.totalScore = 0; _arrG.maxScore = 0;
   _arrG.correctCt = 0; _arrG.totalStages = 0; _arrG.totalTimeMs = 0;
