@@ -697,7 +697,7 @@ canvas.schart { width: 100%; height: 100%; }
 .z01-tk.enter.ready{background:var(--acc2);color:#fff;border-color:var(--acc2);}
 .z01-bust-flash{position:fixed;inset:0;background:rgba(255,71,71,0.22);z-index:500;pointer-events:none;animation:z01BF 0.45s ease-out forwards;}
 @keyframes z01BF{0%{opacity:1;}100%{opacity:0;}}
-.z01-cpu-area{position:absolute;bottom:0;left:0;right:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px 0 16px;background:rgba(10,10,15,0.92);backdrop-filter:blur(8px);border-top:1px solid var(--bdr);z-index:10;}
+.z01-cpu-area{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px 36px 28px;background:rgba(10,10,15,0.95);backdrop-filter:blur(12px);border:1px solid var(--bdr);border-radius:16px;z-index:200;min-width:220px;}
 .z01-cpu-dart{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:7px 14px;font-family:'Bebas Neue',cursive;font-size:22px;color:var(--mut);min-width:64px;text-align:center;transition:border-color .15s,color .15s;}
 .z01-cpu-dart.hit{border-color:var(--acc);color:var(--acc);}
 .z01-cpu-dart.miss{color:rgba(255,255,255,0.2);}
