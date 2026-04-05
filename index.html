@@ -4246,14 +4246,14 @@ function _z01DartLabel(sc) {
   if (sc <= 0) return 'MISS';
   if (sc === 50) return 'D-BULL';
   if (sc === 25) return 'BULL';
+  if (sc >= 1 && sc <= 20) return 'S'+sc;
   if (sc % 3 === 0 && sc/3 >= 1 && sc/3 <= 20) return 'T'+(sc/3);
   if (sc % 2 === 0 && sc/2 >= 1 && sc/2 <= 20) return 'D'+(sc/2);
-  if (sc >= 1 && sc <= 20) return 'S'+sc;
   for (var v = sc-1; v >= 0; v--) {
     if (v === 0) return 'MISS';
+    if (v >= 1 && v <= 20) return 'S'+v;
     if (v % 3 === 0 && v/3 >= 1 && v/3 <= 20) return 'T'+(v/3);
     if (v % 2 === 0 && v/2 >= 1 && v/2 <= 20) return 'D'+(v/2);
-    if (v >= 1 && v <= 20) return 'S'+v;
   }
   return 'MISS';
 }
