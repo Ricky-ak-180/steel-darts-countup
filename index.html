@@ -4361,7 +4361,7 @@ function renderZ01Hist() {
       [
         ['font-size:24px;color:var(--acc);', p.avg>0?p.avg.toFixed(2):'-', 'AVG'],
         ['font-size:18px;color:#b47fff;', p.f9avg>0?p.f9avg.toFixed(2):'-', 'F9 AVG'],
-        ['font-size:16px;color:var(--grn);', p.bestLeg>0?p.bestLeg+'d':'-', 'Best Leg'],
+        ['font-size:16px;color:var(--grn);', p.bestLeg>0?p.bestLeg:'-', 'Best Leg'],
         ['font-size:18px;color:rgba(255,255,255,0.7);', p.c140, '140+'],
         ['font-size:18px;color:#ffd700;', p.c180, '180s']
       ].forEach(function(c){
