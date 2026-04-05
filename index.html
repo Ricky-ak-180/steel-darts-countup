@@ -4279,7 +4279,7 @@ function _z01ShowCpuDart(i, label) {
 }
 function _z01CpuTurn() {
   var cpuArea = document.getElementById('z01-cpu-area');
-  cpuArea.style.display = 'flex';
+  cpuArea.style.visibility = 'visible';
   var status = document.getElementById('z01-cpu-status');
   [0,1,2].forEach(function(i){ _z01ShowCpuDart(i,'—'); });
   if (status) status.textContent = 'THINKING...';
