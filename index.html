@@ -5252,7 +5252,9 @@ function _z01BuildHistEntry() {
       c100: st.c100, c140: st.c140, c180: st.c180,
       hiFin: st.hiFin, bestLeg: st.bestLeg < 999 ? st.bestLeg : 0,
       worstLeg: st.worstLeg > 0 ? st.worstLeg : 0,
-      legWins: _z01.legWins[i]
+      legWins: _z01.legWins[i],
+      rounds: (_z01.roundScores && _z01.roundScores[i]) ? _z01.roundScores[i].slice() : [],
+      checkouts: (_z01.checkoutAttempts && _z01.checkoutAttempts[i]) ? _z01.checkoutAttempts[i].slice() : []
     });
   }
   var winner = n > 1 ? (_z01.legWins[0] > _z01.legWins[1] ? 0 : (_z01.legWins[1] > _z01.legWins[0] ? 1 : -1)) : 0;
