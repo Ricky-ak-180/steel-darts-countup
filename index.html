@@ -4469,7 +4469,12 @@ function renderZ01Hist() {
     });
     html += '</div>';
   })();
-  // === 6. Game list ===
+  // === 6. Export / Import ===
+  html += '<div class="exp-row">';
+  html += '<button class="bexp" id="btn-z01-export">📤 エクスポート</button>';
+  html += '<button class="bexp" id="btn-z01-import">📥 インポート</button>';
+  html += '</div>';
+  // === 7. Game list ===
   html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
   html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">ゲーム履歴</div>';
   h.slice(0,50).forEach(function(g, idx) {
