@@ -4462,6 +4462,17 @@ function trainResult(ok) {
 }
 
 function trainNext() {
+  if (_trainWeakQueue.length > 0) {
+    // 苦手モード中: キューを進める
+    _trainWeakQueue.shift();
+    if (_trainWeakQueue.length > 0) {
+      trainStart(_trainWeakQueue[0]);
+      return;
+    }
+    // キューが空になった → 通常マップへ
+    trainBackToMap();
+    return;
+  }
   var next = _trainNextScore(_trainCurrent);
   if (next) trainStart(next);
   else trainBackToMap();
