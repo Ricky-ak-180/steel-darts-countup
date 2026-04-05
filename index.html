@@ -1573,7 +1573,7 @@ function commit(total) {
   updDisp();
   // undoボタンを表示（1ラウンド目完了後から）
   var ub = document.getElementById('bundo');
-  if (ub) ub.className = g.scores.length >= 2 ? 'bundo show' : 'bundo';
+  if (ub) ub.className = g.scores.length >= 1 ? 'bundo show' : 'bundo';
 
   if (g.round >= ROUNDS) { setTimeout(showResult, 400); return; }
   g.round++;
@@ -1646,7 +1646,7 @@ function doUndo() {
   document.getElementById('rnum').innerHTML = g.round + ' <em>/ 8</em>';
   document.getElementById('bok').className = 'tk enter';
   var ub = document.getElementById('bundo');
-  if (ub) ub.className = g.scores.length >= 2 ? 'bundo show' : 'bundo';
+  if (ub) ub.className = g.scores.length >= 1 ? 'bundo show' : 'bundo';
   updDisp();
   drawDots();
 }
