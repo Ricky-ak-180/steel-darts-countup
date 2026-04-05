@@ -3037,7 +3037,7 @@ function goArrSetup() {
   document.getElementById('arr-setup').style.display = '';
   document.getElementById('arr-hist-wrap').style.display = '';
   document.getElementById('arr-hud').className = 'arr-hud hide';
-  document.getElementById('arr-card').className = 'arr-card hide';
+  var ac = document.getElementById('arr-card'); ac.className = 'arr-card hide'; ac.classList.remove('kezuri-mode');
   document.getElementById('arr-finish').className = 'arr-finish hide';
   document.getElementById('arr-train-home').style.display = 'none';
   document.getElementById('arr-train-prac').style.display = 'none';
