@@ -5119,13 +5119,13 @@ function renderZ01Hist() {
       if (g.data[0].checkouts && g.data[0].checkouts.length) allCOs = allCOs.concat(g.data[0].checkouts);
     });
     var cats = [
-      {min:161, max:170, label:'161〜170', desc:'D-BULL必須　ボギーも潜む神の領域'},
-      {min:131, max:160, label:'131〜160', desc:'トリプル2本必須　ミス1本で即詰み'},
-      {min:121, max:130, label:'121〜130', desc:'S1本を絡めてもOK　テクニカルで面白い数字'},
-      {min:101, max:110, label:'101〜110', desc:'1本目外しても2本目で入れ直せるチャンス圏'},
-      {min:61,  max:100, label:'61〜100',  desc:'T1本＋D1本で終わる　3本持てばリカバリー可'},
-      {min:41,  max:60,  label:'41〜60',   desc:'S＋Dの2本で上がれる　絶対に外せないエリア'},
-      {min:2,   max:40,  label:'2〜40',    desc:'ダブル1投フィニッシュ　技術とメンタルの勝負'}
+      {min:161, max:170, label:'161〜170', desc:'D-BULL必須　3本で上がれる最高難度'},
+      {min:131, max:160, label:'131〜160', desc:'トリプル2本必須　ミス0が条件'},
+      {min:121, max:130, label:'121〜130', desc:'S1本を絡めてトリプル→ダブルで上がれる'},
+      {min:101, max:110, label:'101〜110', desc:'1本目トリプル外しても2本目で入れ直せば上がれる'},
+      {min:61,  max:100, label:'61〜100',  desc:'シングル調整→ダブルフィニッシュ　標準アレンジ圏'},
+      {min:41,  max:60,  label:'41〜60',   desc:'S＋D の2本フィニッシュ'},
+      {min:2,   max:40,  label:'2〜40',    desc:'ダブル1投フィニッシュ'}
     ];
     html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
     html += '<div style="padding:10px 12px 4px;font-size:10px;color:var(--mut);letter-spacing:2px;">チェックアウト成功率（難易度別）</div>';
