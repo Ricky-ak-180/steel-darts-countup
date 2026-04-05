@@ -5320,7 +5320,7 @@ function renderZ01Hist() {
     var todayBestAvg = todayAvgs.length ? Math.max.apply(null,todayAvgs).toFixed(2) : '-';
     var today180 = todayGames.reduce(function(acc,g){return acc+g.data.reduce(function(a,p){return a+p.c180;},0);},0);
     var todayBestLegs = todaySolo.map(function(g){return g.data[0].bestLeg;}).filter(function(v){return v>0;});
-    var todayBL = todayBestLegs.length ? Math.min.apply(null,todayBestLegs)+' darts' : '-';
+    var todayBL = todayBestLegs.length ? Math.min.apply(null,todayBestLegs)+' 本' : '-';
     var todayF9s = todaySolo.map(function(g){return g.data[0].f9avg;}).filter(function(v){return v>0;});
     var todayBestF9 = todayF9s.length ? Math.max.apply(null,todayF9s).toFixed(2) : '-';
     html += '<div class="tcard">';
