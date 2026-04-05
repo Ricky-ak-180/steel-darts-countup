@@ -6061,6 +6061,56 @@ if (impZ01File) impZ01File.addEventListener('change', function(){ importZ01Data(
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(function(){});
 }
+
+// ====== 今日の一言（起動時ランダム削り戦術tips）======
+(function(){
+  var tips = [
+    '💡 ボギーナンバー（159・162・163・165・166・168・169）は3本で上がれないスコア。出したら即アレンジし直し！',
+    '💡 192・195はT20を狙うよりS-BULL（25）を狙って167・170残しを作ると上がりやすい。',
+    '💡 300〜309点台はT20×3本で140点取るとボギー圏に落ちる。1本目からT19かT18に切り替えよう。',
+    '💡 275〜271帯はS-BULL（25）でつないで167か170残し。ブルエリアは的が広く期待値が高い！',
+    '💡 220〜229帯でT20に入ると（60点取ると）→ 162〜169のボギーナンバーに一直線。注意！',
+    '💡 170はT20→T20→D-BULLで上がれる唯一の3桁チェックアウト。会場が沸く最高の一手。',
+    '💡 501はT20ファースト。310点まではT20一択。外れてもS20ならボギーにならない。',
+    '💡 260〜270帯は1本目で下の桁を調整してT20+S+25で167か170残しを作るのが理想。',
+    '💡 296〜300残りのとき、最後の1本でS-BULL（25）を狙えば271〜275帯に収まる。次のターンが楽になる！',
+    '💡 上がり目は170以下。でも161〜170はD-BULL必須の最高難度。落ち着いてアレンジを確認しよう。'
+  ];
+  var today = new Date().toDateString();
+  var lastShown = localStorage.getItem('tip_last_date');
+  if (lastShown === today) return; // 1日1回のみ
+  localStorage.setItem('tip_last_date', today);
+  var tip = tips[Math.floor(Math.random() * tips.length)];
+  var el = document.getElementById('daily-tip-toast');
+  if (!el) return;
+  el.innerHTML = tip;
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 5000);
+})();
+
+// ====== PWAインストール促進バナー ======
+(function(){
+  var deferredPrompt = null;
+  var banner = document.getElementById('pwa-banner');
+  if (!banner) return;
+  var dismissed = localStorage.getItem('pwa_banner_dismissed');
+  if (dismissed) return;
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    banner.style.display = 'flex';
+  });
+  var installBtn = document.getElementById('pwa-install-btn');
+  var dismissBtn = document.getElementById('pwa-dismiss-btn');
+  if (installBtn) installBtn.addEventListener('click', function(){
+    banner.style.display = 'none';
+    if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
+  });
+  if (dismissBtn) dismissBtn.addEventListener('click', function(){
+    banner.style.display = 'none';
+    localStorage.setItem('pwa_banner_dismissed', '1');
+  });
+})();
 </script>
 <div class="arr-flash-overlay" id="arr-flash-overlay"></div>
 <!-- Shortcut editor (global fixed overlay, outside any view) -->
