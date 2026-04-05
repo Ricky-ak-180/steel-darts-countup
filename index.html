@@ -2611,7 +2611,7 @@ function _setupSwipeDelete(hl) {
 
 /* Keyboard */
 document.addEventListener('keydown', function(e) {
-  if (!document.getElementById('vhist').classList.contains('hide')) return;
+  if (document.getElementById('vhist').style.display === 'none') return;
   // sc-editorが開いているときはゲームへのキー入力をブロック
   var scEd = document.getElementById('sc-editor');
   if (scEd && scEd.classList.contains('show')) return;
