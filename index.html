@@ -4381,9 +4381,11 @@ function _z01CpuTurn() {
     }
   } else {
     // 通常スコアリング: 3本独立シミュレート
-    var d0 = _z01SimT20Dart(lv);
-    var d1 = _z01SimT20Dart(lv);
-    var d2 = _z01SimT20Dart(lv);
+    // 約10%の確率でT19にスイッチ（人間らしいゆらぎ）
+    var simDart = (Math.random() < 0.10) ? _z01SimT19Dart : _z01SimT20Dart;
+    var d0 = simDart(lv);
+    var d1 = simDart(lv);
+    var d2 = simDart(lv);
     total = d0.score + d1.score + d2.score;
     labels = [d0.label, d1.label, d2.label];
     var isBust = (_z01.outRule === 0) ?
