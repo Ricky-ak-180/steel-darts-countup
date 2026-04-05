@@ -4225,6 +4225,49 @@ function z01ShowResult() {
   document.getElementById('z01-stats-table').innerHTML = h;
 }
 
+// ---- 01 History Storage ----
+function _z01GetH() { try { return JSON.parse(localStorage.getItem('dh01')||'[]'); } catch(e){ return []; } }
+function _z01SaveH(entry) {
+  try {
+    var h = _z01GetH();
+    h.unshift(entry);
+    localStorage.setItem('dh01', JSON.stringify(h.slice(0, 300)));
+  } catch(ex) { console.warn('_z01SaveH failed:', ex); }
+}
+function _z01DelH(idx) {
+  try {
+    var h = _z01GetH();
+    h.splice(idx, 1);
+    localStorage.setItem('dh01', JSON.stringify(h));
+  } catch(ex) {}
+  renderZ01Hist();
+}
+function _z01BuildHistEntry() {
+  var n = _z01.players === 1 ? 1 : 2;
+  var players = [];
+  for (var i = 0; i < n; i++) {
+    var st = _z01.stats[i];
+    var avg = st.rounds > 0 ? parseFloat((st.total / st.rounds).toFixed(2)) : 0;
+    var f9avg = st.first9.length ? parseFloat((st.first9.reduce(function(a,b){return a+b;},0)/st.first9.length).toFixed(2)) : 0;
+    players.push({
+      name: _z01PlayerName(i),
+      avg: avg, f9avg: f9avg,
+      c100: st.c100, c140: st.c140, c180: st.c180,
+      hiFin: st.hiFin, bestLeg: st.bestLeg < 999 ? st.bestLeg : 0,
+      worstLeg: st.worstLeg > 0 ? st.worstLeg : 0,
+      legWins: _z01.legWins[i]
+    });
+  }
+  var winner = n > 1 ? (_z01.legWins[0] > _z01.legWins[1] ? 0 : (_z01.legWins[1] > _z01.legWins[0] ? 1 : -1)) : 0;
+  return {
+    date: new Date().toISOString(),
+    mode: _z01.mode, legs: _z01.legs,
+    inRule: _z01.inRule, outRule: _z01.outRule,
+    players: n, winner: winner,
+    data: players
+  };
+}
+// ---- end 01 History Storage ----
 function z01Again() {
   var m = _z01.mode;
   _z01.remain = [m, m]; _z01.legWins = [0, 0];
