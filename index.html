@@ -3292,7 +3292,8 @@ function _renderTactics() {
     var d = n % 10;
     var isT19 = (d===3||d===6||d===9);
     var isT18 = (d===2||d===5||d===8);
-    if (!ex && !isT19 && !isT18) return '';
+    var has300sPath = (zone === '300s' && !!TACTICS_300s_PATHS[n]);
+    if (!ex && !isT19 && !isT18 && !has300sPath) return '';
 
     var target = ex ? ex.target : (isT19 ? 'T19' : 'T18');
     var tVal = _tacticsTargetVal(target);
