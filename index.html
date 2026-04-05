@@ -3859,7 +3859,6 @@ function _renderArrWeak(qd, mode) {
 }
 
 function _renderArrReview() {
-  var modeNames = ['初級','中級','上級','全部'];
   var html = '<div class="arr-review-toggle" onclick="var b=document.getElementById(\'arr-review-body\');b.classList.toggle(\'open\');this.textContent=b.classList.contains(\'open\')?\'答え合わせ ▴\':\'答え合わせ ▾\'">答え合わせ ▾</div>';
   html += '<div class="arr-review-body" id="arr-review-body">';
   var curQ = -1;
@@ -3868,37 +3867,61 @@ function _renderArrReview() {
     if (le.q !== curQ) {
       if (curQ !== -1) html += '</div></div>';
       curQ = le.q;
-      var fullPath = (CHECKOUT[le.qScore] || []).join(' → ');
-      html += '<div class="arr-review-q">';
-      html += '<div class="arr-review-q-hdr">';
-      html += '<span class="arr-review-q-num">Q' + (le.q+1) + '  ' + le.qScore + '</span>';
-      html += '<span class="arr-review-q-path">' + fullPath + '</span>';
+      html += '<div class="arr-review-q"><div class="arr-review-q-hdr">';
+      if (le.kezuri) {
+        var kqr = _ARR_KEZURI_QS[le.kIdx] || {};
+        html += '<span class="arr-review-q-num" style="font-size:11px;font-family:inherit;letter-spacing:0">Q' + (le.q+1) + '</span>';
+        html += '<span class="arr-review-q-path" style="font-size:11px">' + (kqr.q || '') + '</span>';
+      } else {
+        var fullPath = (CHECKOUT[le.qScore] || []).join(' → ');
+        html += '<span class="arr-review-q-num">Q' + (le.q+1) + '  ' + le.qScore + '</span>';
+        html += '<span class="arr-review-q-path">' + fullPath + '</span>';
+      }
       html += '</div><div>';
     }
-    var stgNames = ['1本目','2本目','3本目'];
-    var sn = stgNames[le.stgIdx] || (le.stgIdx+1+'本目');
     var icon = le.isCorrect ? '✓' : (le.isTimeout ? '⏱' : '✗');
     var ic = le.isCorrect ? '#66bb6a' : '#ef5350';
-    var ctx = '';
-    if (le.prevOutcome) {
-      var po2 = le.prevOutcome;
-      var ctxLbl = po2.type === 'success' ? po2.dart+'→入' : po2.dart+'→'+po2.missTarget;
-      ctx = '<span style="font-size:10px;color:var(--mut);margin-right:4px">['+ctxLbl+']</span>';
-    }
     var ans = '';
-    if (le.isCorrect) {
-      ans = '<span style="color:#66bb6a;font-weight:700">'+le.correct+'</span>';
-      if (le.pts > 0) ans += '<span style="color:var(--mut);font-size:10px"> +'+le.pts+'pt</span>';
-    } else if (le.chosen) {
-      ans = '<span style="color:#ef5350;text-decoration:line-through">'+le.chosen+'</span><span style="color:#66bb6a;font-weight:700"> → '+le.correct+'</span>';
+    if (le.kezuri) {
+      var kqr2 = _ARR_KEZURI_QS[le.kIdx] || {};
+      var correctText = kqr2.choices ? kqr2.choices[kqr2.ans] : le.correct;
+      var chosenText = (le.chosen && kqr2.choices) ? kqr2.choices[parseInt(le.chosen.replace('__k',''))] : le.chosen;
+      if (le.isCorrect) {
+        ans = '<span style="color:#66bb6a;font-weight:700;font-size:11px">' + correctText + '</span>';
+        if (le.pts > 0) ans += '<span style="color:var(--mut);font-size:10px"> +' + le.pts + 'pt</span>';
+      } else if (le.chosen) {
+        ans = '<span style="color:#ef5350;text-decoration:line-through;font-size:11px">' + chosenText + '</span>'
+            + '<span style="color:#66bb6a;font-weight:700;font-size:11px"> → ' + correctText + '</span>';
+      } else {
+        ans = '<span style="color:#ef5350">⏱</span><span style="color:#66bb6a;font-weight:700;font-size:11px"> → ' + correctText + '</span>';
+      }
+      html += '<div class="arr-review-stage">';
+      html += '<span style="color:'+ic+';min-width:14px">'+icon+'</span>';
+      html += ans;
+      html += '</div>';
     } else {
-      ans = '<span style="color:#ef5350">⏱</span><span style="color:#66bb6a;font-weight:700"> → '+le.correct+'</span>';
+      var stgNames = ['1本目','2本目','3本目'];
+      var sn = stgNames[le.stgIdx] || (le.stgIdx+1+'本目');
+      var ctx = '';
+      if (le.prevOutcome) {
+        var po2 = le.prevOutcome;
+        var ctxLbl = po2.type === 'success' ? po2.dart+'→入' : po2.dart+'→'+po2.missTarget;
+        ctx = '<span style="font-size:10px;color:var(--mut);margin-right:4px">['+ctxLbl+']</span>';
+      }
+      if (le.isCorrect) {
+        ans = '<span style="color:#66bb6a;font-weight:700">'+le.correct+'</span>';
+        if (le.pts > 0) ans += '<span style="color:var(--mut);font-size:10px"> +'+le.pts+'pt</span>';
+      } else if (le.chosen) {
+        ans = '<span style="color:#ef5350;text-decoration:line-through">'+le.chosen+'</span><span style="color:#66bb6a;font-weight:700"> → '+le.correct+'</span>';
+      } else {
+        ans = '<span style="color:#ef5350">⏱</span><span style="color:#66bb6a;font-weight:700"> → '+le.correct+'</span>';
+      }
+      html += '<div class="arr-review-stage" style="'+(le.stgIdx===0?'':'border-top:1px solid var(--bd)')+'">';
+      html += '<span style="color:'+ic+';min-width:14px">'+icon+'</span>';
+      html += '<span style="color:var(--mut);min-width:32px">'+sn+'</span>';
+      html += ctx + ans;
+      html += '</div>';
     }
-    html += '<div class="arr-review-stage" style="'+(le.stgIdx===0?'':'border-top:1px solid var(--bd)')+'">';
-    html += '<span style="color:'+ic+';min-width:14px">'+icon+'</span>';
-    html += '<span style="color:var(--mut);min-width:32px">'+sn+'</span>';
-    html += ctx + ans;
-    html += '</div>';
   }
   if (curQ !== -1) html += '</div></div>';
   html += '</div>';
