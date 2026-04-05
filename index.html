@@ -4285,6 +4285,7 @@ var _TRAIN_SCORES = (function() {
 
 var _trainCurrent = null;
 var _trainHintVis  = false;
+var _trainWeakQueue = [];
 
 function _trainLoad() {
   try { return JSON.parse(localStorage.getItem('arr_train_v1') || '{}'); } catch(e) { return {}; }
