@@ -1781,7 +1781,7 @@ function goTab(tab) {
     if (rp) rp.innerHTML = '';
     if (g.scores.length >= ROUNDS) document.getElementById('ngp').className = 'ngp show';
   }
-  if (tab === '01') { goSub01Game(); _z01LoadDefaults(); }
+  if (tab === '01') { goSub01Game(); _z01LoadDefaults(); z01SetCpu(_z01.cpuLevel); }
 }
 
 /* Storage */
