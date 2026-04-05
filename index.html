@@ -3261,6 +3261,129 @@ function _renderTactics() {
     300, 309, '300s'
   );
 
+  // ── 296〜300帯：ブル狙いでつなぐ ──
+  html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
+    '<div style="font-family:\'Bebas Neue\',cursive;font-size:38px;color:#4fc3f7;line-height:1;margin-bottom:4px;">300 〜 296　ブル狙いでつなぐ</div>' +
+    '<div style="font-size:13px;color:var(--mut);margin-bottom:12px;line-height:1.6;">1本目をブル（50点）狙い。シングルブル（25点）に外れると残り271〜275帯に収まるので、次の手でそのまま回収できる。</div>' +
+    '<div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">' +
+      '<div><span style="color:#66bb6a;font-weight:700;">✓ ブル（50）ヒット</span><span style="color:var(--mut);"> → 残り246〜250（次ターンへ）</span></div>' +
+      '<div><span style="color:#4fc3f7;font-weight:700;">✓ 外ブル（25）ミス</span><span style="color:var(--mut);"> → 残り271〜275 → 下の戦術（S+T20+外ブル）を適用</span></div>' +
+    '</div>' +
+  '</div>';
+
+  // ── 271〜275帯：外ブル（25）でつなぐ ──
+  (function(){
+    var rows275 = [
+      {score:271, d1:'S19', v1:19, d2:'T20', v2:60, d3:'外ブル', v3:25, leave:167},
+      {score:272, d1:'S20', v1:20, d2:'T20', v2:60, d3:'外ブル', v3:25, leave:167},
+      {score:273, d1:'S18', v1:18, d2:'T20', v2:60, d3:'外ブル', v3:25, leave:170},
+      {score:274, d1:'S19', v1:19, d2:'T20', v2:60, d3:'外ブル', v3:25, leave:170},
+      {score:275, d1:'S20', v1:20, d2:'T20', v2:60, d3:'外ブル', v3:25, leave:170}
+    ];
+    var tbl275 = '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;">' +
+      '<tr style="color:var(--mut);font-size:11px;letter-spacing:0.5px;">' +
+        '<th style="padding:4px 6px;text-align:left;font-weight:400;">残り</th>' +
+        '<th style="padding:4px 6px;text-align:center;font-weight:400;">1本目</th>' +
+        '<th style="padding:4px 2px;text-align:center;font-weight:400;color:transparent;">›</th>' +
+        '<th style="padding:4px 6px;text-align:center;font-weight:400;">2本目</th>' +
+        '<th style="padding:4px 2px;text-align:center;font-weight:400;color:transparent;">›</th>' +
+        '<th style="padding:4px 6px;text-align:center;font-weight:400;">3本目</th>' +
+        '<th style="padding:4px 6px;text-align:right;font-weight:400;">残り</th>' +
+      '</tr>';
+    rows275.forEach(function(r){
+      tbl275 += '<tr style="border-top:1px solid rgba(255,255,255,0.06);">' +
+        '<td style="padding:6px 6px;font-family:\'Bebas Neue\',cursive;font-size:22px;color:#4fc3f7;">' + r.score + '</td>' +
+        '<td style="padding:6px;text-align:center;color:var(--fg);">' + r.d1 + '<span style="color:var(--mut);font-size:11px;"> (' + r.v1 + ')</span></td>' +
+        '<td style="padding:6px 2px;text-align:center;color:var(--mut);">›</td>' +
+        '<td style="padding:6px;text-align:center;color:var(--acc);font-weight:700;">' + r.d2 + '<span style="color:var(--mut);font-size:11px;font-weight:400;"> (' + r.v2 + ')</span></td>' +
+        '<td style="padding:6px 2px;text-align:center;color:var(--mut);">›</td>' +
+        '<td style="padding:6px;text-align:center;color:#ff8a65;font-weight:700;">' + r.d3 + '<span style="color:var(--mut);font-size:11px;font-weight:400;"> (' + r.v3 + ')</span></td>' +
+        '<td style="padding:6px;text-align:right;font-weight:700;color:#66bb6a;">' + r.leave + '残し</td>' +
+      '</tr>';
+    });
+    tbl275 += '</table>';
+    html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
+      '<div style="font-family:\'Bebas Neue\',cursive;font-size:38px;color:#4fc3f7;line-height:1;margin-bottom:4px;">275 〜 271　外ブル（25）でつなぐ</div>' +
+      '<div style="font-size:13px;color:var(--mut);margin-bottom:2px;line-height:1.6;">1本目のシングルで下の桁を調整し、T20→<strong style="color:#ff8a65;">外ブル（25点）</strong>で<strong style="color:var(--fg);">167か170</strong>に収める。</div>' +
+      tbl275 +
+    '</div>';
+  })();
+
+  // ── 260〜270帯：1本目で下の桁を調整 ──
+  (function(){
+    var rows260 = [
+      {score:262, d1:'S18', v1:18, d2:'T20', v2:60, d3:'S20', v3:20, leave:164},
+      {score:266, d1:'S19', v1:19, d2:'T20', v2:60, d3:'S20', v3:20, leave:167},
+      {score:269, d1:'S19', v1:19, d2:'T20', v2:60, d3:'S20', v3:20, leave:170}
+    ];
+    var tbl260 = '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;">' +
+      '<tr style="color:var(--mut);font-size:11px;letter-spacing:0.5px;">' +
+        '<th style="padding:4px 6px;text-align:left;font-weight:400;">残り</th>' +
+        '<th style="padding:4px 6px;text-align:center;font-weight:400;">1本目</th>' +
+        '<th style="padding:4px 2px;text-align:center;font-weight:400;color:transparent;">›</th>' +
+        '<th style="padding:4px 6px;text-align:center;font-weight:400;">2本目</th>' +
+        '<th style="padding:4px 2px;text-align:center;font-weight:400;color:transparent;">›</th>' +
+        '<th style="padding:4px 6px;text-align:center;font-weight:400;">3本目</th>' +
+        '<th style="padding:4px 6px;text-align:right;font-weight:400;">残り</th>' +
+      '</tr>';
+    rows260.forEach(function(r){
+      tbl260 += '<tr style="border-top:1px solid rgba(255,255,255,0.06);">' +
+        '<td style="padding:6px 6px;font-family:\'Bebas Neue\',cursive;font-size:22px;color:#4fc3f7;">' + r.score + '</td>' +
+        '<td style="padding:6px;text-align:center;color:var(--fg);">' + r.d1 + '<span style="color:var(--mut);font-size:11px;"> (' + r.v1 + ')</span></td>' +
+        '<td style="padding:6px 2px;text-align:center;color:var(--mut);">›</td>' +
+        '<td style="padding:6px;text-align:center;color:var(--acc);font-weight:700;">' + r.d2 + '<span style="color:var(--mut);font-size:11px;font-weight:400;"> (' + r.v2 + ')</span></td>' +
+        '<td style="padding:6px 2px;text-align:center;color:var(--mut);">›</td>' +
+        '<td style="padding:6px;text-align:center;color:#66bb6a;font-weight:700;">' + r.d3 + '<span style="color:var(--mut);font-size:11px;font-weight:400;"> (' + r.v3 + ')</span></td>' +
+        '<td style="padding:6px;text-align:right;font-weight:700;color:#66bb6a;">' + r.leave + '残し</td>' +
+      '</tr>';
+    });
+    tbl260 += '</table>';
+    html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
+      '<div style="font-family:\'Bebas Neue\',cursive;font-size:38px;color:#4fc3f7;line-height:1;margin-bottom:4px;">270 〜 260　1本目で下の桁を調整</div>' +
+      '<div style="font-size:13px;color:var(--mut);margin-bottom:2px;line-height:1.6;">1本目にS18かS19で下の桁を調整し、T20→S20のコンボで<strong style="color:var(--fg);">164・167・170</strong>に収める。</div>' +
+      tbl260 +
+    '</div>';
+  })();
+
+  // ── 220〜229帯：3本目を18・19に切り替える ──
+  (function(){
+    var rows220 = [
+      {score:222, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:164},
+      {score:223, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:164},
+      {score:225, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:167},
+      {score:226, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:167},
+      {score:228, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:170},
+      {score:229, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:170}
+    ];
+    var tbl220 = '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;">' +
+      '<tr style="color:var(--mut);font-size:11px;letter-spacing:0.5px;">' +
+        '<th style="padding:4px 6px;text-align:left;font-weight:400;">残り</th>' +
+        '<th style="padding:4px 6px;text-align:center;font-weight:400;">1本目</th>' +
+        '<th style="padding:4px 2px;text-align:center;font-weight:400;color:transparent;">›</th>' +
+        '<th style="padding:4px 6px;text-align:center;font-weight:400;">2本目</th>' +
+        '<th style="padding:4px 2px;text-align:center;font-weight:400;color:transparent;">›</th>' +
+        '<th style="padding:4px 6px;text-align:center;font-weight:400;">3本目（切替）</th>' +
+        '<th style="padding:4px 6px;text-align:right;font-weight:400;">残り</th>' +
+      '</tr>';
+    rows220.forEach(function(r){
+      tbl220 += '<tr style="border-top:1px solid rgba(255,255,255,0.06);">' +
+        '<td style="padding:6px 6px;font-family:\'Bebas Neue\',cursive;font-size:22px;color:#4fc3f7;">' + r.score + '</td>' +
+        '<td style="padding:6px;text-align:center;color:var(--mut);">' + r.d1 + '<span style="font-size:11px;"> (' + r.v1 + ')</span></td>' +
+        '<td style="padding:6px 2px;text-align:center;color:var(--mut);">›</td>' +
+        '<td style="padding:6px;text-align:center;color:var(--mut);">' + r.d2 + '<span style="font-size:11px;"> (' + r.v2 + ')</span></td>' +
+        '<td style="padding:6px 2px;text-align:center;color:var(--mut);">›</td>' +
+        '<td style="padding:6px;text-align:center;color:var(--acc);font-weight:700;">' + r.d3 + '<span style="color:var(--mut);font-size:11px;font-weight:400;"> (' + r.v3 + ')</span></td>' +
+        '<td style="padding:6px;text-align:right;font-weight:700;color:#66bb6a;">' + r.leave + '残し</td>' +
+      '</tr>';
+    });
+    tbl220 += '</table>';
+    html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:24px;">' +
+      '<div style="font-family:\'Bebas Neue\',cursive;font-size:38px;color:#4fc3f7;line-height:1;margin-bottom:4px;">229 〜 220　3本目を18・19に切り替える</div>' +
+      '<div style="font-size:13px;color:var(--mut);margin-bottom:2px;line-height:1.6;">S20を2本打った後（残り182〜189）、そのままS20で打つと中途半端な数字になる。3本目を<strong style="color:var(--acc);">S18かS19</strong>に切り替えて<strong style="color:var(--fg);">164・167・170</strong>に収める。</div>' +
+      tbl220 +
+    '</div>';
+  })();
+
   // 171〜199（S20ミスでボギーになる8スコアのみ）
   html += rangeSection(
     '199〜171　最後の一本　要注意',
