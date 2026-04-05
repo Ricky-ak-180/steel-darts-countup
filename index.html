@@ -5667,6 +5667,8 @@ function z01Again() {
   var m = _z01.mode;
   _z01.remain = [m, m]; _z01.legWins = [0, 0];
   _z01.currentPlayer = 0; _z01.currentLeg = 1; _z01._buf = '';
+  _z01.roundScores = [[], []];
+  _z01.checkoutAttempts = [[], []];
   _z01.stats = _z01InitStats(_z01.players===1?1:2);
   document.getElementById('z01-result-wrap').style.display = 'none';
   document.getElementById('z01-game-wrap').style.display = 'flex';
