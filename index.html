@@ -4341,6 +4341,52 @@ function _z01ShowCpuDart(i, label) {
   el.textContent = label;
   el.className = 'z01-cpu-dart ' + (label==='—'?'dash':label==='MISS'?'miss':'hit');
 }
+// チェックアウト失敗時の戦略的1本シミュレーション
+// 残り点数に応じて「次のビジットに向けた最適セグメント」を狙う
+function _z01CheckoutSimDart(lv, remain) {
+  var outRule = _z01.outRule;
+  var hitRate;
+
+  // ── 残り2〜40（偶数, D-out）: ダブル狙い ──
+  if (outRule === 0 && remain % 2 === 0 && remain >= 2 && remain <= 40) {
+    var dbl = remain / 2;
+    hitRate = [0,0.04,0.06,0.09,0.13,0.18,0.23,0.30,0.37,0.45,0.54,0.63,0.72][lv];
+    if (Math.random() < hitRate) return {label:'D'+dbl, score:remain};
+    var r = Math.random();
+    if (r < 0.45) return {label:'S'+dbl, score:dbl};   // インナーワイヤー外れ
+    if (r < 0.72) return {label:'MISS', score:0};       // 完全ミス
+    var adj = (dbl >= 2 && dbl <= 19) ? dbl + (Math.random()<0.5?1:-1) : (dbl===1?18:5);
+    return {label:'S'+Math.max(1,Math.min(20,adj)), score:Math.max(1,Math.min(20,adj))};
+  }
+
+  // ── 残り奇数≤39（D-out）: S1でパリティ修正 ──
+  if (outRule === 0 && remain % 2 !== 0 && remain >= 3 && remain <= 39) {
+    hitRate = [0,0.35,0.42,0.49,0.56,0.63,0.69,0.75,0.80,0.84,0.88,0.91,0.94][lv];
+    if (Math.random() < hitRate) return {label:'S1', score:1};
+    return {label:'MISS', score:0};
+  }
+
+  // ── 残り41〜60: S(remain-40)でD20(40)を残す ──
+  if (remain >= 41 && remain <= 60) {
+    var tgt = remain - 40;  // S1〜S20
+    hitRate = [0,0.30,0.38,0.46,0.53,0.60,0.67,0.73,0.78,0.83,0.87,0.90,0.93][lv];
+    if (Math.random() < hitRate) return {label:'S'+tgt, score:tgt};
+    var mis = tgt + (Math.random() < 0.5 ? 1 : -1);
+    return {label:'S'+Math.max(1,Math.min(20,mis)), score:Math.max(1,Math.min(20,mis))};
+  }
+
+  // ── 残り61〜170: T20/T19のうち好ましいleaveになる方を選択 ──
+  if (remain >= 61 && remain <= 170) {
+    var PREF = [40,32,36,38,24,20,16,8,4,2,50,34,28,26,22,18,12,6,10,14,30];
+    var a20 = remain - 60, a19 = remain - 57;
+    var i20 = PREF.indexOf(a20), i19 = PREF.indexOf(a19);
+    if (i19 >= 0 && (i20 < 0 || i19 < i20)) return _z01SimT19Dart(lv);
+    return _z01SimT20Dart(lv);
+  }
+
+  return _z01SimT20Dart(lv);
+}
+
 function _z01CpuTurn() {
   var cpuArea = document.getElementById('z01-cpu-area');
   cpuArea.style.display = 'flex';
