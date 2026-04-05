@@ -482,6 +482,14 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-finish-btns { display:flex; flex-direction:column; gap:8px; width:100%; }
 .arr-retry-btn { background:var(--acc); color:#000; border:none; border-radius:12px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; width:100%; }
 .arr-back-btn { background:transparent; color:var(--mut); border:1px solid var(--bd); border-radius:12px; padding:12px; font-size:14px; cursor:pointer; width:100%; }
+/* 苦手問題 */
+.arr-weak-wrap { width:100%; background:var(--card); border:1px solid var(--bd); border-radius:12px; padding:12px 14px; }
+.arr-weak-title { font-size:11px; color:var(--mut); letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+.arr-weak-list { display:flex; flex-direction:column; gap:6px; }
+.arr-weak-row { display:flex; align-items:center; gap:6px; font-size:13px; }
+.arr-weak-score { font-family:'Bebas Neue',cursive; font-size:18px; color:var(--fg); min-width:36px; }
+.arr-weak-path { flex:1; color:var(--mut); font-size:11px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.arr-weak-pct { font-weight:700; font-size:13px; min-width:34px; text-align:right; }
 /* 答え合わせ */
 .arr-review { width:100%; }
 .arr-review-toggle { font-size:11px; color:var(--mut); letter-spacing:2px; text-align:center; padding:4px 0 8px; cursor:pointer; user-select:none; }
