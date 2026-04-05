@@ -4847,7 +4847,7 @@ function _z01RenderAvgGraph() {
     var g = hist[i];
     if (g.data && g.data[0] && g.data[0].avg > 0) pts.push(g.data[0].avg);
   }
-  pts = pts.slice(-20);
+  pts = pts.slice(-30);
   if (pts.length < 2) {
     el.innerHTML = '<div class="z01-avg-graph-hdr"><span class="z01-avg-graph-label">AVG推移</span></div>' +
       '<div class="z01-avg-graph-empty">あと' + (2 - pts.length) + 'ゲームでグラフが表示されます</div>';
