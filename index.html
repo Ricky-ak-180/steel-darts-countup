@@ -4181,6 +4181,7 @@ function z01NextLeg() {
 }
 
 function z01ShowResult() {
+  _z01SaveH(_z01BuildHistEntry());
   document.getElementById('z01-leg-overlay').style.display = 'none';
   document.getElementById('z01-game-wrap').style.display = 'none';
   document.getElementById('z01-result-wrap').style.display = '';
