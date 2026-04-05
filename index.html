@@ -1114,7 +1114,11 @@ canvas.schart { width: 100%; height: 100%; }
   <div class="view hide" id="v01" style="overflow:hidden;">
     <div class="cu-subtabs">
       <div class="cu-subtab on" id="sub01-game" data-fn="goSub01Game">🎮 01</div>
+      <div class="cu-subtab" id="sub01-hist" data-fn="goSub01Hist">📊 履歴</div>
       <div class="cu-subtab" id="sub01-arr" data-fn="goSub01Arr">📋 アレンジ</div>
+    </div>
+    <div id="v01-hist-wrap" style="display:none;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+      <div id="z01-hist-content" style="padding:12px;display:flex;flex-direction:column;gap:12px;"></div>
     </div>
     <div id="v01-game-wrap" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;">
     <!-- Setup screen -->
