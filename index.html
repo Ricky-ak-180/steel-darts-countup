@@ -4059,8 +4059,7 @@ function advanceArr() {
 function _arrFinish() {
   _clearArrTimer();
   var raw = _arrG.totalScore;
-  var max = _arrG.maxScore || 1;
-  var score = Math.min(1000, Math.round(raw / max * 1000));
+  var score = Math.min(1000, Math.round(raw));
 
   // ベスト更新
   var bests = _arrGetBests();
