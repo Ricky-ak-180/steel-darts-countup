@@ -4240,86 +4240,138 @@ function renderZ01Hist() {
   if (!wrap) return;
   var h = _z01GetH();
   if (!h.length) {
-    wrap.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--mut);font-size:13px;">まだ記録がありません。<br>ゲームを完了すると自動で保存されます。</div>';
+    wrap.innerHTML = '<div class="hempty"><div class="ei">🎮</div>まだ記録がありません。<br>ゲームを完了すると自動で保存されます。</div>';
     return;
   }
-  // Summary stats
-  var total = h.length;
-  var p1games = h.filter(function(g){ return g.players===1; });
-  var allAvgs = p1games.map(function(g){ return g.data[0].avg; }).filter(function(v){return v>0;});
-  var overallAvg = allAvgs.length ? (allAvgs.reduce(function(a,b){return a+b;},0)/allAvgs.length).toFixed(2) : '-';
-  var bestAvg = allAvgs.length ? Math.max.apply(null,allAvgs).toFixed(2) : '-';
-  var all140 = h.reduce(function(acc,g){ return acc + g.data.reduce(function(a,p){return a+p.c140;},0); },0);
-  var all180 = h.reduce(function(acc,g){ return acc + g.data.reduce(function(a,p){return a+p.c180;},0); },0);
-  var bestLegs = p1games.map(function(g){return g.data[0].bestLeg;}).filter(function(v){return v>0;});
+  // --- Compute cumulative stats ---
+  var soloGames = h.filter(function(g){ return g.players===1; });
+  var allAvgs = soloGames.map(function(g){ return g.data[0].avg; }).filter(function(v){return v>0;});
+  var bestAvgVal = allAvgs.length ? Math.max.apply(null,allAvgs) : 0;
+  var bestAvgStr = bestAvgVal > 0 ? bestAvgVal.toFixed(2) : '-';
+  var all180 = h.reduce(function(acc,g){ return acc+g.data.reduce(function(a,p){return a+p.c180;},0); },0);
+  var all140 = h.reduce(function(acc,g){ return acc+g.data.reduce(function(a,p){return a+p.c140;},0); },0);
+  var bestLegs = soloGames.map(function(g){return g.data[0].bestLeg;}).filter(function(v){return v>0;});
   var bestLeg = bestLegs.length ? Math.min.apply(null,bestLegs) : 0;
-  // AVG trend (last 30 solo games)
-  var trend30 = p1games.slice(0,30).map(function(g){return g.data[0].avg;}).reverse();
-  // Summary card
-  var html = '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px;">';
-  html += '<div style="font-size:10px;color:var(--mut);letter-spacing:2px;margin-bottom:10px;">TOTAL STATS</div>';
-  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;">';
-  var sCards = [
-    [total+'G', '総ゲーム数'],
-    [overallAvg, 'AVG (全体)'],
-    [bestAvg, 'AVG (ベスト)'],
-    [bestLeg ? bestLeg+' darts' : '-', 'ベストレグ'],
-    [all140, '140+'],
-    [all180, '180s']
-  ];
-  sCards.forEach(function(c){
-    html += '<div style="background:var(--bg);border-radius:8px;padding:8px 4px;">';
-    html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:26px;color:var(--acc);">'+c[0]+'</div>';
-    html += '<div style="font-size:9px;color:var(--mut);letter-spacing:1px;">'+c[1]+'</div></div>';
-  });
+  // Find index of best game in full h array
+  var bestHIdx = -1;
+  if (bestAvgVal > 0) { for (var bi=0;bi<h.length;bi++) { if (h[bi].players===1 && h[bi].data[0].avg===bestAvgVal){ bestHIdx=bi; break; } } }
+  // --- Today's stats ---
+  var todayStr = localDateStr(new Date());
+  var todayGames = h.filter(function(g){ return g.date && localDateStr(new Date(g.date))===todayStr; });
+  var todaySolo = todayGames.filter(function(g){ return g.players===1; });
+  // --- Recent 30 solo AVG ---
+  var recent30 = soloGames.slice(0,30);
+  var r30avgs = recent30.map(function(g){return g.data[0].avg;}).filter(function(v){return v>0;});
+  var avgRecent = r30avgs.length ? (r30avgs.reduce(function(a,b){return a+b;},0)/r30avgs.length).toFixed(2) : '-';
+  var prev30avgs = soloGames.slice(1,31).map(function(g){return g.data[0].avg;}).filter(function(v){return v>0;});
+  var avgPrev = prev30avgs.length ? (prev30avgs.reduce(function(a,b){return a+b;},0)/prev30avgs.length) : null;
+  var arrow = '';
+  if (avgPrev !== null && avgRecent !== '-') {
+    if (parseFloat(avgRecent) > avgPrev) arrow = '<span style="color:#ff6b35;font-size:16px;font-weight:900;"> ▲</span>';
+    else if (parseFloat(avgRecent) < avgPrev) arrow = '<span style="color:#4fc3f7;font-size:16px;font-weight:900;"> ▼</span>';
+  }
+  var f9recent = soloGames.slice(0,30).map(function(g){return g.data[0].f9avg;}).filter(function(v){return v>0;});
+  var avgF9 = f9recent.length ? (f9recent.reduce(function(a,b){return a+b;},0)/f9recent.length).toFixed(2) : '-';
+  // AVG trend chart data
+  var trend30 = recent30.map(function(g){return g.data[0].avg;}).reverse();
+  var html = '';
+  // === 1. Profile card ===
+  html += '<div class="pcard">';
+  html += '<div class="pcard-brand"><span class="pcard-badge">🎮 累計成績</span><span class="pcard-app">Steel Darts 01</span></div>';
+  html += '<div class="pcard-score">' + bestAvgStr + '</div>';
+  html += '<div class="pcard-score-label">Personal Best AVG</div>';
+  html += '<hr class="pcard-divider">';
+  html += '<div class="pcard-stats">';
+  html += '<div class="pcard-stat"><div class="pcard-stat-val" style="color:rgba(255,255,255,0.7);">' + h.length + '</div><div class="pcard-stat-lbl">Total Games</div></div>';
+  html += '<div class="pcard-stat"><div class="pcard-stat-val" style="color:#ffd700;">×' + all180 + '</div><div class="pcard-stat-lbl">通算 180</div></div>';
+  html += '<div class="pcard-stat"><div class="pcard-stat-val" style="color:var(--grn);font-size:' + (bestLeg?'22px':'28px') + ';">' + (bestLeg ? bestLeg+' darts' : '-') + '</div><div class="pcard-stat-lbl">Best Leg</div></div>';
   html += '</div></div>';
-  // AVG trend chart (canvas)
+  // === 2. Today's card ===
+  if (todayGames.length > 0) {
+    var todayAvgs = todaySolo.map(function(g){return g.data[0].avg;}).filter(function(v){return v>0;});
+    var todayBestAvg = todayAvgs.length ? Math.max.apply(null,todayAvgs).toFixed(2) : '-';
+    var today180 = todayGames.reduce(function(acc,g){return acc+g.data.reduce(function(a,p){return a+p.c180;},0);},0);
+    var todayBestLegs = todaySolo.map(function(g){return g.data[0].bestLeg;}).filter(function(v){return v>0;});
+    var todayBL = todayBestLegs.length ? Math.min.apply(null,todayBestLegs)+' darts' : '-';
+    var todayF9s = todaySolo.map(function(g){return g.data[0].f9avg;}).filter(function(v){return v>0;});
+    var todayBestF9 = todayF9s.length ? Math.max.apply(null,todayF9s).toFixed(2) : '-';
+    html += '<div class="tcard">';
+    html += '<div class="tcard-brand"><span class="tcard-badge">📅 今日の成績</span><span class="tcard-date">' + todayStr + '</span></div>';
+    html += '<div class="tcard-score">' + todayBestAvg + '</div>';
+    html += '<div class="tcard-score-label">Today\'s Best AVG</div>';
+    html += '<hr class="tcard-divider">';
+    html += '<div class="tcard-stats">';
+    html += '<div class="tcard-stat"><div class="tcard-stat-val" style="color:rgba(255,255,255,0.7);">' + todayGames.length + '</div><div class="tcard-stat-lbl">Games</div></div>';
+    html += '<div class="tcard-stat"><div class="tcard-stat-val" style="color:#ffd700;">×' + today180 + '</div><div class="tcard-stat-lbl">180</div></div>';
+    html += '<div class="tcard-stat"><div class="tcard-stat-val" style="color:var(--grn);font-size:18px;">' + todayBL + '</div><div class="tcard-stat-lbl">Best Leg</div></div>';
+    html += '<div class="tcard-stat"><div class="tcard-stat-val" style="color:#b47fff;">' + todayBestF9 + '</div><div class="tcard-stat-lbl">F9 AVG</div></div>';
+    html += '</div></div>';
+  }
+  // === 3. Recent 30G stats ===
+  if (recent30.length > 0) {
+    html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px;">';
+    html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">';
+    html += '<div style="text-align:center;background:var(--bg);border-radius:8px;padding:12px 4px;position:relative;">';
+    if (arrow) html += '<div style="position:absolute;top:6px;right:8px;line-height:1;">' + arrow + '</div>';
+    html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:32px;color:#fff;">' + avgRecent + '</div>';
+    html += '<div style="font-size:9px;color:var(--mut);letter-spacing:1px;">直近' + recent30.length + 'G AVG</div></div>';
+    html += '<div style="text-align:center;background:var(--bg);border-radius:8px;padding:12px 4px;">';
+    html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:32px;color:#b47fff;">' + avgF9 + '</div>';
+    html += '<div style="font-size:9px;color:var(--mut);letter-spacing:1px;">直近' + (f9recent.length||recent30.length) + 'G F9 AVG</div></div>';
+    html += '</div></div>';
+  }
+  // === 4. AVG trend chart ===
   if (trend30.length > 1) {
     html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px;">';
-    html += '<div style="font-size:10px;color:var(--mut);letter-spacing:2px;margin-bottom:8px;">AVG 推移（直近'+trend30.length+'G）</div>';
+    html += '<div style="font-size:10px;color:var(--mut);letter-spacing:2px;margin-bottom:8px;">AVG 推移（直近' + trend30.length + 'G）</div>';
     html += '<canvas id="z01-hist-chart" height="80" style="width:100%;display:block;"></canvas>';
     html += '</div>';
   }
-  // Game list
+  // === 5. Game list ===
   html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
   html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">ゲーム履歴</div>';
-  h.slice(0,50).forEach(function(g, idx){
+  h.slice(0,50).forEach(function(g, idx) {
     var d = new Date(g.date);
     var dateStr = d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
-    var modeStr = g.mode + ' (' + (g.outRule===0?'ダブルアウト':'シングルアウト') + ')';
-    var legsStr = g.legs > 1 ? ' Best of '+g.legs : '';
-    var p0 = g.data[0];
-    var avgStr = p0.avg > 0 ? p0.avg.toFixed(2) : '-';
-    var legStr = p0.bestLeg > 0 ? p0.bestLeg+' darts' : '-';
-    html += '<div style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;gap:4px;">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;">';
-    html += '<div style="font-size:11px;color:var(--mut);">'+dateStr+'</div>';
-    html += '<div style="font-size:11px;color:var(--acc);font-weight:700;">'+modeStr+legsStr+'</div>';
+    var outStr = g.outRule===0 ? 'ダブル' : 'シングル';
+    var legsStr = g.legs > 1 ? 'BO'+g.legs : '1 Leg';
+    var isBest = (idx === bestHIdx);
+    html += '<div style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
+    html += '<div style="font-size:10px;color:var(--mut);">' + dateStr + (isBest ? ' <span style="color:#ffd700;font-size:10px;">★ BEST</span>' : '') + '</div>';
+    html += '<div style="font-size:10px;color:var(--acc);font-weight:700;">' + g.mode + ' | ' + outStr + ' | ' + legsStr + '</div>';
     html += '</div>';
     if (g.players === 2) {
-      var p1 = g.data[1];
-      var wName = g.winner >= 0 ? g.data[g.winner].name : '-';
-      html += '<div style="font-size:12px;color:var(--txt);font-weight:700;">🏆 '+wName+'</div>';
-      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;">';
-      [p0,p1].forEach(function(p){
-        html += '<div style="background:var(--bg);border-radius:6px;padding:6px 8px;">';
-        html += '<div style="color:var(--acc);font-weight:700;margin-bottom:2px;">'+p.name+'</div>';
-        html += '<div style="color:var(--mut);">AVG: <span style="color:var(--txt);">'+p.avg.toFixed(2)+'</span></div>';
-        html += '<div style="color:var(--mut);">Legs: <span style="color:var(--txt);">'+p.legWins+'</span></div>';
-        html += '</div>';
+      var wName = (g.winner >= 0 && g.winner < g.data.length) ? g.data[g.winner].name : '-';
+      html += '<div style="font-size:11px;color:var(--acc);font-weight:700;margin-bottom:6px;">🏆 ' + wName + '</div>';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">';
+      g.data.forEach(function(p) {
+        var isW = g.winner >= 0 && g.data[g.winner] === p;
+        html += '<div style="background:var(--bg);border-radius:8px;padding:8px;border:1px solid ' + (isW?'rgba(232,255,71,0.3)':'transparent') + ';">';
+        html += '<div style="font-size:11px;color:' + (isW?'var(--acc)':'var(--mut)') + ';font-weight:700;margin-bottom:4px;">' + p.name + ' ' + p.legWins + 'W</div>';
+        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">';
+        html += '<div style="text-align:center;"><div style="font-family:\'Bebas Neue\',cursive;font-size:20px;color:var(--acc);">' + (p.avg>0?p.avg.toFixed(2):'-') + '</div><div style="font-size:8px;color:var(--mut);">AVG</div></div>';
+        html += '<div style="text-align:center;"><div style="font-family:\'Bebas Neue\',cursive;font-size:18px;color:var(--grn);">' + (p.bestLeg>0?p.bestLeg+' darts':'-') + '</div><div style="font-size:8px;color:var(--mut);">Best Leg</div></div>';
+        html += '</div></div>';
       });
       html += '</div>';
     } else {
-      html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:11px;">';
-      var cells = [['AVG',avgStr],['Best Leg',legStr],['140+',p0.c140],['180s',p0.c180]];
-      cells.forEach(function(c){
-        html += '<div style="text-align:center;background:var(--bg);border-radius:6px;padding:5px 2px;">';
-        html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:var(--txt);">'+c[1]+'</div>';
-        html += '<div style="font-size:9px;color:var(--mut);">'+c[0]+'</div></div>';
+      var p = g.data[0];
+      html += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;">';
+      [
+        ['font-size:24px;color:var(--acc);', p.avg>0?p.avg.toFixed(2):'-', 'AVG'],
+        ['font-size:18px;color:#b47fff;', p.f9avg>0?p.f9avg.toFixed(2):'-', 'F9 AVG'],
+        ['font-size:16px;color:var(--grn);', p.bestLeg>0?p.bestLeg+'d':'-', 'Best Leg'],
+        ['font-size:18px;color:rgba(255,255,255,0.7);', p.c140, '140+'],
+        ['font-size:18px;color:#ffd700;', p.c180, '180s']
+      ].forEach(function(c){
+        html += '<div style="text-align:center;background:var(--bg);border-radius:6px;padding:6px 2px;">';
+        html += '<div style="font-family:\'Bebas Neue\',cursive;' + c[0] + '">' + c[1] + '</div>';
+        html += '<div style="font-size:8px;color:var(--mut);">' + c[2] + '</div></div>';
       });
       html += '</div>';
     }
-    html += '<div style="text-align:right;"><button style="background:transparent;border:none;color:var(--mut);font-size:10px;cursor:pointer;padding:2px 4px;" data-fn="_z01DelH" data-arg="'+idx+'">削除</button></div>';
+    html += '<div style="text-align:right;margin-top:4px;"><button style="background:transparent;border:none;color:var(--mut);font-size:10px;cursor:pointer;padding:2px 4px;" data-fn="_z01DelH" data-arg="' + idx + '">削除</button></div>';
     html += '</div>';
   });
   html += '</div>';
@@ -4331,19 +4383,18 @@ function renderZ01Hist() {
       var ctx = canvas.getContext('2d');
       var W = canvas.offsetWidth || 300, H = 80;
       canvas.width = W; canvas.height = H;
-      var mn = Math.min.apply(null,trend30)-10, mx = Math.max.apply(null,trend30)+10;
+      var mn = Math.min.apply(null,trend30)-5, mx = Math.max.apply(null,trend30)+5;
       if (mn < 0) mn = 0;
       ctx.clearRect(0,0,W,H);
       ctx.beginPath();
       trend30.forEach(function(v,i){
-        var x = i/(trend30.length-1)*W, y = H - (v-mn)/(mx-mn)*H*0.85 - H*0.05;
+        var x = i/(trend30.length-1)*W, y = H-(v-mn)/(mx-mn)*H*0.85-H*0.05;
         i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
       });
       ctx.strokeStyle = 'rgba(232,255,71,0.8)';
       ctx.lineWidth = 2;
       ctx.stroke();
-      // Fill under
-      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+      ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
       ctx.fillStyle = 'rgba(232,255,71,0.08)';
       ctx.fill();
     }
