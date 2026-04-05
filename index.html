@@ -4242,12 +4242,62 @@ function _z01NextTurn() {
   if (_z01.players===3 && _z01.currentPlayer===1) _z01CpuTurn();
 }
 
+function _z01DartLabel(sc) {
+  if (sc <= 0) return 'MISS';
+  if (sc === 50) return 'D-BULL';
+  if (sc === 25) return 'BULL';
+  if (sc % 3 === 0 && sc/3 >= 1 && sc/3 <= 20) return 'T'+(sc/3);
+  if (sc % 2 === 0 && sc/2 >= 1 && sc/2 <= 20) return 'D'+(sc/2);
+  if (sc >= 1 && sc <= 20) return 'S'+sc;
+  for (var v = sc-1; v >= 0; v--) {
+    if (v === 0) return 'MISS';
+    if (v % 3 === 0 && v/3 >= 1 && v/3 <= 20) return 'T'+(v/3);
+    if (v % 2 === 0 && v/2 >= 1 && v/2 <= 20) return 'D'+(v/2);
+    if (v >= 1 && v <= 20) return 'S'+v;
+  }
+  return 'MISS';
+}
+function _z01GenDartLabels(total, remain) {
+  if (total === remain && remain > 0 && remain <= 170 && CHECKOUT[remain]) {
+    var path = CHECKOUT[remain];
+    var labels = path.map(function(l){ return /^\d+$/.test(l) ? 'S'+l : l; });
+    while (labels.length < 3) labels.push('—');
+    return labels.slice(0, 3);
+  }
+  if (total <= 0) return ['MISS','MISS','MISS'];
+  var d0 = Math.max(0, Math.min(60, Math.min(total, Math.round(total/3 + _z01Norm()*8))));
+  var r1 = total - d0;
+  var d1 = Math.max(0, Math.min(60, Math.min(r1, Math.round(r1/2 + _z01Norm()*6))));
+  var d2 = Math.max(0, Math.min(60, total - d0 - d1));
+  return [_z01DartLabel(d0), _z01DartLabel(d1), _z01DartLabel(d2)];
+}
+function _z01ShowCpuDart(i, label) {
+  var el = document.getElementById('z01-cpud-'+i);
+  if (!el) return;
+  el.textContent = label;
+  el.className = 'z01-cpu-dart ' + (label==='—'?'dash':label==='MISS'?'miss':'hit');
+}
 function _z01CpuTurn() {
-  document.getElementById('z01-cpu-area').style.display = '';
-  document.getElementById('z01-input-area').style.display = 'none';
-  setTimeout(function() {
-    _z01Commit(_z01CpuScore(_z01.remain[1]));
-  }, 700 + Math.random()*900);
+  var cpuArea = document.getElementById('z01-cpu-area');
+  cpuArea.style.display = 'flex';
+  var status = document.getElementById('z01-cpu-status');
+  [0,1,2].forEach(function(i){ _z01ShowCpuDart(i,'—'); });
+  if (status) status.textContent = 'THINKING...';
+  var remain = _z01.remain[1];
+  var total = _z01CpuScore(remain);
+  var labels = _z01GenDartLabels(total, remain);
+  var t = 600 + Math.random()*400;
+  var gap = 550 + Math.random()*150;
+  setTimeout(function(){
+    _z01ShowCpuDart(0, labels[0]); if(status) status.textContent = '1本目';
+    setTimeout(function(){
+      _z01ShowCpuDart(1, labels[1]); if(status) status.textContent = '2本目';
+      setTimeout(function(){
+        _z01ShowCpuDart(2, labels[2]); if(status) status.textContent = '3本目';
+        setTimeout(function(){ _z01Commit(total); }, 750);
+      }, gap);
+    }, gap);
+  }, t);
 }
 
 function _z01LegEnd(winner) {
