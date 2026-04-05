@@ -4828,7 +4828,7 @@ function _z01Commit(sc) {
   if (rem > 170) { if (_z01.roundScores) _z01.roundScores[p].push(sc); }
   else { if (_z01.checkoutAttempts) _z01.checkoutAttempts[p].push({score: rem, success: after === 0}); }
   st.rounds++; st.total += sc; st.legRounds++;
-  if (st.rounds <= 3) st.first9.push(sc);
+  if (st.legRounds <= 3) st.first9.push(sc);
   if (sc >= 180) st.c180++; else if (sc >= 140) st.c140++; else if (sc >= 100) st.c100++;
   _z01BufUpdate('');
   // Update score log
