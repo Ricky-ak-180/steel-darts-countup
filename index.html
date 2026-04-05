@@ -3343,7 +3343,11 @@ function _renderTactics() {
         );
       }
       var bogeyLeave = n - 140;
-      warningLine = '<span style="color:#ff6b6b;font-size:14px;">⚠ 3本で140点（T20+T20+S20）を取ってしまうと → <strong>' + bogeyLeave + '</strong>（ボギー）</span>';
+      if (BOGEY_NUMS.indexOf(bogeyLeave) >= 0) {
+        warningLine = '<span style="color:#ff6b6b;font-size:14px;">⚠ 3本で140点（T20+T20+S20）を取ってしまうと → <strong>' + bogeyLeave + '</strong>（ボギー）</span>';
+      } else {
+        warningLine = '<span style="color:#66bb6a;font-size:14px;">✓ T20×3（180点）でも140点でも、ボギー圏に落ちない安全な帯です</span>';
+      }
     } else if (zone === '200s') {
       actionLines.push('<span style="color:#66bb6a;">✓ ' + target + 'ヒット → ' + hitLeave + '残し（チェックアウト圏）</span>');
       if (missLeave !== null) {
