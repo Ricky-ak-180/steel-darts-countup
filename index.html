@@ -5784,6 +5784,18 @@ function _z01UndoStats(p, sc) {
   else if (sc >= 140) st.c140 = Math.max(0, st.c140 - 1);
   else if (sc >= 100) st.c100 = Math.max(0, st.c100 - 1);
 }
+function _z01UndoCheckout(p, prevRemain) {
+  // prevRemain is what remain was BEFORE that shot (data.scored + data.remain)
+  if (!_z01.checkoutAttempts || !_z01.checkoutAttempts[p]) return;
+  if (!_z01.roundScores || !_z01.roundScores[p]) return;
+  if (prevRemain <= 170) {
+    // The shot was a checkout attempt; remove the last entry
+    if (_z01.checkoutAttempts[p].length > 0) _z01.checkoutAttempts[p].pop();
+  } else {
+    // The shot was a scoring round (remain > 170)
+    if (_z01.roundScores[p].length > 0) _z01.roundScores[p].pop();
+  }
+}
 function z01Undo() {
   // Find what would be undone and show confirmation
   var log = _z01.log;
