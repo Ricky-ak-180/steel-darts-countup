@@ -975,6 +975,13 @@ canvas.schart { width: 100%; height: 100%; }
   </div>
   </div><!-- /vgame -->
 
+  <!-- 01 Game view -->
+  <div class="view hide" id="v01" style="overflow:hidden;">
+    <div class="cu-subtabs">
+      <div class="cu-subtab on" id="sub01-game" data-fn="goSub01Game">🎮 01</div>
+      <div class="cu-subtab" id="sub01-hist" data-fn="goSub01Hist">📊 履歴</div>
+      <div class="cu-subtab" id="sub01-arr" data-fn="goSub01Arr">📋 アレンジ</div>
+    </div>
   <!-- Arrange practice view -->
   <div id="varr" style="flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;">
     <!-- セットアップ画面 -->
@@ -1109,14 +1116,6 @@ canvas.schart { width: 100%; height: 100%; }
       </div>
     </div>
   </div><!-- /varr -->
-
-  <!-- 01 Game view -->
-  <div class="view hide" id="v01" style="overflow:hidden;">
-    <div class="cu-subtabs">
-      <div class="cu-subtab on" id="sub01-game" data-fn="goSub01Game">🎮 01</div>
-      <div class="cu-subtab" id="sub01-hist" data-fn="goSub01Hist">📊 履歴</div>
-      <div class="cu-subtab" id="sub01-arr" data-fn="goSub01Arr">📋 アレンジ</div>
-    </div>
     <div id="v01-hist-wrap" style="display:none;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;">
       <div id="z01-hist-content" style="padding:12px;display:flex;flex-direction:column;gap:12px;"></div>
     </div>
@@ -1748,7 +1747,7 @@ function goSubHist() {
 function _sub01ShowOnly(id) {
   ['v01-game-wrap','v01-hist-wrap','varr'].forEach(function(el){ var e=document.getElementById(el); if(e) e.style.display='none'; });
   ['sub01-game','sub01-hist','sub01-arr'].forEach(function(el){ var e=document.getElementById(el); if(e) e.className='cu-subtab'; });
-  var show = document.getElementById(id); if(show) show.style.display='flex';
+  var show = document.getElementById(id); if(show) show.style.display = (id==='v01-game-wrap') ? 'flex' : 'block';
 }
 function goSub01Game() {
   _sub01ShowOnly('v01-game-wrap');
