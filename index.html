@@ -4282,9 +4282,18 @@ function z01ShowResult() {
   var winner = -1;
   if (_z01.legWins[0] > _z01.legWins[1]) winner = 0;
   else if (_z01.legWins[1] > _z01.legWins[0]) winner = 1;
-  document.getElementById('z01-result-title').textContent = 'GAME OVER';
-  document.getElementById('z01-result-winner').textContent =
-    winner >= 0 ? '🏆 ' + _z01PlayerName(winner) + ' の勝利！' : '引き分け';
+  var titleEl = document.getElementById('z01-result-title');
+  var winnerEl = document.getElementById('z01-result-winner');
+  if (_z01.players === 1) {
+    titleEl.textContent = 'FINISH';
+    winnerEl.textContent = '';
+  } else if (winner >= 0) {
+    titleEl.textContent = _z01PlayerName(winner);
+    winnerEl.innerHTML = '🏆&nbsp;WINNER';
+  } else {
+    titleEl.textContent = 'DRAW';
+    winnerEl.textContent = '';
+  }
   var rows = [
     ['3ダーツ平均', function(s,i){ return s.rounds>0?(s.total/s.rounds).toFixed(1):'-'; }],
     ['First 9 avg', function(s){ if(!s.first9.length)return'-'; var t=0; for(var j=0;j<s.first9.length;j++)t+=s.first9[j]; return(t/s.first9.length).toFixed(1); }],
