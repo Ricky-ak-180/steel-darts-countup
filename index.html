@@ -3552,6 +3552,7 @@ function chooseArr(idx) {
   _arrG.totalTimeMs += elapsed;
   if (isCorrect) _arrG.correctCt++;
   _arrG.log.push({ q: _arrG.qIdx, qScore: _arrG.qList[_arrG.qIdx],
+    stgIdx: _arrG.stgIdx,
     correct: correct, chosen: chosen,
     isCorrect: isCorrect, isTimeout: isTimeout, pts: pts });
 
