@@ -4326,6 +4326,34 @@ function trainContinue() {
   trainStart(_TRAIN_SCORES[_TRAIN_SCORES.length - 1]);
 }
 
+function trainWeakMode() {
+  var d = _trainLoad();
+  // 3回以上試行して成功率60%未満のスコアを抽出
+  var weak = _TRAIN_SCORES.filter(function(s){
+    if (_trainIsBogey(s)) return false;
+    var e = _trainEntry(s, d);
+    return e.a >= 3 && (e.c / e.a) < 0.6;
+  }).sort(function(a, b){
+    var ea = _trainEntry(a, d), eb = _trainEntry(b, d);
+    return (ea.c/ea.a) - (eb.c/eb.a); // 成功率が低い順
+  });
+  if (weak.length === 0) {
+    alert('苦手スコアが見つかりません。もっとトレーニングを積んでから試してみましょう！');
+    return;
+  }
+  // 最も苦手なスコアからスタート
+  trainStart(weak[0]);
+  // 練習画面に苦手リストを表示
+  setTimeout(function(){
+    var info = document.getElementById('arr-train-weak-info');
+    if (info) {
+      info.innerHTML = '🎯 苦手スコア集中モード (' + weak.length + '個) ｜ 次: ' +
+        weak.slice(1, 4).join(' → ') + (weak.length > 4 ? ' …' : '');
+      info.style.display = 'block';
+    }
+  }, 100);
+}
+
 function trainStart(score) {
   score = parseInt(score, 10);
   if (_trainIsBogey(score)) return;
