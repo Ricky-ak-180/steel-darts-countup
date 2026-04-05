@@ -5062,6 +5062,13 @@ var impFile = document.getElementById('imp-file');
 if (impFile) {
   impFile.addEventListener('change', function(){ importData(this); });
 }
+// 01 export/import ボタン
+var btnZ01Export = document.getElementById('btn-z01-export');
+if (btnZ01Export) btnZ01Export.addEventListener('click', exportZ01Data);
+var btnZ01Import = document.getElementById('btn-z01-import');
+if (btnZ01Import) btnZ01Import.addEventListener('click', triggerImportZ01);
+var impZ01File = document.getElementById('imp-z01-file');
+if (impZ01File) impZ01File.addEventListener('change', function(){ importZ01Data(this); });
 // スタート画面にベストスコアを表示
 (function(){
   var gb = document.getElementById('gs-best');
