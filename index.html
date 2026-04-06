@@ -6303,6 +6303,70 @@ function renderZ01Hist() {
     });
     html += '</div>';
   })();
+  // === 5c. カウントアップ × 01 相関 ===
+  (function(){
+    var cuH = getH(); // カウントアップ履歴 { score, date, ... }
+    var z01H2P = h.filter(function(g){ return g.players === 2 && g.winner >= 0; });
+    if (!cuH.length || !z01H2P.length) return;
+    // 日付文字列でカウントアップAVGをマップ化（同日複数ある場合は平均）
+    var cuByDay = {};
+    cuH.forEach(function(r){
+      if (!r.date) return;
+      var dk = localDateStr(new Date(r.date));
+      if (!cuByDay[dk]) cuByDay[dk] = { sum: 0, cnt: 0 };
+      cuByDay[dk].sum += r.score / 8; // ラウンドAVG
+      cuByDay[dk].cnt++;
+    });
+    // カテゴリ定義
+    var cats = [
+      { label: '〜399（低）', min: 0,   max: 399 },
+      { label: '400〜599（中）', min: 400, max: 599 },
+      { label: '600〜（高）',  min: 600, max: Infinity }
+    ];
+    var buckets = cats.map(function(){ return { wins: 0, total: 0 }; });
+    z01H2P.forEach(function(g){
+      if (!g.date) return;
+      var dk = localDateStr(new Date(g.date));
+      var cu = cuByDay[dk];
+      if (!cu) return;
+      var avg = cu.sum / cu.cnt;
+      for (var ci = 0; ci < cats.length; ci++) {
+        if (avg >= cats[ci].min && avg <= cats[ci].max) {
+          buckets[ci].total++;
+          if (g.winner === 0) buckets[ci].wins++;
+          break;
+        }
+      }
+    });
+    // データがあるか確認
+    var hasData = buckets.some(function(b){ return b.total > 0; });
+    if (!hasData) return;
+    html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
+    html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">📈 カウントアップ × 01 相関</div>';
+    html += '<div style="padding:8px 12px;font-size:10px;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(255,255,255,0.04);">同じ日のカウントアップAVGと01勝率（Player 1）の相関</div>';
+    cats.forEach(function(cat, ci){
+      var b = buckets[ci];
+      if (b.total === 0) {
+        html += '<div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04);opacity:0.35;">';
+        html += '<div style="font-size:12px;color:var(--mut);">CU ' + cat.label + '</div>';
+        html += '<div style="font-size:10px;color:var(--mut);">データなし</div>';
+        html += '</div>';
+      } else {
+        var pct = Math.round(b.wins / b.total * 100);
+        var barColor = pct >= 60 ? '#66bb6a' : pct >= 40 ? '#ffd54f' : '#ff6b6b';
+        html += '<div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04);">';
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">';
+        html += '<div style="font-size:12px;color:var(--mut);">CU ' + cat.label + '</div>';
+        html += '<div style="font-size:12px;font-weight:700;color:' + barColor + ';">' + pct + '%</div>';
+        html += '</div>';
+        html += '<div style="font-size:10px;color:var(--mut);margin-bottom:4px;">01 勝率: ' + b.wins + '勝/' + b.total + '戦</div>';
+        html += '<div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px;overflow:hidden;">';
+        html += '<div style="width:' + pct + '%;height:100%;background:' + barColor + ';border-radius:4px;transition:width 0.4s;"></div>';
+        html += '</div></div>';
+      }
+    });
+    html += '</div>';
+  })();
   // === 6. Export / Import ===
   html += '<div class="exp-row">';
   html += '<button class="bexp" id="btn-z01-export">📤 エクスポート</button>';
