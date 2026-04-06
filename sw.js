@@ -1,4 +1,4 @@
-const CACHE = 'steeldarts-pro-v4';
+const CACHE = 'steeldarts-pro-v5';
 
 const PRECACHE = [
   './',

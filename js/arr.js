@@ -9,7 +9,7 @@ var _TRAIN_PERFECT   = 5;
 
 var _TRAIN_SCORES = (function() {
   var arr = [];
-  for (var i = 2; i <= 40; i += 2) arr.push(i);
+  for (var i = 2; i <= 40; i++) arr.push(i);
   for (var n = 41; n <= 170; n++) {
     if (CHECKOUT[n] || BOGEY_NUMS.indexOf(n) >= 0) arr.push(n);
   }
@@ -177,7 +177,7 @@ function _renderTrainPrac(score, entry) {
   if (badge) badge.innerHTML = '<span class="arr-diff-chip" style="background:' + diff.color + '22;color:' + diff.color + ';border:1px solid ' + diff.color + '44;">' + diff.label + '</span>';
   var path = (_userRoutes && _userRoutes[score] && _userRoutes[score].length > 0)
     ? _userRoutes[score][0]
-    : (score <= 40 ? ['D' + (score / 2)] : CHECKOUT[score]);
+    : (CHECKOUT[score] || (score % 2 === 0 && score <= 40 ? ['D' + (score / 2)] : null));
   document.getElementById('arr-tp-hint-box').innerHTML = _pathHtml(path);
   var hintBtn = document.getElementById('arr-tp-hint-btn');
   hintBtn.style.display = c >= _TRAIN_HINT_HIDE ? '' : 'none';
