@@ -8083,11 +8083,16 @@ function _questShowResult(cleared) {
   html += '<div class="arr-quest-result-stars">'+starsHtml+'</div>';
   html += '<div class="arr-quest-result-sub">'+sub+'</div>';
   html += '<div class="arr-quest-result-btns">';
-  if (cleared && next) {
-    html += '<button class="arr-step-btn arr-step-btn-primary" onclick="startQuestStage('+next.wi+','+next.si+')">次のステージへ →</button>';
+  if (_questG.weaknessMode) {
+    html += '<button class="arr-step-btn arr-step-btn-primary" onclick="startWeaknessTraining()">もう一度特訓</button>';
+    html += '<button class="arr-step-btn" style="border-color:var(--mut);color:var(--mut);" onclick="showQuestWeakness()">弱点分析へ戻る</button>';
+  } else {
+    if (cleared && next) {
+      html += '<button class="arr-step-btn arr-step-btn-primary" onclick="startQuestStage('+next.wi+','+next.si+')">次のステージへ →</button>';
+    }
+    html += '<button class="arr-step-btn" onclick="startQuestStage('+_questG.worldIdx+','+_questG.stageIdx+')">もう一度</button>';
+    html += '<button class="arr-step-btn" style="border-color:var(--mut);color:var(--mut);" onclick="showQuestHome()">ワールド選択へ</button>';
   }
-  html += '<button class="arr-step-btn" onclick="startQuestStage('+_questG.worldIdx+','+_questG.stageIdx+')">もう一度</button>';
-  html += '<button class="arr-step-btn" style="border-color:var(--mut);color:var(--mut);" onclick="showQuestHome()">ワールド選択へ</button>';
   html += '</div>';
 
   var el = document.getElementById('arr-quest-result');
