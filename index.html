@@ -7710,7 +7710,7 @@ function startQuestStage(wi, si) {
 
 function _questNextScore() {
   var stage = _QUEST_WORLDS[_questG.worldIdx].stages[_questG.stageIdx];
-  var cond = stage.cond;
+  var cond = _questG.skipUnlockReq ? {type:'count',n:5,minAcc:0.8} : stage.cond;
   // Check completion
   if (cond.type==='clear' && _questG.stageCleared) { _questShowResult(true); return; }
   if (cond.type==='streak' && _questG.qStreak>=cond.n) { _questShowResult(true); return; }
