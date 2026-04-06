@@ -7596,6 +7596,7 @@ function _questShowThrow(dartStr) {
 
     var rEl = document.getElementById('quest-throw-result-text');
     var pEl = document.getElementById('quest-throw-pts');
+    var hEl = document.getElementById('quest-throw-hint');
     if (result.hit) {
       rEl.innerHTML = '✓ <span style="color:#66bb6a;">' + dartStr + ' ヒット！</span>';
       pEl.style.color = '#66bb6a';
@@ -7608,11 +7609,16 @@ function _questShowThrow(dartStr) {
       pEl.style.color = '#ff9800';
       pEl.textContent = result.value > 0 ? '−' + result.value : '';
     }
+    // 不正解時: 正解を表示してリセット
+    if (_questG.wrongCorrect) {
+      hEl.textContent = '正解は ' + _questG.wrongCorrect + ' でした';
+      _questG.wrongCorrect = null;
+    }
 
     setTimeout(function(){
       overlay.classList.add('hide');
       _questOutcome(dartStr, result);
-    }, 1400);
+    }, 1700);
   }, 680);
 }
 
