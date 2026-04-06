@@ -7769,7 +7769,9 @@ function _questNextScore() {
   }
   // Pick score
   if (_questG.poolIdx >= _questG.pool.length) {
-    _questG.pool = _arrShuffle(_questPool(stage.pool));
+    _questG.pool = _questG.weaknessMode
+      ? _arrShuffle(_questG.pool.slice())
+      : _arrShuffle(_weaknessWeightedPool(_questPool(stage.pool)));
     _questG.poolIdx = 0;
   }
   var score = _questG.pool[_questG.poolIdx++];
