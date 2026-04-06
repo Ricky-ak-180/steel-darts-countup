@@ -1348,7 +1348,10 @@ canvas.schart { width: 100%; height: 100%; }
       <div class="arr-quest-hdr">
         <button class="arr-train-back" data-fn="goArrSetup">← 戻る</button>
         <div class="arr-train-home-title">チェックアウトクエスト</div>
-        <button class="arr-quest-rt-toggle" id="arr-quest-rt-toggle" onclick="toggleQuestRealThrow()">🎯 実投</button>
+        <div class="arr-quest-mode-seg" id="arr-quest-mode-seg">
+          <button id="arr-quest-mode-sim" onclick="setQuestRealThrow(false)">🎲 シミュ</button>
+          <button id="arr-quest-mode-real" onclick="setQuestRealThrow(true)">🎯 実投</button>
+        </div>
         <button class="arr-quest-weakness-btn" onclick="showQuestWeakness()">📊 弱点</button>
       </div>
       <div id="arr-quest-home-sub" style="padding:6px 14px 2px;font-size:11px;color:var(--mut);">ダーツが飛んでランダムに着弾 — ルートを覚えて正確に!</div>
