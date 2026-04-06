@@ -7953,6 +7953,43 @@ function _questNextStage(wi, si) {
   return null;
 }
 
+/* 削りラウンド: 選択肢表示 */
+function _questShowSkezuriQ() {
+  var sk = _questG.skezuriSetup;
+  var correct = sk.shot;
+  document.getElementById('arr-quest-q-label').textContent =
+    _questG.currentScore+'点 — 1本目で削る！何を狙う？';
+  var decoys = _arrShuffle(_ARR_TRIPLE_POOL.filter(function(d){return d!==correct;})).slice(0,3);
+  var choices = _arrShuffle([correct].concat(decoys));
+  var el = document.getElementById('arr-quest-choices');
+  el.innerHTML = '';
+  choices.forEach(function(val) {
+    var btn = document.createElement('button');
+    btn.className = 'arr-quest-choice';
+    btn.textContent = val;
+    btn.onclick = function() { _questChooseSkezuri(val, correct); };
+    el.appendChild(btn);
+  });
+}
+
+function _questChooseSkezuri(chosen, correct) {
+  var isCorrect = chosen === correct;
+  document.querySelectorAll('.arr-quest-choice').forEach(function(b) {
+    b.classList.add('disabled');
+    if (b.textContent===correct) b.classList.add('correct');
+    else if (b.textContent===chosen && !isCorrect) b.classList.add('wrong-ans');
+  });
+  if (!isCorrect) {
+    _questG.thisWrong++;
+    _questG.totalWrong++;
+  }
+  _questG.qCount++;
+  if (isCorrect) { _questG.qCorrect++; _questG.qStreak++; }
+  else { _questG.qStreak = 0; }
+  _questUpdateProgress();
+  setTimeout(function() { _questShowThrow(correct); }, isCorrect ? 250 : 800);
+}
+
 function quitQuestPlay() {
   document.getElementById('arr-quest-play').style.display = 'none';
   showQuestHome();
