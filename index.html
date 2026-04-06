@@ -8165,21 +8165,21 @@ function _questNextStage(wi, si) {
 function _questRealThrowEnabled() {
   return localStorage.getItem('arr_quest_realthrow') === '1';
 }
-function toggleQuestRealThrow() {
-  var on = !_questRealThrowEnabled();
+function setQuestRealThrow(on) {
   localStorage.setItem('arr_quest_realthrow', on ? '1' : '0');
   _questUpdateRealToggleUI();
 }
+function toggleQuestRealThrow() { setQuestRealThrow(!_questRealThrowEnabled()); }
 function _questUpdateRealToggleUI() {
   var on = _questRealThrowEnabled();
-  var btn = document.getElementById('arr-quest-rt-toggle');
-  if (!btn) return;
-  btn.className = 'arr-quest-rt-toggle' + (on ? ' on' : '');
-  btn.textContent = on ? '🎯 実投 ON' : '🎯 実投';
+  var simBtn = document.getElementById('arr-quest-mode-sim');
+  var realBtn = document.getElementById('arr-quest-mode-real');
+  if (simBtn) simBtn.className = on ? '' : 'active-sim';
+  if (realBtn) realBtn.className = on ? 'active-real' : '';
   var sub = document.getElementById('arr-quest-home-sub');
   if (sub) sub.textContent = on
-    ? '実際に投げて結果を入力 — 知識と実力を両方鍛える!'
-    : 'ダーツが飛んでランダムに着弾 — ルートを覚えて正確に!';
+    ? '🎯 実投モード: 実際に投げて結果を入力 — 知識と実力を両方鍛える!'
+    : '🎲 シミュモード: ダーツが飛んでランダムに着弾 — ルートを覚えて正確に!';
 }
 function _updateModeBadge() {
   var badge = document.getElementById('arr-quest-miss-badge');
