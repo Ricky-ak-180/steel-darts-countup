@@ -8017,12 +8017,13 @@ function _questOutcome(dartStr, result) {
     _questG.stageCleared = true;
     setTimeout(function(){
       scoreEl.style.color = '#66bb6a';
+      sfxCheckout();
       // A: CHECKOUTフラッシュ
       var fl = document.getElementById('arr-quest-checkout-flash');
       fl.classList.remove('hide','show'); void fl.offsetWidth; fl.classList.add('show');
       setTimeout(function(){ fl.classList.add('hide'); }, 1900);
       // D: ストリークバナー
-      if (clean && _questG.qStreak >= 3) _questShowStreakBanner(_questG.qStreak);
+      if (clean && _questG.qStreak >= 3) { _questShowStreakBanner(_questG.qStreak); sfxStreak(); }
     }, 200);
     _questUpdateProgress();
     setTimeout(function(){
