@@ -8115,6 +8115,10 @@ function _questShowResult(cleared) {
   var titleText = _questG.weaknessMode ? '特訓終了！' : cleared?'クリア！':'あと少し！';
   var titleColor = _questG.weaknessMode ? '#42a5f5' : cleared?'#66bb6a':'#ff9800';
   var sub = _questG.qCount+'問 ／ 正解 '+_questG.qCorrect+'問（'+acc+'%）';
+  if (_questG.realThrowMode && _questG.qThrowAttempts > 0) {
+    var throwAcc = Math.round(_questG.qThrowHit / _questG.qThrowAttempts * 100);
+    sub += '<br>実投 '+_questG.qThrowHit+'/'+_questG.qThrowAttempts+'本（'+throwAcc+'%）';
+  }
   if (_questG.totalMiss>0) sub += '<br>ミス '+_questG.totalMiss+'回';
   if (_questG.totalWrong>0) sub += '<br>間違い '+_questG.totalWrong+'回';
 
