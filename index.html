@@ -6374,7 +6374,7 @@ function _z01SaveH(entry) {
   try {
     var h = _z01GetH();
     h.unshift(entry);
-    localStorage.setItem('dh01', JSON.stringify(h.slice(0, 300)));
+    localStorage.setItem('dh01', JSON.stringify(h.slice(0, 500)));
   } catch(ex) { console.warn('_z01SaveH failed:', ex); }
 }
 function _z01DelH(idx) {
