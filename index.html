@@ -7766,7 +7766,7 @@ function _questNextScore() {
 
 function _questUpdateProgress() {
   var stage = _QUEST_WORLDS[_questG.worldIdx].stages[_questG.stageIdx];
-  var cond = stage.cond;
+  var cond = _questG.skipUnlockReq ? {type:'count',n:5,minAcc:0.8} : stage.cond;
   var el = document.getElementById('arr-quest-progress');
   if (cond.type==='streak') {
     el.textContent = '連続 '+_questG.qStreak+' / '+cond.n;
