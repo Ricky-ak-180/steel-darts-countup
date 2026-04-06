@@ -7906,7 +7906,8 @@ function _questOutcome(dartStr, result) {
     return;
   }
 
-  var newScore = _questG.currentScore - result.value;
+  var prevScore = _questG.currentScore;
+  var newScore = prevScore - result.value;
   if (!result.hit) { _questG.thisMiss++; _questG.totalMiss++; }
 
   // チェーン更新
@@ -7919,22 +7920,35 @@ function _questOutcome(dartStr, result) {
   }).join('');
 
   _questG.currentScore = newScore;
-  document.getElementById('arr-quest-score-num').textContent = newScore>0?newScore:0;
   _questG.dartNum++;
+  var scoreEl = document.getElementById('arr-quest-score-num');
+
+  // B: スコアカウントダウンアニメーション
+  _questAnimateScore(prevScore, Math.max(newScore, 0), scoreEl, 380);
 
   // Success
   if (newScore === 0) {
     _questG.qCount++;
     _questG.qCorrect++;
     var clean = _questG.thisWrong===0 && _questG.thisMiss===0;
+    var prevStreak = _questG.qStreak;
     _questG.qStreak = clean ? _questG.qStreak+1 : 0;
     _questG.stageCleared = true;
-    document.getElementById('arr-quest-score-num').style.color = '#66bb6a';
+    setTimeout(function(){
+      scoreEl.style.color = '#66bb6a';
+      // A: CHECKOUTフラッシュ
+      var fl = document.getElementById('arr-quest-checkout-flash');
+      fl.classList.remove('hide','show'); void fl.offsetWidth; fl.classList.add('show');
+      setTimeout(function(){ fl.classList.add('hide'); }, 1900);
+      // D: ストリークバナー
+      if (clean && _questG.qStreak >= 3) _questShowStreakBanner(_questG.qStreak);
+    }, 200);
     _questUpdateProgress();
     setTimeout(function(){
+      scoreEl.style.color = '';
       _questG.chain=[]; _questG.thisWrong=0; _questG.thisMiss=0;
       _questNextScore();
-    }, 900);
+    }, 1800);
     return;
   }
 
@@ -7942,23 +7956,34 @@ function _questOutcome(dartStr, result) {
   if (newScore < 0 || newScore === 1) {
     _questG.qCount++;
     _questG.qStreak = 0;
-    document.getElementById('arr-quest-score-num').style.color = '#ef5350';
-    document.getElementById('arr-quest-score-num').textContent = 'BUST';
+    setTimeout(function(){
+      scoreEl.style.color = '#ef5350';
+      scoreEl.textContent = 'BUST';
+    }, 300);
     _questUpdateProgress();
     setTimeout(function(){
-      document.getElementById('arr-quest-score-num').style.color = '';
+      scoreEl.style.color = '';
       _questG.chain=[]; _questG.thisWrong=0; _questG.thisMiss=0;
       _questNextScore();
-    }, 1200);
+    }, 1400);
     return;
   }
+
+  // C: 危険スコア（上がれない数字）シェイク
+  setTimeout(function(){
+    if (newScore > 1 && !_isCheckable(newScore)) {
+      scoreEl.classList.remove('score-danger'); void scoreEl.offsetWidth;
+      scoreEl.classList.add('score-danger');
+      setTimeout(function(){ scoreEl.classList.remove('score-danger'); scoreEl.style.color=''; }, 600);
+    }
+  }, 350);
 
   // Continue
   _questUpdateProgress();
   setTimeout(function(){
     document.getElementById('arr-quest-choices').innerHTML = '';
     _questShowDartQ();
-  }, 300);
+  }, 380);
 }
 
 function _questCalcStars(cleared) {
