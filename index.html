@@ -7626,7 +7626,7 @@ function _renderQuestWorlds() {
     html += '<div class="arr-quest-world-hdr" style="border-left:3px solid '+wColor+';padding-left:13px;">';
     html += '<div class="arr-quest-world-icon">'+(wUnlocked?w.icon:'🔒')+'</div>';
     html += '<div class="arr-quest-world-info">';
-    html += '<div class="arr-quest-world-label" style="color:'+wColor+';">'+w.label+' '+w.subtitle+'</div>';
+    html += '<div class="arr-quest-world-label" style="color:'+wColor+';">'+w.label+'<span style="opacity:0.45;font-size:14px;margin:0 7px;">／</span>'+w.subtitle+'</div>';
     html += '<div class="arr-quest-world-desc">'+w.desc+'</div>';
     html += '</div></div>';
     html += '<div class="arr-quest-stage-list">';
