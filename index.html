@@ -1398,13 +1398,14 @@ canvas.schart { width: 100%; height: 100%; }
       </div>
       <!-- 実投オーバーレイ -->
       <div class="quest-real-overlay hide" id="quest-real-overlay">
-        <div class="quest-real-title correct" id="quest-real-title">投げてください！</div>
-        <div class="quest-real-dart-label correct" id="quest-real-dart-label">D20</div>
-        <div class="quest-real-wrong-note" id="quest-real-wrong-note"></div>
-        <div class="quest-board-box" id="quest-real-board-box"></div>
+        <div class="quest-real-info">
+          <div class="quest-real-title correct" id="quest-real-title">投げてください！</div>
+          <div class="quest-real-dart-label correct" id="quest-real-dart-label">D20</div>
+          <div class="quest-real-wrong-note" id="quest-real-wrong-note"></div>
+        </div>
         <div class="quest-real-btns">
-          <button class="quest-real-btn quest-real-hit" id="quest-real-hit-btn" onclick="_questRealHit()">✓ 入った！</button>
-          <button class="quest-real-btn quest-real-miss" onclick="_questRealMiss()">✗ 外れた</button>
+          <button class="quest-real-btn quest-real-miss" onclick="_questRealMiss()">✗<br>外れた</button>
+          <button class="quest-real-btn quest-real-hit" id="quest-real-hit-btn" onclick="_questRealHit()">✓<br>入った！</button>
         </div>
       </div>
       <div class="arr-quest-result hide" id="arr-quest-result"></div>
