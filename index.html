@@ -4791,7 +4791,7 @@ function _buildBoardSVG(aimStr, landStr) {
   svg += '<circle cx="'+cx+'" cy="'+cy+'" r="'+(R+2)+'" fill="#0a0a0a"/>';
 
   for (var i=0; i<20; i++) {
-    var n=SEGS[i], a1=-90+i*18, a2=a1+18, ev=i%2===0;
+    var n=SEGS[i], a1=-99+i*18, a2=a1+18, ev=i%2===0;
     var isAim  = aim  && aim.n  === n && aim.ring  !== 'Bull' && aim.ring  !== 'SBull';
     var isLand = land && land.n === n && land.ring !== 'Bull' && land.ring !== 'SBull';
 
