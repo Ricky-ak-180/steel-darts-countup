@@ -3861,6 +3861,12 @@ function _buildArrStages(score) {
   return [{ score: score, path: path, turnDart: 1, turnScore: score }];
 }
 
+/* 削り戦術クイズをワンクリックで開始 */
+function startKezuriQuiz() {
+  setArrMode(4);
+  startArrSession();
+}
+
 /* モード選択 */
 function setArrMode(mode) {
   _arrG.mode = mode;
