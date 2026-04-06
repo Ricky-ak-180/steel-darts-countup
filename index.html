@@ -8093,6 +8093,111 @@ function _questNextStage(wi, si) {
   return null;
 }
 
+/* ===== 弱点分析 ===== */
+function _weaknessLoad() {
+  try { return JSON.parse(localStorage.getItem('arr_weakness_v1') || '{}'); } catch(e) { return {}; }
+}
+function _weaknessRecord(score, isCorrect) {
+  var d = _weaknessLoad();
+  if (!d[score]) d[score] = {a:0, c:0};
+  d[score].a++;
+  if (isCorrect) d[score].c++;
+  localStorage.setItem('arr_weakness_v1', JSON.stringify(d));
+}
+function _weaknessAcc(rec) {
+  return rec && rec.a > 0 ? rec.c / rec.a : 1;
+}
+function _weaknessColor(acc) {
+  if (acc < 0.5)  return '#ef5350';
+  if (acc < 0.75) return '#ff9800';
+  return '#66bb6a';
+}
+function _weaknessWeightedPool(base) {
+  var d = _weaknessLoad();
+  var result = [];
+  base.forEach(function(s) {
+    result.push(s);
+    var rec = d[s];
+    if (rec && rec.a >= 3) {
+      var acc = _weaknessAcc(rec);
+      if (acc < 0.5)  result.push(s, s); // 3倍
+      else if (acc < 0.75) result.push(s); // 2倍
+    }
+  });
+  return result;
+}
+
+function showQuestWeakness() {
+  document.getElementById('arr-quest-home').style.display = 'none';
+  document.getElementById('arr-quest-weakness').style.display = 'flex';
+  _renderWeakness();
+}
+function _renderWeakness() {
+  var d = _weaknessLoad();
+  var scores = Object.keys(d).map(Number).filter(function(s){ return d[s].a >= 2; });
+  scores.sort(function(a,b){ return _weaknessAcc(d[a]) - _weaknessAcc(d[b]); });
+  var el = document.getElementById('arr-quest-weakness-body');
+  if (scores.length === 0) {
+    el.innerHTML = '<div class="wk-empty">まだデータがありません。<br>クエストを練習すると記録されます。</div>';
+    return;
+  }
+  var weak = scores.filter(function(s){ return _weaknessAcc(d[s]) < 0.75; });
+  var html = '';
+  // 弱点特訓ボタン
+  if (weak.length > 0) {
+    html += '<button class="wk-train-btn" onclick="startWeaknessTraining()">🎯 弱点スコアで特訓（'+weak.length+'種）</button>';
+  }
+  // 苦手スコア
+  html += '<div class="wk-section-title">正答率（2回以上練習したスコア）</div>';
+  scores.forEach(function(s) {
+    var rec = d[s]; var acc = _weaknessAcc(rec);
+    var pct = Math.round(acc * 100);
+    var col = _weaknessColor(acc);
+    var route = (_getPath(s) || []).join('→');
+    html += '<div class="wk-score-row">';
+    html += '<div class="wk-score-num" style="color:'+col+';">'+s+'</div>';
+    html += '<div style="flex:1;">';
+    html += '<div class="wk-bar-wrap"><div class="wk-bar" style="width:'+pct+'%;background:'+col+';"></div></div>';
+    html += '<div class="wk-route">'+route+'　（'+rec.a+'回中'+rec.c+'回正解）</div>';
+    html += '</div>';
+    html += '<div class="wk-acc" style="color:'+col+';">'+pct+'%</div>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function startWeaknessTraining() {
+  var d = _weaknessLoad();
+  var pool = Object.keys(d).map(Number).filter(function(s){
+    return d[s].a >= 2 && _weaknessAcc(d[s]) < 0.75 && _isCheckable(s);
+  });
+  if (pool.length === 0) { alert('弱点スコアがまだありません'); return; }
+  // 重みづけ（超苦手は3倍）
+  var weighted = [];
+  pool.forEach(function(s) {
+    var acc = _weaknessAcc(d[s]);
+    weighted.push(s);
+    if (acc < 0.5) weighted.push(s, s);
+    else if (acc < 0.65) weighted.push(s);
+  });
+  _questG.worldIdx=0; _questG.stageIdx=0;
+  _questG.thisWrong=0; _questG.thisMiss=0;
+  _questG.totalWrong=0; _questG.totalMiss=0;
+  _questG.qCount=0; _questG.qCorrect=0; _questG.qStreak=0;
+  _questG.stageCleared=false; _questG.chain=[];
+  _questG.skezuriSetup=null; _questG.skipUnlockReq=null; _questG.wrongCorrect=null;
+  _questG.pool = _arrShuffle(weighted); _questG.poolIdx = 0;
+  _questG.weaknessMode = true; // 弱点特訓フラグ
+
+  document.getElementById('arr-quest-weakness').style.display = 'none';
+  var playEl = document.getElementById('arr-quest-play');
+  playEl.style.display = 'flex';
+  document.getElementById('arr-quest-play-title').textContent = '🎯 弱点特訓';
+  document.getElementById('quest-throw-overlay').classList.add('hide');
+  document.getElementById('arr-quest-result').className = 'arr-quest-result hide';
+  _questNextScore();
+}
+
 /* B: スコアカウントダウンアニメーション */
 function _questAnimateScore(from, to, el, ms) {
   var start = performance.now();
