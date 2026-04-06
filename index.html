@@ -8052,7 +8052,8 @@ function _questChooseSkezuri(chosen, correct) {
   if (isCorrect) { _questG.qCorrect++; _questG.qStreak++; }
   else { _questG.qStreak = 0; }
   _questUpdateProgress();
-  setTimeout(function() { _questShowThrow(correct); }, isCorrect ? 250 : 800);
+  _questG.wrongCorrect = isCorrect ? null : correct;
+  setTimeout(function() { _questShowThrow(chosen); }, isCorrect ? 250 : 600);
 }
 
 function quitQuestPlay() {
