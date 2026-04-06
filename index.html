@@ -7691,13 +7691,34 @@ function _questNextScore() {
   }
   var score = _questG.pool[_questG.poolIdx++];
   var path = _getPath(score);
-  if (!path) { _questNextScore(); return; }
+  if (!path) {
+    if (stage.isSkezuri && _SKEZURI_DATA[score]) {
+      // 削りラウンド: フィニッシュ不可点数のセットアップ問題
+      _questG.currentScore = score;
+      _questG.dartNum = 1;
+      _questG.chain = [];
+      _questG.thisWrong = 0;
+      _questG.thisMiss = 0;
+      _questG.skezuriSetup = _SKEZURI_DATA[score];
+      document.getElementById('arr-quest-score-num').textContent = score;
+      document.getElementById('arr-quest-score-num').style.color = '#ff9800';
+      document.getElementById('arr-quest-chain').innerHTML = '';
+      document.getElementById('quest-throw-overlay').classList.add('hide');
+      document.getElementById('arr-quest-bogey-msg').className = 'arr-quest-bogey-msg hide';
+      document.getElementById('arr-quest-q-area').style.display = '';
+      _questUpdateProgress();
+      _questShowSkezuriQ();
+      return;
+    }
+    _questNextScore(); return;
+  }
 
   _questG.currentScore = score;
   _questG.dartNum = 1;
   _questG.chain = [];
   _questG.thisWrong = 0;
   _questG.thisMiss = 0;
+  _questG.skezuriSetup = null;
 
   document.getElementById('arr-quest-score-num').textContent = score;
   document.getElementById('arr-quest-score-num').style.color = '';
