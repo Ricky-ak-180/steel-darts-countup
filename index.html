@@ -8202,16 +8202,15 @@ function _questShowRealThrow(dartStr, wasCorrect) {
   var dartEl  = document.getElementById('quest-real-dart-label');
   var noteEl  = document.getElementById('quest-real-wrong-note');
   if (wasCorrect) {
-    titleEl.textContent = '投げてください！';
+    titleEl.textContent = '✓ 正解！';
     titleEl.className = 'quest-real-title correct';
     dartEl.className  = 'quest-real-dart-label correct';
-    noteEl.textContent = '';
   } else {
-    titleEl.textContent = '✗ 不正解 — 練習として投げましょう';
+    titleEl.textContent = '✗ 不正解...';
     titleEl.className = 'quest-real-title wrong';
     dartEl.className  = 'quest-real-dart-label wrong';
-    noteEl.textContent = '正解は ' + dartStr + ' でした';
   }
+  noteEl.textContent = dartStr + ' に投げてください';
   dartEl.textContent = dartStr;
   document.getElementById('quest-real-board-box').innerHTML = _buildBoardSVG(dartStr, null);
   document.getElementById('quest-real-hit-btn').textContent = '✓ 入った！（-' + pts + '）';
