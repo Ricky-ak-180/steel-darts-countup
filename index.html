@@ -7701,62 +7701,30 @@ function _questShowDartQ() {
 
 function _questChoose(chosen, correct) {
   var isCorrect = chosen === correct;
-  // Visual feedback
+  // ボタンの視覚フィードバック
   document.querySelectorAll('.arr-quest-choice').forEach(function(b) {
     b.classList.add('disabled');
     if (b.textContent===correct) b.classList.add('correct');
     else if (b.textContent===chosen && !isCorrect) b.classList.add('wrong-ans');
   });
-
   if (!isCorrect) {
     _questG.thisWrong++;
     _questG.totalWrong++;
-    // Show correct dart highlighted, then continue with it (forced hit)
-    setTimeout(function() { _questOutcome(correct, true); }, 900);
-    return;
   }
-
-  // Correct — handle outcome
-  var hitVal = _questDartVal(correct);
-  var hitScore = _questG.currentScore - hitVal;
-  var missOut = _questMissOut(correct);
-  var missScore = _questG.currentScore - missOut.value;
-
-  if (_questMissMode === 'study') {
-    var panel = document.getElementById('arr-quest-miss-panel');
-    var html = '';
-    html += '<button class="arr-quest-miss-btn hit" onclick="_questOutcome(\''+correct+'\',true)">✓ ヒット！ → '+(hitScore<=0?'フィニッシュ🎉':hitScore+'残り')+'</button>';
-    if (missOut.value > 0 && missScore > 0 && missScore !== _questG.currentScore) {
-      html += '<button class="arr-quest-miss-btn miss" onclick="_questOutcome(\''+correct+'\',false)">△ '+missOut.label+' → '+missScore+'残り</button>';
-    } else if (missOut.value === 0) {
-      html += '<button class="arr-quest-miss-btn miss" onclick="_questOutcome(\''+correct+'\',false)">△ '+missOut.label+'</button>';
-    }
-    document.getElementById('arr-quest-miss-btns').innerHTML = html;
-    panel.className = 'arr-quest-miss-panel';
-  } else {
-    // Real mode: random
-    var hitRate = correct[0]==='D'?0.60:correct==='Bull'?0.55:0.72;
-    var hit = Math.random() < hitRate;
-    setTimeout(function(){ _questOutcome(correct, hit); }, 400);
-  }
+  // 正解のダーツを投げる（不正解でも正解ルートで投球）
+  setTimeout(function() { _questShowThrow(correct); }, isCorrect ? 250 : 800);
 }
 
-function _questOutcome(dartStr, hit) {
-  document.getElementById('arr-quest-miss-panel').className = 'arr-quest-miss-panel hide';
+function _questOutcome(dartStr, result) {
+  var newScore = _questG.currentScore - result.value;
+  if (!result.hit) { _questG.thisMiss++; _questG.totalMiss++; }
 
-  var hitVal = _questDartVal(dartStr);
-  var missOut = _questMissOut(dartStr);
-  var actualVal = hit ? hitVal : missOut.value;
-  var newScore = _questG.currentScore - actualVal;
-
-  if (!hit) { _questG.thisMiss++; _questG.totalMiss++; }
-
-  // Update chain
-  _questG.chain.push({ dart:dartStr, val:actualVal, hit:hit });
+  // チェーン更新
+  _questG.chain.push({ dart:dartStr, val:result.value, hit:result.hit, land:result.land });
   var chainEl = document.getElementById('arr-quest-chain');
   chainEl.innerHTML = _questG.chain.map(function(c){
     var cls = 'arr-quest-chain-dart '+(c.hit?'hit':'miss');
-    var lbl = c.dart+(c.hit?'':' (S'+c.val+')');
+    var lbl = c.hit ? c.dart : (c.dart+'→'+(c.land||'0'));
     return '<span class="'+cls+'">'+lbl+'</span>';
   }).join('');
 
