@@ -5059,7 +5059,70 @@ function _arrGetHistory() {
 function _renderArrBest() {
   var b = _arrGetBests()[_arrG.mode];
   var el = document.getElementById('arr-best-disp');
-  if (el) el.textContent = b > 0 ? 'ベスト: ' + b + ' pt' : '';
+  if (!el) return;
+  var lines = [];
+  if (b > 0) lines.push('ベスト: ' + b + ' pt');
+  // 3c. 通算正答率
+  var hist = _arrGetHistory();
+  if (hist.length > 0) {
+    var totalCorrect = 0, totalQ = 0;
+    hist.forEach(function(h){ totalCorrect += (h.correct||0); totalQ += (h.total||0); });
+    if (totalQ > 0) {
+      var pctAll = (totalCorrect / totalQ * 100).toFixed(1);
+      lines.push('通算 ' + totalQ + '問中 ' + totalCorrect + '問正解 (' + pctAll + '%)');
+    }
+    // 3d. 連続セッションストリーク（日付ベース）
+    var dates = [];
+    hist.forEach(function(h){ if (h.date) dates.push(localDateStr(new Date(h.date))); });
+    var uniqueDates = dates.filter(function(d, i){ return dates.indexOf(d) === i; }).sort();
+    if (uniqueDates.length > 0) {
+      var streak = 1;
+      var today = localDateStr(new Date());
+      var yesterday = (function(){
+        var d = new Date(); d.setDate(d.getDate()-1);
+        return localDateStr(d);
+      })();
+      // 最新日が今日か昨日でなければストリーク=0
+      var lastDate = uniqueDates[uniqueDates.length - 1];
+      if (lastDate !== today && lastDate !== yesterday) {
+        streak = 0;
+      } else {
+        for (var si = uniqueDates.length - 2; si >= 0; si--) {
+          var prev = new Date(uniqueDates[si + 1]);
+          var cur  = new Date(uniqueDates[si]);
+          var diff = Math.round((prev - cur) / 86400000);
+          if (diff === 1) streak++;
+          else break;
+        }
+      }
+      if (streak >= 2) lines.push('🔥 ' + streak + '日連続');
+    }
+  }
+  // 3a. 弱点スコア帯トップ3
+  _renderWeakBands(el, lines);
+}
+
+function _renderWeakBands(el, existingLines) {
+  var qd = _arrGetQuizData();
+  var keys = Object.keys(qd);
+  var weak = [];
+  keys.forEach(function(k){
+    var v = qd[k];
+    if (v && v.a >= 3) {
+      weak.push({ key: k, acc: v.c / v.a, a: v.a, c: v.c });
+    }
+  });
+  weak.sort(function(a, b){ return a.acc - b.acc; });
+  var top3 = weak.slice(0, 3);
+  var lines = existingLines || [];
+  if (top3.length > 0) {
+    var nums = ['①','②','③'];
+    var parts = top3.map(function(w, i){
+      return nums[i] + ' ' + w.key + ' (' + Math.round(w.acc * 100) + '%)';
+    });
+    lines.push('苦手スコア帯: ' + parts.join(' '));
+  }
+  el.innerHTML = lines.map(function(l){ return '<div>' + l + '</div>'; }).join('');
 }
 function _renderArrHist() {
   var el = document.getElementById('arr-hist-list');
