@@ -1,7 +1,19 @@
-const CACHE = 'darts-v1';
+const CACHE = 'steeldarts-pro-v3';
+
+const PRECACHE = [
+  './',
+  './index.html',
+  './css/app.css',
+  './js/data.js',
+  './js/arr.js',
+  './js/game.js',
+  './js/sfx.js',
+  './js/sim501.js',
+  './manifest.json',
+];
 
 self.addEventListener('install', function(e) {
-  e.waitUntil(caches.open(CACHE).then(function(c) { return c.add('./'); }));
+  e.waitUntil(caches.open(CACHE).then(function(c) { return c.addAll(PRECACHE); }));
   self.skipWaiting();
 });
 
