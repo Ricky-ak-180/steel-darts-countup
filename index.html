@@ -5329,7 +5329,7 @@ function trainWeakMode() {
   var weak = _TRAIN_SCORES.filter(function(s){
     if (_trainIsBogey(s)) return false;
     var e = _trainEntry(s, d);
-    return e.a >= 3 && (e.c / e.a) < 0.6;
+    return e.a >= 1 && (e.c / e.a) < 0.6;
   }).sort(function(a, b){
     var ea = _trainEntry(a, d), eb = _trainEntry(b, d);
     return (ea.c/ea.a) - (eb.c/eb.a); // 成功率が低い順
