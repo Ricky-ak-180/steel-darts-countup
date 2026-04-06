@@ -7750,7 +7750,10 @@ function startQuestSkipChallenge(wi) {
   _questG.qCount=0; _questG.qCorrect=0; _questG.qStreak=0;
   _questG.stageCleared=false; _questG.chain=[];
   _questG.skezuriSetup=null;
-  _questG.skipUnlockReq = w.unlockReq; // クリア時にこのIDを解放
+  _questG.skipUnlockReq = w.unlockReq;
+  _questG.weaknessMode=false;
+  _questG.realThrowMode = _questRealThrowEnabled();
+  _questG.realDart=null; _questG.qThrowAttempts=0; _questG.qThrowHit=0;
   _questG.pool = _arrShuffle(_questPool(testStage.pool));
   _questG.poolIdx = 0;
 
@@ -7759,7 +7762,9 @@ function startQuestSkipChallenge(wi) {
   playEl.style.display = 'flex';
   document.getElementById('arr-quest-play-title').textContent = '⚡ 飛び級: '+w.label;
   document.getElementById('quest-throw-overlay').classList.add('hide');
+  document.getElementById('quest-real-overlay').classList.add('hide');
   document.getElementById('arr-quest-result').className = 'arr-quest-result hide';
+  _updateModeBadge();
   _questNextScore();
 }
 
