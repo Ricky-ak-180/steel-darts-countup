@@ -7394,6 +7394,17 @@ var _QUEST_WORLDS = [
       { id:'w3s0', label:'最終試練', sub:'全スコアランダム 20問 / 75%以上',
         pool:'all', cond:{type:'count',n:20,minAcc:0.75}, isBoss:true }
     ]
+  },
+  { id:'w4', label:'💀 裏ボス', subtitle:'削り戦術', color:'#9c27b0', icon:'💀',
+    desc:'フィニッシュ不可点数から活路を切り開く削り戦術', unlockReq:'w3s0',
+    stages:[
+      { id:'w4s0', label:'170超えの削り方', sub:'171〜180点から残り120へ削る 5問 / 60%以上',
+        pool:'skezuri_high', cond:{type:'count',n:5,minAcc:0.6}, isSkezuri:true },
+      { id:'w4s1', label:'不可能スコア突破', sub:'169/168/166/165/163/162点の対処 8問 / 60%以上',
+        pool:'skezuri_impossible', cond:{type:'count',n:8,minAcc:0.6}, isSkezuri:true },
+      { id:'w4s2', label:'💀 裏ボス: 削り完全制覇', sub:'全削りシナリオ 15問 / 70%以上',
+        pool:'skezuri_all', cond:{type:'count',n:15,minAcc:0.7}, isBoss:true, isSkezuri:true }
+    ]
   }
 ];
 
