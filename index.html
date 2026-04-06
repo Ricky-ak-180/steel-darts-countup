@@ -8290,6 +8290,7 @@ function _questRealNext() {
   });
 
   setTimeout(function(){
+    sfxImpact();
     box.innerHTML = _buildBoardSVG(dartStr, dartStr) +
       '<div class="quest-dart-dot" style="left:'+pos.x+'px;top:'+pos.y+'px;opacity:1;transform:translateY(0) scale(1);"></div>';
     var rEl = document.getElementById('quest-throw-result-text');
