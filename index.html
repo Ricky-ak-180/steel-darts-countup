@@ -7600,7 +7600,7 @@ function startQuestStage(wi, si) {
   var playEl = document.getElementById('arr-quest-play');
   playEl.style.display = 'flex';
   document.getElementById('arr-quest-play-title').textContent = _QUEST_WORLDS[wi].label+' / '+stage.label;
-  document.getElementById('arr-quest-miss-badge').textContent = _questMissMode==='study'?'学習モード':'リアルモード';
+  document.getElementById('quest-throw-overlay').classList.add('hide');
   document.getElementById('arr-quest-result').className = 'arr-quest-result hide';
   _questNextScore();
 }
