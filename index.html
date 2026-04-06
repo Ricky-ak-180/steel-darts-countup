@@ -6297,7 +6297,7 @@ function renderZ01Hist() {
   // === 7. Game list ===
   html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
   html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">ゲーム履歴</div>';
-  h.slice(0,50).forEach(function(g, idx) {
+  h.forEach(function(g, idx) {
     var d = new Date(g.date);
     var dateStr = d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
     var outStr = g.outRule===0 ? 'ダブル' : 'シングル';
