@@ -5361,6 +5361,10 @@ function trainStart(score) {
   _trainHintVis = entry.c < _TRAIN_HINT_HIDE;
   document.getElementById('arr-train-home').style.display = 'none';
   document.getElementById('arr-train-prac').style.display = 'flex';
+  var okBtn = document.getElementById('arr-tp-ok-btn');
+  var ngBtn = document.getElementById('arr-tp-ng-btn');
+  if (okBtn) okBtn.style.opacity = '1';
+  if (ngBtn) ngBtn.style.opacity = '1';
   _renderTrainPrac(score, entry);
 }
 
