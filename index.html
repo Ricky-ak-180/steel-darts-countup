@@ -8190,37 +8190,22 @@ function _updateModeBadge() {
 }
 function _questShowRealThrow(dartStr, wasCorrect) {
   _questG.realDart = dartStr;
-  _questG.qThrowAttempts++;
-  var pts = _questDartVal(dartStr);
   var titleEl = document.getElementById('quest-real-title');
   var dartEl  = document.getElementById('quest-real-dart-label');
-  var noteEl  = document.getElementById('quest-real-wrong-note');
-  if (wasCorrect) {
-    titleEl.textContent = '✓ 正解！';
-    titleEl.className = 'quest-real-title correct';
-    dartEl.className  = 'quest-real-dart-label correct';
-  } else {
-    titleEl.textContent = '✗ 不正解...';
-    titleEl.className = 'quest-real-title wrong';
-    dartEl.className  = 'quest-real-dart-label wrong';
-  }
-  noteEl.textContent = 'に投げてください';
-  dartEl.textContent = dartStr;
+  var subEl   = document.getElementById('quest-real-sub');
+  titleEl.textContent = wasCorrect ? '✓ 正解！' : '✗ 不正解...';
+  titleEl.className   = 'quest-real-title ' + (wasCorrect ? 'correct' : 'wrong');
+  dartEl.textContent  = dartStr;
+  dartEl.className    = 'quest-real-dart-label ' + (wasCorrect ? 'correct' : 'wrong');
+  subEl.textContent   = wasCorrect ? '実際に狙ってみましょう' : '正解は ' + dartStr + ' — 練習として狙ってみましょう';
   document.getElementById('quest-real-board-box').innerHTML = _buildBoardSVG(dartStr, null);
-  document.getElementById('quest-real-hit-btn').textContent = '✓ 入った！（-' + pts + '）';
   document.getElementById('quest-real-overlay').classList.remove('hide');
 }
-function _questRealHit() {
+function _questRealNext() {
   var dartStr = _questG.realDart;
-  _questG.qThrowHit++;
   document.getElementById('quest-real-overlay').classList.add('hide');
   var pts = _questDartVal(dartStr);
   _questOutcome(dartStr, {hit:true, land:dartStr, value:pts});
-}
-function _questRealMiss() {
-  var dartStr = _questG.realDart;
-  document.getElementById('quest-real-overlay').classList.add('hide');
-  _questOutcome(dartStr, {hit:false, land:null, value:0});
 }
 
 /* ===== 弱点分析 ===== */
