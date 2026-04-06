@@ -8068,13 +8068,13 @@ function _questShowResult(cleared) {
     return;
   }
 
-  if (cleared) _questSaveProgress(stage.id, stars);
+  if (cleared && !_questG.weaknessMode) _questSaveProgress(stage.id, stars);
 
-  var starsHtml = (stars>=1?'⭐':'☆')+(stars>=2?'⭐':'☆')+(stars>=3?'⭐':'☆');
+  var starsHtml = _questG.weaknessMode ? '' : (stars>=1?'⭐':'☆')+(stars>=2?'⭐':'☆')+(stars>=3?'⭐':'☆');
   var acc = _questG.qCount>0 ? Math.round(_questG.qCorrect/_questG.qCount*100) : 0;
-  var icon = cleared?'🎉':'💪';
-  var titleText = cleared?'クリア！':'あと少し！';
-  var titleColor = cleared?'#66bb6a':'#ff9800';
+  var icon = _questG.weaknessMode ? '🎯' : cleared?'🎉':'💪';
+  var titleText = _questG.weaknessMode ? '特訓終了！' : cleared?'クリア！':'あと少し！';
+  var titleColor = _questG.weaknessMode ? '#42a5f5' : cleared?'#66bb6a':'#ff9800';
   var sub = _questG.qCount+'問 ／ 正解 '+_questG.qCorrect+'問（'+acc+'%）';
   if (_questG.totalMiss>0) sub += '<br>ミス '+_questG.totalMiss+'回';
   if (_questG.totalWrong>0) sub += '<br>間違い '+_questG.totalWrong+'回';
