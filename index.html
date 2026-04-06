@@ -8166,6 +8166,19 @@ function _questUpdateRealToggleUI() {
     ? '実際に投げて結果を入力 — 知識と実力を両方鍛える!'
     : 'ダーツが飛んでランダムに着弾 — ルートを覚えて正確に!';
 }
+function _updateModeBadge() {
+  var badge = document.getElementById('arr-quest-miss-badge');
+  if (!badge) return;
+  if (_questG.realThrowMode) {
+    badge.textContent = '🎯 実投モード';
+    badge.style.color = '#42a5f5';
+    badge.style.borderColor = '#42a5f5';
+  } else {
+    badge.textContent = '🎲 着弾ランダム';
+    badge.style.color = '';
+    badge.style.borderColor = '';
+  }
+}
 function _questShowRealThrow(dartStr, wasCorrect) {
   _questG.realDart = dartStr;
   _questG.qThrowAttempts++;
