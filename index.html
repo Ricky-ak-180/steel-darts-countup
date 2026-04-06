@@ -7806,6 +7806,45 @@ function _questChoose(chosen, correct) {
 }
 
 function _questOutcome(dartStr, result) {
+  // 削りラウンド: カウント済み（_questChooseSkezuri内）→ メッセージ表示して次へ
+  if (_questG.skezuriSetup) {
+    var sk = _questG.skezuriSetup;
+    _questG.skezuriSetup = null;
+    var newScore = _questG.currentScore - result.value;
+    if (!result.hit) { _questG.thisMiss++; _questG.totalMiss++; }
+    _questG.chain.push({dart:dartStr, val:result.value, hit:result.hit, land:result.land});
+    var chainEl = document.getElementById('arr-quest-chain');
+    chainEl.innerHTML = _questG.chain.map(function(c){
+      var cls='arr-quest-chain-dart '+(c.hit?'hit':'miss');
+      var lbl=c.hit?c.dart:(c.dart+'→'+(c.land||'0'));
+      return '<span class="'+cls+'">'+lbl+'</span>';
+    }).join('');
+    var msg = document.getElementById('arr-quest-bogey-msg');
+    var leavesPath = newScore>0 ? _getPath(newScore) : null;
+    var routeStr = leavesPath ? '（'+leavesPath.slice(0,3).join('→')+'）' : '';
+    if (result.hit) {
+      msg.textContent = '✓ → 残り '+newScore+'点！'+routeStr;
+      msg.style.color = 'var(--acc)';
+    } else if (newScore > 0 && leavesPath) {
+      msg.textContent = '△ → 残り '+newScore+'点 '+routeStr+' ／ 本来 '+sk.leaves+'点に削る';
+      msg.style.color = 'var(--mut)';
+    } else {
+      msg.textContent = '→ 残り '+(newScore>0?newScore:_questG.currentScore)+'点';
+      msg.style.color = 'var(--mut)';
+    }
+    msg.className = 'arr-quest-bogey-msg';
+    document.getElementById('arr-quest-q-area').style.display = 'none';
+    _questUpdateProgress();
+    setTimeout(function() {
+      msg.className = 'arr-quest-bogey-msg hide';
+      msg.style.color = '';
+      document.getElementById('arr-quest-q-area').style.display = '';
+      _questG.chain=[]; _questG.thisWrong=0; _questG.thisMiss=0;
+      _questNextScore();
+    }, 1800);
+    return;
+  }
+
   var newScore = _questG.currentScore - result.value;
   if (!result.hit) { _questG.thisMiss++; _questG.totalMiss++; }
 
