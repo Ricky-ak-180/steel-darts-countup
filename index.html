@@ -6132,12 +6132,12 @@ function renderZ01Hist() {
       if (g.data[0].checkouts && g.data[0].checkouts.length) allCOs = allCOs.concat(g.data[0].checkouts);
     });
     var cats = [
-      {min:161, max:170, label:'161〜170', desc:'トリプル2本 ＋ D-BULL必須　最高難易度'},
-      {min:131, max:160, label:'131〜160', desc:'トリプル2本 → ダブルで上がれる'},
-      {min:101, max:130, label:'101〜130', desc:'シングル1本、トリプル1本 → ダブルで上がれる'},
-      {min:61,  max:100, label:'61〜100',  desc:'トリプルが外れても、シングル2本 → ダブルで上がれる'},
-      {min:41,  max:60,  label:'41〜60',   desc:'シングル＋ダブルの2本フィニッシュ'},
-      {min:2,   max:40,  label:'2〜40',    desc:'ダブル1投フィニッシュ'}
+      {min:161, max:170, label:'161〜170', stars:5, desc:'トリプル2本 ＋ ダブルブル必須　最高難易度'},
+      {min:131, max:160, label:'131〜160', stars:4, desc:'トリプル2本 → ダブルで上がれる'},
+      {min:101, max:130, label:'101〜130', stars:3, desc:'トリプル1〜2本 → ダブルでフィニッシュ'},
+      {min:61,  max:100, label:'61〜100',  stars:2, desc:'トリプルが外れても、シングル2本 → ダブルで上がれる'},
+      {min:41,  max:60,  label:'41〜60',   stars:1, desc:'シングル＋ダブルの2本フィニッシュ'},
+      {min:2,   max:40,  label:'2〜40',    stars:1, desc:'偶数はダブル1投、奇数はシングル→ダブルの2本'}
     ];
     html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
     html += '<div style="padding:10px 12px 4px;font-size:10px;color:var(--mut);letter-spacing:2px;">チェックアウト成功率（難易度別）</div>';
@@ -6145,17 +6145,29 @@ function renderZ01Hist() {
     cats.forEach(function(c){
       var attempts = allCOs.filter(function(a){ return a.score>=c.min && a.score<=c.max; });
       var wins = attempts.filter(function(a){ return a.success; }).length;
-      var pct = attempts.length ? Math.round(wins/attempts.length*100) : 0;
-      var barColor = attempts.length===0?'var(--mut)':pct>=70?'#66bb6a':pct>=40?'#ffd54f':'#ff6b6b';
-      html += '<div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04);">';
-      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+      var n = attempts.length;
+      var pct = n ? Math.round(wins/n*100) : 0;
+      var noData = n === 0;
+      var fewData = n > 0 && n < 5;
+      var barColor = noData ? 'rgba(255,255,255,0.15)' : pct>=70 ? '#66bb6a' : pct>=40 ? '#ffd54f' : '#ff6b6b';
+      var stars = '★'.repeat(c.stars) + '☆'.repeat(5 - c.stars);
+      html += '<div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04);' + (noData?'opacity:0.45;':'') + '">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">';
       html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:18px;color:var(--acc);min-width:70px;">' + c.label + '</div>';
-      html += '<div style="font-size:10px;color:var(--mut);flex:1;">' + c.desc + '</div>';
-      html += '<div style="font-size:14px;font-weight:700;color:' + barColor + ';">' + (attempts.length?pct+'%':'—') + '</div>';
-      html += '<div style="font-size:10px;color:var(--mut);">(' + wins + '/' + attempts.length + ')</div>';
+      html += '<div style="font-size:9px;color:#ffd54f;letter-spacing:1px;flex-shrink:0;">' + stars + '</div>';
+      html += '<div style="font-size:10px;color:var(--mut);flex:1;line-height:1.4;">' + c.desc + '</div>';
+      if (noData) {
+        html += '<div style="font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:1px;">未挑戦</div>';
+      } else {
+        html += '<div style="display:flex;align-items:center;gap:5px;">';
+        if (fewData) html += '<span style="font-size:9px;color:#ff8a65;background:rgba(255,138,101,0.12);border:1px solid rgba(255,138,101,0.3);border-radius:4px;padding:1px 5px;letter-spacing:0.5px;">⚠ 少</span>';
+        html += '<div style="font-size:14px;font-weight:700;color:' + barColor + ';">' + pct + '%</div>';
+        html += '<div style="font-size:10px;color:var(--mut);">(' + wins + '/' + n + ')</div>';
+        html += '</div>';
+      }
       html += '</div>';
-      html += '<div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px;overflow:hidden;">';
-      html += '<div style="width:' + pct + '%;height:100%;background:' + barColor + ';border-radius:4px;"></div>';
+      html += '<div style="background:rgba(255,255,255,0.06);border-radius:4px;height:7px;overflow:hidden;">';
+      html += '<div style="width:' + (noData?100:pct) + '%;height:100%;background:' + (noData?'repeating-linear-gradient(90deg,rgba(255,255,255,0.08) 0px,rgba(255,255,255,0.08) 4px,transparent 4px,transparent 8px)':barColor) + ';border-radius:4px;' + (noData?'':('transition:width 0.6s;')) + '"></div>';
       html += '</div></div>';
     });
     html += '</div>';
