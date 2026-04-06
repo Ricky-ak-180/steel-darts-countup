@@ -3858,7 +3858,7 @@ function startArrSession() {
     var acc = qd[key].c / qd[key].a;
     return Math.max(0.25, 2.0 - 2.0 * acc);
   };
-  _arrG.qList = _arrWeightedSample(allPool, weightFn, Math.min(10, allPool.length));
+  _arrG.qList = _arrWeightedSample(allPool, weightFn, Math.min(_arrG.qCount || 10, allPool.length));
   _arrG.isKezuri = isKezuri;
   _arrG.qIdx = 0;
   _arrG.totalScore = 0; _arrG.maxScore = 0;
