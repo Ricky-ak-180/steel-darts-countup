@@ -4818,7 +4818,7 @@ function _buildBoardSVG(aimStr, landStr) {
     var wc=Math.cos(rad(a1)), ws=Math.sin(rad(a1));
     svg += '<line x1="'+(cx+R*wc)+'" y1="'+(cy+R*ws)+'" x2="'+(cx+RB*wc)+'" y2="'+(cy+RB*ws)+'" stroke="#2a2a2a" stroke-width="1"/>';
 
-    var la=-90+(i+0.5)*18;
+    var la=-99+(i+0.5)*18;
     var tx=cx+113*Math.cos(rad(la)), ty=cy+113*Math.sin(rad(la));
     svg += '<text x="'+tx+'" y="'+ty+'" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#666" font-family="Arial,sans-serif">'+n+'</text>';
   }
