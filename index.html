@@ -7552,9 +7552,11 @@ function _questDartPos(dartStr) {
 /* 投球アニメーション表示 — 着弾先へ正確に飛ぶ */
 function _questShowThrow(dartStr) {
   var overlay = document.getElementById('quest-throw-overlay');
-  document.getElementById('quest-throw-label').textContent = dartStr + ' を狙う！';
+  var isWrongThrow = !!_questG.wrongCorrect;
+  document.getElementById('quest-throw-label').textContent = dartStr + (isWrongThrow ? ' を投げた...' : ' を狙う！');
   document.getElementById('quest-throw-result-text').textContent = '';
   document.getElementById('quest-throw-pts').textContent = '';
+  document.getElementById('quest-throw-hint').textContent = '';
 
   // 先に結果を決定してから着弾座標へ飛ばす
   var result = _questThrow(dartStr);
