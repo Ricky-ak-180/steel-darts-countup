@@ -1320,9 +1320,18 @@ canvas.schart { width: 100%; height: 100%; }
       <div class="arr-quest-hdr">
         <button class="arr-train-back" data-fn="goArrSetup">← 戻る</button>
         <div class="arr-train-home-title">チェックアウトクエスト</div>
+        <button class="arr-quest-weakness-btn" onclick="showQuestWeakness()">📊 弱点</button>
       </div>
       <div style="padding:6px 14px 2px;font-size:11px;color:var(--mut);">ダーツが飛んでランダムに着弾 — ルートを覚えて正確に!</div>
       <div class="arr-quest-worlds" id="arr-quest-worlds"></div>
+    </div>
+    <!-- 弱点分析パネル -->
+    <div class="arr-quest-home" id="arr-quest-weakness" style="display:none;">
+      <div class="arr-quest-hdr">
+        <button class="arr-train-back" onclick="showQuestHome()">← 戻る</button>
+        <div class="arr-train-home-title">📊 弱点分析</div>
+      </div>
+      <div id="arr-quest-weakness-body" style="flex:1;overflow-y:auto;padding:10px 14px 24px;"></div>
     </div>
     <!-- クエストプレイ -->
     <div class="arr-quest-play" id="arr-quest-play" style="display:none;">
