@@ -921,6 +921,70 @@ canvas.schart { width: 100%; height: 100%; }
 .z01-hint-toggle.on{color:var(--acc);border-color:var(--acc);background:rgba(232,255,71,0.07);}
 .z01-lc-s0.editable,.z01-lc-s1.editable{border-bottom:1.5px dashed rgba(255,255,255,0.25);cursor:pointer;}
 .z01-lc-hi.gold{border-color:#ffd700;color:#ffd700;box-shadow:0 0 8px rgba(255,215,0,0.4);}
+/* ── クエストモード ─────────────────────── */
+.arr-quest-home{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;overflow:hidden;}
+.arr-quest-hdr{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--bd);flex-shrink:0;gap:8px;}
+.arr-quest-mode-row{display:flex;align-items:center;gap:8px;padding:8px 14px 2px;flex-shrink:0;}
+.arr-quest-mode-lbl{font-size:11px;color:var(--mut);}
+.arr-quest-mode-toggle{display:flex;border:1px solid var(--bd);border-radius:8px;overflow:hidden;}
+.arr-quest-mode-btn{padding:5px 14px;font-size:11px;font-weight:700;border:none;background:transparent;color:var(--mut);cursor:pointer;letter-spacing:1px;}
+.arr-quest-mode-btn.on{background:var(--acc);color:#000;}
+.arr-quest-worlds{flex:1;overflow-y:auto;padding:10px 12px 24px;}
+.arr-quest-world-card{background:var(--card);border:1px solid var(--bd);border-radius:16px;margin-bottom:14px;overflow:hidden;}
+.arr-quest-world-hdr{display:flex;align-items:center;gap:10px;padding:14px 16px;}
+.arr-quest-world-icon{font-size:24px;flex-shrink:0;}
+.arr-quest-world-info{flex:1;}
+.arr-quest-world-label{font-family:'Bebas Neue',cursive;font-size:19px;letter-spacing:2px;}
+.arr-quest-world-desc{font-size:11px;color:var(--mut);margin-top:2px;}
+.arr-quest-stage-list{border-top:1px solid var(--bd);}
+.arr-quest-stage{display:flex;align-items:center;padding:13px 16px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;gap:10px;-webkit-tap-highlight-color:transparent;}
+.arr-quest-stage:last-child{border-bottom:none;}
+.arr-quest-stage:active{background:rgba(255,255,255,0.04);}
+.arr-quest-stage.locked{opacity:0.3;pointer-events:none;}
+.arr-quest-stage.boss{background:rgba(255,87,34,0.04);}
+.arr-quest-stage-icon{font-size:18px;width:26px;text-align:center;flex-shrink:0;}
+.arr-quest-stage-info{flex:1;}
+.arr-quest-stage-label{font-size:14px;font-weight:700;}
+.arr-quest-stage-sub{font-size:11px;color:var(--mut);margin-top:2px;}
+.arr-quest-stage-stars{font-size:14px;letter-spacing:2px;flex-shrink:0;}
+/* クエストプレイ */
+.arr-quest-play{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;overflow:hidden;}
+.arr-quest-play-hdr{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--bd);flex-shrink:0;gap:8px;}
+.arr-quest-play-title{font-size:13px;font-weight:700;flex:1;letter-spacing:0.5px;}
+.arr-quest-miss-badge{font-size:10px;color:var(--mut);background:rgba(255,255,255,0.06);border:1px solid var(--bd);border-radius:6px;padding:2px 8px;flex-shrink:0;}
+.arr-quest-score-wrap{text-align:center;padding:14px 0 6px;flex-shrink:0;}
+.arr-quest-score-label{font-size:10px;color:var(--mut);letter-spacing:2px;}
+.arr-quest-score-num{font-family:'Bebas Neue',cursive;font-size:80px;color:var(--acc);line-height:1;letter-spacing:4px;transition:color 0.3s;}
+.arr-quest-progress{font-size:11px;color:var(--mut);text-align:center;padding-bottom:4px;flex-shrink:0;}
+.arr-quest-chain{display:flex;gap:5px;padding:4px 14px 8px;flex-wrap:wrap;flex-shrink:0;min-height:28px;}
+.arr-quest-chain-dart{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.arr-quest-chain-dart.hit{background:rgba(102,187,106,0.18);color:#66bb6a;border:1px solid rgba(102,187,106,0.4);}
+.arr-quest-chain-dart.miss{background:rgba(255,107,53,0.13);color:#ff6b35;border:1px solid rgba(255,107,53,0.3);}
+.arr-quest-chain-dart.wrong{background:rgba(239,83,80,0.1);color:#ef5350;border:1px solid rgba(239,83,80,0.3);}
+.arr-quest-q-area{padding:0 14px;flex-shrink:0;}
+.arr-quest-q-label{font-size:12px;color:var(--mut);text-align:center;letter-spacing:1px;margin-bottom:10px;}
+.arr-quest-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.arr-quest-choice{background:rgba(255,255,255,0.06);border:1.5px solid var(--bd);border-radius:12px;padding:17px 0;font-size:20px;font-weight:700;color:var(--fg);cursor:pointer;letter-spacing:1px;font-family:'Bebas Neue',cursive;transition:border-color .15s,background .15s;}
+.arr-quest-choice:active{transform:scale(.95);}
+.arr-quest-choice.correct{background:rgba(102,187,106,0.2)!important;border-color:#66bb6a!important;color:#66bb6a!important;}
+.arr-quest-choice.wrong-ans{background:rgba(239,83,80,0.1)!important;border-color:#ef5350!important;color:#ef5350!important;}
+.arr-quest-choice.disabled{pointer-events:none;}
+.arr-quest-miss-panel{margin:10px 14px 0;background:rgba(255,183,77,0.05);border:1px solid rgba(255,183,77,0.2);border-radius:12px;padding:12px;}
+.arr-quest-miss-panel.hide{display:none;}
+.arr-quest-miss-title{font-size:11px;color:#ffb74d;letter-spacing:1.5px;font-weight:700;margin-bottom:8px;}
+.arr-quest-miss-btn{display:block;width:100%;padding:13px 14px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:6px;border:none;text-align:left;letter-spacing:0.5px;}
+.arr-quest-miss-btn:last-child{margin-bottom:0;}
+.arr-quest-miss-btn.hit{background:rgba(102,187,106,0.15);color:#66bb6a;border:1px solid rgba(102,187,106,0.3);}
+.arr-quest-miss-btn.miss{background:rgba(255,107,53,0.1);color:#ff6b35;border:1px solid rgba(255,107,53,0.25);}
+.arr-quest-bogey-msg{margin:10px 14px 0;padding:12px 14px;background:rgba(239,83,80,0.08);border:1px solid rgba(239,83,80,0.25);border-radius:10px;font-size:13px;color:#ef5350;font-weight:700;text-align:center;}
+.arr-quest-bogey-msg.hide{display:none;}
+.arr-quest-result{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;z-index:10;overflow-y:auto;}
+.arr-quest-result.hide{display:none!important;}
+.arr-quest-result-icon{font-size:52px;margin-bottom:6px;}
+.arr-quest-result-title{font-family:'Bebas Neue',cursive;font-size:44px;letter-spacing:3px;margin-bottom:4px;}
+.arr-quest-result-stars{font-size:30px;letter-spacing:4px;margin-bottom:10px;}
+.arr-quest-result-sub{font-size:13px;color:var(--mut);margin-bottom:20px;text-align:center;line-height:1.7;}
+.arr-quest-result-btns{display:flex;flex-direction:column;gap:8px;width:100%;}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYXJ1LZ2J1"></script>
