@@ -7464,23 +7464,79 @@ function _questDartVal(d) {
   var ring=m[1], n=parseInt(m[2],10);
   return ring==='T'?n*3:ring==='D'?n*2:n;
 }
-function _questMissOut(d) {
-  if (d==='Bull'||d==='D-BULL') return {label:'S-BULLに外れた(−25)', value:25};
-  if (d==='S-BULL') return {label:'完全ミス(0点)', value:0};
-  var m = d.match(/^([TDS]?)(\d+)$/);
-  if (!m) return {label:'ミス(0点)', value:0};
+/* ランダム着弾判定 */
+function _questThrow(dartStr) {
+  var r = Math.random();
+  if (dartStr==='Bull'||dartStr==='D-BULL') {
+    if (r<0.52) return {land:'Bull', value:50, hit:true};
+    if (r<0.88) return {land:'S-BULL', value:25, hit:false};
+    return {land:'S20', value:20, hit:false};
+  }
+  if (dartStr==='S-BULL') {
+    if (r<0.68) return {land:'S-BULL', value:25, hit:true};
+    if (r<0.90) return {land:'Bull', value:50, hit:false};
+    return {land:'S20', value:20, hit:false};
+  }
+  var m = dartStr.match(/^([TDS]?)(\d+)$/);
+  if (!m) return {land:dartStr, value:_questDartVal(dartStr), hit:true};
   var ring=m[1], n=parseInt(m[2],10);
-  if (ring==='T'||ring==='D') return {label:'S'+n+'に外れた(−'+n+')', value:n};
-  return {label:'ミス(0点)', value:0};
+  var idx=_BOARD_SEGS.indexOf(n);
+  var adj = idx>=0 ? _BOARD_SEGS[(idx+(Math.random()<0.5?19:1))%20] : n;
+  if (ring==='T') {
+    if (r<0.68) return {land:dartStr, value:n*3, hit:true};
+    if (r<0.88) return {land:'S'+n, value:n, hit:false};
+    return {land:'T'+adj, value:adj*3, hit:false};
+  }
+  if (ring==='D') {
+    if (r<0.58) return {land:dartStr, value:n*2, hit:true};
+    if (r<0.85) return {land:'S'+n, value:n, hit:false};
+    return {land:null, value:0, hit:false};
+  }
+  if (r<0.82) return {land:dartStr, value:n, hit:true};
+  return {land:'S'+adj, value:adj, hit:false};
 }
 
-function setQuestMissMode(mode) {
-  _questMissMode = mode;
-  document.querySelectorAll('.arr-quest-mode-btn').forEach(function(b){
-    b.classList.toggle('on', b.getAttribute('data-miss')===mode);
+/* 投球アニメーション表示 */
+function _questShowThrow(dartStr) {
+  var overlay = document.getElementById('quest-throw-overlay');
+  document.getElementById('quest-throw-label').textContent = dartStr + ' を狙う！';
+  document.getElementById('quest-throw-result-text').textContent = '';
+  document.getElementById('quest-throw-pts').textContent = '';
+  // ボード（aim のみ表示）
+  var box = document.getElementById('quest-board-box');
+  box.innerHTML = _buildBoardSVG(dartStr, null) + '<div class="quest-dart-dot" id="quest-dart-dot"></div>';
+  overlay.classList.remove('hide');
+  // ダーツ飛行アニメーション開始
+  requestAnimationFrame(function(){
+    var dot = document.getElementById('quest-dart-dot');
+    if (dot) { void dot.offsetWidth; dot.classList.add('flying'); }
   });
-  var hint = document.getElementById('arr-quest-mode-hint');
-  if (hint) hint.textContent = mode==='study' ? '自分でヒット/ミスを選ぶ' : 'ランダムで結果が決まる';
+  // 着弾判定（アニメ完了後）
+  setTimeout(function(){
+    var result = _questThrow(dartStr);
+    // ボード更新（着弾点表示）
+    box.innerHTML = _buildBoardSVG(dartStr, result.land || dartStr);
+    // 結果テキスト
+    var rEl = document.getElementById('quest-throw-result-text');
+    var pEl = document.getElementById('quest-throw-pts');
+    if (result.hit) {
+      rEl.innerHTML = '✓ <span style="color:#66bb6a;">' + dartStr + ' ヒット！</span>';
+      pEl.style.color = '#66bb6a';
+      pEl.textContent = '−' + result.value;
+    } else if (!result.land) {
+      rEl.innerHTML = '✗ <span style="color:#ef5350;">アウト（0点）</span>';
+      pEl.textContent = '';
+    } else {
+      rEl.innerHTML = '△ <span style="color:#ff9800;">' + result.land + ' に外れた</span>';
+      pEl.style.color = '#ff9800';
+      pEl.textContent = result.value > 0 ? '−' + result.value : '';
+    }
+    // オーバーレイを閉じてアウトカム処理
+    setTimeout(function(){
+      overlay.classList.add('hide');
+      _questOutcome(dartStr, result);
+    }, 1400);
+  }, 680);
 }
 
 function showQuestHome() {
