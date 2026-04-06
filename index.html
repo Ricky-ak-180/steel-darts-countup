@@ -7496,6 +7496,25 @@ function _questThrow(dartStr) {
   return {land:'S'+adj, value:adj, hit:false};
 }
 
+/* 狙いのセグメント座標を返す（240×240 SVG 内ピクセル） */
+function _questDartPos(dartStr) {
+  var cx=120, cy=120;
+  if (dartStr==='Bull'||dartStr==='D-BULL') return {x:cx, y:cy};
+  if (dartStr==='S-BULL') return {x:cx, y:cy-11};
+  var m = dartStr.match(/^([TDS]?)(\d+)$/);
+  if (!m) return {x:cx, y:cy};
+  var ring=m[1], n=parseInt(m[2],10);
+  var idx=_BOARD_SEGS.indexOf(n);
+  if (idx<0) return {x:cx, y:cy};
+  var deg = -90 + (idx + 0.5) * 18;
+  var rad = deg * Math.PI / 180;
+  var r = ring==='T' ? 58 : ring==='D' ? 96 : 77;
+  return {
+    x: Math.round(cx + r * Math.cos(rad)),
+    y: Math.round(cy + r * Math.sin(rad))
+  };
+}
+
 /* 投球アニメーション表示 */
 function _questShowThrow(dartStr) {
   var overlay = document.getElementById('quest-throw-overlay');
