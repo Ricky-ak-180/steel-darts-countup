@@ -539,7 +539,7 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-training-start-btn { background:transparent; color:var(--acc); border:1.5px solid var(--acc); border-radius:12px; padding:12px 0; font-size:15px; font-weight:700; cursor:pointer; width:100%; letter-spacing:1px; }
 .arr-training-start-btn:active { opacity:.7; }
 /* トレーニングホーム */
-.arr-train-home { position:fixed; inset:0; background:var(--bg); z-index:200; display:flex; flex-direction:column; overflow:hidden; }
+.arr-train-home { position:fixed; inset:0; background:var(--bg); z-index:200; display:flex; flex-direction:column; overflow:hidden; padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom); }
 .arr-train-home-hdr { display:flex; align-items:center; padding:12px 14px; border-bottom:1px solid var(--bd); flex-shrink:0; gap:8px; }
 .arr-train-back { background:transparent; border:none; color:var(--mut); font-size:13px; padding:4px 8px 4px 0; cursor:pointer; flex-shrink:0; }
 .arr-train-home-title { font-size:15px; font-weight:700; letter-spacing:1px; flex:1; }
@@ -605,7 +605,7 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-train-tile.diff-expert.mastered { background:rgba(171,71,188,0.4); border:1px solid #ab47bc; color:#f3e5f5; }
 .arr-train-tile.diff-expert.perfect  { background:linear-gradient(135deg,#ab47bc,#6a1b9a); border:1px solid #ab47bc; color:#fff; }
 /* トレーニング練習 */
-.arr-train-prac { position:fixed; inset:0; background:var(--bg); z-index:210; display:flex; flex-direction:column; overflow:hidden; }
+.arr-train-prac { position:fixed; inset:0; background:var(--bg); z-index:210; display:flex; flex-direction:column; overflow:hidden; padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom); }
 .arr-tp-hdr { display:flex; align-items:center; padding:12px 14px; border-bottom:1px solid var(--bd); flex-shrink:0; }
 .arr-tp-back { background:transparent; border:none; color:var(--mut); font-size:13px; padding:4px 8px 4px 0; cursor:pointer; flex-shrink:0; }
 .arr-tp-hdr-score { font-family:'Bebas Neue',cursive; font-size:24px; letter-spacing:2px; color:var(--acc); flex:1; text-align:center; }
@@ -629,7 +629,7 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-tp-next:active { opacity:.7; }
 .arr-tp-tip { width:100%; font-size:11px; color:rgba(255,255,255,0.45); line-height:1.6; margin-top:16px; padding:8px 10px; border-left:2px solid var(--acc); background:rgba(255,255,255,0.02); border-radius:0 6px 6px 0; }
 /* アレンジ表パネル */
-.arr-teiseki-panel { position:fixed; inset:0; background:var(--bg); z-index:300; display:flex; flex-direction:column; }
+.arr-teiseki-panel { position:fixed; inset:0; background:var(--bg); z-index:300; display:flex; flex-direction:column; padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom); }
 .arr-teiseki-header { display:flex; align-items:center; padding:12px 12px 8px; gap:8px; border-bottom:1px solid var(--bd); flex-shrink:0; }
 .arr-teiseki-tabs { display:flex; gap:6px; flex:1; }
 .arr-t-tab { flex:1; background:transparent; color:var(--mut); border:1px solid var(--bd); border-radius:8px; padding:7px 4px; font-size:13px; cursor:pointer; }
@@ -843,7 +843,7 @@ canvas.schart { width: 100%; height: 100%; }
 .z01-finish-btn:last-child{border-bottom:none;}
 .z01-finish-btn:active{background:rgba(232,255,71,0.08);}
 /* 01 mid-game stats */
-.z01-midstats{position:fixed;inset:0;background:var(--bg);z-index:450;display:flex;flex-direction:column;}
+.z01-midstats{position:fixed;inset:0;background:var(--bg);z-index:450;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
 .z01-midstats-hdr{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--bdr);flex-shrink:0;}
 .z01-midstats-back{background:transparent;border:none;color:var(--acc);font-size:14px;font-weight:700;cursor:pointer;padding:4px 0;letter-spacing:1px;touch-action:manipulation;min-width:60px;}
 .z01-midstats-title{flex:1;text-align:center;font-size:14px;font-weight:700;letter-spacing:2px;color:var(--txt);}
@@ -907,7 +907,7 @@ canvas.schart { width: 100%; height: 100%; }
 .z01-lc-s0.editable,.z01-lc-s1.editable{border-bottom:1.5px dashed rgba(255,255,255,0.25);cursor:pointer;}
 .z01-lc-hi.gold{border-color:#ffd700;color:#ffd700;box-shadow:0 0 8px rgba(255,215,0,0.4);}
 /* ── クエストモード ─────────────────────── */
-.arr-quest-home{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;overflow:hidden;}
+.arr-quest-home{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;overflow:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
 .arr-quest-hdr{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--bd);flex-shrink:0;gap:8px;}
 .arr-quest-mode-row{display:flex;align-items:center;gap:8px;padding:8px 14px 2px;flex-shrink:0;}
 .arr-quest-mode-lbl{font-size:11px;color:var(--mut);}
@@ -933,7 +933,7 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-quest-stage-sub{font-size:11px;color:var(--mut);margin-top:2px;}
 .arr-quest-stage-stars{font-size:14px;letter-spacing:2px;flex-shrink:0;}
 /* クエストプレイ */
-.arr-quest-play{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;overflow:hidden;}
+.arr-quest-play{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;overflow:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
 .arr-quest-play-hdr{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--bd);flex-shrink:0;gap:8px;}
 .arr-quest-play-title{font-size:13px;font-weight:700;flex:1;letter-spacing:0.5px;}
 .arr-quest-miss-badge{font-size:10px;color:var(--mut);background:rgba(255,255,255,0.06);border:1px solid var(--bd);border-radius:6px;padding:2px 8px;flex-shrink:0;}
