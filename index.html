@@ -2507,11 +2507,11 @@ function renderPer(h) {
     var m60=rr.filter(function(v){return v>=60&&v<100;}).length;
     var m59=rr.filter(function(v){return v<60;}).length;
     var mp=[];
-    if(m180>0) mp.push('<span style="color:#ffd700;">180:'+m180+'</span>');
+    if(m180>0) mp.push('<span style="color:#e8ff47;">180:'+m180+'</span>');
     if(m140>0) mp.push('<span style="color:#47ffb4;">140+:'+m140+'</span>');
-    if(m100>0) mp.push('<span style="color:#ff6b35;">100+:'+m100+'</span>');
-    if(m60>0)  mp.push('<span style="color:#4fc3f7;">60+:'+m60+'</span>');
-    if(m59>0)  mp.push('<span style="color:#6b6b88;">59-:'+m59+'</span>');
+    if(m100>0) mp.push('<span style="color:#4fc3f7;">100+:'+m100+'</span>');
+    if(m60>0)  mp.push('<span style="color:#9575cd;">60+:'+m60+'</span>');
+    if(m59>0)  mp.push('<span style="color:rgba(255,255,255,0.35);">59-:'+m59+'</span>');
     var durM=Math.floor((r.duration||0)/60), durS=(r.duration||0)%60;
     var durStr=r.duration>0?(durM>0?durM+'分'+(durS>0?durS+'秒':''):durS+'秒'):'';
     var timeTag=durStr?'<span style="color:var(--grn);margin-left:auto;">⏱ '+durStr+'</span>':'';
