@@ -1377,13 +1377,24 @@ canvas.schart { width: 100%; height: 100%; }
         <div class="arr-quest-choices" id="arr-quest-choices"></div>
       </div>
       <div class="arr-quest-bogey-msg hide" id="arr-quest-bogey-msg"></div>
-      <!-- 投球オーバーレイ -->
+      <!-- 投球オーバーレイ（シミュレーションモード） -->
       <div class="quest-throw-overlay hide" id="quest-throw-overlay">
         <div class="quest-throw-label" id="quest-throw-label">T20 を狙う！</div>
         <div class="quest-board-box" id="quest-board-box"></div>
         <div class="quest-throw-result-text" id="quest-throw-result-text"></div>
         <div class="quest-throw-pts" id="quest-throw-pts"></div>
         <div class="quest-throw-hint" id="quest-throw-hint"></div>
+      </div>
+      <!-- 実投オーバーレイ -->
+      <div class="quest-real-overlay hide" id="quest-real-overlay">
+        <div class="quest-real-title">投げてください！</div>
+        <div class="quest-real-dart-label" id="quest-real-dart-label">D20</div>
+        <div class="quest-real-wrong-note" id="quest-real-wrong-note"></div>
+        <div class="quest-board-box" id="quest-real-board-box"></div>
+        <div class="quest-real-btns">
+          <button class="quest-real-btn quest-real-hit" id="quest-real-hit-btn" onclick="_questRealHit()">✓ 入った！</button>
+          <button class="quest-real-btn quest-real-miss" onclick="_questRealMiss()">✗ 外れた</button>
+        </div>
       </div>
       <div class="arr-quest-result hide" id="arr-quest-result"></div>
       <!-- A: CHECKOUTフラッシュ -->
