@@ -109,7 +109,7 @@ function _sBoardSVG(aimX,aimY,landX,landY,hint) {
   for(var i=0;i<20;i++){
     var n=_S_SEGS[i],a1=-99+i*18,a2=a1+18,ev=i%2===0;
     var isH = n===hintN;
-    var cS=ev?'#1c1c1c':'#141414', cT=ev?'#0d2e10':'#2a0d0d', cD=ev?'#0d2e10':'#2a0d0d';
+    var cS=ev?'#141414':'#2a2318', cT=ev?'#2a0d0d':'#0d2e10', cD=ev?'#2a0d0d':'#0d2e10';
     if (isH&&hintRing==='S') cS=ev?'rgba(66,165,245,0.3)':'rgba(66,165,245,0.25)';
     if (isH&&hintRing==='T') cT='rgba(66,165,245,0.5)';
     if (isH&&hintRing==='D') cD='rgba(66,165,245,0.5)';
