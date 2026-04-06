@@ -508,7 +508,7 @@ var _ARR_KEZURI_QS = [
    exp:"225−20−20=185残し。185−18=167残し（OK）。S20→165(ボギー)、S19→166(ボギー)。S18一択！"},
   {q:"220〜229帯でS20を2本打った後、3本目をS18かS19に切り替える理由は？",
    choices:["そのままS20を打つと165・166・168などのボギーナンバーに落ちるから","S18の方が入りやすいから","T20を狙いたいから","残り点数が大きすぎるから"],ans:0,
-   exp:"S20を3本打つと164・167・170の上がり目を外れてしまう。3本目だけS18かS19に切り替えることでチェックアウト圏に収める"},
+   exp:"T20を狙うもS20が2本続いた場合、3本目もS20に入るとボギーナンバー（162〜169）に落ちてしまう。3本目だけS18かS19に切り替えることでチェックアウト圏（164・167・170）に収める"},
   // ── 260〜270帯：1本目で下の桁を調整 ──
   {q:"残り266点。T20+S20のコンボで167を残すには1本目に何を狙う？",
    choices:["S19(19点) → 247残→T20(60)→187残→S20(20)→167残","S20(20点) → 246残→T20+S20 → 166(ボギー)","T20(60点) → 206残し","S18(18点) → 248残→T20+S20 → 168(ボギー)"],ans:0,
@@ -1599,9 +1599,9 @@ function _renderTactics() {
     tbl220 += '</table>';
     html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:24px;">' +
       '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">229 〜 220　3本目を18・19に切り替える</div>' +
-      '<div style="font-size:13px;color:var(--mut);margin-bottom:2px;line-height:1.6;">S20を2本打った後（残り182〜189）、そのままS20で打つと中途半端な数字になる。3本目を<strong style="color:var(--acc);">S18かS19</strong>に切り替えて<strong style="color:var(--fg);">164・167・170</strong>に収める。</div>' +
+      '<div style="font-size:13px;color:var(--mut);margin-bottom:2px;line-height:1.6;">T20を狙うもS20に2本外れた後（残り182〜189）、3本目もS20に入るとボギーナンバーに落ちる。3本目を<strong style="color:var(--acc);">S18かS19</strong>に切り替えて<strong style="color:var(--fg);">164・167・170</strong>に収める。</div>' +
       tbl220 +
-      '<div style="margin-top:10px;"><span style="color:#ff6b6b;font-size:14px;">⚠ T20に入ると（60点取ると）→ 162〜169 すべてボギーナンバーに落ちる</span></div>' +
+      '<div style="margin-top:10px;"><span style="color:#ff6b6b;font-size:14px;">⚠ S20＋S20＋S20（合計60点取ると）→ 162〜169 すべてボギーナンバーに落ちる</span></div>' +
     '</div>';
   })();
 
