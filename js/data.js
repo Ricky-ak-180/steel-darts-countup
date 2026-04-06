@@ -1479,10 +1479,10 @@ function _renderTactics() {
   // ── 296〜300帯：3本目（残り1本）は25を狙う ──
   html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
     '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">300 〜 296　3本目（残り1本）は25を狙う</div>' +
-    '<div style="font-size:13px;color:var(--mut);margin-bottom:12px;line-height:1.6;">そのターン2本を打ち終えて残り296〜300になったら、最後の1本で<strong style="color:#ff8a65;">S-BULL（25）</strong>を狙い271〜275帯に収める。ブルエリアは面積が広く期待値が高い。次のターンはT20＋シングル調整＋25で167か170に収めてチェックアウトを目指す。</div>' +
+    '<div style="font-size:13px;color:var(--mut);margin-bottom:12px;line-height:1.6;">そのターン2本を打ち終えて残り296〜300になったら、最後の1本で<strong style="color:#ff8a65;">S-BULL（25）</strong>を狙い271〜275帯に収める。ブルエリアは面積が広く期待値が高い。次のターンはT20を狙いつつ、1本目がシングルに入った場合でもT20＋S-BULLで167か170に収めてチェックアウトを目指す。</div>' +
     '<div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">' +
       '<div><span style="color:#66bb6a;font-weight:700;">✓ D-BULL（50）ヒット</span><span style="color:var(--mut);"> → 残り246〜250（次ターンT20ファーストで削る）</span></div>' +
-      '<div><span style="color:#4fc3f7;font-weight:700;">✓ S-BULL（25）ヒット</span><span style="color:var(--mut);"> → 残り271〜275 → 次ターンはT20＋S調整＋25で167か170残し ✅</span></div>' +
+      '<div><span style="color:#4fc3f7;font-weight:700;">✓ S-BULL（25）ヒット</span><span style="color:var(--mut);"> → 残り271〜275 → 次ターンはT20を狙い、1本目がシングルに入っても T20＋S-BULLで167か170残し ✅</span></div>' +
     '</div>' +
   '</div>';
 
@@ -1520,7 +1520,7 @@ function _renderTactics() {
     tbl275 += '</table>';
     html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
       '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">275 〜 271　S-BULL（25）でつなぐ</div>' +
-      '<div style="font-size:13px;color:var(--mut);margin-bottom:2px;line-height:1.6;">1本目のシングルで下の桁を調整し、T20→<strong style="color:#ff8a65;">S-BULL（25点）</strong>で<strong style="color:var(--fg);">167か170</strong>に収める。</div>' +
+      '<div style="font-size:13px;color:var(--mut);margin-bottom:2px;line-height:1.6;">T20を狙うも1本目がシングルに入った場合、T20→<strong style="color:#ff8a65;">S-BULL（25点）</strong>で<strong style="color:var(--fg);">167か170</strong>に収められる。</div>' +
       tbl275 +
       '<div style="margin-top:10px;"><span style="color:#ff6b6b;font-size:14px;">⚠ T20+S20+S20 で100点を取ってしまうと → 171〜175（上がり目なし）</span></div>' +
     '</div>';
@@ -1558,7 +1558,7 @@ function _renderTactics() {
     tbl260 += '</table>';
     html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
       '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">270 〜 260　1本目で下の桁を調整</div>' +
-      '<div style="font-size:13px;color:var(--mut);margin-bottom:2px;line-height:1.6;">1本目にS18かS19で下の桁を調整し、T20→S20のコンボで<strong style="color:var(--fg);">164・167・170</strong>に収める。</div>' +
+      '<div style="font-size:13px;color:var(--mut);margin-bottom:2px;line-height:1.6;">T20を狙うも1本目がS18かS19に入った場合、T20→S20のコンボで<strong style="color:var(--fg);">164・167・170</strong>に収められる。</div>' +
       tbl260 +
       '<div style="margin-top:10px;"><span style="color:#ff6b6b;font-size:14px;">⚠ T20+S20+S20 で100点を取ってしまうと → 162〜169（ボギー）</span></div>' +
     '</div>';
