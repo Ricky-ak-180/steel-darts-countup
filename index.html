@@ -8066,6 +8066,29 @@ function _questNextStage(wi, si) {
   return null;
 }
 
+/* B: スコアカウントダウンアニメーション */
+function _questAnimateScore(from, to, el, ms) {
+  var start = performance.now();
+  var diff = from - to;
+  function step(now) {
+    var t = Math.min((now - start) / ms, 1);
+    el.textContent = Math.round(from - diff * t);
+    if (t < 1) requestAnimationFrame(step);
+    else el.textContent = to;
+  }
+  requestAnimationFrame(step);
+}
+
+/* D: ストリークバナー表示 */
+function _questShowStreakBanner(n) {
+  var msgs = {3:'🔥 3連続！', 5:'⚡ 5連続！', 7:'🔥🔥 7連続！', 10:'💥 10連続！！', 15:'👑 15連続！！！', 20:'🏆 20連続！！！'};
+  var text = msgs[n] || (n+'連続！🔥');
+  var el = document.getElementById('arr-quest-streak-banner');
+  el.textContent = text;
+  el.classList.remove('hide','show'); void el.offsetWidth; el.classList.add('show');
+  setTimeout(function(){ el.classList.add('hide'); }, 2100);
+}
+
 /* 削りラウンド: 選択肢表示 */
 function _questShowSkezuriQ() {
   var sk = _questG.skezuriSetup;
