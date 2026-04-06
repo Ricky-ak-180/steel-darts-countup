@@ -8210,7 +8210,7 @@ function _questShowRealThrow(dartStr, wasCorrect) {
     titleEl.className = 'quest-real-title wrong';
     dartEl.className  = 'quest-real-dart-label wrong';
   }
-  noteEl.textContent = dartStr + ' に投げてください';
+  noteEl.textContent = 'に投げてください';
   dartEl.textContent = dartStr;
   document.getElementById('quest-real-board-box').innerHTML = _buildBoardSVG(dartStr, null);
   document.getElementById('quest-real-hit-btn').textContent = '✓ 入った！（-' + pts + '）';
