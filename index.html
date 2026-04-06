@@ -7515,44 +7515,52 @@ function _questDartPos(dartStr) {
   };
 }
 
-/* 投球アニメーション表示 */
+/* 投球アニメーション表示 — 着弾先へ正確に飛ぶ */
 function _questShowThrow(dartStr) {
   var overlay = document.getElementById('quest-throw-overlay');
   document.getElementById('quest-throw-label').textContent = dartStr + ' を狙う！';
   document.getElementById('quest-throw-result-text').textContent = '';
   document.getElementById('quest-throw-pts').textContent = '';
-  // ボード（aim のみ表示）＋ダーツ着弾点
+
+  // 先に結果を決定してから着弾座標へ飛ばす
+  var result = _questThrow(dartStr);
+  var landStr = result.land; // null = アウト
+  var flyTarget = landStr || dartStr; // アウトの場合は狙い方向へ
+  var pos = _questDartPos(flyTarget);
+
   var box = document.getElementById('quest-board-box');
-  var pos = _questDartPos(dartStr);
+  // アニメーション中：狙いのみ黄色ハイライト
   box.innerHTML = _buildBoardSVG(dartStr, null) +
     '<div class="quest-dart-dot" id="quest-dart-dot" style="left:'+pos.x+'px;top:'+pos.y+'px;"></div>';
+
   overlay.classList.remove('hide');
+
   // ダーツ飛行アニメーション開始
   requestAnimationFrame(function(){
     var dot = document.getElementById('quest-dart-dot');
     if (dot) { void dot.offsetWidth; dot.classList.add('flying'); }
   });
-  // 着弾判定（アニメ完了後）
+
+  // 着弾後：ボードに着弾点を表示して結果テキスト
   setTimeout(function(){
-    var result = _questThrow(dartStr);
-    // ボード更新（着弾点表示）
-    box.innerHTML = _buildBoardSVG(dartStr, result.land || dartStr);
-    // 結果テキスト
+    // ボード更新：狙い(黄) + 着弾(緑)
+    box.innerHTML = _buildBoardSVG(dartStr, landStr);
+
     var rEl = document.getElementById('quest-throw-result-text');
     var pEl = document.getElementById('quest-throw-pts');
     if (result.hit) {
       rEl.innerHTML = '✓ <span style="color:#66bb6a;">' + dartStr + ' ヒット！</span>';
       pEl.style.color = '#66bb6a';
       pEl.textContent = '−' + result.value;
-    } else if (!result.land) {
+    } else if (!landStr) {
       rEl.innerHTML = '✗ <span style="color:#ef5350;">アウト（0点）</span>';
       pEl.textContent = '';
     } else {
-      rEl.innerHTML = '△ <span style="color:#ff9800;">' + result.land + ' に外れた</span>';
+      rEl.innerHTML = '△ <span style="color:#ff9800;">' + landStr + ' に外れた</span>';
       pEl.style.color = '#ff9800';
       pEl.textContent = result.value > 0 ? '−' + result.value : '';
     }
-    // オーバーレイを閉じてアウトカム処理
+
     setTimeout(function(){
       overlay.classList.add('hide');
       _questOutcome(dartStr, result);
