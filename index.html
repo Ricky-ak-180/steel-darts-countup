@@ -7336,6 +7336,460 @@ function z01CloseStats() {
   document.getElementById('z01-midstats').style.display = 'none';
 }
 
+/* ── クエストモード ──────────────────────────────────── */
+var _questMissMode = 'study';
+
+var _QUEST_WORLDS = [
+  { id:'w0', label:'WORLD 1', subtitle:'入門の丘', color:'#66bb6a', icon:'🌱',
+    desc:'ダブルアウトの基礎を学ぶ', unlockReq:null,
+    stages:[
+      { id:'w0s0', label:'D20をきめろ', sub:'40点スタート・1本フィニッシュ',
+        pool:[40], cond:{type:'clear'}, isBoss:false },
+      { id:'w0s1', label:'ダブルを狙え', sub:'ランダムダブル 3連続クリア',
+        pool:'double_easy', cond:{type:'streak',n:3}, isBoss:false },
+      { id:'w0s2', label:'🔥 BOSS: ダブル全制覇', sub:'ランダムダブル 10問 / 80%以上',
+        pool:'double_all', cond:{type:'count',n:10,minAcc:0.8}, isBoss:true }
+    ]
+  },
+  { id:'w1', label:'WORLD 2', subtitle:'2本の城', color:'#4fc3f7', icon:'🏰',
+    desc:'2本フィニッシュをマスター', unlockReq:'w0s2',
+    stages:[
+      { id:'w1s0', label:'100点を上がれ', sub:'T20→D20の2本フィニッシュ',
+        pool:[100], cond:{type:'clear'}, isBoss:false },
+      { id:'w1s1', label:'2本コンボ', sub:'2本フィニッシュ 5問 / 70%以上',
+        pool:'two_dart_easy', cond:{type:'count',n:5,minAcc:0.7}, isBoss:false },
+      { id:'w1s2', label:'🔥 BOSS: 2本チャレンジ', sub:'2本フィニッシュ 15問 / 75%以上',
+        pool:'two_dart_all', cond:{type:'count',n:15,minAcc:0.75}, isBoss:true }
+    ]
+  },
+  { id:'w2', label:'WORLD 3', subtitle:'3本の要塞', color:'#ff9800', icon:'⚔️',
+    desc:'3本フィニッシュを攻略せよ', unlockReq:'w1s2',
+    stages:[
+      { id:'w2s0', label:'160点を上がれ', sub:'T20→T20→D20の3本フィニッシュ',
+        pool:[160], cond:{type:'clear'}, isBoss:false },
+      { id:'w2s1', label:'定番ルート制覇', sub:'3本フィニッシュ 10問 / 60%以上',
+        pool:'three_dart_common', cond:{type:'count',n:10,minAcc:0.6}, isBoss:false },
+      { id:'w2s2', label:'🔥 BOSS: 170チャレンジ', sub:'上級スコア 20問 / 55%以上',
+        pool:'three_dart_hard', cond:{type:'count',n:20,minAcc:0.55}, isBoss:true }
+    ]
+  },
+  { id:'w3', label:'👑 FINAL', subtitle:'最終試練', color:'#ef5350', icon:'👑',
+    desc:'全スコアランダム総合チャレンジ', unlockReq:'w2s2',
+    stages:[
+      { id:'w3s0', label:'最終試練', sub:'全スコアランダム 20問 / 75%以上',
+        pool:'all', cond:{type:'count',n:20,minAcc:0.75}, isBoss:true }
+    ]
+  }
+];
+
+var _questG = {
+  worldIdx:0, stageIdx:0,
+  currentScore:0, dartNum:1,
+  path:[], chain:[],
+  thisWrong:0, thisMiss:0,
+  totalWrong:0, totalMiss:0,
+  qCount:0, qCorrect:0, qStreak:0,
+  stageCleared:false,
+  pool:[], poolIdx:0
+};
+
+function _questLoadData() {
+  try { return JSON.parse(localStorage.getItem('arr_quest_v1') || '{}'); } catch(e) { return {}; }
+}
+function _questGetProgress(sid) {
+  var d = _questLoadData();
+  return d[sid] || { stars:0, clears:0 };
+}
+function _questSaveProgress(sid, stars) {
+  var d = _questLoadData();
+  if (!d[sid]) d[sid] = { stars:0, clears:0 };
+  d[sid].clears++;
+  if (stars > d[sid].stars) d[sid].stars = stars;
+  localStorage.setItem('arr_quest_v1', JSON.stringify(d));
+}
+function _questIsUnlocked(sid) {
+  for (var wi=0;wi<_QUEST_WORLDS.length;wi++) {
+    var w = _QUEST_WORLDS[wi];
+    for (var si=0;si<w.stages.length;si++) {
+      if (w.stages[si].id !== sid) continue;
+      if (si === 0) return !w.unlockReq || _questGetProgress(w.unlockReq).clears > 0;
+      return _questGetProgress(w.stages[si-1].id).clears > 0;
+    }
+  }
+  return false;
+}
+
+function _questPool(poolType) {
+  if (Array.isArray(poolType)) return poolType.slice();
+  var r = [];
+  if (poolType === 'double_easy') return [40,32,36,20,28,16,24,30,40,36,32];
+  if (poolType === 'double_all') {
+    for (var i=2;i<=40;i+=2) r.push(i);
+    r.push(50); return r;
+  }
+  if (poolType === 'two_dart_easy') return [100,98,96,60,56,52,48,44,41];
+  if (poolType === 'two_dart_all') {
+    for (var i=2;i<=170;i++) { var p=_getPath(i); if(p&&p.length===2) r.push(i); }
+    return r;
+  }
+  if (poolType === 'three_dart_common') return [160,156,150,140,130,121,120,110,104,102];
+  if (poolType === 'three_dart_hard') return [170,167,164,161,160,158,157,156,155,154,153,152,151];
+  if (poolType === 'all') {
+    for (var i=2;i<=170;i++) if(_isCheckable(i)) r.push(i);
+    return r;
+  }
+  return [40];
+}
+
+function _questDartVal(d) {
+  if (d==='Bull'||d==='D-BULL') return 50;
+  if (d==='S-BULL'||d==='25') return 25;
+  var m = d.match(/^([TDS]?)(\d+)$/);
+  if (!m) return 0;
+  var ring=m[1], n=parseInt(m[2],10);
+  return ring==='T'?n*3:ring==='D'?n*2:n;
+}
+function _questMissOut(d) {
+  if (d==='Bull'||d==='D-BULL') return {label:'S-BULLに外れた(−25)', value:25};
+  if (d==='S-BULL') return {label:'完全ミス(0点)', value:0};
+  var m = d.match(/^([TDS]?)(\d+)$/);
+  if (!m) return {label:'ミス(0点)', value:0};
+  var ring=m[1], n=parseInt(m[2],10);
+  if (ring==='T'||ring==='D') return {label:'S'+n+'に外れた(−'+n+')', value:n};
+  return {label:'ミス(0点)', value:0};
+}
+
+function setQuestMissMode(mode) {
+  _questMissMode = mode;
+  document.querySelectorAll('.arr-quest-mode-btn').forEach(function(b){
+    b.classList.toggle('on', b.getAttribute('data-miss')===mode);
+  });
+  var hint = document.getElementById('arr-quest-mode-hint');
+  if (hint) hint.textContent = mode==='study' ? '自分でヒット/ミスを選ぶ' : 'ランダムで結果が決まる';
+}
+
+function showQuestHome() {
+  document.getElementById('arr-setup').style.display = 'none';
+  document.getElementById('arr-hist-wrap').style.display = 'none';
+  document.getElementById('arr-train-home').style.display = 'none';
+  document.getElementById('arr-quest-play').style.display = 'none';
+  document.getElementById('arr-quest-home').style.display = 'flex';
+  _renderQuestWorlds();
+}
+
+function _renderQuestWorlds() {
+  var el = document.getElementById('arr-quest-worlds');
+  var html = '';
+  _QUEST_WORLDS.forEach(function(w, wi) {
+    var wUnlocked = !w.unlockReq || _questGetProgress(w.unlockReq).clears > 0;
+    var wColor = wUnlocked ? w.color : 'rgba(255,255,255,0.15)';
+    html += '<div class="arr-quest-world-card" style="border-color:'+wColor+'44;">';
+    html += '<div class="arr-quest-world-hdr" style="border-left:3px solid '+wColor+';padding-left:13px;">';
+    html += '<div class="arr-quest-world-icon">'+(wUnlocked?w.icon:'🔒')+'</div>';
+    html += '<div class="arr-quest-world-info">';
+    html += '<div class="arr-quest-world-label" style="color:'+wColor+';">'+w.label+' '+w.subtitle+'</div>';
+    html += '<div class="arr-quest-world-desc">'+w.desc+'</div>';
+    html += '</div></div>';
+    html += '<div class="arr-quest-stage-list">';
+    w.stages.forEach(function(stage, si) {
+      var unlocked = _questIsUnlocked(stage.id);
+      var prog = _questGetProgress(stage.id);
+      var stars = prog.clears>0 ? prog.stars : 0;
+      var starsHtml = (stars>=3?'⭐':'☆')+(stars>=2?'⭐':'☆')+(stars>=1?'⭐':'☆');
+      // reverse order for display: leftmost=3rd star
+      starsHtml = (stars>=1?'⭐':'☆')+(stars>=2?'⭐':'☆')+(stars>=3?'⭐':'☆');
+      var icon = !unlocked?'🔒':prog.clears>0?(stars>=3?'⭐':'✓'):(stage.isBoss?'🔥':'▷');
+      var cls = 'arr-quest-stage'+(stage.isBoss?' boss':'')+(unlocked?'':' locked');
+      html += '<div class="'+cls+'" onclick="startQuestStage('+wi+','+si+')">';
+      html += '<div class="arr-quest-stage-icon">'+icon+'</div>';
+      html += '<div class="arr-quest-stage-info">';
+      html += '<div class="arr-quest-stage-label">'+stage.label+'</div>';
+      html += '<div class="arr-quest-stage-sub">'+stage.sub+'</div>';
+      html += '</div>';
+      html += '<div class="arr-quest-stage-stars">'+starsHtml+'</div>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+  el.innerHTML = html;
+}
+
+function startQuestStage(wi, si) {
+  if (!_questIsUnlocked(_QUEST_WORLDS[wi].stages[si].id)) return;
+  _questG.worldIdx=wi; _questG.stageIdx=si;
+  _questG.thisWrong=0; _questG.thisMiss=0;
+  _questG.totalWrong=0; _questG.totalMiss=0;
+  _questG.qCount=0; _questG.qCorrect=0; _questG.qStreak=0;
+  _questG.stageCleared=false; _questG.chain=[];
+  var stage = _QUEST_WORLDS[wi].stages[si];
+  _questG.pool = _arrShuffle(_questPool(stage.pool));
+  _questG.poolIdx = 0;
+
+  document.getElementById('arr-quest-home').style.display = 'none';
+  var playEl = document.getElementById('arr-quest-play');
+  playEl.style.display = 'flex';
+  document.getElementById('arr-quest-play-title').textContent = _QUEST_WORLDS[wi].label+' / '+stage.label;
+  document.getElementById('arr-quest-miss-badge').textContent = _questMissMode==='study'?'学習モード':'リアルモード';
+  document.getElementById('arr-quest-result').className = 'arr-quest-result hide';
+  _questNextScore();
+}
+
+function _questNextScore() {
+  var stage = _QUEST_WORLDS[_questG.worldIdx].stages[_questG.stageIdx];
+  var cond = stage.cond;
+  // Check completion
+  if (cond.type==='clear' && _questG.stageCleared) { _questShowResult(true); return; }
+  if (cond.type==='streak' && _questG.qStreak>=cond.n) { _questShowResult(true); return; }
+  if (cond.type==='count' && _questG.qCount>=cond.n) {
+    var acc = _questG.qCount>0 ? _questG.qCorrect/_questG.qCount : 0;
+    _questShowResult(acc>=(cond.minAcc||0)); return;
+  }
+  // Pick score
+  if (_questG.poolIdx >= _questG.pool.length) {
+    _questG.pool = _arrShuffle(_questPool(stage.pool));
+    _questG.poolIdx = 0;
+  }
+  var score = _questG.pool[_questG.poolIdx++];
+  var path = _getPath(score);
+  if (!path) { _questNextScore(); return; }
+
+  _questG.currentScore = score;
+  _questG.dartNum = 1;
+  _questG.chain = [];
+  _questG.thisWrong = 0;
+  _questG.thisMiss = 0;
+
+  document.getElementById('arr-quest-score-num').textContent = score;
+  document.getElementById('arr-quest-score-num').style.color = '';
+  document.getElementById('arr-quest-chain').innerHTML = '';
+  document.getElementById('arr-quest-miss-panel').className = 'arr-quest-miss-panel hide';
+  document.getElementById('arr-quest-bogey-msg').className = 'arr-quest-bogey-msg hide';
+  document.getElementById('arr-quest-q-area').style.display = '';
+  _questUpdateProgress();
+  _questShowDartQ();
+}
+
+function _questUpdateProgress() {
+  var stage = _QUEST_WORLDS[_questG.worldIdx].stages[_questG.stageIdx];
+  var cond = stage.cond;
+  var el = document.getElementById('arr-quest-progress');
+  if (cond.type==='streak') {
+    el.textContent = '連続 '+_questG.qStreak+' / '+cond.n;
+  } else if (cond.type==='count') {
+    var acc = _questG.qCount>0 ? Math.round(_questG.qCorrect/_questG.qCount*100)+'%' : '-';
+    el.textContent = _questG.qCount+' / '+cond.n+'問  正答率 '+acc;
+  } else {
+    el.textContent = _questG.stageCleared ? '✓ クリア' : '挑戦中';
+  }
+}
+
+function _questShowDartQ() {
+  var path = _getPath(_questG.currentScore);
+  if (!path) {
+    // Bogey or no checkout
+    document.getElementById('arr-quest-q-area').style.display = 'none';
+    var bogeyEl = document.getElementById('arr-quest-bogey-msg');
+    bogeyEl.textContent = '残り '+_questG.currentScore+' — チェックアウト不可！';
+    bogeyEl.className = 'arr-quest-bogey-msg';
+    _questG.qCount++;
+    _questG.qStreak = 0;
+    setTimeout(function() {
+      bogeyEl.className = 'arr-quest-bogey-msg hide';
+      document.getElementById('arr-quest-q-area').style.display = '';
+      _questG.chain = []; _questG.thisWrong = 0; _questG.thisMiss = 0;
+      _questNextScore();
+    }, 1500);
+    return;
+  }
+  _questG.path = path;
+  var nLeft = path.length;
+  var label = _questG.dartNum+'本目は何を狙う？';
+  if (nLeft===1) label = _questG.dartNum+'本目でフィニッシュ！何を狙う？';
+  else label = _questG.dartNum+'本目は？（あと'+nLeft+'本でフィニッシュ可能）';
+  document.getElementById('arr-quest-q-label').textContent = label;
+
+  var correct = path[0];
+  var pool;
+  if (correct==='Bull'||correct==='D-BULL') pool=["Bull","T20","T19","T18","D20","S-BULL"];
+  else if (correct[0]==='T') pool=_ARR_TRIPLE_POOL;
+  else if (correct[0]==='D') pool=_ARR_DOUBLE_POOL;
+  else pool=_ARR_SINGLE_POOL;
+  var decoys = _arrShuffle(pool.filter(function(d){return d!==correct;})).slice(0,3);
+  var choices = _arrShuffle([correct].concat(decoys));
+
+  var el = document.getElementById('arr-quest-choices');
+  el.innerHTML = '';
+  choices.forEach(function(val) {
+    var btn = document.createElement('button');
+    btn.className = 'arr-quest-choice';
+    btn.textContent = val;
+    btn.onclick = function() { _questChoose(val, correct); };
+    el.appendChild(btn);
+  });
+}
+
+function _questChoose(chosen, correct) {
+  var isCorrect = chosen === correct;
+  // Visual feedback
+  document.querySelectorAll('.arr-quest-choice').forEach(function(b) {
+    b.classList.add('disabled');
+    if (b.textContent===correct) b.classList.add('correct');
+    else if (b.textContent===chosen && !isCorrect) b.classList.add('wrong-ans');
+  });
+
+  if (!isCorrect) {
+    _questG.thisWrong++;
+    _questG.totalWrong++;
+    // Show correct dart highlighted, then continue with it (forced hit)
+    setTimeout(function() { _questOutcome(correct, true); }, 900);
+    return;
+  }
+
+  // Correct — handle outcome
+  var hitVal = _questDartVal(correct);
+  var hitScore = _questG.currentScore - hitVal;
+  var missOut = _questMissOut(correct);
+  var missScore = _questG.currentScore - missOut.value;
+
+  if (_questMissMode === 'study') {
+    var panel = document.getElementById('arr-quest-miss-panel');
+    var html = '';
+    html += '<button class="arr-quest-miss-btn hit" onclick="_questOutcome(\''+correct+'\',true)">✓ ヒット！ → '+(hitScore<=0?'フィニッシュ🎉':hitScore+'残り')+'</button>';
+    if (missOut.value > 0 && missScore > 0 && missScore !== _questG.currentScore) {
+      html += '<button class="arr-quest-miss-btn miss" onclick="_questOutcome(\''+correct+'\',false)">△ '+missOut.label+' → '+missScore+'残り</button>';
+    } else if (missOut.value === 0) {
+      html += '<button class="arr-quest-miss-btn miss" onclick="_questOutcome(\''+correct+'\',false)">△ '+missOut.label+'</button>';
+    }
+    document.getElementById('arr-quest-miss-btns').innerHTML = html;
+    panel.className = 'arr-quest-miss-panel';
+  } else {
+    // Real mode: random
+    var hitRate = correct[0]==='D'?0.60:correct==='Bull'?0.55:0.72;
+    var hit = Math.random() < hitRate;
+    setTimeout(function(){ _questOutcome(correct, hit); }, 400);
+  }
+}
+
+function _questOutcome(dartStr, hit) {
+  document.getElementById('arr-quest-miss-panel').className = 'arr-quest-miss-panel hide';
+
+  var hitVal = _questDartVal(dartStr);
+  var missOut = _questMissOut(dartStr);
+  var actualVal = hit ? hitVal : missOut.value;
+  var newScore = _questG.currentScore - actualVal;
+
+  if (!hit) { _questG.thisMiss++; _questG.totalMiss++; }
+
+  // Update chain
+  _questG.chain.push({ dart:dartStr, val:actualVal, hit:hit });
+  var chainEl = document.getElementById('arr-quest-chain');
+  chainEl.innerHTML = _questG.chain.map(function(c){
+    var cls = 'arr-quest-chain-dart '+(c.hit?'hit':'miss');
+    var lbl = c.dart+(c.hit?'':' (S'+c.val+')');
+    return '<span class="'+cls+'">'+lbl+'</span>';
+  }).join('');
+
+  _questG.currentScore = newScore;
+  document.getElementById('arr-quest-score-num').textContent = newScore>0?newScore:0;
+  _questG.dartNum++;
+
+  // Success
+  if (newScore === 0) {
+    _questG.qCount++;
+    _questG.qCorrect++;
+    var clean = _questG.thisWrong===0 && _questG.thisMiss===0;
+    _questG.qStreak = clean ? _questG.qStreak+1 : 0;
+    _questG.stageCleared = true;
+    document.getElementById('arr-quest-score-num').style.color = '#66bb6a';
+    _questUpdateProgress();
+    setTimeout(function(){
+      _questG.chain=[]; _questG.thisWrong=0; _questG.thisMiss=0;
+      _questNextScore();
+    }, 900);
+    return;
+  }
+
+  // Bust / negative
+  if (newScore < 0 || newScore === 1) {
+    _questG.qCount++;
+    _questG.qStreak = 0;
+    document.getElementById('arr-quest-score-num').style.color = '#ef5350';
+    document.getElementById('arr-quest-score-num').textContent = 'BUST';
+    _questUpdateProgress();
+    setTimeout(function(){
+      document.getElementById('arr-quest-score-num').style.color = '';
+      _questG.chain=[]; _questG.thisWrong=0; _questG.thisMiss=0;
+      _questNextScore();
+    }, 1200);
+    return;
+  }
+
+  // Continue
+  _questUpdateProgress();
+  setTimeout(function(){
+    document.getElementById('arr-quest-choices').innerHTML = '';
+    _questShowDartQ();
+  }, 300);
+}
+
+function _questCalcStars(cleared) {
+  if (!cleared) return 0;
+  var stage = _QUEST_WORLDS[_questG.worldIdx].stages[_questG.stageIdx];
+  var cond = stage.cond;
+  if (cond.type==='clear') {
+    if (_questG.thisWrong===0 && _questG.thisMiss===0) return 3;
+    if (_questG.totalWrong<=1) return 2;
+    return 1;
+  }
+  var acc = _questG.qCount>0 ? _questG.qCorrect/_questG.qCount : 0;
+  if (acc >= 0.9) return 3;
+  if (acc >= (cond.minAcc||0.7)) return 2;
+  return 1;
+}
+
+function _questShowResult(cleared) {
+  var stars = _questCalcStars(cleared);
+  var stage = _QUEST_WORLDS[_questG.worldIdx].stages[_questG.stageIdx];
+  if (cleared) _questSaveProgress(stage.id, stars);
+
+  var starsHtml = (stars>=1?'⭐':'☆')+(stars>=2?'⭐':'☆')+(stars>=3?'⭐':'☆');
+  var acc = _questG.qCount>0 ? Math.round(_questG.qCorrect/_questG.qCount*100) : 0;
+  var icon = cleared?'🎉':'💪';
+  var titleText = cleared?'クリア！':'あと少し！';
+  var titleColor = cleared?'#66bb6a':'#ff9800';
+  var sub = _questG.qCount+'問 ／ 正解 '+_questG.qCorrect+'問（'+acc+'%）';
+  if (_questG.totalMiss>0) sub += '<br>ミス '+_questG.totalMiss+'回';
+  if (_questG.totalWrong>0) sub += '<br>間違い '+_questG.totalWrong+'回';
+
+  var next = _questNextStage(_questG.worldIdx, _questG.stageIdx);
+  var html = '<div class="arr-quest-result-icon">'+icon+'</div>';
+  html += '<div class="arr-quest-result-title" style="color:'+titleColor+';">'+titleText+'</div>';
+  html += '<div class="arr-quest-result-stars">'+starsHtml+'</div>';
+  html += '<div class="arr-quest-result-sub">'+sub+'</div>';
+  html += '<div class="arr-quest-result-btns">';
+  if (cleared && next) {
+    html += '<button class="arr-step-btn arr-step-btn-primary" onclick="startQuestStage('+next.wi+','+next.si+')">次のステージへ →</button>';
+  }
+  html += '<button class="arr-step-btn" onclick="startQuestStage('+_questG.worldIdx+','+_questG.stageIdx+')">もう一度</button>';
+  html += '<button class="arr-step-btn" style="border-color:var(--mut);color:var(--mut);" onclick="showQuestHome()">ワールド選択へ</button>';
+  html += '</div>';
+
+  var el = document.getElementById('arr-quest-result');
+  el.innerHTML = html;
+  el.className = 'arr-quest-result';
+}
+
+function _questNextStage(wi, si) {
+  if (si+1 < _QUEST_WORLDS[wi].stages.length) return {wi:wi, si:si+1};
+  if (wi+1 < _QUEST_WORLDS.length) return {wi:wi+1, si:0};
+  return null;
+}
+
+function quitQuestPlay() {
+  document.getElementById('arr-quest-play').style.display = 'none';
+  showQuestHome();
+}
+
 /* 高速タッチ処理 */
 var _fns = { kp: kp, kd: kd, doOk: doOk, commit: commit,
   undoRound: undoRound, resetGame: resetGame,
