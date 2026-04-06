@@ -7961,9 +7961,11 @@ function _questOutcome(dartStr, result) {
   if (newScore < 0 || newScore === 1) {
     _questG.qCount++;
     _questG.qStreak = 0;
-    // スコアは動かさず即座にBUST表示
-    scoreEl.style.color = '#ef5350';
-    scoreEl.textContent = 'BUST';
+    // アニメーション完了後にBUST表示（タメを作る）
+    setTimeout(function(){
+      scoreEl.style.color = '#ef5350';
+      scoreEl.textContent = 'BUST';
+    }, 500);
     _questUpdateProgress();
     setTimeout(function(){
       scoreEl.style.color = '';
