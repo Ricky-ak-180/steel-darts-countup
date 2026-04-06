@@ -8199,9 +8199,42 @@ function _questShowRealThrow(dartStr, wasCorrect) {
 }
 function _questRealNext() {
   var dartStr = _questG.realDart;
-  document.getElementById('quest-real-overlay').classList.add('hide');
   var pts = _questDartVal(dartStr);
-  _questOutcome(dartStr, {hit:true, land:dartStr, value:pts});
+  var result = {hit:true, land:dartStr, value:pts};
+
+  // 実投オーバーレイを隠してシミュレーションと同じ投球アニメを流す
+  document.getElementById('quest-real-overlay').classList.add('hide');
+
+  var overlay = document.getElementById('quest-throw-overlay');
+  document.getElementById('quest-throw-label').textContent = dartStr + ' を狙う！';
+  document.getElementById('quest-throw-result-text').textContent = '';
+  document.getElementById('quest-throw-pts').textContent = '';
+  document.getElementById('quest-throw-hint').textContent = '';
+
+  var pos = _questDartPos(dartStr);
+  var box = document.getElementById('quest-board-box');
+  box.innerHTML = _buildBoardSVG(dartStr, null) +
+    '<div class="quest-dart-dot" id="quest-dart-dot" style="left:'+pos.x+'px;top:'+pos.y+'px;"></div>';
+  overlay.classList.remove('hide');
+
+  requestAnimationFrame(function(){
+    var dot = document.getElementById('quest-dart-dot');
+    if (dot) { void dot.offsetWidth; dot.classList.add('flying'); }
+  });
+
+  setTimeout(function(){
+    box.innerHTML = _buildBoardSVG(dartStr, dartStr) +
+      '<div class="quest-dart-dot" style="left:'+pos.x+'px;top:'+pos.y+'px;opacity:1;transform:translateY(0) scale(1);"></div>';
+    var rEl = document.getElementById('quest-throw-result-text');
+    var pEl = document.getElementById('quest-throw-pts');
+    rEl.innerHTML = '✓ <span style="color:#66bb6a;">' + dartStr + ' ヒット！</span>';
+    pEl.style.color = '#66bb6a';
+    pEl.textContent = '−' + pts;
+    setTimeout(function(){
+      overlay.classList.add('hide');
+      _questOutcome(dartStr, result);
+    }, 1700);
+  }, 680);
 }
 
 /* ===== 弱点分析 ===== */
