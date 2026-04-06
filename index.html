@@ -7543,8 +7543,9 @@ function _questShowThrow(dartStr) {
 
   // 着弾後：ボードに着弾点を表示して結果テキスト
   setTimeout(function(){
-    // ボード更新：狙い(黄) + 着弾(緑)
-    box.innerHTML = _buildBoardSVG(dartStr, landStr);
+    // ボード更新：狙い(黄) + 着弾(緑) + 光点を同座標に残す
+    box.innerHTML = _buildBoardSVG(dartStr, landStr) +
+      '<div class="quest-dart-dot" style="left:'+pos.x+'px;top:'+pos.y+'px;opacity:1;transform:translateY(0) scale(1);"></div>';
 
     var rEl = document.getElementById('quest-throw-result-text');
     var pEl = document.getElementById('quest-throw-pts');
