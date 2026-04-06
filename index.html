@@ -7950,8 +7950,35 @@ function _questCalcStars(cleared) {
 }
 
 function _questShowResult(cleared) {
+  var isSkip = !!_questG.skipUnlockReq;
   var stars = _questCalcStars(cleared);
   var stage = _QUEST_WORLDS[_questG.worldIdx].stages[_questG.stageIdx];
+
+  if (isSkip) {
+    // 飛び級チャレンジ結果
+    if (cleared) _questSaveProgress(_questG.skipUnlockReq, 1);
+    _questG.skipUnlockReq = null;
+    var acc = _questG.qCount>0 ? Math.round(_questG.qCorrect/_questG.qCount*100) : 0;
+    var w = _QUEST_WORLDS[_questG.worldIdx];
+    var icon = cleared ? '⚡' : '💪';
+    var titleText = cleared ? '飛び級成功！' : 'あと少し！';
+    var titleColor = cleared ? 'var(--acc)' : '#ff9800';
+    var sub = _questG.qCount+'問 ／ 正解 '+_questG.qCorrect+'問（'+acc+'%）';
+    var html = '<div class="arr-quest-result-icon">'+icon+'</div>';
+    html += '<div class="arr-quest-result-title" style="color:'+titleColor+';">'+titleText+'</div>';
+    if (cleared) html += '<div class="arr-quest-result-sub" style="color:var(--acc);font-weight:700;">'+w.label+' が解放されました！</div>';
+    html += '<div class="arr-quest-result-sub">'+sub+'</div>';
+    html += '<div class="arr-quest-result-btns">';
+    if (cleared) html += '<button class="arr-step-btn arr-step-btn-primary" onclick="showQuestHome()">ワールドを選ぶ →</button>';
+    html += '<button class="arr-step-btn" onclick="startQuestSkipChallenge('+_questG.worldIdx+')">もう一度</button>';
+    html += '<button class="arr-step-btn" style="border-color:var(--mut);color:var(--mut);" onclick="showQuestHome()">戻る</button>';
+    html += '</div>';
+    var el = document.getElementById('arr-quest-result');
+    el.innerHTML = html;
+    el.className = 'arr-quest-result';
+    return;
+  }
+
   if (cleared) _questSaveProgress(stage.id, stars);
 
   var starsHtml = (stars>=1?'⭐':'☆')+(stars>=2?'⭐':'☆')+(stars>=3?'⭐':'☆');
