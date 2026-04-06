@@ -2432,7 +2432,7 @@ function importZ01Data(input) {
         if (!dates[x.date]) { current.push(x); newGames.push(x); }
       });
       current.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
-      localStorage.setItem('dh01', JSON.stringify(current.slice(0, 300)));
+      localStorage.setItem('dh01', JSON.stringify(current.slice(0, 500)));
       renderZ01Hist();
       alert(newGames.length + '件のデータを追加しました（重複は除外）');
     } catch(err) {
