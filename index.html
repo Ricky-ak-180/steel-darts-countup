@@ -2757,9 +2757,9 @@ function renderHist() {
     if (lastWeekGames.length > 0) {
       var lastAvg = Math.round(lastWeekGames.reduce(function(a,g){return a+g.score;},0)/lastWeekGames.length);
       var diff = thisAvg - lastAvg;
-      if (diff > 0) msg = '📈 直近7日比 <strong style="color:#66bb6a;">+' + diff + '点</strong> 伸びています！ (今週平均 '+thisAvg+'点)';
-      else if (diff < 0) msg = '📉 直近7日比 <strong style="color:#ff6b6b;">' + diff + '点</strong>　(今週平均 '+thisAvg+'点)';
-      else msg = '➡ 直近7日と同水準　(今週平均 '+thisAvg+'点)';
+      if (diff > 0) msg = '📈 先週より <strong style="color:#66bb6a;">+' + diff + '点アップ ↑</strong>　(今週平均 '+thisAvg+'点)';
+      else if (diff < 0) msg = '📉 先週より <strong style="color:#ff9944;">' + Math.abs(diff) + '点ダウン ↓</strong>　(今週平均 '+thisAvg+'点)';
+      else msg = '➡ <span style="color:var(--mut);">先週と同じ</span>　(今週平均 '+thisAvg+'点)';
     } else {
       msg = '🎯 今週の平均スコア: <strong style="color:var(--acc);">' + thisAvg + '点</strong>　(' + thisWeekGames.length + 'G)';
     }
