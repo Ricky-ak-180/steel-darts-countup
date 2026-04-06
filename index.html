@@ -8212,7 +8212,8 @@ function _questShowRealThrow(dartStr, wasCorrect) {
   }
   noteEl.textContent = 'に投げてください';
   dartEl.textContent = dartStr;
-  document.getElementById('quest-real-hit-btn').innerHTML = '✓<br>入った！';
+  document.getElementById('quest-real-board-box').innerHTML = _buildBoardSVG(dartStr, null);
+  document.getElementById('quest-real-hit-btn').textContent = '✓ 入った！（-' + pts + '）';
   document.getElementById('quest-real-overlay').classList.remove('hide');
 }
 function _questRealHit() {
