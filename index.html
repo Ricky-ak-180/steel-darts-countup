@@ -4354,12 +4354,12 @@ function _buildTeisekiEntries() {
 }
 
 function showTeiseki() {
-  _teisekiFilter = 501;
+  _teisekiFilter = 99;
   document.querySelectorAll('.arr-t-tab').forEach(function(t){
     var arg = +t.getAttribute('data-arg');
     t.className = 'arr-t-tab' + (arg === _teisekiFilter ? ' on' : '');
   });
-  _renderTactics();
+  _renderTeiseki(_teisekiFilter);
   document.getElementById('arr-teiseki-panel').className = 'arr-teiseki-panel';
 }
 
