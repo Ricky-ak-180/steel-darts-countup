@@ -8137,6 +8137,50 @@ function _questNextStage(wi, si) {
   return null;
 }
 
+/* ===== 実投モード ===== */
+function _questRealThrowEnabled() {
+  return localStorage.getItem('arr_quest_realthrow') === '1';
+}
+function toggleQuestRealThrow() {
+  var on = !_questRealThrowEnabled();
+  localStorage.setItem('arr_quest_realthrow', on ? '1' : '0');
+  _questUpdateRealToggleUI();
+}
+function _questUpdateRealToggleUI() {
+  var on = _questRealThrowEnabled();
+  var btn = document.getElementById('arr-quest-rt-toggle');
+  if (!btn) return;
+  btn.className = 'arr-quest-rt-toggle' + (on ? ' on' : '');
+  btn.textContent = on ? '🎯 実投 ON' : '🎯 実投';
+  var sub = document.getElementById('arr-quest-home-sub');
+  if (sub) sub.textContent = on
+    ? '実際に投げて結果を入力 — 知識と実力を両方鍛える!'
+    : 'ダーツが飛んでランダムに着弾 — ルートを覚えて正確に!';
+}
+function _questShowRealThrow(dartStr, wasCorrect) {
+  _questG.realDart = dartStr;
+  _questG.qThrowAttempts++;
+  var pts = _questDartVal(dartStr);
+  document.getElementById('quest-real-dart-label').textContent = dartStr;
+  document.getElementById('quest-real-board-box').innerHTML = _buildBoardSVG(dartStr, null);
+  document.getElementById('quest-real-wrong-note').textContent =
+    wasCorrect ? '' : '✗ 不正解 — 正解は ' + dartStr + ' でした';
+  document.getElementById('quest-real-hit-btn').textContent = '✓ 入った！（-' + pts + '）';
+  document.getElementById('quest-real-overlay').classList.remove('hide');
+}
+function _questRealHit() {
+  var dartStr = _questG.realDart;
+  _questG.qThrowHit++;
+  document.getElementById('quest-real-overlay').classList.add('hide');
+  var pts = _questDartVal(dartStr);
+  _questOutcome(dartStr, {hit:true, land:dartStr, value:pts});
+}
+function _questRealMiss() {
+  var dartStr = _questG.realDart;
+  document.getElementById('quest-real-overlay').classList.add('hide');
+  _questOutcome(dartStr, {hit:false, land:null, value:0});
+}
+
 /* ===== 弱点分析 ===== */
 function _weaknessLoad() {
   try { return JSON.parse(localStorage.getItem('arr_weakness_v1') || '{}'); } catch(e) { return {}; }
