@@ -5105,23 +5105,36 @@ function _renderArrBest() {
 function _renderWeakBands(el, existingLines) {
   var qd = _arrGetQuizData();
   var keys = Object.keys(qd);
-  var weak = [];
+  var normalWeak = [], kzWeak = [];
   keys.forEach(function(k){
-    if (k.indexOf('kz_') === 0) return; // 削り戦術キーは除外
     var v = qd[k];
-    if (v && v.a >= 3) {
-      weak.push({ score: parseInt(k, 10), acc: v.c / v.a, a: v.a, c: v.c });
+    if (!v || v.a < 3) return;
+    var acc = v.c / v.a;
+    if (k.indexOf('kz_') === 0) {
+      var idx = parseInt(k.slice(3), 10);
+      kzWeak.push({ label: '削りQ' + (idx + 1) + '番', acc: acc });
+    } else {
+      normalWeak.push({ label: parseInt(k, 10) + '点', acc: acc });
     }
   });
-  weak.sort(function(a, b){ return a.acc - b.acc; });
-  var top3 = weak.slice(0, 3);
   var lines = existingLines || [];
-  if (top3.length > 0) {
+  // 通常アレンジクイズの苦手
+  if (normalWeak.length > 0) {
+    normalWeak.sort(function(a, b){ return a.acc - b.acc; });
     var nums = ['①','②','③'];
-    var parts = top3.map(function(w, i){
-      return nums[i] + ' ' + w.score + '点 (' + Math.round(w.acc * 100) + '%)';
+    var parts = normalWeak.slice(0, 3).map(function(w, i){
+      return nums[i] + ' ' + w.label + ' (' + Math.round(w.acc * 100) + '%)';
     });
-    lines.push('苦手スコア帯: ' + parts.join(' '));
+    lines.push('苦手スコア: ' + parts.join(' '));
+  }
+  // 削り戦術クイズの苦手
+  if (kzWeak.length > 0) {
+    kzWeak.sort(function(a, b){ return a.acc - b.acc; });
+    var nums2 = ['①','②','③'];
+    var kzParts = kzWeak.slice(0, 3).map(function(w, i){
+      return nums2[i] + ' ' + w.label + ' (' + Math.round(w.acc * 100) + '%)';
+    });
+    lines.push('苦手削り: ' + kzParts.join(' '));
   }
   el.innerHTML = lines.map(function(l){ return '<div>' + l + '</div>'; }).join('');
 }
