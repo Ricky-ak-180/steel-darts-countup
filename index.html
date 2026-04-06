@@ -7915,12 +7915,14 @@ function _questChoose(chosen, correct) {
     _questG.thisWrong++;
     _questG.totalWrong++;
   }
-  // 弱点記録
-  _weaknessRecord(_questG.currentScore, isCorrect);
-  // 選んだダーツを投げる。不正解なら後でヒント表示
-  // 弱点記録（削り戦術は削りスコアを記録）
   _weaknessRecord(_questG.currentScore, isCorrect);
   _questG.wrongCorrect = isCorrect ? null : correct;
+  if (_questG.realThrowMode) {
+    // 実投モード: 正解ダーツを表示して投げさせる
+    var delay = isCorrect ? 250 : 700;
+    setTimeout(function(){ _questShowRealThrow(correct, isCorrect); }, delay);
+    return;
+  }
   setTimeout(function() { _questShowThrow(chosen); }, isCorrect ? 250 : 600);
 }
 
