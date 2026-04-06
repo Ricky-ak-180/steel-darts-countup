@@ -8011,7 +8011,7 @@ function _questOutcome(dartStr, result) {
   if (newScore === 0) {
     _questG.qCount++;
     _questG.qCorrect++;
-    var clean = _questG.thisWrong===0 && _questG.thisMiss===0;
+    var clean = _questG.thisWrong===0 && (_questG.realThrowMode || _questG.thisMiss===0);
     var prevStreak = _questG.qStreak;
     _questG.qStreak = clean ? _questG.qStreak+1 : 0;
     _questG.stageCleared = true;
