@@ -1119,9 +1119,16 @@ canvas.schart { width: 100%; height: 100%; }
         <div class="arr-train-home-title">アレンジトレーニング</div>
         <div class="arr-train-progress" id="arr-train-progress">0 / 0</div>
       </div>
+      <div class="arr-total-prog-wrap">
+        <div class="arr-total-prog-bar"><div class="arr-total-prog-fill" id="arr-total-prog-fill" style="width:0%"></div></div>
+      </div>
+      <div class="arr-session-strip" id="arr-session-strip" style="display:none;"></div>
       <div class="arr-train-continue-wrap" id="arr-train-continue-wrap" style="display:none;">
         <button class="arr-train-continue-btn" data-fn="trainContinue">続きから → <span id="arr-train-continue-score"></span></button>
-        <button class="arr-train-continue-btn" data-fn="trainWeakMode" style="margin-top:8px;background:rgba(255,107,53,0.15);color:#ff6b35;border:1px solid rgba(255,107,53,0.4);">🎯 苦手スコア集中モード</button>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="arr-train-random-btn" data-fn="trainRandom">🎲 ランダム練習</button>
+          <button class="arr-train-weak-btn" data-fn="trainWeakMode">🎯 苦手集中</button>
+        </div>
       </div>
       <div class="arr-train-map" id="arr-train-map"></div>
     </div>
