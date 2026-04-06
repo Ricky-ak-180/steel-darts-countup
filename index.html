@@ -6237,11 +6237,10 @@ function renderZ01Hist() {
     html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">期間別成績（直近14日）</div>';
     days.forEach(function(day){
       var games = bk[day];
-      var solo = games.filter(function(g){return g.players===1;});
-      var avgs2 = solo.map(function(g){return g.data[0].avg;}).filter(function(v){return v>0;});
+      var avgs2 = games.map(function(g){return g.data[0].avg;}).filter(function(v){return v>0;});
       var dayAvg = avgs2.length ? (avgs2.reduce(function(a,b){return a+b;},0)/avgs2.length).toFixed(2) : '-';
       var day180 = games.reduce(function(acc,g){return acc+g.data.reduce(function(a,p){return a+p.c180;},0);},0);
-      var bestLegDay = solo.map(function(g){return g.data[0].bestLeg;}).filter(function(v){return v>0;});
+      var bestLegDay = games.map(function(g){return g.data[0].bestLeg;}).filter(function(v){return v>0;});
       var blDay = bestLegDay.length ? Math.min.apply(null,bestLegDay) : 0;
       html += '<div style="display:flex;align-items:center;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04);gap:8px;">';
       html += '<div style="font-size:11px;color:var(--mut);min-width:80px;">' + day + '</div>';
