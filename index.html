@@ -8074,7 +8074,7 @@ function _questCalcStars(cleared) {
   var stage = _QUEST_WORLDS[_questG.worldIdx].stages[_questG.stageIdx];
   var cond = _questG.skipUnlockReq ? {type:'count',n:5,minAcc:0.8} : stage.cond;
   if (cond.type==='clear') {
-    if (_questG.thisWrong===0 && _questG.thisMiss===0) return 3;
+    if (_questG.thisWrong===0 && (_questG.realThrowMode || _questG.thisMiss===0)) return 3;
     if (_questG.totalWrong<=1) return 2;
     return 1;
   }
