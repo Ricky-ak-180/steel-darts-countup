@@ -4807,6 +4807,11 @@ function _arrShowStage() {
   } else {
     document.getElementById('arr-card').classList.remove('kezuri-mode');
     document.getElementById('arr-q-score').textContent = st.score;
+    var nDarts = st.path ? st.path.length : 3;
+    var labelText = nDarts === 1 ? '1本でフィニッシュ！　何を狙う？'
+      : nDarts === 2 ? '2本フィニッシュ 🎯　1本目は何を狙う？'
+      : '3本フィニッシュ　1本目は何を狙う？';
+    document.getElementById('arr-q-label').textContent = labelText;
     document.getElementById('arr-q-label').style.display = '';
     _arrBuildChoices(st);
   }
