@@ -999,6 +999,18 @@ canvas.schart { width: 100%; height: 100%; }
     <div id="vhist" style="display:none;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;">
     <div id="profile-card" style="display:none;"></div>
     <div id="today-card" style="display:none;"></div>
+    <div style="margin:12px 12px 4px;background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:14px 16px;">
+      <div style="font-size:11px;color:var(--mut);letter-spacing:1.5px;font-weight:700;margin-bottom:10px;">🎯 カウントアップ 目標スコア</div>
+      <div id="gs-goal-pills" style="display:flex;flex-wrap:wrap;gap:6px;">
+        <button class="gs-goal-pill on" data-val="0" onclick="gsSetGoal(0)">設定なし</button>
+        <button class="gs-goal-pill" data-val="400" onclick="gsSetGoal(400)">400</button>
+        <button class="gs-goal-pill" data-val="500" onclick="gsSetGoal(500)">500</button>
+        <button class="gs-goal-pill" data-val="600" onclick="gsSetGoal(600)">600</button>
+        <button class="gs-goal-pill" data-val="700" onclick="gsSetGoal(700)">700</button>
+        <button class="gs-goal-pill" data-val="800" onclick="gsSetGoal(800)">800</button>
+        <button class="gs-goal-pill" data-val="1000" onclick="gsSetGoal(1000)">1000</button>
+      </div>
+    </div>
     <div class="s3" id="hs3"></div>
     <div class="chart-wrap" id="chart-wrap" style="display:none;">
       <div class="chart-tabs">
