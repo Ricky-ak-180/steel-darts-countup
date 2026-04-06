@@ -7652,6 +7652,12 @@ function _renderQuestWorlds() {
       html += '<div class="arr-quest-stage-stars">'+starsHtml+'</div>';
       html += '</div>';
     });
+    // ロック中のワールドには飛び級ボタンを表示
+    if (!wUnlocked && w.unlockReq && !w.isSkezuri) {
+      html += '<div class="arr-quest-skip-wrap">';
+      html += '<button class="arr-quest-skip-btn" onclick="startQuestSkipChallenge('+wi+')">⚡ 飛び級に挑戦（5問 / 80%以上でこのワールド解放）</button>';
+      html += '</div>';
+    }
     html += '</div></div>';
   });
   el.innerHTML = html;
