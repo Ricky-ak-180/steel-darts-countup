@@ -4823,7 +4823,7 @@ function _buildBoardSVG(aimStr, landStr) {
     svg += '<text x="'+tx+'" y="'+ty+'" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#666" font-family="Arial,sans-serif">'+n+'</text>';
   }
 
-  var cBull='#1c1c1c', cBullseye='#141414';
+  var cBull='#0d3d10', cBullseye='#6b0f0f';
   if (land && land.ring==='SBull') cBull='#47ffb4';
   if (land && land.ring==='Bull')  cBullseye='#47ffb4';
   if (aim && aim.ring==='SBull' && !(land && land.ring==='SBull')) cBull='rgba(232,255,71,0.5)';
