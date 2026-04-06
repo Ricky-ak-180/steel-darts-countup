@@ -13,6 +13,16 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Steel Darts Pro">
 <link rel="stylesheet" href="./css/app.css">
+<style>
+/* Critical fallback: app.css読み込み失敗時に最低限のレイアウトを保護 */
+.hide{display:none!important}
+.onboard,.overlay,#confetti-canvas,#flash-180,#pwa-banner,#sc-editor,#daily-tip-toast{display:none}
+body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
+.app{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+.view{display:flex;flex-direction:column;flex:1;min-height:0}
+.view.hide{display:none!important}
+.game-start{position:fixed;inset:0;z-index:200;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center}
+</style>
 </head>
 <body>
 <div class="game-start" id="game-start">
