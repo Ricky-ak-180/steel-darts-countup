@@ -159,13 +159,12 @@
    - 前の2本がT20エリアに刺さって物理的に入りにくい場合はT19・T18にスイッチしてOK
    - スイッチの条件：①前の2本が邪魔　②T19/T18に切り替えても削り戦術上問題ない
 
-   ■ 309〜300：T19/T18ファースト（T20+T20+S20=140でボギー圏に落ちるスコアあり）
-   - T20+T20+S20=140点取ると残りがボギーナンバーになる危険スコアが存在する
-   - 切替必要（奇数→T19、偶数→T18）：
+   ■ 309〜302：T19/T18ファースト（T20+T20+S20=140でボギー圏に落ちるスコアあり）
+   - T20+T20+S20=140点取ると残りがボギーナンバーになる危険スコア6つ
+   - 奇数→T19、偶数→T18 に切り替える：
      309(T19) → 169ボギー回避　308(T18) → 168ボギー回避
      306(T19) → 166ボギー回避　305(T18) → 165ボギー回避
      303(T19) → 163ボギー回避　302(T18) → 162ボギー回避
-   - T20のままOK：310, 307, 304, 301, 300（どちらに転んでもボギー圏に落ちない）
 
    ■ 300〜296：3本目（残り1本）はS-BULLを狙う
    - 2本打ち終えて残り296〜300になったら最後の1本はS-BULL(25)を狙い271〜275帯に収める
@@ -1516,28 +1515,21 @@ function _renderTactics() {
       return '<span style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:' + color + ';background:' + bg + ';border:1px solid ' + border + ';border-radius:6px;padding:2px 8px;letter-spacing:0.5px;">' + n + '</span>';
     }
     var dangerBadges = dangerScores.map(function(n){ return scoreBadge(n,'#ff6b6b','rgba(255,107,107,0.1)','rgba(255,107,107,0.3)'); }).join('');
-    var safeBadges   = safeScores.map(function(n){ return scoreBadge(n,'#66bb6a','rgba(102,187,106,0.1)','rgba(102,187,106,0.3)'); }).join('');
     var quickRef =
       '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:12px;">' +
-        '<div style="font-size:10px;color:var(--mut);letter-spacing:1.5px;margin-bottom:10px;text-transform:uppercase;">300〜310 T20可否 早見</div>' +
-        '<div style="display:flex;flex-direction:column;gap:8px;">' +
-          '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
-            '<span style="font-size:11px;color:#ff6b6b;font-weight:700;letter-spacing:0.5px;min-width:64px;flex-shrink:0;">❌ 切替必要</span>' +
-            '<div style="display:flex;gap:5px;flex-wrap:wrap;">' + dangerBadges + '</div>' +
-          '</div>' +
-          '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
-            '<span style="font-size:11px;color:#66bb6a;font-weight:700;letter-spacing:0.5px;min-width:64px;flex-shrink:0;">✅ T20 OK</span>' +
-            '<div style="display:flex;gap:5px;flex-wrap:wrap;">' + safeBadges + '</div>' +
-          '</div>' +
+        '<div style="font-size:10px;color:var(--mut);letter-spacing:1.5px;margin-bottom:10px;text-transform:uppercase;">309〜302 切替必要スコア</div>' +
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+          '<span style="font-size:11px;color:#ff6b6b;font-weight:700;letter-spacing:0.5px;min-width:64px;flex-shrink:0;">❌ 切替必要</span>' +
+          '<div style="display:flex;gap:5px;flex-wrap:wrap;">' + dangerBadges + '</div>' +
         '</div>' +
-        '<div style="font-size:11px;color:var(--mut);margin-top:10px;padding-top:8px;border-top:1px solid var(--bd);line-height:1.5;">T20+T20+S20で140点取ると残りがボギーナンバーになるスコアは切替が必要。</div>' +
+        '<div style="font-size:11px;color:var(--mut);margin-top:10px;padding-top:8px;border-top:1px solid var(--bd);line-height:1.5;">T20+T20+S20で140点取ると残りがボギーナンバーになる。奇数→T19、偶数→T18に切替。</div>' +
       '</div>';
     var cards = '';
-    for (var n = 309; n >= 300; n--) { cards += scoreCard(n, '300s'); }
+    dangerScores.forEach(function(n){ cards += scoreCard(n, '300s'); });
     html +=
       '<div style="margin-bottom:24px;">' +
-        '<div style="font-family:\'Bebas Neue\',cursive;font-size:26px;color:var(--acc);line-height:1.2;margin-bottom:4px;letter-spacing:0.5px;">309〜300　T19 / T18 ファースト</div>' +
-        '<div style="font-size:12px;color:var(--mut);margin-bottom:10px;line-height:1.5;">3本でT20+T20+S20＝140点を取るとボギー圏に落ちるスコアがある。切替不要な安全スコアも覚えよう。</div>' +
+        '<div style="font-family:\'Bebas Neue\',cursive;font-size:26px;color:var(--acc);line-height:1.2;margin-bottom:4px;letter-spacing:0.5px;">309〜302　T19 / T18 ファースト</div>' +
+        '<div style="font-size:12px;color:var(--mut);margin-bottom:10px;line-height:1.5;">3本でT20+T20+S20＝140点を取るとボギー圏に落ちるスコアがある。奇数は T19、偶数は T18 に切り替える。</div>' +
         quickRef +
         cards +
       '</div>';
