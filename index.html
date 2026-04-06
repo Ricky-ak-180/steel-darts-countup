@@ -8284,14 +8284,18 @@ function startWeaknessTraining() {
   _questG.stageCleared=false; _questG.chain=[];
   _questG.skezuriSetup=null; _questG.skipUnlockReq=null; _questG.wrongCorrect=null;
   _questG.pool = _arrShuffle(weighted); _questG.poolIdx = 0;
-  _questG.weaknessMode = true; // 弱点特訓フラグ
+  _questG.weaknessMode = true;
+  _questG.realThrowMode = _questRealThrowEnabled();
+  _questG.realDart=null; _questG.qThrowAttempts=0; _questG.qThrowHit=0;
 
   document.getElementById('arr-quest-weakness').style.display = 'none';
   var playEl = document.getElementById('arr-quest-play');
   playEl.style.display = 'flex';
   document.getElementById('arr-quest-play-title').textContent = '🎯 弱点特訓';
   document.getElementById('quest-throw-overlay').classList.add('hide');
+  document.getElementById('quest-real-overlay').classList.add('hide');
   document.getElementById('arr-quest-result').className = 'arr-quest-result hide';
+  _updateModeBadge();
   _questNextScore();
 }
 
