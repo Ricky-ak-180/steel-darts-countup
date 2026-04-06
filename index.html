@@ -1283,6 +1283,46 @@ canvas.schart { width: 100%; height: 100%; }
         <div class="arr-tp-tip" id="arr-tp-tip" style="display:none;"></div>
       </div>
     </div>
+    <!-- クエストホーム -->
+    <div class="arr-quest-home" id="arr-quest-home" style="display:none;">
+      <div class="arr-quest-hdr">
+        <button class="arr-train-back" data-fn="goArrSetup">← 戻る</button>
+        <div class="arr-train-home-title">チェックアウトクエスト</div>
+      </div>
+      <div class="arr-quest-mode-row">
+        <span class="arr-quest-mode-lbl">ミスモード：</span>
+        <div class="arr-quest-mode-toggle">
+          <button class="arr-quest-mode-btn on" data-miss="study" data-fn="setQuestMissMode" data-arg="study">学習</button>
+          <button class="arr-quest-mode-btn" data-miss="real" data-fn="setQuestMissMode" data-arg="real">リアル</button>
+        </div>
+        <span style="font-size:10px;color:var(--mut);" id="arr-quest-mode-hint">自分でヒット/ミスを選ぶ</span>
+      </div>
+      <div class="arr-quest-worlds" id="arr-quest-worlds"></div>
+    </div>
+    <!-- クエストプレイ -->
+    <div class="arr-quest-play" id="arr-quest-play" style="display:none;">
+      <div class="arr-quest-play-hdr">
+        <button class="arr-train-back" data-fn="quitQuestPlay">← 中断</button>
+        <div class="arr-quest-play-title" id="arr-quest-play-title">WORLD 1</div>
+        <div class="arr-quest-miss-badge" id="arr-quest-miss-badge">学習</div>
+      </div>
+      <div class="arr-quest-score-wrap">
+        <div class="arr-quest-score-label">残り</div>
+        <div class="arr-quest-score-num" id="arr-quest-score-num">0</div>
+      </div>
+      <div class="arr-quest-progress" id="arr-quest-progress"></div>
+      <div class="arr-quest-chain" id="arr-quest-chain"></div>
+      <div class="arr-quest-q-area" id="arr-quest-q-area">
+        <div class="arr-quest-q-label" id="arr-quest-q-label">1本目は何を狙う？</div>
+        <div class="arr-quest-choices" id="arr-quest-choices"></div>
+      </div>
+      <div class="arr-quest-miss-panel hide" id="arr-quest-miss-panel">
+        <div class="arr-quest-miss-title">どうなった？</div>
+        <div id="arr-quest-miss-btns"></div>
+      </div>
+      <div class="arr-quest-bogey-msg hide" id="arr-quest-bogey-msg"></div>
+      <div class="arr-quest-result hide" id="arr-quest-result"></div>
+    </div>
     <!-- アレンジ表 -->
     <div class="arr-teiseki-panel hide" id="arr-teiseki-panel">
       <div class="arr-teiseki-header">
