@@ -4835,7 +4835,7 @@ function _buildBoardSVG(aimStr, landStr) {
   if (land) {
     var dx=cx, dy=cy;
     if (land.ring!=='Bull' && land.ring!=='SBull') {
-      var li=SEGS.indexOf(land.n), la2=-90+(li+0.5)*18;
+      var li=SEGS.indexOf(land.n), la2=-99+(li+0.5)*18;
       var lr = land.ring==='D' ? (R+RD)/2 : land.ring==='T' ? (RT2+RT1)/2 : (RT1+RB)/2;
       dx=cx+lr*Math.cos(rad(la2)); dy=cy+lr*Math.sin(rad(la2));
     } else if (land.ring==='SBull') { dx=cx+RB*0.55; }
