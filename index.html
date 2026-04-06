@@ -2573,11 +2573,11 @@ function renderRrateRows() {
   if (!rrateRows) return;
   if (!total) { rrateRows.innerHTML='<div style="text-align:center;color:var(--mut);font-size:12px;padding:8px 0;">データなし</div>'; return; }
   var bands = [
-    { lbl:'180',  color:'#ffd700', fn:function(s){return s===180;} },
+    { lbl:'180',  color:'#e8ff47', fn:function(s){return s===180;} },
     { lbl:'140+', color:'#47ffb4', fn:function(s){return s>=140&&s<180;} },
-    { lbl:'100+', color:'#ff6b35', fn:function(s){return s>=100&&s<140;} },
-    { lbl:'60+',  color:'#4fc3f7', fn:function(s){return s>=60&&s<100;} },
-    { lbl:'59-',  color:'#6b6b88', fn:function(s){return s<60;} },
+    { lbl:'100+', color:'#4fc3f7', fn:function(s){return s>=100&&s<140;} },
+    { lbl:'60+',  color:'#9575cd', fn:function(s){return s>=60&&s<100;} },
+    { lbl:'59-',  color:'rgba(255,255,255,0.2)', fn:function(s){return s<60;} },
   ];
   rrateRows.innerHTML = bands.map(function(b){
     var cnt=rounds.filter(b.fn).length, pct=Math.round(cnt/total*100);
