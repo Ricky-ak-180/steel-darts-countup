@@ -3822,6 +3822,14 @@ function setArrMode(mode) {
   _renderArrBest();
 }
 
+/* 問題数セレクター */
+function setQCount(n) {
+  _arrG.qCount = Number(n);
+  document.querySelectorAll('.arr-qcount-btn').forEach(function(el){
+    el.className = 'arr-qcount-btn' + (Number(el.getAttribute('data-arg')) === _arrG.qCount ? ' on' : '');
+  });
+}
+
 /* arr_quiz_v1 読み書き */
 function _arrGetQuizData() {
   try { return JSON.parse(localStorage.getItem('arr_quiz_v1') || '{}'); } catch(e) { return {}; }
