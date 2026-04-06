@@ -7923,8 +7923,13 @@ function _questOutcome(dartStr, result) {
   _questG.dartNum++;
   var scoreEl = document.getElementById('arr-quest-score-num');
 
-  // B: スコアカウントダウンアニメーション
-  _questAnimateScore(prevScore, Math.max(newScore, 0), scoreEl, 380);
+  // B: スコアカウントダウンアニメーション（バスト時はスキップ）
+  if (newScore > 1) {
+    _questAnimateScore(prevScore, newScore, scoreEl, 380);
+  } else if (newScore === 0) {
+    _questAnimateScore(prevScore, 0, scoreEl, 380);
+  }
+  // newScore < 0 or === 1: スコア表示そのまま、BUSTテキストが上書き
 
   // Success
   if (newScore === 0) {
