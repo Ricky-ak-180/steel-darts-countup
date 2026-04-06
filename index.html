@@ -7633,7 +7633,7 @@ function _questNextScore() {
   document.getElementById('arr-quest-score-num').textContent = score;
   document.getElementById('arr-quest-score-num').style.color = '';
   document.getElementById('arr-quest-chain').innerHTML = '';
-  document.getElementById('arr-quest-miss-panel').className = 'arr-quest-miss-panel hide';
+  document.getElementById('quest-throw-overlay').classList.add('hide');
   document.getElementById('arr-quest-bogey-msg').className = 'arr-quest-bogey-msg hide';
   document.getElementById('arr-quest-q-area').style.display = '';
   _questUpdateProgress();
