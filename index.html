@@ -5391,6 +5391,11 @@ function _renderTrainPrac(score, entry) {
   if (c >= _TRAIN_PERFECT) stars = '🌟 PERFECT';
   document.getElementById('arr-tp-stars').textContent = stars;
   document.getElementById('arr-tp-rate').textContent = _trainRateText(entry);
+  var streakEl = document.getElementById('arr-tp-streak');
+  if (streakEl) streakEl.textContent = '';
+  var diff = _trainDiff(score);
+  var badge = document.getElementById('arr-tp-diff-badge');
+  if (badge) badge.innerHTML = '<span class="arr-diff-chip" style="background:' + diff.color + '22;color:' + diff.color + ';border:1px solid ' + diff.color + '44;">' + diff.label + '</span>';
   var path = (_userRoutes && _userRoutes[score] && _userRoutes[score].length > 0)
     ? _userRoutes[score][0]
     : (score <= 40 ? ['D' + (score / 2)] : CHECKOUT[score]);
@@ -5401,6 +5406,11 @@ function _renderTrainPrac(score, entry) {
   var tip = document.getElementById('arr-tp-tip');
   if (CHECKOUT_TIPS[score]) { tip.textContent = CHECKOUT_TIPS[score]; tip.style.display = ''; }
   else { tip.style.display = 'none'; }
+  var prevBtn = document.getElementById('arr-tp-prev-btn');
+  if (prevBtn) {
+    var curIdx = _TRAIN_SCORES.indexOf(score);
+    prevBtn.style.display = curIdx > 0 ? '' : 'none';
+  }
   document.getElementById('arr-tp-result-row').style.display = 'none';
 }
 
