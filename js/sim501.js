@@ -233,9 +233,14 @@ function _simProcessDart(who,dart) {
     return;
   }
   if (res.bust) {
-    // Restore score
-    if(who==='player') _simG.playerScore=_simG.pRoundStart;
-    else               _simG.cpuScore   =_simG.cRoundStart;
+    // Restore score and reverse this round's pScored/cScored contributions
+    if(who==='player') {
+      _simG.pScored -= (_simG.pRoundStart - _simG.playerScore);
+      _simG.playerScore = _simG.pRoundStart;
+    } else {
+      _simG.cScored -= (_simG.cRoundStart - _simG.cpuScore);
+      _simG.cpuScore = _simG.cRoundStart;
+    }
     _simRefresh();
     setTimeout(function(){
       if(who==='player') _simEndPlayerRound();
@@ -269,8 +274,6 @@ function _simEndPlayerRound() {
     _simDrawHint();
     return;
   }
-  // Track CPU CO attempt
-  if (_simG.cpuScore<=170&&typeof CHECKOUT!=='undefined'&&CHECKOUT[_simG.cpuScore]) _simG.cCoAttempts++;
   _simG.curPlayer='cpu';
   _simG.cRoundStart=_simG.cpuScore;
   _simRefresh();
