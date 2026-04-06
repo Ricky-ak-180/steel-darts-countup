@@ -7838,8 +7838,9 @@ function _questChoose(chosen, correct) {
     _questG.thisWrong++;
     _questG.totalWrong++;
   }
-  // 正解のダーツを投げる（不正解でも正解ルートで投球）
-  setTimeout(function() { _questShowThrow(correct); }, isCorrect ? 250 : 800);
+  // 選んだダーツを投げる。不正解なら後でヒント表示
+  _questG.wrongCorrect = isCorrect ? null : correct;
+  setTimeout(function() { _questShowThrow(chosen); }, isCorrect ? 250 : 600);
 }
 
 function _questOutcome(dartStr, result) {
