@@ -4881,8 +4881,6 @@ function _buildBoardSVG(aimStr, landStr) {
       var lr = land.ring==='D' ? (R+RD)/2 : land.ring==='T' ? (RT2+RT1)/2 : (RT1+RB)/2;
       dx=cx+lr*Math.cos(rad(la2)); dy=cy+lr*Math.sin(rad(la2));
     } else if (land.ring==='SBull') { dx=cx+RB*0.55; }
-    svg += '<circle cx="'+dx+'" cy="'+dy+'" r="5" fill="white" stroke="#000" stroke-width="1.5"/>';
-    svg += '<circle cx="'+dx+'" cy="'+dy+'" r="2" fill="#000"/>';
   }
 
   svg += '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>';
