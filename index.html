@@ -2784,11 +2784,11 @@ function renderHist() {
       var c60=rds.filter(function(r){return r>=60&&r<100;}).length;
       var c59=rds.filter(function(r){return r<60;}).length;
       var parts=[];
-      if(c180>0) parts.push('<span style="color:#ffd700;">180:'+c180+'</span>');
+      if(c180>0) parts.push('<span style="color:#e8ff47;">180:'+c180+'</span>');
       if(c140>0) parts.push('<span style="color:#47ffb4;">140+:'+c140+'</span>');
-      if(c100>0) parts.push('<span style="color:#ff6b35;">100+:'+c100+'</span>');
-      if(c60>0)  parts.push('<span style="color:#4fc3f7;">60+:'+c60+'</span>');
-      if(c59>0)  parts.push('<span style="color:#6b6b88;">59-:'+c59+'</span>');
+      if(c100>0) parts.push('<span style="color:#4fc3f7;">100+:'+c100+'</span>');
+      if(c60>0)  parts.push('<span style="color:#9575cd;">60+:'+c60+'</span>');
+      if(c59>0)  parts.push('<span style="color:rgba(255,255,255,0.35);">59-:'+c59+'</span>');
       mini=parts.length?'<div style="font-size:10px;margin-top:3px;display:flex;gap:6px;">'+parts.join('')+'</div>':'';
     }
     return '<div class="hi" data-idx="'+idx+'">'+
