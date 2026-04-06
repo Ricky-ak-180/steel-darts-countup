@@ -5422,6 +5422,9 @@ function trainResult(ok) {
   d[_trainCurrent].a++;
   if (ok) d[_trainCurrent].c++;
   _trainSave(d);
+  _trainSession.attempts++;
+  if (ok) { _trainSession.correct++; _trainSession.combo++; }
+  else _trainSession.combo = 0;
   var entry = d[_trainCurrent];
   var c = entry.c;
   var stars = '';
@@ -5430,6 +5433,22 @@ function trainResult(ok) {
   document.getElementById('arr-tp-stars').textContent = stars;
   document.getElementById('arr-tp-header-clears').textContent = c + '回クリア';
   document.getElementById('arr-tp-rate').textContent = _trainRateText(entry);
+  var streakEl = document.getElementById('arr-tp-streak');
+  if (streakEl) {
+    if (_trainSession.combo >= 5) streakEl.textContent = '⚡ ' + _trainSession.combo + '連続！！';
+    else if (_trainSession.combo >= 3) streakEl.textContent = '🔥 ' + _trainSession.combo + '連続！';
+    else streakEl.textContent = '';
+  }
+  var body = document.getElementById('arr-tp-body');
+  if (body) {
+    body.classList.remove('train-flash-ok','train-flash-ng');
+    void body.offsetWidth;
+    body.classList.add(ok ? 'train-flash-ok' : 'train-flash-ng');
+  }
+  var okBtn = document.getElementById('arr-tp-ok-btn');
+  var ngBtn = document.getElementById('arr-tp-ng-btn');
+  if (okBtn) okBtn.style.opacity = ok ? '1' : '0.4';
+  if (ngBtn) ngBtn.style.opacity = ok ? '0.4' : '1';
   if (ok && c === _TRAIN_HINT_HIDE) {
     _trainHintVis = false;
     document.getElementById('arr-tp-hint-btn').style.display = '';
@@ -5438,10 +5457,12 @@ function trainResult(ok) {
   var unlockEl = document.getElementById('arr-tp-unlock-msg');
   var next = _trainNextScore(_trainCurrent);
   if (ok && c === 1 && next) unlockEl.textContent = '🔓 ' + next + ' をアンロック！';
-  else if (ok && c === _TRAIN_HINT_HIDE) unlockEl.textContent = '✨ ヒントが自動非表示になりました';
+  else if (ok && c === _TRAIN_HINT_HIDE) unlockEl.textContent = '✨ ヒントが自動非表示に';
   else if (ok && c >= _TRAIN_PERFECT && c === _TRAIN_PERFECT) unlockEl.textContent = '🌟 PERFECTマスター！';
   else unlockEl.textContent = '';
   document.getElementById('arr-tp-next-btn').textContent = next ? '次のスコアへ →' : '一覧へ戻る';
+  var prevBtn = document.getElementById('arr-tp-prev-btn');
+  if (prevBtn) prevBtn.style.display = _TRAIN_SCORES.indexOf(_trainCurrent) > 0 ? '' : 'none';
   document.getElementById('arr-tp-result-row').style.display = '';
 }
 
