@@ -4406,12 +4406,10 @@ function _renderTeiseki() {
   var html = '';
   entries.forEach(function(e) {
     if (!e.path) {
-      html += '<div class="arr-t-row arr-t-bogey-row" data-score="' + e.score + '">' +
-        '<div class="arr-t-score arr-t-bogey-score">' + e.score + '</div>' +
-        '<div class="arr-t-routes">' +
-          '<div class="arr-t-bogey-label">上がり不可</div>' +
-          '<div class="arr-t-tip">3本以内でチェックアウトできないスコア。次のラウンドでアレンジし直す必要がある。</div>' +
-        '</div></div>';
+      html += '<div class="arr-t-bogey-slim" data-score="' + e.score + '">' +
+        '<span class="arr-t-bogey-slim-score">' + e.score + '</span>' +
+        '<span class="arr-t-bogey-slim-label">上がり不可</span>' +
+        '</div>';
       return;
     }
     var alts = CHECKOUT_ALT[e.score] || [];
