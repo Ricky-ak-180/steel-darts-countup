@@ -5483,6 +5483,32 @@ function trainNext() {
   else trainBackToMap();
 }
 
+function trainRetry() {
+  var okBtn = document.getElementById('arr-tp-ok-btn');
+  var ngBtn = document.getElementById('arr-tp-ng-btn');
+  if (okBtn) okBtn.style.opacity = '1';
+  if (ngBtn) ngBtn.style.opacity = '1';
+  document.getElementById('arr-tp-result-row').style.display = 'none';
+  document.getElementById('arr-tp-unlock-msg').textContent = '';
+}
+
+function trainRandom() {
+  var d = _trainLoad();
+  var pool = _TRAIN_SCORES.filter(function(s, idx) {
+    return !_trainIsBogey(s) && _trainUnlocked(idx, d);
+  });
+  if (!pool.length) return;
+  _trainWeakQueue = [];
+  trainStart(pool[Math.floor(Math.random() * pool.length)]);
+}
+
+function trainPrev() {
+  var idx = _TRAIN_SCORES.indexOf(_trainCurrent);
+  for (var i = idx - 1; i >= 0; i--) {
+    if (!_trainIsBogey(_TRAIN_SCORES[i])) { trainStart(_TRAIN_SCORES[i]); return; }
+  }
+}
+
 function _renderTrainMap() {
   var d = _trainLoad();
   var total = 0, mastered = 0;
