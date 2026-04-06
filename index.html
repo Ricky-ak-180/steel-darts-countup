@@ -7416,7 +7416,20 @@ var _questG = {
   totalWrong:0, totalMiss:0,
   qCount:0, qCorrect:0, qStreak:0,
   stageCleared:false,
-  pool:[], poolIdx:0
+  pool:[], poolIdx:0,
+  skezuriSetup:null
+};
+
+/* 削り戦術データ: フィニッシュ不可点数 → 最善の1本目 & 残り点 */
+var _SKEZURI_DATA = {
+  171:{shot:'T17',leaves:120}, 172:{shot:'T20',leaves:112},
+  173:{shot:'T19',leaves:116}, 174:{shot:'T18',leaves:120},
+  175:{shot:'T19',leaves:118}, 176:{shot:'T20',leaves:116},
+  177:{shot:'T19',leaves:120}, 178:{shot:'T20',leaves:118},
+  179:{shot:'T19',leaves:122}, 180:{shot:'T20',leaves:120},
+  162:{shot:'T20',leaves:102}, 163:{shot:'T19',leaves:106},
+  165:{shot:'T19',leaves:108}, 166:{shot:'T20',leaves:106},
+  168:{shot:'T20',leaves:108}, 169:{shot:'T20',leaves:109}
 };
 
 function _questLoadData() {
