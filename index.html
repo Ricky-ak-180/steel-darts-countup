@@ -493,9 +493,14 @@ canvas.schart { width: 100%; height: 100%; }
 /* 削り戦術クイズ */
 .arr-kezuri-btn { background:rgba(232,255,71,0.08) !important; border:1.5px solid var(--acc) !important; color:var(--acc) !important; }
 .arr-kezuri-btn.on { background:var(--acc) !important; color:#000 !important; }
-.arr-card.kezuri-mode .arr-q-score { font-size:16px; font-family:inherit; letter-spacing:0; line-height:1.5; padding:10px 4px 8px; text-align:left; color:var(--fg); }
+.arr-card.kezuri-mode .arr-q-score { font-size:17px; font-family:inherit; letter-spacing:0; line-height:1.6; padding:12px 4px 10px; text-align:left; color:var(--fg); font-weight:600; }
 .arr-card.kezuri-mode .arr-choices { grid-template-columns:1fr; }
-.kezuri-choice { font-family:inherit !important; font-size:14px !important; padding:13px 14px !important; text-align:left !important; letter-spacing:0 !important; }
+.kezuri-choice { font-family:inherit !important; font-size:14.5px !important; padding:14px 16px !important; text-align:left !important; letter-spacing:0 !important; line-height:1.4 !important; }
+/* 問題数セレクター */
+.arr-qcount-row { display:flex; align-items:center; gap:8px; width:100%; }
+.arr-qcount-label { font-size:12px; color:var(--mut); letter-spacing:1px; white-space:nowrap; }
+.arr-qcount-btn { flex:1; padding:6px 0; border:1px solid var(--bd); background:transparent; border-radius:8px; color:var(--mut); font-size:13px; font-weight:600; cursor:pointer; transition:background 0.15s,color 0.15s; }
+.arr-qcount-btn.on { background:rgba(232,255,71,0.15); color:var(--acc); border-color:rgba(232,255,71,0.4); }
 /* 答え合わせ */
 .arr-review { width:100%; }
 .arr-review-toggle { font-size:11px; color:var(--mut); letter-spacing:2px; text-align:center; padding:4px 0 8px; cursor:pointer; user-select:none; }
