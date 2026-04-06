@@ -5240,6 +5240,22 @@ var _TRAIN_SCORES = (function() {
 var _trainCurrent = null;
 var _trainHintVis  = false;
 var _trainWeakQueue = [];
+var _trainSession = { correct: 0, attempts: 0, combo: 0 };
+
+var _TRAIN_DIFF = [
+  { key:'beginner', label:'⬜ 入門',   color:'#66bb6a', from:2,   to:40  },
+  { key:'easy',     label:'🟦 初級',   color:'#4fc3f7', from:41,  to:60  },
+  { key:'normal',   label:'🟨 中級',   color:'#ffd54f', from:61,  to:100 },
+  { key:'hard',     label:'🟧 上級',   color:'#ff9800', from:101, to:130 },
+  { key:'vhard',    label:'🟥 難しい', color:'#ef5350', from:131, to:160 },
+  { key:'expert',   label:'🟣 超難',   color:'#ab47bc', from:161, to:170 }
+];
+function _trainDiff(score) {
+  for (var i = 0; i < _TRAIN_DIFF.length; i++) {
+    if (score >= _TRAIN_DIFF[i].from && score <= _TRAIN_DIFF[i].to) return _TRAIN_DIFF[i];
+  }
+  return _TRAIN_DIFF[0];
+}
 
 function _trainLoad() {
   try { return JSON.parse(localStorage.getItem('arr_train_v1') || '{}'); } catch(e) { return {}; }
