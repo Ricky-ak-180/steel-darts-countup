@@ -7932,6 +7932,7 @@ function _questChoose(chosen, correct) {
   }
   _weaknessRecord(_questG.currentScore, isCorrect);
   _questG.wrongCorrect = isCorrect ? null : correct;
+  if (!isCorrect) sfxWrong();
   if (_questG.realThrowMode) {
     // 実投モード: 正解ダーツを表示して投げさせる
     var delay = isCorrect ? 250 : 700;
