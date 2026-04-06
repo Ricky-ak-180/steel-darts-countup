@@ -183,7 +183,7 @@
      272: S20→T20→S-BULL = 167残し
      271: S19→T20→S-BULL = 167残し
 
-   ■ 270〜260：T20×1＋S18かS19×1の組み合わせを活かす
+   ■ 269〜262：T20×1＋S18かS19×1の組み合わせを活かす
    - 2本のうち1本がT20・1本がS18かS19になった場合（順不同）、3本目S20で164・167・170に収められる
    - 1本目T20+2本目S18/S19 でも 1本目S18/S19+2本目T20 でも結果は同じ
    - ⚠ T20+S20+S20=100点取ってしまうと → 162〜169（ボギー）
@@ -1624,7 +1624,7 @@ function _renderTactics() {
     });
     tbl260 += '</table>';
     html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
-      '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">270 〜 260　1本目で下の桁を調整</div>' +
+      '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">269 〜 262　T20×1＋S18/S19×1でつなぐ</div>' +
       '<div style="font-size:13px;color:var(--mut);margin-bottom:2px;line-height:1.6;">2本のうち1本がT20・1本がS18かS19になった場合（順不同）、3本目に<strong style="color:var(--fg);">S20</strong>を打つと<strong style="color:var(--fg);">164・167・170</strong>に収められる。</div>' +
       tbl260 +
       '<div style="margin-top:10px;"><span style="color:#ff6b6b;font-size:14px;">⚠ T20+S20+S20 で100点を取ってしまうと → 162〜169（ボギー）</span></div>' +
