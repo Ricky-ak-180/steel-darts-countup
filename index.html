@@ -57,6 +57,7 @@
   <div class="tabs">
     <div class="tab on" id="tgame" data-fn="goTabGame">🎯 カウントアップ</div>
     <div class="tab" id="t01" data-fn="goTab01">🎮 01</div>
+    <div class="tab" id="tsim" data-fn="goTabSim">🎯 シム</div>
     <button class="btn-snd" id="btn-snd" data-fn="toggleSound">🔊</button>
   </div>
 
@@ -666,6 +667,108 @@
   </div>
   </div><!-- /v01-game-wrap -->
   </div><!-- /v01 -->
+<!-- 501 Simulator view -->
+<div class="view hide" id="vsim" style="overflow-y:auto;padding-bottom:32px;">
+
+  <!-- SETUP SCREEN -->
+  <div id="sim-setup-screen">
+    <div class="sim-title">501 シミュレーター</div>
+    <div class="sim-setup-card">
+      <div class="sim-row">
+        <div class="sim-row-lbl">モード</div>
+        <div class="sim-seg">
+          <button id="simm0" class="sim-seg-btn active" data-fn="sim501SetMode0">ソロ</button>
+          <button id="simm1" class="sim-seg-btn" data-fn="sim501SetMode1">vs CPU</button>
+        </div>
+      </div>
+      <div class="sim-row">
+        <div class="sim-row-lbl">プレイヤー</div>
+        <select id="sim-plvl" class="sim-sel">
+          <option value="0">初心者</option>
+          <option value="1">アマ</option>
+          <option value="2" selected>ハウス</option>
+          <option value="3">セミプロ</option>
+          <option value="4">プロ</option>
+          <option value="5">エリート</option>
+        </select>
+      </div>
+      <div class="sim-row" id="sim-cpu-row">
+        <div class="sim-row-lbl">CPU</div>
+        <select id="sim-clvl" class="sim-sel">
+          <option value="0">初心者</option>
+          <option value="1">アマ</option>
+          <option value="2" selected>ハウス</option>
+          <option value="3">セミプロ</option>
+          <option value="4">プロ</option>
+          <option value="5">エリート</option>
+        </select>
+      </div>
+      <div class="sim-row">
+        <div class="sim-row-lbl">レグ数</div>
+        <select id="sim-legs" class="sim-sel">
+          <option value="1">1 レグ</option>
+          <option value="3" selected>3 レグ (Bo3)</option>
+          <option value="5">5 レグ (Bo5)</option>
+          <option value="7">7 レグ (Bo7)</option>
+        </select>
+      </div>
+      <div class="sim-row sim-row-wrap" id="sim-first-row">
+        <div class="sim-row-lbl">先行</div>
+        <div class="sim-seg sim-seg-4">
+          <button class="sim-seg-btn active" data-simfirst="player" data-fn="sim501First" data-arg="0">プレイヤー</button>
+          <button class="sim-seg-btn" data-simfirst="cpu" data-fn="sim501First" data-arg="1">CPU</button>
+          <button class="sim-seg-btn" data-simfirst="coin" data-fn="sim501First" data-arg="2">コイン</button>
+          <button class="sim-seg-btn" data-simfirst="cork" data-fn="sim501First" data-arg="3">コーク</button>
+        </div>
+      </div>
+    </div>
+    <button class="sim-start-btn" data-fn="sim501Start">ゲームスタート</button>
+  </div>
+
+  <!-- CORK SCREEN -->
+  <div id="sim-cork-screen" style="display:none">
+    <div class="sim-title">コーク — ブルを狙え</div>
+    <div class="sim-cork-sub">ボードをタップして投げる</div>
+    <div class="sim-board-wrap" id="sim-cork-wrap"></div>
+    <div class="sim-cork-msg" id="sim-cork-msg"></div>
+    <button class="sim-cork-go" id="sim-cork-btn" style="display:none" data-fn="sim501CorkGo">スタート！</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="sim-game-screen" style="display:none">
+    <div class="sim-scoreboard">
+      <div class="sim-score-blk" id="sim-score-player">
+        <div class="sim-plr">YOU</div>
+        <div class="sim-score-num" id="sim-ps">501</div>
+      </div>
+      <div class="sim-ls" id="sim-ls">0 – 0</div>
+      <div class="sim-score-blk" id="sim-score-cpu">
+        <div class="sim-plr">CPU</div>
+        <div class="sim-score-num" id="sim-cs">501</div>
+      </div>
+    </div>
+    <div class="sim-board-wrap" id="sim-board-wrap"></div>
+    <div class="sim-hint" id="sim-hint" style="display:none"></div>
+    <div class="sim-dart-slots" id="sim-dart-slots"></div>
+    <div class="sim-turn-msg" id="sim-turn-msg"></div>
+  </div>
+
+  <!-- LEG RESULT OVERLAY -->
+  <div class="sim-leg-overlay hide" id="sim-leg-overlay">
+    <div id="sim-leg-res-txt" class="sim-leg-res-txt">—</div>
+    <div id="sim-leg-res-scr" class="sim-leg-res-scr">0 – 0</div>
+    <button class="sim-leg-btn" data-fn="sim501NextLeg">次のレグへ →</button>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="sim-result-screen" style="display:none">
+    <div id="sim-rw" class="sim-rw"></div>
+    <div id="sim-rs" class="sim-rs"></div>
+    <button class="sim-again-btn" data-fn="sim501Again">もう一度</button>
+  </div>
+
+</div><!-- /vsim -->
+
 
 <!-- Result overlay -->
 <div class="overlay" id="ovr">
@@ -771,5 +874,6 @@
 <script src="./js/data.js"></script>
 <script src="./js/game.js"></script>
 <script src="./js/arr.js"></script>
+<script src="./js/sim501.js"></script>
 </body>
 </html>
