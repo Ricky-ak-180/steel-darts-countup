@@ -6059,8 +6059,8 @@ function renderZ01Hist() {
     wrap.innerHTML = '<div class="hempty"><div class="ei">🎮</div>まだ記録がありません。<br>ゲームを完了すると自動で保存されます。</div>';
     return;
   }
-  // --- Compute cumulative stats ---
-  var soloGames = h.filter(function(g){ return g.players===1; });
+  // --- Compute cumulative stats (solo + vs CPU/2P すべて対象) ---
+  var soloGames = h; // Player 1のデータはdata[0]で統一 solo/2P問わず集計
   var allAvgs = soloGames.map(function(g){ return g.data[0].avg; }).filter(function(v){return v>0;});
   var bestAvgVal = allAvgs.length ? Math.max.apply(null,allAvgs) : 0;
   var bestAvgStr = bestAvgVal > 0 ? bestAvgVal.toFixed(2) : '-';
@@ -6070,12 +6070,12 @@ function renderZ01Hist() {
   var bestLeg = bestLegs.length ? Math.min.apply(null,bestLegs) : 0;
   // Find index of best game in full h array
   var bestHIdx = -1;
-  if (bestAvgVal > 0) { for (var bi=0;bi<h.length;bi++) { if (h[bi].players===1 && h[bi].data[0].avg===bestAvgVal){ bestHIdx=bi; break; } } }
+  if (bestAvgVal > 0) { for (var bi=0;bi<h.length;bi++) { if (h[bi].data[0].avg===bestAvgVal){ bestHIdx=bi; break; } } }
   // --- Today's stats ---
   var todayStr = localDateStr(new Date());
   var todayGames = h.filter(function(g){ return g.date && localDateStr(new Date(g.date))===todayStr; });
-  var todaySolo = todayGames.filter(function(g){ return g.players===1; });
-  // --- Recent 30 solo AVG ---
+  var todaySolo = todayGames; // 全ゲーム対象
+  // --- Recent 30G AVG ---
   var recent30 = soloGames.slice(0,30);
   var r30avgs = recent30.map(function(g){return g.data[0].avg;}).filter(function(v){return v>0;});
   var avgRecent = r30avgs.length ? (r30avgs.reduce(function(a,b){return a+b;},0)/r30avgs.length).toFixed(2) : '-';
