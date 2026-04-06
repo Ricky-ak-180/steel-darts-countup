@@ -5107,9 +5107,10 @@ function _renderWeakBands(el, existingLines) {
   var keys = Object.keys(qd);
   var weak = [];
   keys.forEach(function(k){
+    if (k.indexOf('kz_') === 0) return; // 削り戦術キーは除外
     var v = qd[k];
     if (v && v.a >= 3) {
-      weak.push({ key: k, acc: v.c / v.a, a: v.a, c: v.c });
+      weak.push({ score: parseInt(k, 10), acc: v.c / v.a, a: v.a, c: v.c });
     }
   });
   weak.sort(function(a, b){ return a.acc - b.acc; });
@@ -5118,7 +5119,7 @@ function _renderWeakBands(el, existingLines) {
   if (top3.length > 0) {
     var nums = ['①','②','③'];
     var parts = top3.map(function(w, i){
-      return nums[i] + ' ' + w.key + ' (' + Math.round(w.acc * 100) + '%)';
+      return nums[i] + ' ' + w.score + '点 (' + Math.round(w.acc * 100) + '%)';
     });
     lines.push('苦手スコア帯: ' + parts.join(' '));
   }
