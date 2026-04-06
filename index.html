@@ -7506,7 +7506,7 @@ function _questDartPos(dartStr) {
   var ring=m[1], n=parseInt(m[2],10);
   var idx=_BOARD_SEGS.indexOf(n);
   if (idx<0) return {x:cx, y:cy};
-  var deg = -90 + (idx + 0.5) * 18;
+  var deg = -99 + (idx + 0.5) * 18;
   var rad = deg * Math.PI / 180;
   var r = ring==='T' ? 58 : ring==='D' ? 96 : 77;
   return {
