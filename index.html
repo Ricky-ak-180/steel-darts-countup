@@ -7477,6 +7477,9 @@ function _questPool(poolType) {
     for (var i=2;i<=170;i++) if(_isCheckable(i)) r.push(i);
     return r;
   }
+  if (poolType === 'skezuri_high') return [171,172,173,174,175,176,177,178,179,180];
+  if (poolType === 'skezuri_impossible') return [162,163,165,166,168,169];
+  if (poolType === 'skezuri_all') return Object.keys(_SKEZURI_DATA).map(Number);
   return [40];
 }
 
