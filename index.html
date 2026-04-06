@@ -576,6 +576,49 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-train-tile.mastered { background:rgba(255,183,77,0.3); border:1px solid rgba(255,183,77,0.7); color:#ffe082; }
 .arr-train-tile.perfect { background:linear-gradient(135deg,rgba(255,183,77,0.7),rgba(255,143,0,0.7)); border:1px solid #ffb74d; color:#fff; }
 .arr-train-tile.bogey { background:rgba(255,80,80,0.07); color:rgba(255,80,80,0.3); cursor:default; pointer-events:none; font-size:11px; }
+/* 全体進捗バー */
+.arr-total-prog-wrap { padding:6px 14px 4px; flex-shrink:0; }
+.arr-total-prog-bar { height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; }
+.arr-total-prog-fill { height:100%; background:var(--acc); border-radius:3px; transition:width 0.6s; }
+/* セッション統計 */
+.arr-session-strip { padding:5px 14px; font-size:11px; color:var(--mut); display:flex; gap:14px; flex-shrink:0; background:rgba(255,255,255,0.02); border-bottom:1px solid var(--bdr); }
+/* ランダム・苦手ボタン */
+.arr-train-random-btn { flex:1; background:rgba(79,195,247,0.1); color:#4fc3f7; border:1px solid rgba(79,195,247,0.3); border-radius:10px; padding:11px 0; font-size:13px; font-weight:700; cursor:pointer; }
+.arr-train-weak-btn { flex:1; background:rgba(255,107,53,0.1); color:#ff6b35; border:1px solid rgba(255,107,53,0.3); border-radius:10px; padding:11px 0; font-size:13px; font-weight:700; cursor:pointer; }
+/* セクション進捗バー */
+.arr-sec-prog { height:3px; background:rgba(255,255,255,0.08); border-radius:2px; margin:3px 0 8px; }
+.arr-sec-prog-fill { height:100%; border-radius:2px; transition:width 0.5s; }
+/* ストリーク */
+.arr-tp-streak { font-size:13px; font-weight:700; color:#ffd54f; min-height:18px; text-align:center; letter-spacing:0.5px; margin:2px 0; }
+/* もう一度・前へボタン */
+.arr-tp-retry { flex:1; background:rgba(255,255,255,0.07); color:var(--mut); border:1px solid var(--bdr); border-radius:10px; padding:11px 0; font-size:13px; font-weight:700; cursor:pointer; }
+.arr-tp-prev { background:rgba(255,255,255,0.05); color:var(--mut); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 0; font-size:12px; cursor:pointer; }
+/* フラッシュアニメーション */
+@keyframes trainFlashOk { 0%{background:rgba(102,187,106,0.25)} 100%{background:transparent} }
+@keyframes trainFlashNg { 0%{background:rgba(255,107,107,0.25)} 100%{background:transparent} }
+.train-flash-ok { animation:trainFlashOk 0.5s ease-out; }
+.train-flash-ng { animation:trainFlashNg 0.5s ease-out; }
+/* 難易度チップ */
+.arr-diff-chip { display:inline-block; font-size:9px; font-weight:700; padding:2px 8px; border-radius:4px; letter-spacing:1px; }
+/* 難易度別タイル */
+.arr-train-tile.diff-beginner.started  { background:rgba(102,187,106,0.2); border:1px solid rgba(102,187,106,0.5); color:#a5d6a7; }
+.arr-train-tile.diff-beginner.mastered { background:rgba(102,187,106,0.4); border:1px solid #66bb6a; color:#e8f5e9; }
+.arr-train-tile.diff-beginner.perfect  { background:linear-gradient(135deg,#66bb6a,#43a047); border:1px solid #66bb6a; color:#fff; }
+.arr-train-tile.diff-easy.started  { background:rgba(79,195,247,0.2); border:1px solid rgba(79,195,247,0.5); color:#80d8ff; }
+.arr-train-tile.diff-easy.mastered { background:rgba(79,195,247,0.4); border:1px solid #4fc3f7; color:#e1f5fe; }
+.arr-train-tile.diff-easy.perfect  { background:linear-gradient(135deg,#4fc3f7,#0288d1); border:1px solid #4fc3f7; color:#fff; }
+.arr-train-tile.diff-normal.started  { background:rgba(255,213,79,0.2); border:1px solid rgba(255,213,79,0.5); color:#ffd54f; }
+.arr-train-tile.diff-normal.mastered { background:rgba(255,213,79,0.4); border:1px solid #ffd54f; color:#fff8e1; }
+.arr-train-tile.diff-normal.perfect  { background:linear-gradient(135deg,#ffd54f,#ff8f00); border:1px solid #ffd54f; color:#fff; }
+.arr-train-tile.diff-hard.started  { background:rgba(255,152,0,0.2); border:1px solid rgba(255,152,0,0.5); color:#ffb74d; }
+.arr-train-tile.diff-hard.mastered { background:rgba(255,152,0,0.4); border:1px solid #ff9800; color:#fff3e0; }
+.arr-train-tile.diff-hard.perfect  { background:linear-gradient(135deg,#ff9800,#e65100); border:1px solid #ff9800; color:#fff; }
+.arr-train-tile.diff-vhard.started  { background:rgba(239,83,80,0.2); border:1px solid rgba(239,83,80,0.5); color:#ef9a9a; }
+.arr-train-tile.diff-vhard.mastered { background:rgba(239,83,80,0.4); border:1px solid #ef5350; color:#ffebee; }
+.arr-train-tile.diff-vhard.perfect  { background:linear-gradient(135deg,#ef5350,#b71c1c); border:1px solid #ef5350; color:#fff; }
+.arr-train-tile.diff-expert.started  { background:rgba(171,71,188,0.2); border:1px solid rgba(171,71,188,0.5); color:#ce93d8; }
+.arr-train-tile.diff-expert.mastered { background:rgba(171,71,188,0.4); border:1px solid #ab47bc; color:#f3e5f5; }
+.arr-train-tile.diff-expert.perfect  { background:linear-gradient(135deg,#ab47bc,#6a1b9a); border:1px solid #ab47bc; color:#fff; }
 /* トレーニング練習 */
 .arr-train-prac { position:fixed; inset:0; background:var(--bg); z-index:210; display:flex; flex-direction:column; overflow:hidden; }
 .arr-tp-hdr { display:flex; align-items:center; padding:12px 14px; border-bottom:1px solid var(--bd); flex-shrink:0; }
