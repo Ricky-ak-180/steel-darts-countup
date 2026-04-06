@@ -2746,7 +2746,13 @@ function renderHist() {
     checkDay.setDate(checkDay.getDate()-1);
   }
   var sb = document.getElementById('streak-badge');
-  if (sb) sb.textContent = streak >= 2 ? '🔥 ' + streak + '日連続プレー' : '';
+  if (sb) {
+    if (streak >= 2) {
+      sb.innerHTML = '<div class="streak-card"><div class="streak-fire">🔥</div><div class="streak-num">'+streak+'</div><div class="streak-lbl">日連続<br>プレー</div></div>';
+    } else {
+      sb.innerHTML = '';
+    }
+  }
   // 週次サマリー
   (function(){
     var now = new Date();
