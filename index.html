@@ -7067,13 +7067,16 @@ if (v01hist) {
 }
 var impZ01File = document.getElementById('imp-z01-file');
 if (impZ01File) impZ01File.addEventListener('change', function(){ importZ01Data(this); });
-// 目標スコアをlocalStorageと同期
+// 目標スコアをlocalStorageと同期（ピルボタン）
+function gsSetGoal(val) {
+  localStorage.setItem('cu_goal', String(val));
+  document.querySelectorAll('.gs-goal-pill').forEach(function(b){
+    b.classList.toggle('on', parseInt(b.getAttribute('data-val'),10) === val);
+  });
+}
 (function(){
-  var sel = document.getElementById('gs-goal');
-  if (!sel) return;
-  var saved = localStorage.getItem('cu_goal') || '0';
-  sel.value = saved;
-  sel.addEventListener('change', function(){ localStorage.setItem('cu_goal', this.value); });
+  var saved = parseInt(localStorage.getItem('cu_goal') || '0', 10);
+  gsSetGoal(saved);
 })();
 // スタート画面にベストスコアを表示
 (function(){
