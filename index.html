@@ -7663,6 +7663,30 @@ function _renderQuestWorlds() {
   el.innerHTML = html;
 }
 
+function startQuestSkipChallenge(wi) {
+  var w = _QUEST_WORLDS[wi];
+  if (!w.unlockReq) return;
+  // 最初のステージのプールで5問テスト
+  var testStage = w.stages[0];
+  _questG.worldIdx=wi; _questG.stageIdx=0;
+  _questG.thisWrong=0; _questG.thisMiss=0;
+  _questG.totalWrong=0; _questG.totalMiss=0;
+  _questG.qCount=0; _questG.qCorrect=0; _questG.qStreak=0;
+  _questG.stageCleared=false; _questG.chain=[];
+  _questG.skezuriSetup=null;
+  _questG.skipUnlockReq = w.unlockReq; // クリア時にこのIDを解放
+  _questG.pool = _arrShuffle(_questPool(testStage.pool));
+  _questG.poolIdx = 0;
+
+  document.getElementById('arr-quest-home').style.display = 'none';
+  var playEl = document.getElementById('arr-quest-play');
+  playEl.style.display = 'flex';
+  document.getElementById('arr-quest-play-title').textContent = '⚡ 飛び級: '+w.label;
+  document.getElementById('quest-throw-overlay').classList.add('hide');
+  document.getElementById('arr-quest-result').className = 'arr-quest-result hide';
+  _questNextScore();
+}
+
 function startQuestStage(wi, si) {
   if (!_questIsUnlocked(_QUEST_WORLDS[wi].stages[si].id)) return;
   _questG.worldIdx=wi; _questG.stageIdx=si;
