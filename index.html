@@ -1823,6 +1823,11 @@ function showResult() {
   var f180 = document.getElementById('flash-180');
   if (f180) f180.classList.remove('show');
   if (isPB) setTimeout(launchConfetti, 300);
+  // 目標スコア達成時の紙吹雪（PBでない場合のみ、PBは既に発射済み）
+  if (!isPB) {
+    var cuGoal = parseInt(localStorage.getItem('cu_goal') || '0', 10);
+    if (cuGoal > 0 && g.total >= cuGoal) setTimeout(launchConfetti, 300);
+  }
   document.getElementById('ovr').classList.add('show');
 }
 function startNew() {
