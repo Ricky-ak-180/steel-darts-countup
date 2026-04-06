@@ -7521,9 +7521,11 @@ function _questShowThrow(dartStr) {
   document.getElementById('quest-throw-label').textContent = dartStr + ' を狙う！';
   document.getElementById('quest-throw-result-text').textContent = '';
   document.getElementById('quest-throw-pts').textContent = '';
-  // ボード（aim のみ表示）
+  // ボード（aim のみ表示）＋ダーツ着弾点
   var box = document.getElementById('quest-board-box');
-  box.innerHTML = _buildBoardSVG(dartStr, null) + '<div class="quest-dart-dot" id="quest-dart-dot"></div>';
+  var pos = _questDartPos(dartStr);
+  box.innerHTML = _buildBoardSVG(dartStr, null) +
+    '<div class="quest-dart-dot" id="quest-dart-dot" style="left:'+pos.x+'px;top:'+pos.y+'px;"></div>';
   overlay.classList.remove('hide');
   // ダーツ飛行アニメーション開始
   requestAnimationFrame(function(){
