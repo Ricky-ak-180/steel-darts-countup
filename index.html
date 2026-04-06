@@ -4815,7 +4815,7 @@ function _buildBoardSVG(aimStr, landStr) {
     svg += '<path d="'+arc(RT2,RT1,a1,a2)+'" fill="'+cT+'"/>';
     svg += '<path d="'+arc(RT1,RB,a1,a2)+'" fill="'+cS+'"/>';
 
-    var wc=Math.cos(rad(a1+9)), ws=Math.sin(rad(a1+9));
+    var wc=Math.cos(rad(a1)), ws=Math.sin(rad(a1));
     svg += '<line x1="'+(cx+R*wc)+'" y1="'+(cy+R*ws)+'" x2="'+(cx+RB*wc)+'" y2="'+(cy+RB*ws)+'" stroke="#2a2a2a" stroke-width="1"/>';
 
     var la=-99+(i+0.5)*18;
