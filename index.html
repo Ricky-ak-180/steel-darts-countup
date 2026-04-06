@@ -5515,7 +5515,16 @@ function _renderTrainMap() {
   _TRAIN_SCORES.forEach(function(s) {
     if (!_trainIsBogey(s)) { total++; if (_trainEntry(s, d).c >= _TRAIN_MASTER) mastered++; }
   });
-  document.getElementById('arr-train-progress').textContent = mastered + ' / ' + total + ' マスター';
+  var pct = total > 0 ? Math.round(mastered / total * 100) : 0;
+  document.getElementById('arr-train-progress').textContent = mastered + ' / ' + total + ' マスター (' + pct + '%)';
+  var fill = document.getElementById('arr-total-prog-fill');
+  if (fill) fill.style.width = pct + '%';
+  var strip = document.getElementById('arr-session-strip');
+  if (strip && _trainSession.attempts > 0) {
+    var sRate = Math.round(_trainSession.correct / _trainSession.attempts * 100);
+    strip.innerHTML = '📊 本日: ' + _trainSession.attempts + '回試行　' + _trainSession.correct + '回成功　' + sRate + '%';
+    strip.style.display = 'flex';
+  }
   var continueScore = null;
   for (var j = 0; j < _TRAIN_SCORES.length; j++) {
     if (!_trainUnlocked(j, d)) break;
@@ -5529,33 +5538,40 @@ function _renderTrainMap() {
   } else {
     contWrap.style.display = 'none';
   }
-  var sections = [
-    {lbl:'DOUBLES — 2〜40', from:2, to:40},
-    {lbl:'2本フィニッシュ — 41〜100', from:41, to:100},
-    {lbl:'3本フィニッシュ — 101〜170', from:101, to:170}
-  ];
   var html = '';
-  sections.forEach(function(sec) {
+  _TRAIN_DIFF.forEach(function(diff) {
     var tiles = [];
     for (var k = 0; k < _TRAIN_SCORES.length; k++) {
       var s = _TRAIN_SCORES[k];
-      if (s >= sec.from && s <= sec.to) tiles.push({s:s, idx:k});
+      if (s >= diff.from && s <= diff.to) tiles.push({s:s, idx:k});
     }
     if (!tiles.length) return;
-    html += '<div class="arr-train-section"><div class="arr-train-section-lbl">' + sec.lbl + '</div><div class="arr-train-grid">';
+    var secTotal = 0, secMastered = 0;
+    tiles.forEach(function(t){
+      if (!_trainIsBogey(t.s)) { secTotal++; if (_trainEntry(t.s, d).c >= _TRAIN_MASTER) secMastered++; }
+    });
+    var secPct = secTotal > 0 ? Math.round(secMastered / secTotal * 100) : 0;
+    html += '<div class="arr-train-section">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">';
+    html += '<div style="font-size:10px;color:' + diff.color + ';letter-spacing:1.5px;font-weight:700;">' + diff.label + ' <span style="color:var(--mut);font-weight:400;">' + diff.from + '〜' + diff.to + '</span></div>';
+    html += '<div style="font-size:10px;color:var(--mut);">' + secMastered + '/' + secTotal + ' (' + secPct + '%)</div>';
+    html += '</div>';
+    html += '<div class="arr-sec-prog"><div class="arr-sec-prog-fill" style="width:' + secPct + '%;background:' + diff.color + ';"></div></div>';
+    html += '<div class="arr-train-grid">';
     tiles.forEach(function(t) {
       var cls = _trainTileClass(t.s, t.idx, d);
+      var diffCls = ' diff-' + diff.key;
       var fn = (cls !== 'locked' && cls !== 'bogey') ? ' data-fn="trainStart" data-arg="' + t.s + '"' : '';
       var c = _trainEntry(t.s, d).c;
       var sub = '';
       if (cls === 'bogey') sub = '<div class="t-sub">×</div>';
       else if (cls === 'locked') sub = '<div class="t-sub">🔒</div>';
       else if (c > 0) {
-        var entry2 = _trainEntry(t.s, d);
-        var rate = entry2.a ? Math.round(entry2.c / entry2.a * 100) : 100;
-        sub = '<div class="t-sub">' + (c >= _TRAIN_PERFECT ? '★' : c + '/' + _TRAIN_MASTER) + ' ' + rate + '%</div>';
+        var e2 = _trainEntry(t.s, d);
+        var rate = e2.a ? Math.round(e2.c / e2.a * 100) + '%' : '';
+        sub = '<div class="t-sub">' + (c >= _TRAIN_PERFECT ? '★' : c + '/' + _TRAIN_MASTER) + ' ' + rate + '</div>';
       }
-      html += '<div class="arr-train-tile ' + cls + '"' + fn + '><div class="t-num">' + t.s + '</div>' + sub + '</div>';
+      html += '<div class="arr-train-tile ' + cls + diffCls + '"' + fn + '><div class="t-num">' + t.s + '</div>' + sub + '</div>';
     });
     html += '</div></div>';
   });
