@@ -7885,6 +7885,8 @@ function _questChoose(chosen, correct) {
   // 弱点記録
   _weaknessRecord(_questG.currentScore, isCorrect);
   // 選んだダーツを投げる。不正解なら後でヒント表示
+  // 弱点記録（削り戦術は削りスコアを記録）
+  _weaknessRecord(_questG.currentScore, isCorrect);
   _questG.wrongCorrect = isCorrect ? null : correct;
   setTimeout(function() { _questShowThrow(chosen); }, isCorrect ? 250 : 600);
 }
