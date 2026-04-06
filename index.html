@@ -7744,7 +7744,8 @@ function startQuestStage(wi, si) {
   _questG.stageCleared=false; _questG.chain=[];
   _questG.skezuriSetup=null; _questG.skipUnlockReq=null; _questG.wrongCorrect=null;
   var stage = _QUEST_WORLDS[wi].stages[si];
-  _questG.pool = _arrShuffle(_questPool(stage.pool));
+  _questG.weaknessMode = false;
+  _questG.pool = _arrShuffle(_weaknessWeightedPool(_questPool(stage.pool)));
   _questG.poolIdx = 0;
 
   document.getElementById('arr-quest-home').style.display = 'none';
