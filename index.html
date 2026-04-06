@@ -7525,8 +7525,19 @@ function _questShowThrow(dartStr) {
   // 先に結果を決定してから着弾座標へ飛ばす
   var result = _questThrow(dartStr);
   var landStr = result.land; // null = アウト
-  var flyTarget = landStr || dartStr; // アウトの場合は狙い方向へ
-  var pos = _questDartPos(flyTarget);
+  // アウト（landStr=null）の場合はダブル外側の座標へ飛ばす
+  var pos;
+  if (!landStr) {
+    // ダブル枠のさらに外 → radius 110 (R=100 の外) の方向
+    var m2 = dartStr.match(/^([TDS]?)(\d+)$/);
+    if (m2) {
+      var idx2 = _BOARD_SEGS.indexOf(parseInt(m2[2],10));
+      var deg2 = (-99 + (idx2 + 0.5) * 18) * Math.PI / 180;
+      pos = { x: Math.round(120 + 110 * Math.cos(deg2)), y: Math.round(120 + 110 * Math.sin(deg2)) };
+    } else { pos = _questDartPos(dartStr); }
+  } else {
+    pos = _questDartPos(landStr);
+  }
 
   var box = document.getElementById('quest-board-box');
   // アニメーション中：狙いのみ黄色ハイライト
