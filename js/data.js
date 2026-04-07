@@ -1835,7 +1835,7 @@ function _arrShowStage() {
 function _startArrTimer() {
   _clearArrTimer();
   var bar = document.getElementById('arr-timer-bar');
-  var start = Date.now(), dur = _arrG.STAGE_MS;
+  var start = Date.now(), dur = _arrG.isKezuri ? 15000 : _arrG.STAGE_MS;
   function tick() {
     var p = Math.max(0, 1 - (Date.now() - start) / dur);
     bar.style.width = (p * 100) + '%';
@@ -2026,6 +2026,41 @@ function _arrFinish() {
   document.getElementById('arr-finish').className = 'arr-finish';
   var _varrEl = document.getElementById('varr');
   if (_varrEl) _varrEl.scrollTop = 0;
+
+  // 間違えた問題があれば「苦手だけもう1回」ボタンを表示
+  var weakBtn = document.getElementById('arr-retry-weak-btn');
+  if (weakBtn) {
+    var wrongCount = _arrG.log.filter(function(le){ return !le.isCorrect; }).length;
+    weakBtn.style.display = wrongCount > 0 ? '' : 'none';
+  }
+}
+
+/* 苦手だけリトライ */
+function startArrWeakRetry() {
+  var wrongItems = [];
+  var seen = {};
+  for (var i = 0; i < _arrG.log.length; i++) {
+    var le = _arrG.log[i];
+    if (!le.isCorrect) {
+      var key = le.kezuri ? ('kz_' + le.kIdx) : String(le.qScore);
+      if (!seen[key]) {
+        seen[key] = true;
+        wrongItems.push(le.kezuri ? le.kIdx : le.qScore);
+      }
+    }
+  }
+  if (wrongItems.length === 0) { startArrSession(); return; }
+  _arrG.qList = wrongItems;
+  _arrG.qIdx = 0;
+  _arrG.totalScore = 0; _arrG.maxScore = 0;
+  _arrG.correctCt = 0; _arrG.totalStages = 0; _arrG.totalTimeMs = 0; _arrG.combo = 0;
+  _arrG.log = [];
+  document.getElementById('arr-setup').style.display = 'none';
+  document.getElementById('arr-hist-wrap').style.display = 'none';
+  document.getElementById('arr-finish').className = 'arr-finish hide';
+  document.getElementById('arr-hud').className = 'arr-hud';
+  document.getElementById('arr-card').className = 'arr-card';
+  _arrNextQ();
 }
 
 /* 苦手問題ランキング */

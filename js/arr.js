@@ -355,6 +355,17 @@ function _renderTrainMap() {
     html += '</div></div>';
   });
   document.getElementById('arr-train-map').innerHTML = html;
+
+  // 現在の進捗位置に自動スクロール
+  if (continueScore !== null) {
+    setTimeout(function(){
+      var map = document.getElementById('arr-train-map');
+      var tile = map && map.querySelector('[data-arg="' + continueScore + '"]');
+      if (tile && map) {
+        tile.scrollIntoView({block: 'center', behavior: 'smooth'});
+      }
+    }, 100);
+  }
 }
 
 /* ====================== 01 GAME ====================== */
@@ -3027,6 +3038,7 @@ var _fns = { kp: kp, kd: kd, doOk: doOk, commit: commit,
   setArrMode: setArrMode,
   setQCount: setQCount,
   startArrSession: startArrSession,
+  startArrWeakRetry: startArrWeakRetry,
   startKezuriQuiz: startKezuriQuiz,
   goArrSetup: goArrSetup,
   chooseArr: chooseArr,

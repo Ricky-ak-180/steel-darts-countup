@@ -123,8 +123,9 @@ body::before {
 .bundo.show { display: inline-block; }
 
 /* Next game prompt */
-.ngp { display: none; background: var(--sur); border: 1px solid var(--acc); border-radius: 14px; padding: 16px 20px; text-align: center; box-shadow: 0 0 30px rgba(232,255,71,0.1); }
+.ngp { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 900; background: var(--sur); border: 1px solid var(--acc); border-radius: 14px; padding: 24px 28px; text-align: center; box-shadow: 0 0 40px rgba(232,255,71,0.2); width: min(85vw, 320px); }
 .ngp.show { display: block; }
+.ngp.show::before { content: ''; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: -1; }
 /* ゲームスタート画面 */
 @keyframes gsPulse { 0%,100%{filter:drop-shadow(0 0 18px rgba(232,255,71,0.4));} 50%{filter:drop-shadow(0 0 48px rgba(232,255,71,0.95));} }
 .game-start { position: fixed; inset: 0; z-index: 200; background: radial-gradient(ellipse at 50% 38%, #1a1a2e 0%, #0a0a0f 68%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
@@ -485,6 +486,7 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-stat-val { color:var(--fg); font-weight:700; }
 .arr-finish-btns { display:flex; flex-direction:column; gap:8px; width:100%; }
 .arr-retry-btn { background:var(--acc); color:#000; border:none; border-radius:12px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; width:100%; }
+.arr-retry-weak-btn { background:transparent; color:#ff9800; border:1px solid #ff9800; border-radius:12px; padding:12px; font-size:14px; font-weight:700; cursor:pointer; width:100%; }
 .arr-back-btn { background:transparent; color:var(--mut); border:1px solid var(--bd); border-radius:12px; padding:12px; font-size:14px; cursor:pointer; width:100%; }
 /* 苦手問題 */
 .arr-weak-wrap { width:100%; background:var(--card); border:1px solid var(--bd); border-radius:12px; padding:12px 14px; }
