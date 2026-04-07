@@ -1637,7 +1637,7 @@ function _z01BufUpdate(v) {
   enter.className = 'z01-tk enter ready' + (bv ? ' bust' : '');
 }
 
-function z01Pre(arg) { _z01BufUpdate(String(arg)); z01Ok(); soundCommit(arg); }
+function z01Pre(arg) { _z01BufUpdate(String(arg)); z01Ok(); }
 
 function z01Kp(arg) {
   var v = _z01._buf + String(arg);
