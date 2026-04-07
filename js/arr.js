@@ -637,13 +637,14 @@ function _z01Commit(sc) {
     var justEntered = rem > 170 && after <= 170 && CHECKOUT[after];
     var isBogeyResult = BOGEY_NUMS.indexOf(after) >= 0;
     if (justEntered) {
-      (function(){
+      (function(score){
         var fl = document.createElement('div'); fl.className = 'z01-agari-flash'; document.body.appendChild(fl);
         setTimeout(function(){ fl.parentNode && fl.parentNode.removeChild(fl); }, 700);
         var t = document.createElement('div'); t.className = 'z01-event-toast agari';
-        t.textContent = '🎯 上がり目！'; document.body.appendChild(t);
-        setTimeout(function(){ t.parentNode && t.parentNode.removeChild(t); }, 1600);
-      })();
+        t.innerHTML = '<div class="agari-score">' + score + '</div><div class="agari-label">FINISH RANGE</div>';
+        document.body.appendChild(t);
+        setTimeout(function(){ t.parentNode && t.parentNode.removeChild(t); }, 1800);
+      })(after);
     } else if (isBogeyResult) {
       (function(){
         var fl = document.createElement('div'); fl.className = 'z01-bogey-flash'; document.body.appendChild(fl);
