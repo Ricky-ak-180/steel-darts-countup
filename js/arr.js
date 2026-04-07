@@ -1947,9 +1947,9 @@ function _z01BuildFinishModal(finishedScore) {
     can2 = finishedScore <= 60;
   }
   var h = '<div class="z01-finish-title">何本目で上がりましたか？</div>';
-  if (can1) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="1">1本目で上がり</button>';
-  if (can2) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="2">2本目で上がり</button>';
-  h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="3">3本目で上がり</button>';
+  if (can1) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="1"><span class="z01-finish-btn-main">1本目で上がり</span><span class="z01-finish-btn-sub">Ace finish</span></button>';
+  if (can2) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="2"><span class="z01-finish-btn-main">2本目で上がり</span><span class="z01-finish-btn-sub">2-dart finish</span></button>';
+  h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="3"><span class="z01-finish-btn-main">3本目で上がり</span><span class="z01-finish-btn-sub">3-dart finish</span></button>';
   inner.innerHTML = h;
 }
 function z01FinishDart(dartNo) {
