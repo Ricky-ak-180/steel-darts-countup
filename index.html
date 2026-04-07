@@ -312,16 +312,16 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     </div>
     <!-- クエストホーム -->
     <div class="arr-quest-home" id="arr-quest-home" style="display:none;">
-      <div class="arr-quest-hdr">
+      <div class="arr-quest-hdr" style="flex-wrap:nowrap;">
         <button class="arr-train-back" data-fn="goArrSetup">← 戻る</button>
-        <div class="arr-train-home-title">チェックアウトクエスト</div>
+        <div class="arr-train-home-title" style="font-size:13px;white-space:nowrap;">クエスト</div>
         <div class="arr-quest-mode-seg" id="arr-quest-mode-seg">
           <button id="arr-quest-mode-sim" onclick="setQuestRealThrow(false)">🎲 シミュ</button>
           <button id="arr-quest-mode-real" onclick="setQuestRealThrow(true)">🎯 実投</button>
         </div>
         <button class="arr-quest-weakness-btn" onclick="showQuestWeakness()">📊 弱点</button>
       </div>
-      <div id="arr-quest-home-sub" style="padding:6px 14px 2px;font-size:11px;color:var(--mut);">ダーツが飛んでランダムに着弾 — ルートを覚えて正確に!</div>
+      <div id="arr-quest-home-sub" style="padding:6px 14px 2px;font-size:11px;color:var(--mut);">🎲 シミュ: ダーツが飛んでランダムに着弾 — ルートを覚えて正確に!</div>
       <div class="arr-quest-worlds" id="arr-quest-worlds"></div>
     </div>
     <!-- 弱点分析パネル -->
