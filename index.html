@@ -224,9 +224,9 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         <div class="arr-modes">
           <button class="arr-mode on" data-fn="setArrMode" data-arg="0">初級</button>
           <button class="arr-mode" data-fn="setArrMode" data-arg="1">中級</button>
-          <button class="arr-mode" data-fn="setArrMode" data-arg="2">上級</button>
-          <button class="arr-mode" data-fn="setArrMode" data-arg="3">全部</button>
+          <button class="arr-mode" data-fn="setArrMode" data-arg="4">上級</button>
         </div>
+        <div id="arr-mode-desc" style="font-size:11px;color:var(--mut);margin:4px 0 8px;min-height:1.3em;">〜100点：2本フィニッシュの基礎</div>
         <div class="arr-qcount-row">
           <span class="arr-qcount-label">問題数</span>
           <button class="arr-qcount-btn on" data-fn="setQCount" data-arg="10">10問</button>
@@ -235,10 +235,6 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         </div>
         <button class="arr-step-btn" data-fn="startArrSession">クイズ開始 →</button>
         <div class="arr-best-disp" id="arr-best-disp"></div>
-        <div style="margin-top:4px;border-top:1px solid var(--bdr);padding-top:12px;">
-          <div style="font-size:10px;color:var(--mut);letter-spacing:1.5px;margin-bottom:8px;">⚡ 上級者向け</div>
-          <button class="arr-step-btn arr-kezuri-btn" data-fn="startKezuriQuiz">削り戦術クイズ →</button>
-        </div>
       </div>
       <!-- STEP 3 -->
       <div class="arr-step-card">
