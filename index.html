@@ -561,10 +561,8 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
       <div class="z01-log-wrap" id="z01-log-wrap">
         <div class="z01-log" id="z01-log"></div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px;padding:0 10px 2px;flex-shrink:0;">
-        <div class="z01-checkout-hint" id="z01-checkout-hint" style="flex:1;margin:0;"></div>
-        <button class="z01-hint-toggle" id="z01-hint-toggle" data-fn="z01ToggleHint">ヒント ON</button>
-      </div>
+      <!-- Checkout hint bar (collapses when OFF) -->
+      <div class="z01-checkout-hint" id="z01-checkout-hint"></div>
       <!-- CPU turn indicator -->
       <div class="z01-cpu-area" id="z01-cpu-area" style="display:none;">
         <div class="z01-cpu-header">
@@ -583,13 +581,11 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         </div>
         <div class="z01-cpu-total" id="z01-cpu-total"></div>
       </div>
-      <!-- Bottom action bar -->
-      <div class="z01-bottom-bar">
-        <button class="z01-bb-btn" data-fn="z01ConfirmExit">Exit</button>
-        <button class="z01-bb-btn" data-fn="z01Undo">↩ 取消</button>
-        <button class="z01-bb-btn z01-bb-dim" id="z01-bb-finish" data-fn="z01FinishBtn">Finish</button>
-        <button class="z01-bb-btn" data-fn="z01OpenStats">Stats</button>
-        <button class="z01-bb-btn" data-fn="toggleScEditor">⚙</button>
+      <!-- Primary action row (CountUp-like: above numpad) -->
+      <div class="z01-action-row">
+        <button class="z01-ar-btn z01-ar-undo" data-fn="z01Undo">↩ 取消</button>
+        <button class="z01-ar-btn z01-hint-toggle" id="z01-hint-toggle" data-fn="z01ToggleHint">ヒント ON</button>
+        <button class="z01-ar-btn z01-bb-dim" id="z01-bb-finish" data-fn="z01FinishBtn">Finish</button>
       </div>
       <!-- Input area -->
       <div class="z01-input" id="z01-input-area">
@@ -600,6 +596,12 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
           <div class="z01-tk" data-fn="z01Kp" data-arg="7">7</div><div class="z01-tk" data-fn="z01Kp" data-arg="8">8</div><div class="z01-tk" data-fn="z01Kp" data-arg="9">9</div>
           <div class="z01-tk del" data-fn="z01Kd">⌫</div><div class="z01-tk" data-fn="z01Kp" data-arg="0">0</div><div class="z01-tk enter" id="z01-enter" data-fn="z01Ok">Enter</div>
         </div>
+      </div>
+      <!-- Secondary bar (Exit / Stats / ⚙) -->
+      <div class="z01-secondary-bar">
+        <button class="z01-sb-btn" data-fn="z01ConfirmExit">Exit</button>
+        <button class="z01-sb-btn" data-fn="z01OpenStats">Stats</button>
+        <button class="z01-sb-btn" data-fn="toggleScEditor">⚙</button>
       </div>
     </div>
     <!-- Result screen -->
