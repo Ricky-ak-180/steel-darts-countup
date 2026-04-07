@@ -910,7 +910,7 @@ canvas.schart { width: 100%; height: 100%; }
 .z01-ar-btn:active{background:rgba(255,255,255,0.06);}
 .z01-ar-undo{color:var(--txt);border-color:rgba(255,255,255,0.18);}
 /* 01 secondary bar (Exit / Stats / ⚙) */
-.z01-secondary-bar{display:flex;align-items:stretch;background:#0d0d1a;border-top:1px solid var(--bdr);flex-shrink:0;}
+.z01-secondary-bar{display:flex;align-items:stretch;background:#0d0d1a;border-top:1px solid var(--bdr);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0px);}
 .z01-sb-btn{flex:1;background:transparent;border:none;border-right:1px solid var(--bdr);color:var(--mut);font-size:11px;font-weight:700;padding:8px 4px;cursor:pointer;letter-spacing:0.5px;touch-action:manipulation;font-family:'Noto Sans JP',sans-serif;}
 .z01-sb-btn:last-child{border-right:none;}
 .z01-sb-btn:active{background:rgba(255,255,255,0.04);}
