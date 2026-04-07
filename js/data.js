@@ -2063,7 +2063,7 @@ function _renderTeiseki() {
       '<div class="arr-t-routes">' +
         '<div class="arr-t-path arr-t-main">' + mainLabel + (hasCtxMix ? _holdLabel(mainCtx) : '') + _pathHtml(e.path, false, showRem) + '</div>' +
         (show2h ? _2hHtml(e.score) : '') +
-        /* arr-t-tipはトレーニングモードのみ表示（アレンジ表ではルートと重複するため非表示） */
+        (CHECKOUT_TIPS[e.score] ? '<div class="arr-t-tip">' + CHECKOUT_TIPS[e.score] + '</div>' : '') +
         alts.map(function(a, i) {
           var ctx = (!is3 && hasCtxMix) ? _holdLabel(altCtxs[i]) : '';
           return '<div class="arr-t-path arr-t-alt">' + ctx + _pathHtml(a, false, showRem) + '</div>';

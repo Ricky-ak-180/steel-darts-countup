@@ -646,17 +646,17 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-tp-next:active { opacity:.7; }
 .arr-tp-tip { width:100%; font-size:11px; color:rgba(255,255,255,0.45); line-height:1.6; margin-top:16px; padding:8px 10px; border-left:2px solid var(--acc); background:rgba(255,255,255,0.02); border-radius:0 6px 6px 0; }
 /* アレンジ表パネル */
-.arr-teiseki-panel { position:fixed; inset:0; background:var(--bg); z-index:300; display:flex; flex-direction:column; padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom); }
-.arr-teiseki-header { display:flex; align-items:center; padding:12px 12px 8px; gap:8px; border-bottom:1px solid var(--bd); flex-shrink:0; }
+.arr-teiseki-panel { position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:var(--bg); z-index:300; display:flex; flex-direction:column; padding-top:max(12px,env(safe-area-inset-top)); padding-bottom:max(8px,env(safe-area-inset-bottom)); box-sizing:border-box; }
+.arr-teiseki-header { display:flex; align-items:center; padding:8px 12px; gap:8px; border-bottom:1px solid var(--bdr); flex-shrink:0; }
 .arr-teiseki-tabs { display:flex; gap:6px; flex:1; }
-.arr-t-tab { flex:1; background:transparent; color:var(--mut); border:1px solid var(--bd); border-radius:8px; padding:7px 4px; font-size:13px; cursor:pointer; }
+.arr-t-tab { flex:1; background:transparent; color:var(--mut); border:1px solid var(--bdr); border-radius:8px; padding:7px 4px; font-size:13px; cursor:pointer; touch-action:manipulation; -webkit-appearance:none; appearance:none; }
 .arr-t-tab.on { background:var(--acc); color:#000; border-color:var(--acc); font-weight:700; }
 .arr-teiseki-close { background:transparent; color:var(--mut); border:none; font-size:20px; cursor:pointer; padding:4px 8px; }
 .arr-teiseki-list { flex:1; overflow-y:auto; padding:8px 12px 20px; display:flex; flex-direction:column; gap:4px; }
 .arr-t-row { display:flex; align-items:flex-start; gap:6px; padding:10px 10px; background:linear-gradient(135deg, #1e1e2c 0%, #17172a 100%); border:1px solid rgba(232,255,71,0.1); border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03); }
-.arr-t-score { font-family:'Bebas Neue',cursive; font-size:40px; color:var(--acc); min-width:52px; text-align:right; padding-top:0; line-height:1; text-shadow:0 0 20px rgba(232,255,71,0.35); }
-.arr-t-routes { display:flex; flex-direction:column; gap:6px; flex:1; min-width:0; padding-left:8px; border-left:2px solid rgba(232,255,71,0.2); }
-.arr-t-path { display:flex; gap:3px; align-items:center; flex-wrap:nowrap; overflow:hidden; min-width:0; }
+.arr-t-score { font-family:'Bebas Neue',cursive; font-size:36px; color:var(--acc); min-width:46px; text-align:right; padding-top:0; line-height:1; text-shadow:0 0 20px rgba(232,255,71,0.35); flex-shrink:0; }
+.arr-t-routes { display:flex; flex-direction:column; gap:5px; flex:1; min-width:0; padding-left:8px; border-left:2px solid rgba(232,255,71,0.2); }
+.arr-t-path { display:flex; gap:2px; align-items:center; flex-wrap:nowrap; overflow:hidden; min-width:0; }
 .arr-t-main {}
 .arr-t-alt { opacity:0.55; padding-left:6px; border-left:2px solid var(--bd); }
 .arr-t-tip { font-size:13px; color:rgba(255,255,255,0.55); line-height:1.6; margin-top:4px; padding:6px 10px; border-left:2px solid var(--acc); background:rgba(255,255,255,0.03); border-radius:0 4px 4px 0; }
@@ -667,9 +667,9 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-t-bogey-slim { display:flex; align-items:center; gap:10px; padding:4px 12px; background:rgba(255,107,107,0.02); border:1px solid rgba(255,107,107,0.07); border-radius:8px; }
 .arr-t-bogey-slim-score { font-family:'Bebas Neue',cursive; font-size:20px; color:#a06060; min-width:40px; text-align:right; line-height:1; }
 .arr-t-bogey-slim-label { font-size:10px; color:#a06060; opacity:0.7; letter-spacing:1px; font-weight:400; }
-.arr-t-dart { font-size:13px; background:var(--bg); border:1px solid var(--bd); border-radius:6px; padding:3px 7px; white-space:nowrap; flex-shrink:0; }
+.arr-t-dart { font-size:11px; background:var(--bg); border:1px solid var(--bdr); border-radius:5px; padding:2px 6px; white-space:nowrap; flex-shrink:0; }
 .arr-t-dart.finish { color:var(--acc); border-color:var(--acc); }
-.arr-t-arr { color:var(--mut); font-size:11px; flex-shrink:0; }
+.arr-t-arr { color:var(--mut); font-size:9px; flex-shrink:0; }
 /* 本数ラベル */
 .arr-t-label { font-size:11px; font-weight:700; letter-spacing:1px; border-radius:4px; padding:3px 7px; white-space:nowrap; flex-shrink:0; }
 .arr-t-label-3 { background:rgba(232,255,71,0.12); color:var(--acc); border:1px solid rgba(232,255,71,0.3); }
@@ -678,7 +678,7 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-t-label-2h { background:rgba(71,200,255,0.1); color:#4fc3f7; border:1px solid rgba(71,200,255,0.3); }
 .arr-t-leave { font-size:15px; color:#4fc3f7; font-weight:700; }
 .arr-t-leave-next { font-size:13px; color:var(--mut); }
-.arr-t-remain { font-size:10px; color:var(--mut); margin-left:1px; flex-shrink:0; white-space:nowrap; }
+.arr-t-remain { font-size:9px; color:var(--mut); margin-left:1px; flex-shrink:0; white-space:nowrap; }
 /* ユーザーカスタムルート */
 .arr-t-user { opacity:0.85; padding-left:4px; border-left:2px solid rgba(232,255,71,0.4); display:flex; align-items:center; gap:6px; }
 .arr-t-user-del { background:transparent; border:none; color:var(--mut); font-size:13px; cursor:pointer; padding:0 2px; line-height:1; flex-shrink:0; }
