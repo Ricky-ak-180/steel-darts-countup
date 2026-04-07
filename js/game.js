@@ -321,7 +321,7 @@ function shareX() {
   var url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
   window.open(url, '_blank');
 }
-function goHist() { document.getElementById('ovr').classList.remove('show'); goTab('hist'); }
+function goHist() { document.getElementById('ovr').classList.remove('show'); goTab('game'); goSubHist(); }
 
 /* Reset */
 function resetState() {

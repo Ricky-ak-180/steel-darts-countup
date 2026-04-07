@@ -573,205 +573,142 @@ var CHECKOUT_ALT = {};
 
 /* 削り戦術クイズ問題集（アレンジ表の戦術ページ準拠） */
 var _ARR_KEZURI_QS = [
-  // ── 例外スコア：T19が危険 ──
-  {q:"残り219点。T19（57点）を打つと残りはいくつ？",
-   choices:["162点（ボギーナンバー！）","160点","164点","166点"],ans:0,
-   exp:"219−57=162点。162はボギーナンバー！T19は絶対NG"},
-  {q:"残り219点。T20→159(ボギー)、T19→162(ボギー)、T18→165(ボギー)、T17→168(ボギー)。正解ターゲットは？",
-   choices:["T16 → 171点残し","T15 → 174点残し","T14 → 177点残し","T20 → 159点（ボギー）"],ans:0,
-   exp:"残り219は高トリプル全てがボギー圏に落ちる最難関スコア。T16(48点)→171残しで回避！"},
-  {q:"残り216点。T19を打つと159(ボギー)、T18を打つと162(ボギー)。正解は？",
-   choices:["T20 → 156点残し（唯一安全）","T19 → 159点（ボギー）","T18 → 162点（ボギー）","T17 → 165点（ボギー）"],ans:0,
-   exp:"216−57=159(ボギー)、216−54=162(ボギー)。T20(60点)→156残しが唯一の安全な高トリプル"},
-  {q:"残り222点。T18（54点）を打つと残りはいくつ？",
-   choices:["168点（ボギーナンバー！）","166点","164点","172点"],ans:0,
-   exp:"222−54=168点。168はボギーナンバー！T20→162(ボギー)、T19→165(ボギー)。正解はT17(→171点残し)"},
-  {q:"残り222点の正解ターゲットは？（T18→168ボギー、T20→162ボギー、T19→165ボギー）",
-   choices:["T17 → 171点残し","T18 → 168点（ボギー）","T20 → 162点（ボギー）","T16 → 174点残し"],ans:0,
-   exp:"T17(51点)→171点残しが正解。T18・T20・T19は全てボギー圏。こういうスコアを事前に覚えておく"},
-  {q:"残り223点。T19→166(ボギー)、T18→169(ボギー)。正解ターゲットは？",
-   choices:["T17 → 172点残し","T19 → 166点（ボギー）","T18 → 169点（ボギー）","T20 → 163点（ボギー）"],ans:0,
-   exp:"223−57=166(ボギー)、223−54=169(ボギー)、223−60=163(ボギー)。T17(51点)→172残しで回避"},
-  {q:"残り226点。T19→169(ボギー)、T20→166(ボギー)。正解ターゲットは？",
-   choices:["T18 → 172点残し","T19 → 169点（ボギー）","T20 → 166点（ボギー）","T17 → 175点残し"],ans:0,
-   exp:"226−57=169(ボギー)、226−60=166(ボギー)。T18(54点)→172残しで回避！"},
-  {q:"残り192点。T18の代わりにS-BULLを狙う理由は？",
-   choices:["S-BULL→167残し。T20+T19+D-BULL で一気にチェックアウト可能！","S-BULLを打つと171残しになるから","T18よりS-BULLの方が面積が広く期待値が高いから","T20では得点が高すぎるから"],ans:0,
-   exp:"192−S-BULL(25)=167残し。167=T20(60)+T19(57)+D-BULL(50)でチェックアウト可能！195→170残しと同じ発想"},
-  {q:"残り195点。S-BULLを打つと残りはいくつ？何がうれしい？",
-   choices:["170点残し → 次のターンT20+T20+D-BULLで一気にアウト！","170点残し → でも難しすぎる","145点残し → アレンジに入れる","120点残し → 2本でフィニッシュ"],ans:0,
-   exp:"195−S-BULL(25)=170残し。170=T20+T20+D-BULL。計算通りに刺さればそのターンでゲームセット！"},
-  // ── 309〜302帯 ──
-  {q:"残り309点。T20→T20→S20（S20に外れた）で合計140点取ると残りは？",
-   choices:["169点（ボギーナンバー！）","149点","159点","139点"],ans:0,
-   exp:"309−60−60−20=169点。169はボギーナンバー！309〜302帯でT20スタートは危険"},
-  {q:"残り309点での理想ルートは？（170残しでチェックアウト圏へ）",
-   choices:["T19→T19→S-BULL→170残し","T20→T20→T20→369超過","T19→T19→T19→138残し","T20→T19→T18→138残し"],ans:0,
-   exp:"309−57−57−S-BULL(25)=170残し。次のターンT20+T20+D-BULLでチェックアウト！309〜302帯の定石ルート"},
-  {q:"309〜302帯でT19・T18から狙う理由は？",
-   choices:["T20を打つとS20ミス時に3本計140点になり、ボギー圏に落ちるスコアがあるから","T19の方が入りやすいから","T20では点数が高すぎるから","T18が安全だから"],ans:0,
-   exp:"T20+T20+S20=140点。309なら309−140=169(ボギー)。この帯はT19/T18スタートが鉄則"},
-  // ── 171〜199帯（S20ミスでボギーになる危険スコア） ──
-  {q:"残り189点でT20を狙い、S20（20点）に外れた場合の残りは？",
-   choices:["169点（ボギーナンバー！）","129点","149点","159点"],ans:0,
-   exp:"189−20=169点。169はボギーナンバー！残り189でのT20スタートは絶対NG"},
-  {q:"残り189点。T20はS20ミスで169(ボギー)。代わりにT19を狙うべき理由は？",
-   choices:["S19に外れても189−19=170残し（チェックアウト圏）になるから","T19の方が入りやすいから","T20より得点が高いから","T18は届かないから"],ans:0,
-   exp:"189−57=132残し(OK)。S19ミスでも189−19=170残し(チェックアウト圏)！T20はリスクが高すぎる"},
-  {q:"残り182点でT20を狙い、S20に外れた場合の残りは？",
-   choices:["162点（ボギーナンバー！）","122点","142点","152点"],ans:0,
-   exp:"182−20=162点。162はボギーナンバー！残り182ではT18を狙い、S18ミスでも164残しで安全"},
-  {q:"残り188点。T18を狙うべき理由は？",
-   choices:["S18に外れても188−18=170残し（チェックアウト圏）になるから","T18が一番入りやすいから","T20は難しいから","T19は点数が低いから"],ans:0,
-   exp:"188−54=134残し(OK)。S18ミスでも188−18=170残し(チェックアウト圏)！T20はS20ミスで168(ボギー)"},
-  {q:"残り179点でT20を狙い、S20に外れた場合の残りは？",
-   choices:["159点（ボギーナンバー！）","119点","139点","149点"],ans:0,
-   exp:"179−20=159点。159はボギーナンバー！残り179ではT19を狙い、S19ミスでも160残しで安全"},
-  {q:"残り183点。T20を狙いS20に外れると163(ボギー)。何を狙うべき？",
-   choices:["T19 → S19ミスでも183−19=164残し（安全）","T20 → S20ミスで163（ボギー）","T18 → S18ミスで165（ボギー）","Bull → 133残し"],ans:0,
-   exp:"183−20=163(ボギー)。T19なら183−57=126残し(OK)、S19ミスでも164残し。T19一択！"},
-  // ── ボギーナンバー ──
-  {q:"ボギーナンバー（3本以内でチェックアウト不可）は全部で何個？",
-   choices:["7個","5個","9個","3個"],ans:0,
-   exp:"ボギーナンバー: 159・162・163・165・166・168・169 の7個。この残しは絶対に避ける！"},
-  {q:"次のうちボギーナンバーはどれ？",
-   choices:["168","167","164","156"],ans:0,
-   exp:"168はボギーナンバー。167はT20+T19+D-BULL=60+57+50=167でチェックアウト可能（ボギーではない）"},
-  {q:"171〜199点の中で「T20を打ってS20に外れるとボギーになる」危険スコアはいくつある？",
-   choices:["7個（179・182・183・185・186・188・189）","3個","5個","0個（全て安全）"],ans:0,
-   exp:"ボギーナンバー7個それぞれに +20 したスコアが危険帯。179(→159)、182(→162)など。全て覚えるのが理想"},
-  // ── 220〜229帯：3本目切り替え ──
-  {q:"残り228点。S20→S20で40点取った後（残り188点）、3本目はどこを狙う？",
-   choices:["S18 → 170点残し（チェックアウト圏）","S20 → 168点（ボギー！）","T20 → 128点残し","T18 → 134点残し"],ans:0,
-   exp:"228−20−20=188残し。188−18=170残し（チェックアウト圏）。S20を打つと168(ボギー)なのでS18に切り替えが正解！"},
-  {q:"残り225点。S20→S20で40点取った後（残り185点）、3本目はどこを狙う？",
-   choices:["S18 → 167点残し（チェックアウト圏）","S20 → 165点（ボギー！）","T20 → 125点残し","S19 → 166点（ボギー！）"],ans:0,
-   exp:"225−20−20=185残し。185−18=167残し（OK）。S20→165(ボギー)、S19→166(ボギー)。S18一択！"},
-  {q:"220〜229帯でS20を2本打った後、3本目をS18かS19に切り替える理由は？",
-   choices:["そのままS20を打つと165・166・168などのボギーナンバーに落ちるから","S18の方が入りやすいから","T20を狙いたいから","残り点数が大きすぎるから"],ans:0,
-   exp:"T20を狙うもS20が2本続いた場合、3本目もS20に入るとボギーナンバー（162〜169）に落ちてしまう。3本目だけS18かS19に切り替えることでチェックアウト圏（164・167・170）に収める"},
-  // ── 269〜262帯：1本目で下の桁を調整 ──
-  {q:"残り266点。T20+S20のコンボで167を残すには1本目に何を狙う？",
-   choices:["S19(19点) → 247残→T20(60)→187残→S20(20)→167残","S20(20点) → 246残→T20+S20 → 166(ボギー)","T20(60点) → 206残し","S18(18点) → 248残→T20+S20 → 168(ボギー)"],ans:0,
-   exp:"266−19=247、247−60=187、187−20=167残し。1本目S19(19点)で下の桁を調整するのがポイント！"},
-  {q:"残り262点。1本目S18(18点)→T20(60点)→S20(20点)で残りは何点？",
-   choices:["164点残し（チェックアウト圏）","166点（ボギー！）","168点（ボギー！）","170点残し"],ans:0,
-   exp:"262−18−60−20=164残し。S18で下の桁を18に整え、T20+S20=80点でぴったり164に収める"},
-  // ── 271〜275帯：S-BULL（25点）でつなぐ ──
-  {q:"残り275点。S20(20)+T20(60)の後（残り195点）、3本目にS-BULL（25点）を打つと？",
-   choices:["170点残し（チェックアウト圏）","175点残し","165点（ボギー！）","170点残し（でもS-BULLは難しい）"],ans:0,
-   exp:"275−20−60−25=170残し！S-BULL（25点）でチェックアウト圏に収めるのがこのゾーンの定石"},
-  {q:"残り272点。S20(20)+T20(60)の後（残り192点）、3本目にS-BULL（25点）を打つと？",
-   choices:["167点残し（チェックアウト圏）","168点（ボギー！）","170点残し","162点（ボギー！）"],ans:0,
-   exp:"272−20−60−S-BULL(25)=167残し。167=T20+T19+D-BULL でアウト可能なチェックアウト圏！"},
-  {q:"271〜275帯で「S-BULL（25点）」を3本目に使う利点は？",
-   choices:["167か170の上がり目に収められるから","ブルは得点が高いから","S-BULLは入りやすいから","ダブルアウトに使えるから"],ans:0,
-   exp:"このゾーンはS+T20+S-BULL=167か170に収まる設計。S-BULLでキレイな上がり目を作れるのが最大の強み"},
-  // ── 296〜300帯：ブル狙いでつなぐ ──
-  {q:"残り296〜300点。1本目に何を狙うのが正しい戦術？",
-   choices:["ブル（50点）→S-BULLミス(25点)でも271〜275帯に収まる","T20（60点）→残り236〜240点","T19（57点）→残り239〜243点","S20（20点）→まず削る"],ans:0,
-   exp:"ブル(50)が入れば残り246〜250。S-BULL(25)ミスでも残り271〜275帯に収まり、S+T20+S-BULLの戦術がそのまま使える！"},
-  // ── 基本戦略 ──
-  {q:"501〜310帯の基本戦略は？",
-   choices:["T20ファースト（S20に外れてもボギーにならない）","T19で削る","常にT18を狙う","ブルを積極的に狙う"],ans:0,
-   exp:"501〜310帯はT20外してS20に入っても大半でボギーにならない。まずT20ファーストで最高得点を狙う"},
-  {q:"削り戦術で「ターゲットを変える」主な理由は？",
-   choices:["T20（S20ミス）やT19（S19ミス）でボギーナンバーになるのを防ぐため","T20より得点の高いエリアがあるから","T19の方が入りやすいから","Bull狙いで得点を稼ぐため"],ans:0,
-   exp:"ミスしてシングルに入ったとき、ボギーナンバーに落ちるかどうかが判断基準。ボギー回避が削り戦術の本質"},
-  // ── ボギーナンバー詳細 ──
-  {q:"次のうちボギーナンバーでないスコアはどれ？",
-   choices:["164","163","166","169"],ans:0,
-   exp:"164はT20+T18+D-BULL=60+54+50=164でチェックアウト可能。163・166・169は全てボギーナンバー"},
-  {q:"残り159点はボギーナンバー。この理由として正しいのは？",
-   choices:["3本以内で合計159点になりダブルで上がれる組み合わせが存在しない","T20を打てないから","ダブルブルが遠いから","計算が難しいから"],ans:0,
-   exp:"159はどんな3本の組み合わせでも最後がダブルで上がれない。ボギーナンバーの本質的な定義"},
-  {q:"残り162点。なぜ「上がれない」のか？",
-   choices:["3本以内の組み合わせで残りがダブルで上がれる形にならないから","T20が3本刺さらないから","T19+T19+D-BULLで162になるから","計算が合わないから"],ans:0,
-   exp:"T20+T20+Bull=60+60+50=170≠162。T20+T18+D12=60+54+24=138≠162。どの組み合わせも合わない"},
+  // ── 309〜302：T19/T18ファースト（6問）──
+  {q:"残り309点。どこから狙う？",
+   choices:["T19","T20","T18","T17"],ans:0,
+   exp:"T20+T20+S20=140点取ると309−140=169（ボギー）。奇数→T19スタートで回避。T19+T19+S-BULL=139点→170残し。"},
+  {q:"残り308点。どこから狙う？",
+   choices:["T18","T20","T19","T17"],ans:0,
+   exp:"T20+T20+S20=140点取ると308−140=168（ボギー）。偶数→T18スタートで回避。"},
+  {q:"残り306点。どこから狙う？",
+   choices:["T19","T20","T18","T17"],ans:0,
+   exp:"T20+T20+S20=140点取ると306−140=166（ボギー）。奇数→T19スタートで回避。"},
+  {q:"残り305点。どこから狙う？",
+   choices:["T18","T20","T19","T17"],ans:0,
+   exp:"T20+T20+S20=140点取ると305−140=165（ボギー）。偶数→T18スタートで回避。"},
+  {q:"残り303点。どこから狙う？",
+   choices:["T19","T20","T18","T17"],ans:0,
+   exp:"T20+T20+S20=140点取ると303−140=163（ボギー）。奇数→T19スタートで回避。"},
+  {q:"残り302点。どこから狙う？",
+   choices:["T18","T20","T19","T17"],ans:0,
+   exp:"T20+T20+S20=140点取ると302−140=162（ボギー）。偶数→T18スタートで回避。"},
 
-  // ── カテゴリC: ボギーナンバー問題（追加） ──
-  {q:"次のうちボギーナンバー（3本以内でアウト不可）はどれ？",
-   choices:["163","164","161","160"],ans:0,
-   exp:"163はボギーナンバー。160=T20+T20+D20、161=T20+T17+D-BULL、164=T20+T18+D-BULLでそれぞれ上がれる"},
-  {q:"次のうちボギーナンバーはどれ？（注意：2択はない）",
-   choices:["169","167","170","164"],ans:0,
-   exp:"169はボギーナンバー。167=T20+T19+D-BULL、170=T20+T20+D-BULL、164=T20+T18+D-BULLで上がれる"},
-  {q:"次のうちボギーナンバーはどれ？",
-   choices:["166","167","164","161"],ans:0,
-   exp:"166はボギーナンバー。167=T20+T19+D-BULL、164=T20+T18+D-BULL、161=T20+T17+D-BULLで上がれる"},
-  {q:"次のうちボギーナンバーはどれ？",
-   choices:["159","160","158","157"],ans:0,
-   exp:"159はボギーナンバー。160=T20+T20+D20、158=T20+T20+D19、157=T20+T19+D20でそれぞれ上がれる"},
-  {q:"「ボギーナンバー」の正確な定義は？",
-   choices:["3本以内（1ターン）でチェックアウト不可能なスコア","2本以内でチェックアウト不可能なスコア","偶数で上がれないスコア","T20で割り切れないスコア"],ans:0,
-   exp:"ボギーナンバーとは1ターン（3ダーツ）でチェックアウトできないスコア。現在7個（159・162・163・165・166・168・169）"},
-  {q:"残り159点はボギーナンバー。チェックアウト不可能な理由は？",
-   choices:["どのトリプル・ダブル・ブルの組み合わせでも3本では割り切れないため","T20を打ったら99点が残り奇数になるため","3本とも20を狙わないといけないため","T19を2本打つと45点残りでブルが使えないため"],ans:0,
-   exp:"159は3本でどう組み合わせても50以下のダブルで割り切れる残りを作れない。チェックアウト表に存在しないスコア"},
-  {q:"残り162点はボギーナンバー。1本目T20で何点残る？",
-   choices:["102点（チェックアウト可能）","162点（まだボギー）","122点","82点"],ans:0,
-   exp:"162−T20(60)=102残し。102=T16+14+D20などでチェックアウト可能。ボギーを脱出するためまずT20で一気に削る"},
-  {q:"残り165点はボギーナンバー。T20を打つと何点残る？",
-   choices:["105点（チェックアウト可能）","165点（変わらない）","125点","65点"],ans:0,
-   exp:"165−T20(60)=105残し。105=T20+13+D16でチェックアウト可能。ボギーを脱出するためT20で削る"},
+  // ── 300〜296：3本目はS-BULL（5問）──
+  {q:"2本打ち終えて残り300点。最後の1本はどこを狙う？",
+   choices:["S-BULL","T20","S20","T19"],ans:0,
+   exp:"S-BULL(25点)→275残し。次ターンS20+T20+S-BULLで170残しを目指す。"},
+  {q:"2本打ち終えて残り299点。最後の1本はどこを狙う？",
+   choices:["S-BULL","T20","S20","T19"],ans:0,
+   exp:"S-BULL(25点)→274残し。次ターンS19+T20+S-BULLで170残しを目指す。"},
+  {q:"2本打ち終えて残り298点。最後の1本はどこを狙う？",
+   choices:["S-BULL","T20","S20","T19"],ans:0,
+   exp:"S-BULL(25点)→273残し。次ターンS18+T20+S-BULLで170残しを目指す。"},
+  {q:"2本打ち終えて残り297点。最後の1本はどこを狙う？",
+   choices:["S-BULL","T20","S20","T19"],ans:0,
+   exp:"S-BULL(25点)→272残し。次ターンS20+T20+S-BULLで167残しを目指す。"},
+  {q:"2本打ち終えて残り296点。最後の1本はどこを狙う？",
+   choices:["S-BULL","T20","S20","T19"],ans:0,
+   exp:"S-BULL(25点)→271残し。次ターンS19+T20+S-BULLで167残しを目指す。"},
 
-  // ── カテゴリD: 削り戦術応用（追加） ──
-  {q:"残り185点でT20を打ち、S20（20点）に外れた場合の残りは？",
-   choices:["165点（ボギーナンバー！）","125点","145点","155点"],ans:0,
-   exp:"185−20=165点。165はボギーナンバー！T19はS19ミスで166(ボギー)、T17はS17ミスで168(ボギー)。T18推奨（S18ミスで185−18=167残し、安全）"},
-  {q:"残り186点でT20を打ち、S20（20点）に外れた場合の残りは？",
-   choices:["166点（ボギーナンバー！）","126点","146点","156点"],ans:0,
-   exp:"186−20=166点。166はボギーナンバー！残り186では代替ターゲットを検討。T19→129残し(OK)"},
-  {q:"残り303点。T19+T19+T20で何点削れる？残りは何点？",
-   choices:["174点削り → 129点残し","180点削り → 123点残し","171点削り → 132点残し","178点削り → 125点残し"],ans:0,
-   exp:"T19(57)+T19(57)+T20(60)=174。303−174=129残し。129=19+T20+D-BULLでチェックアウト可"},
-  {q:"残り230点。T20→T20で120点削った後（残り110点）、フィニッシュは？",
-   choices:["T20→S10→D20（110=T20+10+D20）","T19→S3→D20（不可）","T18→D16（54+32=86、不足）","T20→S20→D-BULL（60+20+50=130、過多）"],ans:0,
-   exp:"110=T20(60)+10+D20(40)。60+10+40=110。残り110は3本でチェックアウト圏！"},
-  {q:"残り171点。なぜ一気にチェックアウトできないのか？",
-   choices:["171はチェックアウト不可。170が上限","T20+T17+D-BULLで上がれるはず（間違い）","T19+T18+D-BULLで上がれる（間違い）","ダブルブルが難しいから"],ans:0,
-   exp:"171はチェックアウト不可。170がダーツで上がれる最大スコア。171はどの3本でもダブルで割れない"},
-  {q:"残り170点のチェックアウトを「1ターンで決める」には何が必要？",
-   choices:["T20+T20+D-BULLを正確に3本決める","T20を2本打ってダブルアウト","3本どこかに刺さればよい","170点は上がれない"],ans:0,
-   exp:"170=T20(60)+T20(60)+D-BULL(50)。3本全て的確に刺さる必要がある。1ターンでゲームセット"},
-  {q:"残り240点。T20×3=180点削った後の残りは何点？次ターンはどうする？",
-   choices:["60点残し → 20→D20で2本フィニッシュ","60点残し → 上がれない","60点残し → T20でバスト","60点残し → D-BULLが必要（50点で届かない）"],ans:0,
-   exp:"240−180=60残し。60=20+D20(40)で2本フィニッシュ！T20×3+S20+D20の計5本で終了"},
-  {q:"残り200点でT20を3本打った（残り20点）。次ターンは？",
-   choices:["D10でフィニッシュ（20=D10）","S20でフィニッシュ（ダブルアウトルールでは不可）","T4→D4で上がれる","20点は上がれない"],ans:0,
-   exp:"残り20=D10(20)の1本でフィニッシュ！T20×3で180取り、200−180=20残し→D10一本"},
+  // ── 275〜271：1本目は何を狙う？（5問）──
+  {q:"残り275点。S__ → T20 → S-BULL で170残し。1本目は？",
+   choices:["S20","S19","S18","S17"],ans:0,
+   exp:"S20(20点)→255残→T20(60点)→195残→S-BULL(25点)→170残し。20+60+25=105点削り。"},
+  {q:"残り274点。S__ → T20 → S-BULL で170残し。1本目は？",
+   choices:["S19","S20","S18","S17"],ans:0,
+   exp:"S19(19点)→255残→T20(60点)→195残→S-BULL(25点)→170残し。19+60+25=104点削り。"},
+  {q:"残り273点。S__ → T20 → S-BULL で170残し。1本目は？",
+   choices:["S18","S20","S19","S17"],ans:0,
+   exp:"S18(18点)→255残→T20(60点)→195残→S-BULL(25点)→170残し。18+60+25=103点削り。"},
+  {q:"残り272点。S__ → T20 → S-BULL で167残し。1本目は？",
+   choices:["S20","S19","S18","S17"],ans:0,
+   exp:"S20(20点)→252残→T20(60点)→192残→S-BULL(25点)→167残し。20+60+25=105点削り。"},
+  {q:"残り271点。S__ → T20 → S-BULL で167残し。1本目は？",
+   choices:["S19","S20","S18","S17"],ans:0,
+   exp:"S19(19点)→252残→T20(60点)→192残→S-BULL(25点)→167残し。19+60+25=104点削り。"},
 
-  // ── カテゴリH: アレンジ表の知識（追加） ──
-  {q:"残り224点。S20→S20で40点削った後（残り184点）。3本目はどこを狙う？",
-   choices:["S14 → 170点残し（チェックアウト圏）","S20 → 164点残し（OK）","S18 → 166点（ボギー！）","S19 → 165点（ボギー！）"],ans:0,
-   exp:"224−20−20=184残し。184−14=170残し！S14が正解。S18→166(ボギー)、S19→165(ボギー)に注意"},
-  {q:"残り220点。S20→S20で40点削った後（残り180点）。3本目はどこを狙う？",
-   choices:["T20 → 120点残し（チェックアウト圏）","S20 → 160点残し","S18 → 162点（ボギー！）","S19 → 161点残し"],ans:0,
-   exp:"220−20−20=180残し。T20(60)→120残し。120=T20+20+D20でチェックアウト可能！"},
-  {q:"残り270点。1本目S-BULL(25点)→残り245点。2本目T20(60点)→残り185点。3本目は？",
-   choices:["S18 → 167点残し（チェックアウト圏）","S20 → 165点（ボギー！）","S19 → 166点（ボギー！）","T20 → 125点残し"],ans:0,
-   exp:"185−18=167残し。167=T20+T19+D-BULLでチェックアウト可能！S18を選ぶのが正解"},
-  {q:"残り280点。T20×3=180点で削ると残りは何点？チェックアウト可能か？",
-   choices:["100点残し → T20+D20の2本でフィニッシュ可能","100点残し → 上がれない","80点残し → T20+D10でフィニッシュ","120点残し → 3本必要"],ans:0,
-   exp:"280−180=100残し。100=T20(60)+D20(40)の2本でチェックアウト！次ターン2本でゲームセット"},
-  {q:"「170残しを目指す」削り戦術の理由は何か？",
-   choices:["170=T20+T20+D-BULLで3本フィニッシュが可能な最高スコアだから","170は切りがいい数字だから","170以下にならないと計算できないから","T20を3本打てばちょうど170点だから"],ans:0,
-   exp:"170はチェックアウト可能な最高スコア。1ターンで一気にアウトできるため、削り中に170を残すのが理想的"},
-  {q:"チェックアウト戦術で「D20を最後に狙う」のはなぜ最も一般的か？",
-   choices:["D20は最高得点(40)のダブルで、外れてもS20(20)が残り点を減らし次の上がり目が計算しやすいから","D20は一番大きいから","D20はボードの上部にあり打ちやすいから","D20だけ2倍になるから"],ans:0,
-   exp:"D20(40点)は最大のダブル。外してS20(20点)が入った場合も残り点が偶数になりやすく計算が楽"},
-  {q:"残り300点。1本目にブル（50点）→残り250点。2本目にT20（60点）→残り190点。3本目は？",
-   choices:["S20→170点残し（次ターンT20+T20+D-BULLでアウト）","T20→130点残し","S-BULL→165点（ボギー！）","T19→133点残し"],ans:0,
-   exp:"190−20=170残し！S20で170を残し、次ターンT20+T20+D-BULLでゲームセット。300帯の理想ルート"},
-  {q:"残り171〜179点の帯。なぜ一気にチェックアウトできないのか？",
-   choices:["171〜179はチェックアウト表に存在しない（上がれない）スコアだから","3本では点数が足りないから","ダブルが使えないから","T20が打てないから"],ans:0,
-   exp:"171〜179は3本でチェックアウトできないスコア。170が上限。171残しは2ターン必要で、170残しを目標にする戦術が生まれる"},
-  {q:"残り260点。1本目S19(19点)→残り241点。2本目T20(60点)→残り181点。3本目は？",
-   choices:["S11 → 170点残し（チェックアウト圏）","S20 → 161点残し","S18 → 163点（ボギー！）","T20 → 121点残し"],ans:0,
-   exp:"181−11=170残し！S19で下の桁を調整してからT20で削り、3本目S11で170に収めるのが260帯の定石"},
-  {q:"残り302点。理想の3本打ちルートは？（TACTICS_300s参照）",
-   choices:["TS18→T20→T20→128点残し","T20→T20→T20→122点残し","T19→T19→T19→131点残し","T18→T18→T18→140点残し"],ans:0,
-   exp:"302=T18(54)+T20(60)+T20(60)+128残し。128=T20+18+D-BULLでチェックアウト可能！"}
+  // ── 269〜262：1本目は何を狙う？（3問）──
+  {q:"残り269点。S__ → T20 → S20 で170残し。1本目は？",
+   choices:["S19","S20","S18","S17"],ans:0,
+   exp:"S19(19点)→250残→T20(60点)→190残→S20(20点)→170残し。19+60+20=99点削り。"},
+  {q:"残り266点。S__ → T20 → S20 で167残し。1本目は？",
+   choices:["S19","S20","S18","S17"],ans:0,
+   exp:"S19(19点)→247残→T20(60点)→187残→S20(20点)→167残し。19+60+20=99点削り。"},
+  {q:"残り262点。S__ → T20 → S20 で164残し。1本目は？",
+   choices:["S18","S20","S19","S17"],ans:0,
+   exp:"S18(18点)→244残→T20(60点)→184残→S20(20点)→164残し。18+60+20=98点削り。"},
+
+  // ── 229〜222：3本目はどこを狙う？（6問）──
+  {q:"残り229点。S20 → S20 と入った。3本目はどこを狙う？",
+   choices:["S19","S18","S20","S17"],ans:0,
+   exp:"229−20−20=189残し。S19(19点)→170残し。S20を打つと189−20=169（ボギー）！"},
+  {q:"残り228点。S20 → S20 と入った。3本目はどこを狙う？",
+   choices:["S18","S19","S20","S17"],ans:0,
+   exp:"228−20−20=188残し。S18(18点)→170残し。S20を打つと188−20=168（ボギー）！"},
+  {q:"残り226点。S20 → S20 と入った。3本目はどこを狙う？",
+   choices:["S19","S18","S20","S17"],ans:0,
+   exp:"226−20−20=186残し。S19(19点)→167残し。S20を打つと186−20=166（ボギー）！"},
+  {q:"残り225点。S20 → S20 と入った。3本目はどこを狙う？",
+   choices:["S18","S19","S20","S17"],ans:0,
+   exp:"225−20−20=185残し。S18(18点)→167残し。S20を打つと185−20=165（ボギー）！"},
+  {q:"残り223点。S20 → S20 と入った。3本目はどこを狙う？",
+   choices:["S19","S18","S20","S17"],ans:0,
+   exp:"223−20−20=183残し。S19(19点)→164残し。S20を打つと183−20=163（ボギー）！"},
+  {q:"残り222点。S20 → S20 と入った。3本目はどこを狙う？",
+   choices:["S18","S19","S20","S17"],ans:0,
+   exp:"222−20−20=182残し。S18(18点)→164残し。S20を打つと182−20=162（ボギー）！"},
+
+  // ── 199〜171：要注意スコア（9問）──
+  {q:"残り195点。どこを狙う？",
+   choices:["S-BULL","T20","T19","S20"],ans:0,
+   exp:"S-BULL(25点)→170残し。次ターンT20+T20+D-BULLで一気にチェックアウト可能！T20→S20ミスで175残し（上がり目なし）。"},
+  {q:"残り192点。どこを狙う？",
+   choices:["S-BULL","T20","T19","S20"],ans:0,
+   exp:"S-BULL(25点)→167残し。次ターンT20+T19+D-BULLでチェックアウト可能！T20→S20ミスで172残し（上がり目なし）。"},
+  {q:"残り189点。どこを狙う？",
+   choices:["T19","T20","T18","S-BULL"],ans:0,
+   exp:"T19(57点)→132残し。S19ミスでも189−19=170残し（安全）。T20→S20ミスで169（ボギー）！"},
+  {q:"残り188点。どこを狙う？",
+   choices:["T18","T20","T19","S-BULL"],ans:0,
+   exp:"T18(54点)→134残し。S18ミスでも188−18=170残し（安全）。T20→S20ミスで168（ボギー）！"},
+  {q:"残り186点。どこを狙う？",
+   choices:["T19","T20","T18","S-BULL"],ans:0,
+   exp:"T19(57点)→129残し。S19ミスでも186−19=167残し（安全）。T20→S20ミスで166（ボギー）！"},
+  {q:"残り185点。どこを狙う？",
+   choices:["T18","T20","T19","S-BULL"],ans:0,
+   exp:"T18(54点)→131残し。S18ミスでも185−18=167残し（安全）。T20→S20ミスで165（ボギー）！"},
+  {q:"残り183点。どこを狙う？",
+   choices:["T19","T20","T18","S-BULL"],ans:0,
+   exp:"T19(57点)→126残し。S19ミスでも183−19=164残し（安全）。T20→S20ミスで163（ボギー）！"},
+  {q:"残り182点。どこを狙う？",
+   choices:["T18","T20","T19","S-BULL"],ans:0,
+   exp:"T18(54点)→128残し。S18ミスでも182−18=164残し（安全）。T20→S20ミスで162（ボギー）！"},
+  {q:"残り179点。どこを狙う？",
+   choices:["T19","T20","T18","S-BULL"],ans:0,
+   exp:"T19(57点)→122残し。S19ミスでも179−19=160残し（安全）。T20→S20ミスで159（ボギー）！"},
+
+  // ── ボギーナンバー（7問）──
+  {q:"次のうちボギーナンバーはどれ？",
+   choices:["159","158","160","157"],ans:0,
+   exp:"159はボギーナンバー。158=T20+T20+D19、160=T20+T20+D20、157=T20+T19+D20でそれぞれ上がれる。"},
+  {q:"次のうちボギーナンバーはどれ？",
+   choices:["162","160","161","164"],ans:0,
+   exp:"162はボギーナンバー。160=T20+T20+D20、161=T20+T17+D-BULL、164=T20+T18+D-BULLで上がれる。"},
+  {q:"次のうちボギーナンバーはどれ？",
+   choices:["163","160","161","164"],ans:0,
+   exp:"163はボギーナンバー。160=T20+T20+D20、161=T20+T17+D-BULL、164=T20+T18+D-BULLで上がれる。"},
+  {q:"次のうちボギーナンバーはどれ？",
+   choices:["165","164","167","170"],ans:0,
+   exp:"165はボギーナンバー。164=T20+T18+D-BULL、167=T20+T19+D-BULL、170=T20+T20+D-BULLで上がれる。"},
+  {q:"次のうちボギーナンバーはどれ？",
+   choices:["166","164","167","170"],ans:0,
+   exp:"166はボギーナンバー。164=T20+T18+D-BULL、167=T20+T19+D-BULL、170=T20+T20+D-BULLで上がれる。"},
+  {q:"次のうちボギーナンバーはどれ？",
+   choices:["168","164","167","170"],ans:0,
+   exp:"168はボギーナンバー。164=T20+T18+D-BULL、167=T20+T19+D-BULL、170=T20+T20+D-BULLで上がれる。"},
+  {q:"次のうちボギーナンバーはどれ？",
+   choices:["169","164","167","170"],ans:0,
+   exp:"169はボギーナンバー。164=T20+T18+D-BULL、167=T20+T19+D-BULL、170=T20+T20+D-BULLで上がれる。"}
 ];
 
 var _ARR_SCORES = (function(){
@@ -839,6 +776,7 @@ var _ADJACENT = {
   16:[7,8],  17:[2,3],  18:[1,4],  19:[3,7],  20:[5,1]
 };
 
+
 // dart(例:"T18")を cur点から投げたときの全可能アウトカム（CHECKOUTが続くものだけ）
 function _getMissOptions(dart, cur) {
   var opts = [];
@@ -901,11 +839,28 @@ var _arrG = {
 var _arrInited = false;
 var _ARR_BASE_PTS = [40, 35, 25]; // ステージ0,1,2の基底点
 
-/* 1スコア1問：最初の1本だけ問う */
+/* 1スコアにつき最大2ステージ：1本目 → 2本目の穴埋め */
 function _buildArrStages(score) {
   var path = _getPath(score);
   if (!path) return [];
-  return [{ score: score, path: path, turnDart: 1, turnScore: score }];
+  var stages = [];
+  // ステージ1：1本目は何を狙う？
+  stages.push({ score: score, path: path, turnDart: 1, turnScore: score });
+  // ステージ2：2本目は何を狙う？（パスが2本以上ある場合のみ）
+  if (path.length >= 2) {
+    var firstVal = _dartVal(path[0]);
+    var remScore = score - firstVal; // 1本目が入った後の残り点数
+    stages.push({
+      score:     remScore,    // _arrBuildChoices / _getAltFirstDarts が使うスコア
+      path:      path.slice(1), // 残りのパス（2本目以降）
+      origScore: score,       // 問題文表示用の元スコア
+      origPath:  path,        // 正解ルート表示用のフルパス
+      prevDart:  path[0],     // 「T19を狙って入った」用
+      turnDart:  2,
+      turnScore: remScore
+    });
+  }
+  return stages;
 }
 
 /* 削り戦術クイズをワンクリックで開始 */
@@ -917,7 +872,7 @@ function startKezuriQuiz() {
 /* モード選択 */
 var _ARR_MODE_DESCS = {
   0: '〜100点：2本フィニッシュの基礎',
-  1: '101〜170点：3本フィニッシュの応用',
+  1: '101〜170点：3本フィニッシュ ＋ ミスリカバリー',
   4: '171点〜：ボギー回避・削り戦術'
 };
 function setArrMode(mode) {
@@ -1253,7 +1208,7 @@ function _renderTactics() {
 
   // ── 296〜300帯：3本目（残り1本）は25を狙う ──
   html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
-    '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">300 〜 296　3本目（残り1本）は25を狙う</div>' +
+    '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">300 〜 296<br>3本目（残り1本）は25を狙う</div>' +
     '<div style="font-size:13px;color:var(--mut);margin-bottom:12px;line-height:1.6;">そのターン2本を打ち終えて残り296〜300になったら、最後の1本で<strong style="color:#ff8a65;">S-BULL（25）</strong>を狙い271〜275帯に収める。ブルエリアは面積が広く期待値が高い。次のターンは2本のうち1本がT20・1本がシングルになった場合（順不同）、3本目S-BULLで167か170に収めてチェックアウトを目指す。</div>' +
     '<div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">' +
       '<div><span style="color:#66bb6a;font-weight:700;">✓ D-BULL（50）ヒット</span><span style="color:var(--mut);"> → 残り246〜250（次ターンT20ファーストで削る）</span></div>' +
@@ -1264,125 +1219,158 @@ function _renderTactics() {
   // ── 271〜275帯：S-BULL（25）でつなぐ ──
   (function(){
     var rows275 = [
-      {score:275, d1:'S20', v1:20, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:170},
-      {score:274, d1:'S19', v1:19, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:170},
-      {score:273, d1:'S18', v1:18, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:170},
-      {score:272, d1:'S20', v1:20, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:167},
-      {score:271, d1:'S19', v1:19, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:167}
+      {score:275, cut:105, d1:'S20', v1:20, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:170},
+      {score:274, cut:104, d1:'S19', v1:19, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:170},
+      {score:273, cut:103, d1:'S18', v1:18, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:170},
+      {score:272, cut:105, d1:'S20', v1:20, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:167},
+      {score:271, cut:104, d1:'S19', v1:19, d2:'T20', v2:60, d3:'S-BULL', v3:25, leave:167}
     ];
-    var tbl275 = '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;">' +
-      '<tr style="color:var(--mut);font-size:11px;letter-spacing:0.5px;">' +
-        '<th style="padding:4px 6px;text-align:left;font-weight:400;">残り</th>' +
-        '<th style="padding:4px 6px;text-align:center;font-weight:400;">1本目</th>' +
-        '<th style="padding:4px 2px;text-align:center;font-weight:400;color:transparent;">›</th>' +
-        '<th style="padding:4px 6px;text-align:center;font-weight:400;">2本目</th>' +
-        '<th style="padding:4px 2px;text-align:center;font-weight:400;color:transparent;">›</th>' +
-        '<th style="padding:4px 6px;text-align:center;font-weight:400;">3本目</th>' +
-        '<th style="padding:4px 6px;text-align:right;font-weight:400;">残り</th>' +
-      '</tr>';
+    var cards275 = '';
     rows275.forEach(function(r){
       var r1=r.score-r.v1, r2=r.score-r.v1-r.v2;
-      tbl275 += '<tr style="border-top:1px solid rgba(255,255,255,0.06);">' +
-        '<td style="padding:6px 6px;font-family:\'Bebas Neue\',cursive;font-size:22px;color:#4fc3f7;">' + r.score + '</td>' +
-        '<td style="padding:6px;text-align:center;color:var(--fg);">' + r.d1 + '<span style="color:var(--mut);font-size:11px;"> (' + r1 + '残)</span></td>' +
-        '<td style="padding:6px 2px;text-align:center;color:var(--mut);">›</td>' +
-        '<td style="padding:6px;text-align:center;color:var(--acc);font-weight:700;">' + r.d2 + '<span style="color:var(--mut);font-size:11px;font-weight:400;"> (' + r2 + '残)</span></td>' +
-        '<td style="padding:6px 2px;text-align:center;color:var(--mut);">›</td>' +
-        '<td style="padding:6px;text-align:center;color:#ff8a65;font-weight:700;">' + r.d3 + '<span style="color:var(--mut);font-size:11px;font-weight:400;"> (' + r.leave + '残)</span></td>' +
-        '<td style="padding:6px;text-align:right;font-weight:700;color:#66bb6a;">' + r.leave + '残し</td>' +
-      '</tr>';
+      var isB=r.v1===18, isR=r.v1===19;
+      var wmColor    = isB ? 'rgba(79,195,247,0.15)'  : isR ? 'rgba(255,107,107,0.15)'  : 'rgba(255,255,255,0.07)';
+      var scoreColor = isB ? '#4fc3f7'                : isR ? '#ff6b6b'                 : 'var(--fg)';
+      var bdColor    = 'rgba(255,255,255,0.08)';
+      var bgColor    = 'rgba(255,255,255,0.03)';
+      cards275 +=
+        '<div style="background:' + bgColor + ';border:1px solid ' + bdColor + ';border-radius:10px;padding:12px 14px;margin-bottom:8px;position:relative;overflow:hidden;">' +
+          '<div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:\'Bebas Neue\',cursive;font-size:72px;color:' + wmColor + ';line-height:1;pointer-events:none;">' + r.v1 + '</div>' +
+          '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;position:relative;">' +
+            '<span style="font-family:\'Bebas Neue\',cursive;font-size:32px;color:' + scoreColor + ';line-height:1;">' + r.score + '</span>' +
+            '<span style="font-size:16px;color:var(--mut);">' + r.cut + '点削り</span>' +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:4px;position:relative;">' +
+            '<div style="display:flex;flex-direction:column;align-items:center;">' +
+              '<span style="font-size:18px;font-weight:700;color:' + scoreColor + ';">' + r.d1 + '</span>' +
+              '<span style="font-size:11px;color:var(--mut);">(' + r1 + '残)</span>' +
+            '</div>' +
+            '<span style="color:var(--mut);font-size:16px;margin:0 2px;">›</span>' +
+            '<div style="display:flex;flex-direction:column;align-items:center;">' +
+              '<span style="font-size:18px;font-weight:700;color:var(--acc);">' + r.d2 + '</span>' +
+              '<span style="font-size:11px;color:var(--mut);">(' + r2 + '残)</span>' +
+            '</div>' +
+            '<span style="color:var(--mut);font-size:16px;margin:0 2px;">›</span>' +
+            '<div style="display:flex;flex-direction:column;align-items:center;">' +
+              '<span style="font-size:18px;font-weight:700;color:#ff8a65;">' + r.d3 + '</span>' +
+              '<span style="font-size:11px;color:var(--mut);">(' + r.leave + '残)</span>' +
+            '</div>' +
+            '<span style="font-size:13px;font-weight:700;color:#66bb6a;margin-left:8px;">' + r.leave + '残し</span>' +
+          '</div>' +
+        '</div>';
     });
-    tbl275 += '</table>';
     html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
-      '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">275 〜 271　S-BULL（25）でつなぐ</div>' +
-      '<div style="font-size:13px;color:var(--mut);margin-bottom:2px;line-height:1.6;">2本のうち1本がT20・1本がシングルになった場合（順不同）、3本目に<strong style="color:#ff8a65;">S-BULL（25点）</strong>を打つと<strong style="color:var(--fg);">167か170</strong>に収められる。</div>' +
-      tbl275 +
-      '<div style="margin-top:10px;"><span style="color:#ff6b6b;font-size:14px;">⚠ T20+S20+S20 で100点を取ってしまうと → 171〜175（上がり目なし）</span></div>' +
+      '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">275 〜 271<br>S-BULL（25）でつなぐ</div>' +
+      '<div style="font-size:13px;color:var(--mut);margin-bottom:10px;line-height:1.6;">2本のうち1本がT20・1本がシングルになった場合（順不同）、3本目に<strong style="color:#ff8a65;">S-BULL（25点）</strong>を打つと<strong style="color:var(--fg);">167か170</strong>に収められる。</div>' +
+      cards275 +
+      '<div style="margin-top:4px;"><span style="color:#ff6b6b;font-size:13px;">⚠ T20+S20+S20 で100点を取ってしまうと → 171〜175（上がり目なし）</span></div>' +
     '</div>';
   })();
 
   // ── 269〜262帯：1本目で下の桁を調整 ──
   (function(){
     var rows260 = [
-      {score:269, d1:'S19', v1:19, d2:'T20', v2:60, d3:'S20', v3:20, leave:170},
-      {score:266, d1:'S19', v1:19, d2:'T20', v2:60, d3:'S20', v3:20, leave:167},
-      {score:262, d1:'S18', v1:18, d2:'T20', v2:60, d3:'S20', v3:20, leave:164}
+      {score:269, cut:99, d1:'S19', v1:19, d2:'T20', v2:60, d3:'S20', v3:20, leave:170},
+      {score:266, cut:99, d1:'S19', v1:19, d2:'T20', v2:60, d3:'S20', v3:20, leave:167},
+      {score:262, cut:98, d1:'S18', v1:18, d2:'T20', v2:60, d3:'S20', v3:20, leave:164}
     ];
-    var tbl260 = '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;">' +
-      '<tr style="color:var(--mut);font-size:11px;letter-spacing:0.5px;">' +
-        '<th style="padding:4px 6px;text-align:left;font-weight:400;">残り</th>' +
-        '<th style="padding:4px 6px;text-align:center;font-weight:400;">1本目</th>' +
-        '<th style="padding:4px 2px;text-align:center;font-weight:400;color:transparent;">›</th>' +
-        '<th style="padding:4px 6px;text-align:center;font-weight:400;">2本目</th>' +
-        '<th style="padding:4px 2px;text-align:center;font-weight:400;color:transparent;">›</th>' +
-        '<th style="padding:4px 6px;text-align:center;font-weight:400;">3本目</th>' +
-        '<th style="padding:4px 6px;text-align:right;font-weight:400;">残り</th>' +
-      '</tr>';
+    var cards260 = '';
     rows260.forEach(function(r){
       var r1=r.score-r.v1, r2=r.score-r.v1-r.v2;
-      tbl260 += '<tr style="border-top:1px solid rgba(255,255,255,0.06);">' +
-        '<td style="padding:6px 6px;font-family:\'Bebas Neue\',cursive;font-size:22px;color:#4fc3f7;">' + r.score + '</td>' +
-        '<td style="padding:6px;text-align:center;color:var(--fg);">' + r.d1 + '<span style="color:var(--mut);font-size:11px;"> (' + r1 + '残)</span></td>' +
-        '<td style="padding:6px 2px;text-align:center;color:var(--mut);">›</td>' +
-        '<td style="padding:6px;text-align:center;color:var(--acc);font-weight:700;">' + r.d2 + '<span style="color:var(--mut);font-size:11px;font-weight:400;"> (' + r2 + '残)</span></td>' +
-        '<td style="padding:6px 2px;text-align:center;color:var(--mut);">›</td>' +
-        '<td style="padding:6px;text-align:center;color:#66bb6a;font-weight:700;">' + r.d3 + '<span style="color:var(--mut);font-size:11px;font-weight:400;"> (' + r.leave + '残)</span></td>' +
-        '<td style="padding:6px;text-align:right;font-weight:700;color:#66bb6a;">' + r.leave + '残し</td>' +
-      '</tr>';
+      var isB=r.v1===18, isR=r.v1===19;
+      var wmColor    = isB ? 'rgba(79,195,247,0.15)'  : isR ? 'rgba(255,107,107,0.15)'  : 'rgba(255,255,255,0.07)';
+      var scoreColor = isB ? '#4fc3f7'                : isR ? '#ff6b6b'                 : 'var(--fg)';
+      var bdColor    = 'rgba(255,255,255,0.08)';
+      var bgColor    = 'rgba(255,255,255,0.03)';
+      cards260 +=
+        '<div style="background:' + bgColor + ';border:1px solid ' + bdColor + ';border-radius:10px;padding:12px 14px;margin-bottom:8px;position:relative;overflow:hidden;">' +
+          '<div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:\'Bebas Neue\',cursive;font-size:72px;color:' + wmColor + ';line-height:1;pointer-events:none;">' + r.v1 + '</div>' +
+          '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;position:relative;">' +
+            '<span style="font-family:\'Bebas Neue\',cursive;font-size:32px;color:' + scoreColor + ';line-height:1;">' + r.score + '</span>' +
+            '<span style="font-size:16px;color:var(--mut);">' + r.cut + '点削り</span>' +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:4px;position:relative;">' +
+            '<div style="display:flex;flex-direction:column;align-items:center;">' +
+              '<span style="font-size:18px;font-weight:700;color:' + scoreColor + ';">' + r.d1 + '</span>' +
+              '<span style="font-size:11px;color:var(--mut);">(' + r1 + '残)</span>' +
+            '</div>' +
+            '<span style="color:var(--mut);font-size:16px;margin:0 2px;">›</span>' +
+            '<div style="display:flex;flex-direction:column;align-items:center;">' +
+              '<span style="font-size:18px;font-weight:700;color:var(--acc);">' + r.d2 + '</span>' +
+              '<span style="font-size:11px;color:var(--mut);">(' + r2 + '残)</span>' +
+            '</div>' +
+            '<span style="color:var(--mut);font-size:16px;margin:0 2px;">›</span>' +
+            '<div style="display:flex;flex-direction:column;align-items:center;">' +
+              '<span style="font-size:18px;font-weight:700;color:#66bb6a;">' + r.d3 + '</span>' +
+              '<span style="font-size:11px;color:var(--mut);">(' + r.leave + '残)</span>' +
+            '</div>' +
+            '<span style="font-size:13px;font-weight:700;color:#66bb6a;margin-left:8px;">' + r.leave + '残し</span>' +
+          '</div>' +
+        '</div>';
     });
-    tbl260 += '</table>';
     html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
-      '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">269 〜 262　T20×1＋S18/S19×1でつなぐ</div>' +
-      '<div style="font-size:13px;color:var(--mut);margin-bottom:2px;line-height:1.6;">2本のうち1本がT20・1本がS18かS19になった場合（順不同）、3本目に<strong style="color:var(--fg);">S20</strong>を打つと<strong style="color:var(--fg);">164・167・170</strong>に収められる。</div>' +
-      tbl260 +
-      '<div style="margin-top:10px;"><span style="color:#ff6b6b;font-size:14px;">⚠ T20+S20+S20 で100点を取ってしまうと → 162〜169（ボギー）</span></div>' +
+      '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">269 〜 262<br>T20 ＋ S18/S19 でつなぐ</div>' +
+      '<div style="font-size:13px;color:var(--mut);margin-bottom:10px;line-height:1.6;">2本のうち1本がT20・1本がS18かS19になった場合（順不同）、3本目に<strong style="color:var(--fg);">S20</strong>を打つと<strong style="color:var(--fg);">164・167・170</strong>に収められる。</div>' +
+      cards260 +
+      '<div style="margin-top:4px;"><span style="color:#ff6b6b;font-size:13px;">⚠ T20+S20+S20 で100点を取ってしまうと → 162〜169（ボギー）</span></div>' +
     '</div>';
   })();
 
   // ── 220〜229帯：3本目を18・19に切り替える ──
   (function(){
     var rows220 = [
-      {score:229, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:170},
-      {score:228, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:170},
-      {score:226, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:167},
-      {score:225, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:167},
-      {score:223, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:164},
-      {score:222, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:164}
+      {score:229, cut:59, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:170},
+      {score:228, cut:58, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:170},
+      {score:226, cut:59, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:167},
+      {score:225, cut:58, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:167},
+      {score:223, cut:59, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:164},
+      {score:222, cut:58, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:164}
     ];
-    var tbl220 = '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;">' +
-      '<tr style="color:var(--mut);font-size:11px;letter-spacing:0.5px;">' +
-        '<th style="padding:4px 6px;text-align:left;font-weight:400;">残り</th>' +
-        '<th style="padding:4px 6px;text-align:center;font-weight:400;">1本目</th>' +
-        '<th style="padding:4px 2px;text-align:center;font-weight:400;color:transparent;">›</th>' +
-        '<th style="padding:4px 6px;text-align:center;font-weight:400;">2本目</th>' +
-        '<th style="padding:4px 2px;text-align:center;font-weight:400;color:transparent;">›</th>' +
-        '<th style="padding:4px 6px;text-align:center;font-weight:400;">3本目（切替）</th>' +
-        '<th style="padding:4px 6px;text-align:right;font-weight:400;">残り</th>' +
-      '</tr>';
+    var cards220 = '';
     rows220.forEach(function(r){
       var r1=r.score-r.v1, r2=r.score-r.v1-r.v2;
-      tbl220 += '<tr style="border-top:1px solid rgba(255,255,255,0.06);">' +
-        '<td style="padding:6px 6px;font-family:\'Bebas Neue\',cursive;font-size:22px;color:#4fc3f7;">' + r.score + '</td>' +
-        '<td style="padding:6px;text-align:center;color:var(--mut);">' + r.d1 + '<span style="font-size:11px;"> (' + r1 + '残)</span></td>' +
-        '<td style="padding:6px 2px;text-align:center;color:var(--mut);">›</td>' +
-        '<td style="padding:6px;text-align:center;color:var(--mut);">' + r.d2 + '<span style="font-size:11px;"> (' + r2 + '残)</span></td>' +
-        '<td style="padding:6px 2px;text-align:center;color:var(--mut);">›</td>' +
-        '<td style="padding:6px;text-align:center;color:var(--acc);font-weight:700;">' + r.d3 + '<span style="color:var(--mut);font-size:11px;font-weight:400;"> (' + r.leave + '残)</span></td>' +
-        '<td style="padding:6px;text-align:right;font-weight:700;color:#66bb6a;">' + r.leave + '残し</td>' +
-      '</tr>';
+      var isB=r.v3===18, isR=r.v3===19;
+      var wmColor    = isB ? 'rgba(79,195,247,0.15)'  : 'rgba(255,107,107,0.15)';
+      var scoreColor = isB ? '#4fc3f7'                : '#ff6b6b';
+      var bdColor    = 'rgba(255,255,255,0.08)';
+      var bgColor    = 'rgba(255,255,255,0.03)';
+      cards220 +=
+        '<div style="background:' + bgColor + ';border:1px solid ' + bdColor + ';border-radius:10px;padding:12px 14px;margin-bottom:8px;position:relative;overflow:hidden;">' +
+          '<div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:\'Bebas Neue\',cursive;font-size:72px;color:' + wmColor + ';line-height:1;pointer-events:none;">' + r.v3 + '</div>' +
+          '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;position:relative;">' +
+            '<span style="font-family:\'Bebas Neue\',cursive;font-size:32px;color:' + scoreColor + ';line-height:1;">' + r.score + '</span>' +
+            '<span style="font-size:16px;color:var(--mut);">' + r.cut + '点削り</span>' +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:4px;position:relative;">' +
+            '<div style="display:flex;flex-direction:column;align-items:center;">' +
+              '<span style="font-size:18px;font-weight:700;color:var(--mut);">' + r.d1 + '</span>' +
+              '<span style="font-size:11px;color:var(--mut);">(' + r1 + '残)</span>' +
+            '</div>' +
+            '<span style="color:var(--mut);font-size:16px;margin:0 2px;">›</span>' +
+            '<div style="display:flex;flex-direction:column;align-items:center;">' +
+              '<span style="font-size:18px;font-weight:700;color:var(--mut);">' + r.d2 + '</span>' +
+              '<span style="font-size:11px;color:var(--mut);">(' + r2 + '残)</span>' +
+            '</div>' +
+            '<span style="color:var(--mut);font-size:16px;margin:0 2px;">›</span>' +
+            '<div style="display:flex;flex-direction:column;align-items:center;">' +
+              '<span style="font-size:18px;font-weight:700;color:' + scoreColor + ';">' + r.d3 + '</span>' +
+              '<span style="font-size:11px;color:var(--mut);">(' + r.leave + '残)</span>' +
+            '</div>' +
+            '<span style="font-size:13px;font-weight:700;color:#66bb6a;margin-left:8px;">' + r.leave + '残し</span>' +
+          '</div>' +
+        '</div>';
     });
-    tbl220 += '</table>';
     html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:24px;">' +
-      '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">229 〜 220　3本目を18・19に切り替える</div>' +
-      '<div style="font-size:13px;color:var(--mut);margin-bottom:2px;line-height:1.6;">T20を狙うもS20に2本外れた後（残り182〜189）、3本目もS20に入るとボギーナンバーに落ちる。3本目を<strong style="color:var(--acc);">S18かS19</strong>に切り替えて<strong style="color:var(--fg);">164・167・170</strong>に収める。</div>' +
-      tbl220 +
-      '<div style="margin-top:10px;"><span style="color:#ff6b6b;font-size:14px;">⚠ S20＋S20＋S20（合計60点取ると）→ 162〜169 すべてボギーナンバーに落ちる</span></div>' +
+      '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">229 〜 220<br>3本目を18・19に切り替える</div>' +
+      '<div style="font-size:13px;color:var(--mut);margin-bottom:10px;line-height:1.6;">T20を狙うもS20に2本外れた後（残り182〜189）、3本目もS20に入るとボギーナンバーに落ちる。3本目を<strong style="color:var(--acc);">S18かS19</strong>に切り替えて<strong style="color:var(--fg);">164・167・170</strong>に収める。</div>' +
+      cards220 +
+      '<div style="margin-top:4px;"><span style="color:#ff6b6b;font-size:13px;">⚠ S20＋S20＋S20（合計60点取ると）→ 162〜169 すべてボギーナンバーに落ちる</span></div>' +
     '</div>';
   })();
 
   // 171〜199（S20ミスでボギーになる8スコアのみ）
   html += rangeSection(
-    '199〜171　最後の一本　要注意',
+    '199〜171<br>最後の一本　要注意',
     '最後の一本がS20だと、上がり目がなくなってしまう（ボギーナンバーになる）',
     171, 199, '170s'
   );
@@ -1825,11 +1813,17 @@ function _arrShowStage() {
     _arrBuildKezuriChoices(kq);
   } else {
     document.getElementById('arr-card').classList.remove('kezuri-mode');
-    document.getElementById('arr-q-score').textContent = st.score;
-    var nDarts = st.path ? st.path.length : 3;
-    var labelText = nDarts === 1 ? '1本でフィニッシュ！　何を狙う？'
-      : nDarts === 2 ? '2本フィニッシュ 🎯　1本目は何を狙う？'
-      : '3本フィニッシュ　1本目は何を狙う？';
+    // 2本目問題は元のスコアを表示（例：残り139点のまま）
+    document.getElementById('arr-q-score').textContent = st.origScore || st.score;
+    var labelText;
+    if (st.turnDart === 2) {
+      labelText = st.prevDart + ' を狙って入った。2本目はどこを狙う？';
+    } else {
+      var nDarts = st.path ? st.path.length : 3;
+      labelText = nDarts === 1 ? '1本でフィニッシュ！　何を狙う？'
+        : nDarts === 2 ? '2本フィニッシュ 🎯　1本目は何を狙う？'
+        : '3本フィニッシュ　1本目は何を狙う？';
+    }
     document.getElementById('arr-q-label').textContent = labelText;
     document.getElementById('arr-q-label').style.display = '';
     _arrBuildChoices(st);
@@ -1939,23 +1933,36 @@ function chooseArr(idx) {
       + '<span style="color:#66bb6a;font-weight:700">✓ ' + correctText + '</span><br>'
       + kq.exp + '</div>';
   } else {
-    pathEl.innerHTML = '<div class="arr-answer-path-label">正解ルート</div><div>' + _pathHtml(st.path, false, st.score) + '</div>';
+    // 2本目問題はフルルートで文脈を見せる（origPathがある場合）
+    var displayPath = st.origPath || st.path;
+    var displayScore = st.origScore || st.score;
+    pathEl.innerHTML = '<div class="arr-answer-path-label">正解ルート</div><div>' + _pathHtml(displayPath, false, displayScore) + '</div>';
   }
   pathEl.className = 'arr-answer-path';
 
   document.getElementById('arr-hud-score').textContent = _arrG.totalScore;
 
   var isLastQ = (_arrG.qIdx + 1) >= _arrG.qList.length;
+  var isLastStage = (_arrG.stgIdx + 1) >= _arrG.stages.length;
   var nextBtn = document.getElementById('arr-next-btn');
-  nextBtn.textContent = isLastQ ? '結果を見る' : '次の問題 →';
+  nextBtn.textContent = (isLastQ && isLastStage) ? '結果を見る'
+    : isLastStage ? '次の問題 →'
+    : '2本目 →';
   document.getElementById('arr-next-row').className = 'arr-next-row';
 }
 
 /* 次の問題へ */
 function advanceArr() {
   _clearArrTimer();
-  _arrG.qIdx++;
-  _arrNextQ();
+  _arrG.stgIdx++;
+  if (_arrG.stgIdx >= _arrG.stages.length) {
+    // 全ステージ完了 → 次の問題へ
+    _arrG.qIdx++;
+    _arrNextQ();
+  } else {
+    // 次のステージ（2本目）へ
+    _arrShowStage();
+  }
 }
 
 /* セッション終了 */
@@ -2017,6 +2024,8 @@ function _arrFinish() {
   document.getElementById('arr-hud').className = 'arr-hud hide';
   document.getElementById('arr-card').className = 'arr-card hide';
   document.getElementById('arr-finish').className = 'arr-finish';
+  var _varrEl = document.getElementById('varr');
+  if (_varrEl) _varrEl.scrollTop = 0;
 }
 
 /* 苦手問題ランキング */
