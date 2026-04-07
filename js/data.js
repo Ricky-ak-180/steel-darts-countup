@@ -1832,6 +1832,22 @@ function _arrShowStage() {
 }
 
 /* タイマー（5秒） */
+function _showComboFlash(text, color) {
+  var el = document.getElementById('arr-combo-flash');
+  if (!el) {
+    el = document.createElement('div'); el.id = 'arr-combo-flash';
+    el.className = 'arr-combo-flash';
+    document.querySelector('.app').appendChild(el);
+  }
+  el.textContent = text;
+  el.style.color = color;
+  el.style.textShadow = '0 0 20px ' + color + ', 0 0 40px ' + color;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  if (typeof sfxStreak === 'function') sfxStreak();
+  setTimeout(function(){ el.classList.remove('show'); }, 900);
+}
 function _startArrTimer() {
   _clearArrTimer();
   var bar = document.getElementById('arr-timer-bar');
@@ -1867,7 +1883,8 @@ function chooseArr(idx) {
   var comboBonus = 1;
   if (isCorrect) {
     _arrG.combo++;
-    if (_arrG.combo >= 5) comboBonus = 2.0;
+    if (_arrG.combo >= 10) comboBonus = 3.0;
+    else if (_arrG.combo >= 5) comboBonus = 2.0;
     else if (_arrG.combo >= 3) comboBonus = 1.5;
   } else {
     _arrG.combo = 0;
@@ -1903,8 +1920,17 @@ function chooseArr(idx) {
   var resEl = document.getElementById('arr-result');
   if (isCorrect) {
     resEl.className = 'arr-result arr-ok';
-    var comboLabel = _arrG.combo >= 5 ? ' 🔥 COMBO ×' + _arrG.combo + '！(×2.0)' :
-                     _arrG.combo >= 3 ? ' ⚡ COMBO ×' + _arrG.combo + '！(×1.5)' : '';
+    var comboLabel = '';
+    if (_arrG.combo >= 10) {
+      comboLabel = ' 💎 ' + _arrG.combo + ' COMBO！(×3.0)';
+      _showComboFlash('💎 UNSTOPPABLE!', '#e040fb');
+    } else if (_arrG.combo >= 5) {
+      comboLabel = ' ⚡ ' + _arrG.combo + ' COMBO！(×2.0)';
+      _showComboFlash('⚡ ON FIRE!', '#ff9800');
+    } else if (_arrG.combo >= 3) {
+      comboLabel = ' 🔥 ' + _arrG.combo + ' COMBO！(×1.5)';
+      _showComboFlash('🔥 COMBO!', '#ffd54f');
+    }
     resEl.innerHTML = pts > 0 ? '◯&nbsp; <strong>+' + pts + ' pt</strong><span style="color:#ffd54f;font-size:13px;">' + comboLabel + '</span>' : '◯';
   } else if (isTimeout) {
     resEl.className = 'arr-result arr-ng';
@@ -2003,6 +2029,11 @@ function _arrFinish() {
     grade: grade, correct: _arrG.correctCt, total: _arrG.totalStages });
   if (hist.length > 30) hist.length = 30;
   try { localStorage.setItem('arr_history', JSON.stringify(hist)); } catch(e) {}
+
+  // デイリー & XP更新
+  var correctRate = _arrG.totalStages > 0 ? _arrG.correctCt / _arrG.totalStages : 0;
+  if (typeof _dailyOnArrQuiz === 'function') _dailyOnArrQuiz(correctRate, _arrG.combo);
+  if (typeof _addXP === 'function') _addXP(5 + Math.floor(score / 100), 'アレンジクイズ');
 
   // arr_quiz_v1 精度更新
   var qd = _arrGetQuizData();

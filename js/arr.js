@@ -3122,6 +3122,15 @@ function gameStart() {
   var gs = document.getElementById('game-start');
   if (gs) gs.classList.add('hide');
   startTimer();
+  // 既存ユーザーのXPブートストラップ（初回のみ）
+  if (!localStorage.getItem('xp_bootstrapped') && typeof _addXP === 'function') {
+    localStorage.setItem('xp_bootstrapped', '1');
+    var t = getTotals();
+    if (t.games > 0) {
+      var bootXP = t.games * 10 + Math.floor((t.best || 0) / 50);
+      _addXP(bootXP, 'ブートストラップ');
+    }
+  }
 }
 
 /* Init */
@@ -3193,7 +3202,11 @@ function gsSetGoal(val) {
   if (!gb) return;
   try {
     var t = JSON.parse(localStorage.getItem('dh_totals')||'{}');
-    if (t.best) gb.textContent = 'Personal Best  ' + t.best + '  |  ' + t.games + ' Games';
+    var xd = typeof _getXP === 'function' ? _getXP() : {level:1,xp:0};
+    var info = '';
+    if (t.best) info = 'PERSONAL BEST ' + t.best + ' | ' + t.games + ' GAMES';
+    if (xd.level > 1) info += ' | LV.' + xd.level;
+    gb.textContent = info;
   } catch(e){}
 })();
 // Service Worker 登録（新バージョン検出時に自動リロード）

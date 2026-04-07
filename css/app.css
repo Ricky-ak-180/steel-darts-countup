@@ -753,6 +753,7 @@ canvas.schart { width: 100%; height: 100%; }
 .streak-fire{font-size:28px;line-height:1;}
 .streak-num{font-family:'Bebas Neue',cursive;font-size:40px;color:#ff9944;line-height:1;text-shadow:0 0 12px rgba(255,150,0,0.5);}
 .streak-lbl{font-size:11px;color:rgba(255,150,0,0.8);font-weight:700;letter-spacing:1px;}
+.streak-title{font-size:12px;font-weight:700;color:#ffd54f;letter-spacing:1px;margin-left:auto;}
 .z01-start-btn:active{opacity:.8;}
 .z01-game-wrap{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;position:relative;}
 .z01-players{display:flex;gap:0;padding:0;flex-shrink:0;border-bottom:1px solid var(--bdr);}
@@ -1179,6 +1180,109 @@ canvas.schart { width: 100%; height: 100%; }
     transition-duration: 0.01ms !important;
   }
   .view { animation: none; }
+}
+
+/* ============================================================
+   デイリーチャレンジ
+   ============================================================ */
+#daily-challenge-card {
+  margin: 8px 12px 4px; background: linear-gradient(135deg, rgba(79,195,247,0.08), rgba(232,255,71,0.05));
+  border: 1px solid rgba(79,195,247,0.25); border-radius: 14px; padding: 12px 14px;
+}
+.dc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.dc-title { font-size: 13px; font-weight: 700; color: #4fc3f7; letter-spacing: 1px; }
+.dc-count { font-family: 'Bebas Neue', cursive; font-size: 20px; color: var(--acc); }
+.dc-mission { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid rgba(255,255,255,0.05); font-size: 12px; color: var(--txt); transition: opacity 0.3s; }
+.dc-mission.dc-done { opacity: 0.5; text-decoration: line-through; }
+.dc-icon { font-size: 16px; flex-shrink: 0; }
+.dc-text { flex: 1; }
+.dc-check { font-size: 14px; flex-shrink: 0; }
+.dc-complete { text-align: center; font-size: 13px; font-weight: 700; color: var(--acc); margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(232,255,71,0.2); letter-spacing: 1px; }
+
+/* ============================================================
+   XP / レベルバー
+   ============================================================ */
+#xp-bar-card {
+  margin: 4px 12px; background: var(--sur); border: 1px solid var(--bdr); border-radius: 12px; padding: 10px 14px;
+}
+.xp-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.xp-level { font-family: 'Bebas Neue', cursive; font-size: 22px; color: var(--acc); }
+.xp-label { font-size: 10px; color: var(--mut); letter-spacing: 1px; }
+.xp-bar-outer { height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+.xp-bar-inner { height: 100%; background: linear-gradient(90deg, var(--acc), #47ffb4); border-radius: 4px; transition: width 0.5s ease; }
+.xp-footer { display: flex; justify-content: space-between; margin-top: 4px; font-size: 10px; color: var(--mut); }
+
+/* ============================================================
+   レベルアップ演出
+   ============================================================ */
+.levelup-flash {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(10,10,15,0.85); z-index: 250; pointer-events: none;
+  opacity: 0; transition: none;
+}
+.levelup-flash.show {
+  animation: lvupFade 2.5s ease-out forwards;
+}
+@keyframes lvupFade {
+  0% { opacity: 0; } 10% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; }
+}
+.lvup-label {
+  font-family: 'Bebas Neue', cursive; font-size: 28px; color: var(--acc);
+  letter-spacing: 8px; animation: lvupScale 0.6s ease-out;
+}
+.lvup-num {
+  font-family: 'Bebas Neue', cursive; font-size: 80px; color: #fff;
+  text-shadow: 0 0 40px var(--acc), 0 0 80px var(--acc);
+  animation: lvupScale 0.6s ease-out 0.2s both;
+}
+.lvup-title {
+  font-size: 18px; color: #ffd54f; letter-spacing: 2px; font-weight: 700;
+  margin-top: 8px; animation: lvupScale 0.6s ease-out 0.4s both;
+}
+@keyframes lvupScale {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* ============================================================
+   クイズ コンボフラッシュ演出
+   ============================================================ */
+.arr-combo-flash {
+  position: fixed; top: 30%; left: 50%; transform: translate(-50%,-50%) scale(0.3);
+  font-family: 'Bebas Neue', cursive; font-size: 36px; letter-spacing: 4px;
+  pointer-events: none; opacity: 0; z-index: 180; white-space: nowrap;
+}
+.arr-combo-flash.show {
+  animation: comboFlashIn 0.9s ease-out forwards;
+}
+@keyframes comboFlashIn {
+  0% { opacity: 0; transform: translate(-50%,-50%) scale(0.3) rotate(-5deg); }
+  12% { opacity: 1; transform: translate(-50%,-50%) scale(1.2) rotate(2deg); }
+  30% { transform: translate(-50%,-50%) scale(1) rotate(0); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%,-60%) scale(1.05); }
+}
+
+/* ============================================================
+   ラウンド演出フラッシュ（NICE! / GREAT! / EXCELLENT!）
+   ============================================================ */
+.round-flash {
+  position: fixed; top: 38%; left: 50%; transform: translate(-50%,-50%) scale(0.5);
+  font-family: 'Bebas Neue', cursive; font-size: 42px; letter-spacing: 6px;
+  pointer-events: none; opacity: 0; z-index: 180;
+  text-shadow: 0 0 30px currentColor, 0 0 60px currentColor;
+  transition: none;
+}
+.round-flash.show {
+  animation: roundFlashIn 0.8s ease-out forwards;
+}
+@keyframes roundFlashIn {
+  0% { opacity: 0; transform: translate(-50%,-50%) scale(0.5); }
+  15% { opacity: 1; transform: translate(-50%,-50%) scale(1.15); }
+  40% { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%,-55%) scale(1.05); }
 }
 
 /* ============================================================

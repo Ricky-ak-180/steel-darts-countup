@@ -90,7 +90,12 @@ function commit(total) {
   g.total += total;
   buf = '';
   if (total === 180) { sound180(); show180(); setTimeout(launchConfetti, 150); }
-  else { soundCommit(total); }
+  else {
+    soundCommit(total);
+    if (total >= 140) { showRoundFlash('EXCELLENT!', '#ff6b35'); if (navigator.vibrate) navigator.vibrate([40,30,40]); }
+    else if (total >= 120) { showRoundFlash('GREAT!', '#47ffb4'); if (navigator.vibrate) navigator.vibrate(30); }
+    else if (total >= 100) { showRoundFlash('NICE!', '#4fc3f7'); }
+  }
   showRoundPopup(total);
   var el = document.getElementById('total');
   el.textContent = g.total;
@@ -279,6 +284,24 @@ function showResult() {
   document.getElementById('rrounds').innerHTML = html;
   document.getElementById('rpb').style.display = isPB ? 'block' : 'none';
   document.getElementById('rdb').style.display = isDB ? 'block' : 'none';
+  // ランクアップ分析
+  var rankUpEl = document.getElementById('rank-up-hint');
+  if (!rankUpEl) {
+    rankUpEl = document.createElement('div'); rankUpEl.id = 'rank-up-hint';
+    rankUpEl.style.cssText = 'font-size:12px;margin:6px 0 2px;letter-spacing:0.5px;';
+    document.getElementById('rdb').after(rankUpEl);
+  }
+  var _nextRanks = [{s:300,r:'C'},{s:400,r:'B'},{s:500,r:'B+'},{s:600,r:'A'},{s:700,r:'A+'},{s:800,r:'S'},{s:1000,r:'S+'}];
+  var _nextR = null;
+  for (var ni=0; ni<_nextRanks.length; ni++) { if (g.total < _nextRanks[ni].s) { _nextR = _nextRanks[ni]; break; } }
+  if (_nextR) {
+    var diff = _nextR.s - g.total;
+    var perRound = Math.ceil(diff / 8);
+    rankUpEl.innerHTML = '<span style="color:var(--acc2);">あと <strong>' + diff + '点</strong> で ' + _nextR.r + ' ランク</span>'
+      + '<span style="color:var(--mut);font-size:10px;margin-left:6px;">（1R平均+' + perRound + '点）</span>';
+  } else {
+    rankUpEl.innerHTML = '<span style="color:var(--acc);">👑 最高ランク S+ 達成！</span>';
+  }
   // タイム表示をTOTAL SCOREの下に
   var timeEl = document.querySelector('.ovr-time');
   if (!timeEl) {
@@ -300,6 +323,9 @@ function showResult() {
     if (cuGoal > 0 && g.total >= cuGoal) setTimeout(launchConfetti, 300);
   }
   document.getElementById('ovr').classList.add('show');
+  // デイリーチャレンジ & XP更新
+  _dailyOnCountUp(g.total, g.scores);
+  _addXP(10 + Math.floor(g.total / 100), 'カウントアップ');
 }
 function startNew() {
   document.getElementById('ovr').classList.remove('show');
@@ -583,6 +609,20 @@ function show180() {
   txt.style.animation = '';
   el.classList.add('show');
   setTimeout(function(){ el.classList.remove('show'); }, 1100);
+}
+function showRoundFlash(text, color) {
+  var el = document.getElementById('round-flash');
+  if (!el) {
+    el = document.createElement('div'); el.id = 'round-flash';
+    el.className = 'round-flash';
+    document.querySelector('.app').appendChild(el);
+  }
+  el.textContent = text;
+  el.style.color = color;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 800);
 }
 function showRoundPopup(score) {
   var el = document.getElementById('round-popup');
@@ -1097,6 +1137,8 @@ function renderRrateRows() {
 /* Render history */
 function renderHist() {
   migrateTotals();
+  _renderDailyBadge();
+  _renderXPBar();
   var h=getH();
   var s3=document.getElementById('hs3');
   var a3=document.getElementById('ha3');
@@ -1248,10 +1290,27 @@ function renderHist() {
   var sb = document.getElementById('streak-badge');
   if (sb) {
     if (streak >= 2) {
-      sb.innerHTML = '<div class="streak-card"><div class="streak-fire">🔥</div><div class="streak-num">'+streak+'</div><div class="streak-lbl">日連続<br>プレー</div></div>';
+      var stTitle = streak >= 365 ? '🏆 伝説' : streak >= 100 ? '👑 ダーツの鬼' : streak >= 60 ? '💎 ダイヤモンド' : streak >= 30 ? '🔥 鉄人' : streak >= 14 ? '⚡ 常連' : streak >= 7 ? '✨ 週末戦士' : '';
+      sb.innerHTML = '<div class="streak-card"><div class="streak-fire">🔥</div><div class="streak-num">'+streak+'</div><div class="streak-lbl">日連続<br>プレー</div>'
+        + (stTitle ? '<div class="streak-title">' + stTitle + '</div>' : '')
+        + '</div>';
     } else {
       sb.innerHTML = '';
     }
+  }
+  // 称号一覧をプロフィールカードにも反映
+  var titleEl = document.getElementById('profile-titles');
+  if (titleEl) {
+    var titles = [];
+    var t = getTotals();
+    if (t.games >= 100) titles.push('🎯 百戦錬磨');
+    if (t.c180 >= 50) titles.push('💯 180マスター');
+    if (t.best >= 1000) titles.push('👑 S+到達');
+    if (streak >= 7) titles.push('✨ 週末戦士');
+    if (streak >= 30) titles.push('🔥 鉄人');
+    if (streak >= 100) titles.push('💎 ダーツの鬼');
+    titleEl.innerHTML = titles.length ? titles.join(' ') : '';
+    titleEl.style.display = titles.length ? 'block' : 'none';
   }
   // 週次サマリー
   (function(){
@@ -2060,6 +2119,8 @@ function z01NextLeg() {
 
 function z01ShowResult() {
   _z01SaveH(_z01BuildHistEntry());
+  if (typeof _dailyOnZ01 === 'function') _dailyOnZ01();
+  if (typeof _addXP === 'function') _addXP(15, '01ゲーム');
   document.getElementById('z01-leg-overlay').style.display = 'none';
   document.getElementById('z01-game-wrap').style.display = 'none';
   document.getElementById('z01-result-wrap').style.display = '';
@@ -3065,4 +3126,195 @@ function z01CloseStats() {
 
 /* ── クエストモード ──────────────────────────────────── */
 /* _questMissMode removed — replaced by animation-based random outcome */
+
+/* ============================================================
+   デイリーチャレンジシステム
+   ============================================================ */
+var _DAILY_POOL = [
+  { id: 'cu_100x3', text: '100点以上のラウンドを3回出す', icon: '🎯', check: function(s){ return (s.cu_high_rounds || 0) >= 3; } },
+  { id: 'cu_100x5', text: '100点以上のラウンドを5回出す', icon: '🎯', check: function(s){ return (s.cu_high_rounds || 0) >= 5; } },
+  { id: 'cu_avg80', text: '3ダーツ平均80以上でゲーム完了', icon: '📊', check: function(s){ return !!s.cu_avg80; } },
+  { id: 'cu_avg90', text: '3ダーツ平均90以上でゲーム完了', icon: '📊', check: function(s){ return !!s.cu_avg90; } },
+  { id: 'cu_game2', text: 'カウントアップを2ゲームプレイ', icon: '🔁', check: function(s){ return (s.cu_games || 0) >= 2; } },
+  { id: 'cu_game3', text: 'カウントアップを3ゲームプレイ', icon: '🔁', check: function(s){ return (s.cu_games || 0) >= 3; } },
+  { id: 'cu_500', text: 'スコア500点以上を達成', icon: '⭐', check: function(s){ return !!s.cu_500; } },
+  { id: 'cu_700', text: 'スコア700点以上を達成', icon: '👑', check: function(s){ return !!s.cu_700; } },
+  { id: 'cu_140', text: '140以上のラウンドを1回出す', icon: '🔥', check: function(s){ return !!s.cu_140; } },
+  { id: 'cu_180', text: '180を1回出す', icon: '💯', check: function(s){ return !!s.cu_180; } },
+  { id: 'arr_quiz', text: 'アレンジクイズを1回クリア', icon: '📝', check: function(s){ return !!s.arr_quiz; } },
+  { id: 'arr_combo3', text: 'クイズで3コンボ以上達成', icon: '⚡', check: function(s){ return !!s.arr_combo3; } },
+  { id: 'arr_perfect', text: 'クイズで正解率100%', icon: '💎', check: function(s){ return !!s.arr_perfect; } },
+  { id: 'cu_no_miss', text: 'ミス(0点)なしでゲーム完了', icon: '🛡', check: function(s){ return !!s.cu_no_miss; } },
+  { id: 'z01_play', text: '01ゲームを1回プレイ', icon: '🎮', check: function(s){ return !!s.z01_play; } },
+];
+
+function _getDailyChallenge() {
+  var today = localDateStr(new Date());
+  var stored = null;
+  try { stored = JSON.parse(localStorage.getItem('daily_challenge')); } catch(e){}
+  if (stored && stored.date === today) return stored;
+  // 日付シード乱数で3つ選ぶ
+  var seed = 0;
+  for (var i = 0; i < today.length; i++) seed = seed * 31 + today.charCodeAt(i);
+  function seededRand() { seed = (seed * 16807 + 0) % 2147483647; return (seed & 0x7fffffff) / 2147483647; }
+  var pool = _DAILY_POOL.slice();
+  var picked = [];
+  for (var j = 0; j < 3 && pool.length > 0; j++) {
+    var idx = Math.floor(seededRand() * pool.length);
+    picked.push(pool[idx].id);
+    pool.splice(idx, 1);
+  }
+  var dc = { date: today, missions: picked, progress: {}, completed: [] };
+  localStorage.setItem('daily_challenge', JSON.stringify(dc));
+  return dc;
+}
+
+function _updateDailyProgress(key, value) {
+  var dc = _getDailyChallenge();
+  dc.progress[key] = value;
+  // チェック完了
+  dc.completed = [];
+  for (var i = 0; i < dc.missions.length; i++) {
+    var m = null;
+    for (var j = 0; j < _DAILY_POOL.length; j++) { if (_DAILY_POOL[j].id === dc.missions[i]) { m = _DAILY_POOL[j]; break; } }
+    if (m && m.check(dc.progress)) dc.completed.push(dc.missions[i]);
+  }
+  localStorage.setItem('daily_challenge', JSON.stringify(dc));
+  _renderDailyBadge();
+  // 全ミッション達成時の演出
+  if (dc.completed.length === dc.missions.length) {
+    var claimedKey = 'daily_claimed_' + dc.date;
+    if (!localStorage.getItem(claimedKey)) {
+      localStorage.setItem(claimedKey, '1');
+      setTimeout(function(){ launchConfetti(); _addXP(50, 'デイリーチャレンジ達成'); }, 500);
+    }
+  }
+}
+
+// CountUpゲーム終了時にデイリー進捗を更新
+function _dailyOnCountUp(score, rounds) {
+  var dc = _getDailyChallenge();
+  var p = dc.progress;
+  p.cu_games = (p.cu_games || 0) + 1;
+  var highR = 0;
+  var hasMiss = false;
+  for (var i = 0; i < rounds.length; i++) {
+    if (rounds[i] >= 100) highR++;
+    if (rounds[i] >= 140) p.cu_140 = true;
+    if (rounds[i] === 180) p.cu_180 = true;
+    if (rounds[i] === 0) hasMiss = true;
+  }
+  p.cu_high_rounds = (p.cu_high_rounds || 0) + highR;
+  if (!hasMiss) p.cu_no_miss = true;
+  if (score >= 500) p.cu_500 = true;
+  if (score >= 700) p.cu_700 = true;
+  var avg3 = score / 8;
+  if (avg3 >= 80) p.cu_avg80 = true;
+  if (avg3 >= 90) p.cu_avg90 = true;
+  dc.progress = p;
+  localStorage.setItem('daily_challenge', JSON.stringify(dc));
+  _updateDailyProgress('_sync', true);
+}
+
+// アレンジクイズ完了時
+function _dailyOnArrQuiz(correctRate, maxCombo) {
+  var dc = _getDailyChallenge();
+  dc.progress.arr_quiz = true;
+  if (maxCombo >= 3) dc.progress.arr_combo3 = true;
+  if (correctRate >= 1.0) dc.progress.arr_perfect = true;
+  localStorage.setItem('daily_challenge', JSON.stringify(dc));
+  _updateDailyProgress('_sync', true);
+}
+
+// 01ゲーム完了時
+function _dailyOnZ01() {
+  _updateDailyProgress('z01_play', true);
+}
+
+function _renderDailyBadge() {
+  var dc = _getDailyChallenge();
+  var el = document.getElementById('daily-challenge-card');
+  if (!el) return;
+  var html = '<div class="dc-header"><span class="dc-title">📅 デイリーチャレンジ</span><span class="dc-count">' + dc.completed.length + '/' + dc.missions.length + '</span></div>';
+  for (var i = 0; i < dc.missions.length; i++) {
+    var m = null;
+    for (var j = 0; j < _DAILY_POOL.length; j++) { if (_DAILY_POOL[j].id === dc.missions[i]) { m = _DAILY_POOL[j]; break; } }
+    if (!m) continue;
+    var done = dc.completed.indexOf(dc.missions[i]) >= 0;
+    html += '<div class="dc-mission' + (done ? ' dc-done' : '') + '"><span class="dc-icon">' + m.icon + '</span><span class="dc-text">' + m.text + '</span><span class="dc-check">' + (done ? '✅' : '⬜') + '</span></div>';
+  }
+  if (dc.completed.length === dc.missions.length) {
+    html += '<div class="dc-complete">🎉 全ミッション達成！ +50 XP</div>';
+  }
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
+
+/* ============================================================
+   XP / レベルシステム
+   ============================================================ */
+var _XP_TABLE = [0,50,120,200,300,420,560,720,900,1100,1320,1560,1820,2100,2400,2720,3060,3420,3800,4200,4620,5060,5520,6000,6500,7020,7560,8120,8700,9300,10000];
+
+function _getXP() {
+  try { var d = JSON.parse(localStorage.getItem('player_xp')); return d || {xp:0,level:1}; } catch(e){ return {xp:0,level:1}; }
+}
+function _saveXP(d) { try { localStorage.setItem('player_xp', JSON.stringify(d)); } catch(e){} }
+
+function _addXP(amount, source) {
+  var d = _getXP();
+  var oldLevel = d.level;
+  d.xp += amount;
+  // レベル計算
+  for (var i = _XP_TABLE.length - 1; i >= 0; i--) {
+    if (d.xp >= _XP_TABLE[i]) { d.level = i + 1; break; }
+  }
+  _saveXP(d);
+  // レベルアップ演出
+  if (d.level > oldLevel) {
+    setTimeout(function(){
+      _showLevelUp(d.level);
+      launchConfetti();
+    }, 600);
+  }
+  _renderXPBar();
+}
+
+function _showLevelUp(level) {
+  var el = document.getElementById('levelup-flash');
+  if (!el) {
+    el = document.createElement('div'); el.id = 'levelup-flash';
+    el.className = 'levelup-flash';
+    document.querySelector('.app').appendChild(el);
+  }
+  var title = _getLevelTitle(level);
+  el.innerHTML = '<div class="lvup-label">LEVEL UP!</div><div class="lvup-num">' + level + '</div>' + (title ? '<div class="lvup-title">' + title + '</div>' : '');
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 2500);
+}
+
+function _getLevelTitle(lv) {
+  if (lv >= 30) return '🏆 レジェンド';
+  if (lv >= 25) return '👑 グランドマスター';
+  if (lv >= 20) return '💎 マスター';
+  if (lv >= 15) return '⚡ エキスパート';
+  if (lv >= 10) return '🔥 アドバンス';
+  if (lv >= 5)  return '⭐ インターミディエイト';
+  return '';
+}
+
+function _renderXPBar() {
+  var el = document.getElementById('xp-bar-card');
+  if (!el) return;
+  var d = _getXP();
+  var currReq = _XP_TABLE[d.level - 1] || 0;
+  var nextReq = _XP_TABLE[d.level] || (currReq + 500);
+  var pct = Math.min(100, Math.round((d.xp - currReq) / (nextReq - currReq) * 100));
+  var title = _getLevelTitle(d.level);
+  el.innerHTML = '<div class="xp-header"><span class="xp-level">LV.' + d.level + (title ? ' <span style="font-size:13px;color:var(--txt);letter-spacing:0;">' + title + '</span>' : '') + '</span><span class="xp-label">' + d.xp + ' XP</span></div>'
+    + '<div class="xp-bar-outer"><div class="xp-bar-inner" style="width:' + pct + '%;"></div></div>'
+    + '<div class="xp-footer"><span>' + (d.xp - currReq) + ' / ' + (nextReq - currReq) + '</span><span>NEXT LV.' + (d.level + 1) + '</span></div>';
+  el.style.display = 'block';
+}
 
