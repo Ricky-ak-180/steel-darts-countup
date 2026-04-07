@@ -591,7 +591,7 @@ function _z01BufUpdate(v) {
   enter.className = 'z01-tk enter ready' + (bv ? ' bust' : '');
 }
 
-function z01Pre(arg) { _z01BufUpdate(String(arg)); z01Ok(); soundCommit(arg); }
+function z01Pre(arg) { _z01BufUpdate(String(arg)); z01Ok(); }
 
 function z01Kp(arg) {
   var v = _z01._buf + String(arg);
@@ -604,7 +604,8 @@ function z01Ok() {
   if (_z01._buf === '') return;
   var sc = parseInt(_z01._buf, 10);
   if (isNaN(sc) || sc < 0 || sc > 180) return;
-  soundCommit(sc);
+  if (sc === 180) { sound180(); show180(); setTimeout(launchConfetti, 150); }
+  else { soundCommit(sc); }
   _z01Commit(sc);
 }
 
