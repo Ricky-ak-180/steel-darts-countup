@@ -981,6 +981,14 @@ function _z01CpuTurn() {
 function _z01LegEnd(winner) {
   var winsNeeded = Math.ceil(_z01.legs / 2);
   var matchOver = _z01.legWins[winner] >= winsNeeded;
+  // 勝利・敗北・レッグ勝利の音
+  var humanWon = (winner === 0);
+  if (matchOver) {
+    if (humanWon) { soundFinish(false); setTimeout(launchConfetti, 200); }
+    else { soundLose(); }
+  } else {
+    soundLegWin();
+  }
   document.getElementById('z01-leg-title').textContent = matchOver ? 'MATCH WIN!' : 'LEG WIN!';
   document.getElementById('z01-leg-winner-name').textContent = _z01PlayerName(winner) + ' の勝利！';
   document.getElementById('z01-leg-stats').textContent = (_z01.stats[winner].finishDarts || (_z01.stats[winner].legRounds * 3)) + ' 本';
