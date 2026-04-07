@@ -471,7 +471,6 @@ CHECKOUT_TIPS[42]='S10の左に外れてS6になっても残り36→D18でフィ
 CHECKOUT_TIPS[41]='S1を使わない理由：左右が20と18で外れると大きく点が入りすぎる。S9の隣（14・12）の方が隣接リスクが低い。';
 // 特殊ケース
 CHECKOUT_TIPS[50]='D-BULLを外してアウターブル(25)になると奇数が残り対応困難。S18→D16の方が安全。';
-CHECKOUT_TIPS[7]='3番の左右は17と19。シングルに外れるとバースト、D3（=6）に当たると残り1→詰み。三重苦の位置。';
 
 // 2本持ちルート（3本持ちと異なる場合）
 // fin:true → 2本でフィニッシュ可能 path:[dart1,dart2]
@@ -1859,11 +1858,12 @@ function _pathHtml(path, noFinish, startScore) {
     if (i > 0) h += '<span class="arr-t-arr">→</span>';
     var isFinish = !noFinish && i === path.length - 1;
     var dLabel = (d === 'Bull') ? 'D-BULL' : (d === '25') ? 'S-BULL' : d;
-    h += '<span class="arr-t-dart' + (isFinish ? ' finish' : '') + '">' + dLabel + '</span>';
-    if (startScore && !isFinish) {
-      rem -= _dartVal(d);
-      h += '<span class="arr-t-remain">(' + rem + '残)</span>';
-    }
+    var showRemain = !!(startScore && !isFinish);
+    if (showRemain) rem -= _dartVal(d);
+    h += '<span class="arr-t-dart' + (isFinish ? ' finish' : '') + '">';
+    h += '<span class="arr-t-dart-num">' + dLabel + '</span>';
+    if (showRemain) h += '<span class="arr-t-remain">' + rem + '残</span>';
+    h += '</span>';
   });
   return h;
 }

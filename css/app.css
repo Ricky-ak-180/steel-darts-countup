@@ -667,9 +667,10 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-t-bogey-slim { display:flex; align-items:center; gap:10px; padding:4px 12px; background:rgba(255,107,107,0.02); border:1px solid rgba(255,107,107,0.07); border-radius:8px; }
 .arr-t-bogey-slim-score { font-family:'Bebas Neue',cursive; font-size:20px; color:#a06060; min-width:40px; text-align:right; line-height:1; }
 .arr-t-bogey-slim-label { font-size:10px; color:#a06060; opacity:0.7; letter-spacing:1px; font-weight:400; }
-.arr-t-dart { font-size:11px; background:var(--bg); border:1px solid var(--bdr); border-radius:5px; padding:2px 6px; white-space:nowrap; flex-shrink:0; }
+.arr-t-dart { display:inline-flex; flex-direction:column; align-items:center; gap:1px; background:var(--bg); border:1px solid var(--bdr); border-radius:5px; padding:3px 8px; white-space:nowrap; flex-shrink:0; }
 .arr-t-dart.finish { color:var(--acc); border-color:var(--acc); }
-.arr-t-arr { color:var(--mut); font-size:9px; flex-shrink:0; }
+.arr-t-dart-num { font-size:21px; line-height:1; }
+.arr-t-arr { color:var(--mut); font-size:11px; flex-shrink:0; }
 /* 本数ラベル */
 .arr-t-label { font-size:11px; font-weight:700; letter-spacing:1px; border-radius:4px; padding:3px 7px; white-space:nowrap; flex-shrink:0; }
 .arr-t-label-3 { background:rgba(232,255,71,0.12); color:var(--acc); border:1px solid rgba(232,255,71,0.3); }
@@ -678,7 +679,7 @@ canvas.schart { width: 100%; height: 100%; }
 .arr-t-label-2h { background:rgba(71,200,255,0.1); color:#4fc3f7; border:1px solid rgba(71,200,255,0.3); }
 .arr-t-leave { font-size:15px; color:#4fc3f7; font-weight:700; }
 .arr-t-leave-next { font-size:13px; color:var(--mut); }
-.arr-t-remain { font-size:9px; color:var(--mut); margin-left:1px; flex-shrink:0; white-space:nowrap; }
+.arr-t-remain { font-size:14px; color:var(--mut); line-height:1; white-space:nowrap; }
 /* ユーザーカスタムルート */
 .arr-t-user { opacity:0.85; padding-left:4px; border-left:2px solid rgba(232,255,71,0.4); display:flex; align-items:center; gap:6px; }
 .arr-t-user-del { background:transparent; border:none; color:var(--mut); font-size:13px; cursor:pointer; padding:0 2px; line-height:1; flex-shrink:0; }
