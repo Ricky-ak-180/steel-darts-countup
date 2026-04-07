@@ -1,14 +1,9 @@
-const CACHE = 'steeldarts-pro-v5';
+const CACHE = 'steeldarts-pro-v23';
 
+// JS/CSSはキャッシュしない（常に最新版をサーバーから取得）
 const PRECACHE = [
   './',
   './index.html',
-  './css/app.css',
-  './js/data.js',
-  './js/arr.js',
-  './js/game.js',
-  './js/sfx.js',
-  './js/sim501.js',
   './manifest.json',
 ];
 
@@ -21,14 +16,32 @@ self.addEventListener('activate', function(e) {
   e.waitUntil(
     caches.keys().then(function(ks) {
       return Promise.all(ks.filter(function(k) { return k !== CACHE; }).map(function(k) { return caches.delete(k); }));
+    }).then(function() {
+      // 新バージョン起動時に全クライアントを強制リロード（最新コードを読み込む）
+      return self.clients.matchAll({ type: 'window' }).then(function(clients) {
+        clients.forEach(function(c) { c.navigate(c.url); });
+      });
     })
   );
   self.clients.claim();
 });
 
-// Network-first: オンライン時は常に最新版を取得してキャッシュ更新、オフライン時はキャッシュで動作
 self.addEventListener('fetch', function(e) {
   if (e.request.method !== 'GET') return;
+  var url = new URL(e.request.url);
+  var ext = url.pathname.split('.').pop();
+
+  // JS・CSSは常にネットワーク直取得（キャッシュ無効）
+  if (ext === 'js' || ext === 'css') {
+    e.respondWith(
+      fetch(e.request, { cache: 'no-store' }).catch(function() {
+        return caches.match(e.request);
+      })
+    );
+    return;
+  }
+
+  // その他はNetwork-first
   e.respondWith(
     fetch(e.request).then(function(res) {
       if (res && res.ok) {

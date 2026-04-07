@@ -1227,7 +1227,7 @@ function renderZ01Hist() {
       html += '<div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04);' + (noData?'opacity:0.45;':'') + '">';
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">';
       html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:18px;color:var(--acc);min-width:70px;">' + c.label + '</div>';
-      html += '<div style="font-size:9px;color:#ffd54f;letter-spacing:1px;flex-shrink:0;">' + stars + '</div>';
+      html += '<div style="font-size:9px;color:#ffd54f;letter-spacing:1px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1px;"><span style="font-size:8px;color:var(--mut);letter-spacing:0.5px;">難易度</span>' + stars + '</div>';
       html += '<div style="font-size:10px;color:var(--mut);flex:1;line-height:1.4;">' + c.desc + '</div>';
       if (noData) {
         html += '<div style="font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:1px;">未挑戦</div>';
@@ -3174,9 +3174,20 @@ function gsSetGoal(val) {
     if (t.best) gb.textContent = 'Personal Best  ' + t.best + '  |  ' + t.games + ' Games';
   } catch(e){}
 })();
-// Service Worker 登録
+// Service Worker 登録（新バージョン検出時に自動リロード）
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(function(){});
+  navigator.serviceWorker.register('./sw.js').then(function(reg) {
+    reg.addEventListener('updatefound', function() {
+      var newSW = reg.installing;
+      if (!newSW) return;
+      newSW.addEventListener('statechange', function() {
+        if (newSW.state === 'activated') {
+          // 新しいSWが有効になったらページをリロードして最新コードを読み込む
+          location.reload();
+        }
+      });
+    });
+  }).catch(function(){});
 }
 
 // ====== 今日の一言（起動時ランダム削り戦術tips）======

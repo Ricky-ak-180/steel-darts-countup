@@ -173,6 +173,8 @@ function doUndo() {
   var rp = document.getElementById('round-popup');
   if (rp) rp.innerHTML = '';
   document.getElementById('total').textContent = g.total;
+  var hint = document.getElementById('total-hint');
+  if (hint && g.total > 0) hint.classList.add('hide');
   drawRoundGrid();
   document.getElementById('rnum').innerHTML = g.round + ' <em>/ 8</em>';
   document.getElementById('bok').className = 'tk enter';
@@ -325,6 +327,8 @@ function goHist() { document.getElementById('ovr').classList.remove('show'); goT
 function resetState() {
   g = { round: 1, scores: [], total: 0 }; buf = '';
   document.getElementById('total').textContent = '0';
+  var hint = document.getElementById('total-hint');
+  if (hint) hint.classList.remove('hide');
   drawRoundGrid();
   document.getElementById('rnum').innerHTML = '1 <em>/ 8</em>';
   document.getElementById('bok').className = 'tk enter';
@@ -555,6 +559,15 @@ function soundFinish(isPB) {
   } else {
     _tone(659, 'sine', 0.14, 0.14); _tone(784, 'sine', 0.18, 0.14, 0.14);
   }
+}
+function soundLose() {
+  if (!_sndOn) return;
+  _tone(440, 'sine', 0.16, 0.14); _tone(370, 'sine', 0.18, 0.12, 0.14);
+  _tone(294, 'triangle', 0.28, 0.1, 0.30);
+}
+function soundLegWin() {
+  if (!_sndOn) return;
+  _tone(784, 'sine', 0.1, 0.14); _tone(1047, 'sine', 0.16, 0.16, 0.1);
 }
 
 /* ============================================================
@@ -1349,9 +1362,21 @@ function _setupSwipeDelete(hl) {
 /* Keyboard */
 document.addEventListener('keydown', function(e) {
   if (document.getElementById('vhist').style.display !== 'none') return;
-  // sc-editorが開いているときはゲームへのキー入力をブロック
   var scEd = document.getElementById('sc-editor');
   if (scEd && scEd.classList.contains('show')) return;
+  // 01ゲーム中はz01関数へルーティング
+  var v01El = document.getElementById('v01');
+  var z01Wrap = document.getElementById('z01-game-wrap');
+  if (v01El && v01El.style.display !== 'none' && z01Wrap && z01Wrap.style.display !== 'none') {
+    var finMod = document.getElementById('z01-finish-modal');
+    if (finMod && finMod.style.display === 'flex') return;
+    var legOv = document.getElementById('z01-leg-overlay');
+    if (legOv && legOv.style.display === 'flex') return;
+    if (e.key >= '0' && e.key <= '9') { z01Kp(parseInt(e.key)); }
+    else if (e.key === 'Backspace') { e.preventDefault(); z01Kd(); }
+    else if (e.key === 'Enter') { z01Ok(); }
+    return;
+  }
   if (e.key>='0'&&e.key<='9') kp(parseInt(e.key));
   else if (e.key==='Backspace'){e.preventDefault();kd();}
   else if (e.key==='Enter') doOk();
@@ -1451,7 +1476,7 @@ function z01SetCpu(arg) {
 function _z01SaveDefaults() {
   try {
     var d = {
-      mode: _z01.mode, legs: _z01.legs, inRule: _z01.inRule, outRule: _z01.outRule, players: _z01.players,
+      legs: _z01.legs, inRule: _z01.inRule, outRule: _z01.outRule, players: _z01.players,
       customVal: document.getElementById('z01-custom-val').value,
       legsCustomVal: document.getElementById('z01-legs-custom-val').value,
       name1: document.getElementById('z01-name1').value.trim(),
@@ -1464,7 +1489,7 @@ function _z01LoadDefaults() {
   try {
     var d = JSON.parse(localStorage.getItem('z01_defaults')||'null');
     if (!d) return;
-    if (d.mode !== undefined) z01SetMode(d.mode);
+    /* モードは毎回501スタート（保存しない） */
     if (d.customVal) document.getElementById('z01-custom-val').value = d.customVal;
     if (d.legs !== undefined) z01SetLegs(d.legs);
     if (d.legsCustomVal) document.getElementById('z01-legs-custom-val').value = d.legsCustomVal;
@@ -1548,7 +1573,23 @@ function _z01HintUpdate() {
   var rem = _z01.remain[_z01.currentPlayer];
   var coPath = _getPath(rem);
   if (_z01HintOn && rem > 0 && coPath) {
-    el.textContent = '🎯 ' + coPath.join(' → ');
+    var cur = rem;
+    var parts = [];
+    coPath.forEach(function(d, i) {
+      var isLast = i === coPath.length - 1;
+      var lbl = d === 'Bull' ? 'D-BULL' : d === '25' ? 'S-BULL' : d;
+      if (i > 0) parts.push('<span class="z01-hint-sep">→</span>');
+      if (isLast) {
+        parts.push('<span class="z01-hint-finish">' + lbl + '</span>');
+      } else {
+        cur -= _dartVal(d);
+        parts.push('<span class="z01-hint-dart">' + lbl + '</span><span class="z01-hint-rem">(' + cur + ')</span>');
+      }
+    });
+    var n = coPath.length;
+    var nLabel = n === 1 ? '1本' : n === 2 ? '2本' : '3本';
+    var nColor = n === 1 ? '#47ffb4' : n === 2 ? 'var(--acc)' : '#ff8a65';
+    el.innerHTML = '<span class="z01-hint-n" style="color:' + nColor + ';">' + nLabel + '</span>' + parts.join('');
     el.classList.add('show');
   } else {
     el.classList.remove('show');
@@ -1609,7 +1650,8 @@ function z01Ok() {
   if (_z01._buf === '') return;
   var sc = parseInt(_z01._buf, 10);
   if (isNaN(sc) || sc < 0 || sc > 180) return;
-  soundCommit(sc);
+  if (sc === 180) { sound180(); show180(); setTimeout(launchConfetti, 150); }
+  else { soundCommit(sc); }
   _z01Commit(sc);
 }
 
@@ -1963,6 +2005,7 @@ function _z01CpuTurn() {
 
         // スコアコメンタリー
         if (total === 180) {
+          sound180(); show180(); setTimeout(launchConfetti, 150);
           _z01CpuCommentary('🤖 CPU 180!', 'great');
         } else if (total >= 140) {
           _z01CpuCommentary('🤖 CPU ' + total + '!', 'great');
@@ -1990,6 +2033,14 @@ function _z01LegEnd(winner) {
   var btn = document.getElementById('z01-leg-btn');
   if (matchOver) { btn.setAttribute('data-fn','z01ShowResult'); btn.textContent = '結果を見る →'; }
   else { btn.setAttribute('data-fn','z01NextLeg'); btn.textContent = '次のLegへ →'; }
+  // 勝利・敗北音
+  if (matchOver) {
+    var playerWon = (_z01.players === 3) ? (winner === 0) : true;
+    if (_z01.players === 3 && winner === 1) { soundLose(); }
+    else { soundFinish(false); }
+  } else {
+    soundLegWin();
+  }
   document.getElementById('z01-leg-overlay').style.display = 'flex';
   _z01Render();
 }
@@ -2849,8 +2900,8 @@ function _z01LogRender() {
   // Player names row (2P)
   if (isP2) {
     var cp = _z01.currentPlayer;
-    var n0 = _z01PlayerName(0) + (_z01.legs>1?' ('+_z01.legWins[0]+'W)':'');
-    var n1 = _z01PlayerName(1) + (_z01.legs>1?' ('+_z01.legWins[1]+'W)':'');
+    var n0 = (cp===0?'▶ ':'') + _z01PlayerName(0) + (_z01.legs>1?' ('+_z01.legWins[0]+'W)':'');
+    var n1 = _z01PlayerName(1) + (_z01.legs>1?' ('+_z01.legWins[1]+'W)':'') + (cp===1?' ◀':'');
     h += '<div class="z01-log-names"><div class="z01-log-name-l' + (cp===0?' z01-log-name-act':'') + '">' + n0 + '</div><div></div><div class="z01-log-name-r' + (cp===1?' z01-log-name-act':'') + '">' + n1 + '</div></div>';
     h += '<div class="z01-log-hdr"><div>点数</div><div>残り</div><div></div><div>点数</div><div>残り</div></div>';
   } else {
@@ -2941,10 +2992,20 @@ function _z01BuildFinishModal(finishedScore) {
     can1 = finishedScore <= 20 || finishedScore === 25 || finishedScore === 50;
     can2 = finishedScore <= 60;
   }
-  var h = '<div class="z01-finish-title">何本目で上がりましたか？</div>';
-  if (can1) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="1">1本目で上がり</button>';
-  if (can2) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="2">2本目で上がり</button>';
-  h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="3">3本目で上がり</button>';
+  var p = _z01.currentPlayer, st = _z01.stats[p];
+  var legR = st.legRounds; // 今レグの投数（ラウンド単位、このターン含む）
+  var baseDarts = (legR - 1) * 3; // このターン前までの投本数
+  var path = _getPath(finishedScore);
+  var routeStr = path ? path.map(function(d){ return d === 'Bull' ? 'D-BULL' : d === '25' ? 'S-BULL' : d; }).join(' → ') : '';
+  var h = '<div class="z01-finish-header">';
+  h += '<span class="z01-finish-score-big">' + finishedScore + '</span>';
+  h += '<span class="z01-finish-score-label">点フィニッシュ！</span>';
+  if (routeStr) h += '<div class="z01-finish-route">推奨: ' + routeStr + '</div>';
+  h += '</div>';
+  h += '<div class="z01-finish-title">何本目で上がりましたか？</div>';
+  if (can1) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="1"><span class="z01-finish-btn-main">1本目でフィニッシュ</span><span class="z01-finish-btn-sub">このターン1投目に決めた（計' + (baseDarts + 1) + '本）</span></button>';
+  if (can2) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="2"><span class="z01-finish-btn-main">2本目でフィニッシュ</span><span class="z01-finish-btn-sub">このターン2投目に決めた（計' + (baseDarts + 2) + '本）</span></button>';
+  h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="3"><span class="z01-finish-btn-main">3本目でフィニッシュ</span><span class="z01-finish-btn-sub">このターン3投フル使用（計' + (baseDarts + 3) + '本）</span></button>';
   inner.innerHTML = h;
 }
 function z01FinishDart(dartNo) {
