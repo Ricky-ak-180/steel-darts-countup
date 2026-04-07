@@ -843,6 +843,18 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
   </div>
 </div>
 
+<!-- アレンジ表パネル（body直下: position:fixedがどこからでも機能するよう） -->
+<div class="arr-teiseki-panel hide" id="arr-teiseki-panel">
+  <div class="arr-teiseki-header">
+    <div class="arr-teiseki-tabs">
+      <button class="arr-t-tab on" data-fn="filterTeiseki" data-arg="99">170〜99</button>
+      <button class="arr-t-tab" data-fn="filterTeiseki" data-arg="41">100〜3</button>
+      <button class="arr-t-tab" data-fn="filterTeiseki" data-arg="501">削り戦術</button>
+    </div>
+    <button class="arr-teiseki-close" data-fn="hideTeiseki">✕</button>
+  </div>
+  <div class="arr-teiseki-list" id="arr-teiseki-list"></div>
+</div>
 <div class="toast-final" id="toast-final">🎯 FINAL ROUND!</div>
 <canvas id="confetti-canvas"></canvas>
 <div id="flash-180"><span id="flash-180-text">180</span></div>
