@@ -1141,10 +1141,10 @@ var _ARR_KEZURI_QS = [
 var _ARR_SCORES = (function(){
   var all = Object.keys(CHECKOUT).map(Number);
   return [
-    all.filter(function(n){ return n <= 100; }),
-    all.filter(function(n){ return n >= 101 && n <= 130; }),
-    all.filter(function(n){ return n >= 131; }),
-    all
+    all.filter(function(n){ return n <= 100; }),   // 0: 初級 〜100
+    all.filter(function(n){ return n >= 101; }),   // 1: 中級 101〜170
+    [],                                             // 2: (未使用)
+    all                                             // 3: (未使用)
   ];
 })();
 
@@ -1279,15 +1279,20 @@ function startKezuriQuiz() {
 }
 
 /* モード選択 */
+var _ARR_MODE_DESCS = {
+  0: '〜100点：2本フィニッシュの基礎',
+  1: '101〜170点：3本フィニッシュの応用',
+  4: '171点〜：ボギー回避・削り戦術'
+};
 function setArrMode(mode) {
   _arrG.mode = mode;
-  // arr-mode buttons (0-3)
-  document.querySelectorAll('.arr-mode').forEach(function(el, i){
-    el.className = 'arr-mode' + (i === mode ? ' on' : '');
+  // arr-mode buttons（data-arg で照合）
+  document.querySelectorAll('.arr-mode').forEach(function(el){
+    el.className = 'arr-mode' + (Number(el.getAttribute('data-arg')) === mode ? ' on' : '');
   });
-  // 削り戦術ボタン
-  var kb = document.querySelector('.arr-kezuri-btn');
-  if (kb) kb.className = 'arr-step-btn arr-kezuri-btn' + (mode === 4 ? ' on' : '');
+  // モード説明
+  var descEl = document.getElementById('arr-mode-desc');
+  if (descEl) descEl.textContent = _ARR_MODE_DESCS[mode] || '';
   _renderArrBest();
 }
 
