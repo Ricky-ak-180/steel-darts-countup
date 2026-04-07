@@ -641,7 +641,7 @@ function _z01Commit(sc) {
         var fl = document.createElement('div'); fl.className = 'z01-agari-flash'; document.body.appendChild(fl);
         setTimeout(function(){ fl.parentNode && fl.parentNode.removeChild(fl); }, 700);
         var t = document.createElement('div'); t.className = 'z01-event-toast agari';
-        t.innerHTML = '<div class="agari-score">' + score + '</div><div class="agari-label">FINISH RANGE</div>';
+        t.innerHTML = '<div class="agari-label">FINISH RANGE</div><div class="agari-score">▸ ' + score + '</div>';
         document.body.appendChild(t);
         setTimeout(function(){ t.parentNode && t.parentNode.removeChild(t); }, 1800);
       })(after);
