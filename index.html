@@ -33,33 +33,56 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
 </div>
 
 <div class="onboard" id="onboard">
-  <div class="ob-logo">🎯</div>
-  <div class="ob-title" style="font-size:24px;letter-spacing:2px;">STEEL DARTS PRO</div>
-  <div class="ob-sub">スティールダーツ スコア管理アプリ</div>
-  <div class="ob-steps">
-    <div class="ob-step">
-      <div class="ob-num">1</div>
-      <div class="ob-text">
-        <strong>ラウンドのスコアを入力</strong>
-        <span>ショートカットボタンかテンキーで<br>各ラウンドの合計点を入力してください</span>
+  <div class="ob-card-wrap" id="ob-card-wrap">
+    <!-- Step 0: Welcome -->
+    <div class="ob-card ob-card-active" data-step="0">
+      <div class="ob-logo">🎯</div>
+      <div class="ob-title">STEEL DARTS PRO</div>
+      <div class="ob-card-desc">スティールダーツの総合スコア管理アプリ</div>
+      <div class="ob-features">
+        <div class="ob-feat"><span class="ob-feat-icon">📊</span><span>CountUp / 01 スコア記録</span></div>
+        <div class="ob-feat"><span class="ob-feat-icon">📈</span><span>スコア推移・ランク分析</span></div>
+        <div class="ob-feat"><span class="ob-feat-icon">🧠</span><span>アレンジ学習・クイズ</span></div>
+      </div>
+      <button class="ob-next-btn" id="ob-next-0">次へ</button>
+    </div>
+    <!-- Step 1: Skill Level -->
+    <div class="ob-card" data-step="1">
+      <div class="ob-card-emoji">🎯</div>
+      <div class="ob-card-heading">あなたのレベルは？</div>
+      <div class="ob-card-desc">おすすめのモードをご案内します</div>
+      <div class="ob-levels">
+        <button class="ob-level-btn" data-level="0">
+          <span class="ob-level-label">🔰 初心者</span>
+          <span class="ob-level-sub">ダーツを始めたばかり</span>
+        </button>
+        <button class="ob-level-btn" data-level="1">
+          <span class="ob-level-label">🎯 中級者</span>
+          <span class="ob-level-sub">Rt.5前後・基本は分かる</span>
+        </button>
+        <button class="ob-level-btn" data-level="2">
+          <span class="ob-level-label">🏆 上級者</span>
+          <span class="ob-level-sub">Rt.10以上・アレンジも得意</span>
+        </button>
       </div>
     </div>
-    <div class="ob-step">
-      <div class="ob-num">2</div>
-      <div class="ob-text">
-        <strong>8ラウンドで自動集計</strong>
-        <span>8ラウンド終了後にスコアとランクを表示。<br>自己ベスト更新で紙吹雪が舞います🎉</span>
+    <!-- Step 2: Recommendation -->
+    <div class="ob-card" data-step="2">
+      <div class="ob-card-emoji" id="ob-rec-emoji">🚀</div>
+      <div class="ob-card-heading">まずはここから</div>
+      <div class="ob-rec-box" id="ob-rec-box">
+        <div class="ob-rec-mode" id="ob-rec-mode"></div>
+        <div class="ob-rec-why" id="ob-rec-why"></div>
       </div>
-    </div>
-    <div class="ob-step">
-      <div class="ob-num">3</div>
-      <div class="ob-text">
-        <strong>履歴で成長を確認</strong>
-        <span>スコア推移グラフ・平均・期間別成績で<br>上達の過程を記録できます</span>
-      </div>
+      <button class="ob-start-btn" id="ob-go">始めよう!</button>
     </div>
   </div>
-  <button class="ob-start" id="ob-start">はじめる →</button>
+  <div class="ob-dots" id="ob-dots">
+    <span class="ob-dot on"></span>
+    <span class="ob-dot"></span>
+    <span class="ob-dot"></span>
+  </div>
+  <button class="ob-skip" id="ob-skip">スキップ</button>
 </div>
 
 <div class="app">
