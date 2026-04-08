@@ -2028,14 +2028,57 @@ select:focus-visible {
 /* Lang button hover */
 [data-theme="light"] .btn-lang:hover { background: rgba(196,168,0,0.08); }
 
-/* Cricket */
-[data-theme="light"] .ckt-num-btn {
+/* 01 preset buttons */
+[data-theme="light"] .z01-pre {
+  background: linear-gradient(160deg, #f0f0eb 0%, #e8e8e0 100%);
+  border-color: rgba(196,168,0,0.3);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+[data-theme="light"] .z01-pre:nth-child(-n+4) {
+  background: linear-gradient(160deg, #faf5d0 0%, #f0eab0 100%);
+  border-color: rgba(196,168,0,0.6);
+  box-shadow: 0 3px 16px rgba(0,0,0,0.1), 0 0 12px rgba(196,168,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7);
+  color: #8a7500;
+}
+[data-theme="light"] .z01-pre:active,
+[data-theme="light"] .z01-pre.pressing { background: var(--acc); color: #fff; }
+
+/* 01 tenkey buttons */
+[data-theme="light"] .z01-tk {
   background: linear-gradient(180deg, #f6f6f2 0%, #eaeae4 100%);
   border-color: #d0d0c8;
+  color: var(--txt);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+[data-theme="light"] .z01-tk:active,
+[data-theme="light"] .z01-tk.pressing { background: var(--acc); color: #fff; }
+[data-theme="light"] .z01-tk.del {
+  background: linear-gradient(180deg, #fff0f0 0%, #fde0e0 100%);
+  border-color: #e8b0b0; color: #c03030;
+}
+[data-theme="light"] .z01-tk.del:active { background: var(--red); color: #fff; }
+[data-theme="light"] .z01-tk.enter {
+  background: linear-gradient(180deg, #f6f6f2 0%, #eaeae4 100%);
+  border-color: #d0d0c8; color: var(--mut);
+}
+[data-theme="light"] .z01-tk.enter.ready {
+  background: linear-gradient(145deg, #ff8844 0%, #ff5500 100%);
+  color: #fff; border-color: transparent;
+  box-shadow: 0 4px 24px rgba(255,80,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+[data-theme="light"] .z01-tk.enter.ready.bust { background: var(--red); color: #fff; border-color: transparent; }
+
+/* Cricket */
+[data-theme="light"] .ckt-num-btn,
+[data-theme="light"] .ckt-number-btn {
+  background: linear-gradient(180deg, #f6f6f2 0%, #eaeae4 100%);
+  border-color: #d0d0c8;
+  color: var(--txt);
   box-shadow: 0 3px 6px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8);
 }
 [data-theme="light"] .ckt-mult-btn {
   background: var(--sur2);
+  color: var(--txt);
 }
 
 /* Theme toggle button */
