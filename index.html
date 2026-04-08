@@ -29,7 +29,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
   <div class="gs-icon">🎯</div>
   <div class="gs-title">STEEL DARTS PRO</div>
   <div id="gs-best" class="gs-best"></div>
-  <button class="gs-btn" id="gs-btn" aria-label="ゲームを開始する">GAME START</button>
+  <button class="gs-btn" id="gs-btn" aria-label="ゲームを開始する" data-i18n="cu.game_start">GAME START</button>
 </div>
 
 <div class="onboard" id="onboard">
@@ -44,7 +44,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         <div class="ob-feat"><span class="ob-feat-icon">📈</span><span>スコア推移・ランク分析</span></div>
         <div class="ob-feat"><span class="ob-feat-icon">🧠</span><span>アレンジ学習・クイズ</span></div>
       </div>
-      <button class="ob-next-btn" id="ob-next-0">次へ</button>
+      <button class="ob-next-btn" id="ob-next-0" data-i18n="ob.next">次へ</button>
     </div>
     <!-- Step 1: Skill Level -->
     <div class="ob-card" data-step="1">
@@ -74,7 +74,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         <div class="ob-rec-mode" id="ob-rec-mode"></div>
         <div class="ob-rec-why" id="ob-rec-why"></div>
       </div>
-      <button class="ob-start-btn" id="ob-go">始めよう!</button>
+      <button class="ob-start-btn" id="ob-go" data-i18n="ob.start">始めよう!</button>
     </div>
   </div>
   <div class="ob-dots" id="ob-dots">
@@ -82,7 +82,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     <span class="ob-dot"></span>
     <span class="ob-dot"></span>
   </div>
-  <button class="ob-skip" id="ob-skip">スキップ</button>
+  <button class="ob-skip" id="ob-skip" data-i18n="ob.skip">スキップ</button>
 </div>
 
 <div class="app">
@@ -90,25 +90,26 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
   <div class="tabs" role="tablist" aria-label="ゲームモード選択">
     <div class="tab on" id="tgame" data-fn="goTabGame" role="tab" aria-selected="true" tabindex="0">🎯 <span class="tab-cap">C</span><span class="tab-small">ount</span><span class="tab-cap">U</span><span class="tab-small">p</span></div>
     <div class="tab" id="t01" data-fn="goTab01" role="tab" aria-selected="false" tabindex="-1">🎮 01</div>
-    <div class="tab" id="tsim" data-fn="goTabSim" role="tab" aria-selected="false" tabindex="-1">🎯 シム</div>
+    <div class="tab" id="tsim" data-fn="goTabSim" role="tab" aria-selected="false" tabindex="-1" data-i18n="tab.sim" data-i18n-emoji="🎯">🎯 シム</div>
     <div class="tab" id="tckt" data-fn="goTabCkt" role="tab" aria-selected="false" tabindex="-1">🎯 Cricket</div>
     <button class="btn-snd" id="btn-snd" data-fn="toggleSound" aria-label="サウンドのオン/オフ">🔊</button>
     <button class="btn-caller" id="btn-caller" onclick="toggleCaller()" aria-label="コーラーのオン/オフ">🎙️</button>
+    <button class="btn-lang" id="btn-lang" onclick="toggleLang()" aria-label="言語切替">EN</button>
   </div>
 
   <!-- Game view -->
   <div class="view" id="vgame" style="overflow:hidden;">
     <div class="cu-subtabs">
-      <div class="cu-subtab on" id="cust-game" data-fn="goSubGame">🎯 ゲーム</div>
-      <div class="cu-subtab" id="cust-hist" data-fn="goSubHist">📊 履歴</div>
+      <div class="cu-subtab on" id="cust-game" data-fn="goSubGame" data-i18n="cu.sub.game" data-i18n-emoji="🎯">🎯 ゲーム</div>
+      <div class="cu-subtab" id="cust-hist" data-fn="goSubHist" data-i18n="cu.sub.hist" data-i18n-emoji="📊">📊 履歴</div>
     </div>
     <div id="cu-game-wrap" class="flex-col-grow">
     <div class="ngp" id="ngp">
-      <div class="ngp-t">ゲーム終了</div>
-      <div class="ngp-s">次のゲームを始めますか？</div>
+      <div class="ngp-t" data-i18n="cu.game_over">ゲーム終了</div>
+      <div class="ngp-s" data-i18n="cu.next_game_ask">次のゲームを始めますか？</div>
       <div class="ngp-b">
-        <button class="ngp-no" id="ngp-no">そのまま</button>
-        <button class="ngp-yes" id="ngp-yes">次のゲームへ</button>
+        <button class="ngp-no" id="ngp-no" data-i18n="cu.stay">そのまま</button>
+        <button class="ngp-yes" id="ngp-yes" data-i18n="cu.next_game">次のゲームへ</button>
       </div>
     </div>
     <div class="rbar">
@@ -122,20 +123,20 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         <button class="bpause" id="bpause" data-fn="togglePause" aria-label="一時停止">⏸</button>
       </div>
       <div style="display:flex;flex-direction:row;gap:6px;align-items:center;flex-shrink:0;">
-        <button class="bundo" id="bundo" data-fn="undoRound" aria-label="直前のラウンドを取り消す">↩ 取消</button>
-        <button class="breset" data-fn="resetGame" aria-label="ゲームをリセットする">↺ リセット</button>
+        <button class="bundo" id="bundo" data-fn="undoRound" aria-label="直前のラウンドを取り消す" data-i18n="cu.undo">↩ 取消</button>
+        <button class="breset" data-fn="resetGame" aria-label="ゲームをリセットする" data-i18n="cu.reset">↺ リセット</button>
       </div>
     </div>
     <div class="scard">
       <div class="total" id="total" aria-live="polite" aria-label="現在のスコア">0</div>
-      <div class="total-hint" id="total-hint">ショートカットまたはテンキーで入力</div>
+      <div class="total-hint" id="total-hint" data-i18n="cu.input_hint">ショートカットまたはテンキーで入力</div>
       <div id="round-popup"></div>
       <div class="rgrid" id="rgrid"></div>
       <div id="pace-bar" style="display:none;margin-top:4px;font-size:10px;color:var(--mut);text-align:center;letter-spacing:1px;"></div>
     </div>
     <div class="isec" id="isec">
       <div style="display:flex;justify-content:flex-end;">
-        <button class="sc-customize-btn" data-fn="toggleScEditor">⚙ カスタマイズ</button>
+        <button class="sc-customize-btn" data-fn="toggleScEditor" data-i18n="cu.customize">⚙ カスタマイズ</button>
       </div>
       <div class="scrow" id="scrow">
         <div class="sc" data-fn="commit" data-arg="140">140</div>
@@ -149,7 +150,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
       </div>
       <div class="tkd">
         <div class="tkv empty" id="tkv">—</div>
-        <div class="tkh" id="tkh">合計点を入力してください</div>
+        <div class="tkh" id="tkh" data-i18n="cu.input_total">合計点を入力してください</div>
       </div>
       <div class="tkg">
         <div class="tk" data-fn="kp" data-arg="1">1</div><div class="tk" data-fn="kp" data-arg="2">2</div><div class="tk" data-fn="kp" data-arg="3">3</div>
@@ -166,9 +167,9 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     <div id="profile-titles" style="display:none;text-align:center;padding:4px 12px;font-size:13px;letter-spacing:1px;"></div>
     <div id="today-card" style="display:none;"></div>
     <div style="margin:12px 12px 4px;background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:14px 16px;">
-      <div style="font-size:11px;color:var(--mut);letter-spacing:1.5px;font-weight:700;margin-bottom:10px;">🎯 カウントアップ 目標スコア</div>
+      <div style="font-size:11px;color:var(--mut);letter-spacing:1.5px;font-weight:700;margin-bottom:10px;" data-i18n="hist.goal_label" data-i18n-emoji="🎯">🎯 カウントアップ 目標スコア</div>
       <div id="gs-goal-pills" style="display:flex;flex-wrap:wrap;gap:6px;">
-        <button class="gs-goal-pill on" data-val="0" onclick="gsSetGoal(0)">設定なし</button>
+        <button class="gs-goal-pill on" data-val="0" onclick="gsSetGoal(0)" data-i18n="hist.no_goal">設定なし</button>
         <button class="gs-goal-pill" data-val="400" onclick="gsSetGoal(400)">400</button>
         <button class="gs-goal-pill" data-val="500" onclick="gsSetGoal(500)">500</button>
         <button class="gs-goal-pill" data-val="600" onclick="gsSetGoal(600)">600</button>
@@ -180,9 +181,9 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     <div class="s3" id="hs3"></div>
     <div class="chart-wrap" id="chart-wrap" style="display:none;">
       <div class="chart-tabs">
-        <button class="chart-tab on-score" id="ct-score">スコア推移</button>
-        <button class="chart-tab" id="ct-avg">平均推移</button>
-        <button class="chart-tab" id="ct-time">日別プレイ時間</button>
+        <button class="chart-tab on-score" id="ct-score" data-i18n="hist.score_chart">スコア推移</button>
+        <button class="chart-tab" id="ct-avg" data-i18n="hist.avg_chart">平均推移</button>
+        <button class="chart-tab" id="ct-time" data-i18n="hist.time_chart">日別プレイ時間</button>
       </div>
       <div class="chart-canvas-wrap">
         <canvas class="schart" id="schart"></canvas>
@@ -193,26 +194,26 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     <div id="ha3" style="display:none;"></div>
     <div class="rrate-card" id="rrate-card" style="display:none;">
       <div class="rrate-header">
-        <div class="rrate-title">スコア分布</div>
+        <div class="rrate-title" data-i18n="hist.dist_title">スコア分布</div>
         <div class="rrate-tabs">
-          <button class="rrate-tab on" onclick="switchRrate('30g')">直近30G</button>
-          <button class="rrate-tab" onclick="switchRrate('today')">当日</button>
-          <button class="rrate-tab" onclick="switchRrate('30d')">直近30DAY</button>
-          <button class="rrate-tab" onclick="switchRrate('all')">TOTAL</button>
+          <button class="rrate-tab on" onclick="switchRrate('30g')" data-i18n="hist.last30g">直近30G</button>
+          <button class="rrate-tab" onclick="switchRrate('today')" data-i18n="hist.today">当日</button>
+          <button class="rrate-tab" onclick="switchRrate('30d')" data-i18n="hist.last30d">直近30DAY</button>
+          <button class="rrate-tab" onclick="switchRrate('all')" data-i18n="hist.total">TOTAL</button>
         </div>
       </div>
       <div id="rrate-rows"></div>
     </div>
-    <div class="slbl">期間別成績</div>
+    <div class="slbl" data-i18n="hist.period">期間別成績</div>
     <div id="hper"></div>
     <div class="exp-row">
-      <button class="bexp" id="btn-export">📤 エクスポート</button>
-      <button class="bexp" id="btn-import">📥 インポート</button>
+      <button class="bexp" id="btn-export" data-i18n="hist.export">📤 エクスポート</button>
+      <button class="bexp" id="btn-import" data-i18n="hist.import">📥 インポート</button>
       <input type="file" id="imp-file" accept=".json" style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px;">
     </div>
     <div class="hdr">
-      <div class="slbl">ゲーム履歴</div>
-      <button class="bclr" id="btn-clr">全件削除</button>
+      <div class="slbl" data-i18n="hist.game_hist">ゲーム履歴</div>
+      <button class="bclr" id="btn-clr" data-i18n="hist.clear_all">全件削除</button>
     </div>
     <div class="hlist" id="hlist"></div>
   </div>
@@ -221,73 +222,73 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
   <!-- 01 Game view -->
   <div class="view hide" id="v01" style="overflow:hidden;">
     <div class="cu-subtabs">
-      <div class="cu-subtab on" id="sub01-game" data-fn="goSub01Game">🎮 01</div>
-      <div class="cu-subtab" id="sub01-hist" data-fn="goSub01Hist">📊 履歴</div>
-      <div class="cu-subtab" id="sub01-arr" data-fn="goSub01Arr">📋 アレンジ</div>
+      <div class="cu-subtab on" id="sub01-game" data-fn="goSub01Game" data-i18n="z01.sub.game" data-i18n-emoji="🎮">🎮 01</div>
+      <div class="cu-subtab" id="sub01-hist" data-fn="goSub01Hist" data-i18n="z01.sub.hist" data-i18n-emoji="📊">📊 履歴</div>
+      <div class="cu-subtab" id="sub01-arr" data-fn="goSub01Arr" data-i18n="z01.sub.arr" data-i18n-emoji="📋">📋 アレンジ</div>
     </div>
   <!-- Arrange practice view -->
   <div id="varr" style="flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;">
     <!-- セットアップ画面 -->
     <div id="arr-setup">
       <div class="arr-roadmap-hdr">
-        <div class="arr-roadmap-hdr-title">アレンジ習得ロードマップ</div>
-        <div style="font-size:10px;color:var(--mut);padding:4px 12px 8px;">削り = 残り点数を上がり目（170以下）に収めるための打ち方</div>
+        <div class="arr-roadmap-hdr-title" data-i18n="arr.roadmap">アレンジ習得ロードマップ</div>
+        <div style="font-size:10px;color:var(--mut);padding:4px 12px 8px;" data-i18n="arr.roadmap_sub">削り = 残り点数を上がり目（170以下）に収めるための打ち方</div>
       </div>
       <!-- STEP 1 -->
       <div class="arr-step-card">
         <div class="arr-step-badge">
-          <div class="arr-step-num">STEP 1</div>
-          <div class="arr-step-title">アレンジ表</div>
+          <div class="arr-step-num" data-i18n="arr.step1">STEP 1</div>
+          <div class="arr-step-title" data-i18n="arr.step1_title">アレンジ表</div>
         </div>
-        <div class="arr-step-sub">まずは表を眺めて基礎知識を学ぼう。削り戦術・ボギー回避も確認できる。</div>
-        <button class="arr-step-btn arr-step-btn-primary" data-fn="showTeiseki">表を開く →</button>
+        <div class="arr-step-sub" data-i18n="arr.step1_sub">まずは表を眺めて基礎知識を学ぼう。削り戦術・ボギー回避も確認できる。</div>
+        <button class="arr-step-btn arr-step-btn-primary" data-fn="showTeiseki" data-i18n="arr.step1_btn">表を開く →</button>
       </div>
       <!-- STEP 2 -->
       <div class="arr-step-card">
         <div class="arr-step-badge">
-          <div class="arr-step-num">STEP 2</div>
-          <div class="arr-step-title">アレンジクイズ</div>
+          <div class="arr-step-num" data-i18n="arr.step2">STEP 2</div>
+          <div class="arr-step-title" data-i18n="arr.step2_title">アレンジクイズ</div>
         </div>
-        <div class="arr-step-sub">クイズ形式でアレンジを素早く判断する力を養う。速さ × 正確さでスコア算出。</div>
+        <div class="arr-step-sub" data-i18n="arr.step2_sub">クイズ形式でアレンジを素早く判断する力を養う。速さ × 正確さでスコア算出。</div>
         <div class="arr-modes">
-          <button class="arr-mode on" data-fn="setArrMode" data-arg="0">初級</button>
-          <button class="arr-mode" data-fn="setArrMode" data-arg="1">中級</button>
-          <button class="arr-mode" data-fn="setArrMode" data-arg="4">上級</button>
+          <button class="arr-mode on" data-fn="setArrMode" data-arg="0" data-i18n="arr.beginner">初級</button>
+          <button class="arr-mode" data-fn="setArrMode" data-arg="1" data-i18n="arr.intermediate">中級</button>
+          <button class="arr-mode" data-fn="setArrMode" data-arg="4" data-i18n="arr.advanced">上級</button>
         </div>
         <div id="arr-mode-desc" style="font-size:11px;color:var(--mut);margin:4px 0 8px;min-height:1.3em;">〜100点：2本フィニッシュの基礎</div>
         <div class="arr-qcount-row">
-          <span class="arr-qcount-label">問題数</span>
-          <button class="arr-qcount-btn on" data-fn="setQCount" data-arg="10">10問</button>
-          <button class="arr-qcount-btn" data-fn="setQCount" data-arg="20">20問</button>
-          <button class="arr-qcount-btn" data-fn="setQCount" data-arg="30">30問</button>
+          <span class="arr-qcount-label" data-i18n="arr.q_count">問題数</span>
+          <button class="arr-qcount-btn on" data-fn="setQCount" data-arg="10" data-i18n="arr.q10">10問</button>
+          <button class="arr-qcount-btn" data-fn="setQCount" data-arg="20" data-i18n="arr.q20">20問</button>
+          <button class="arr-qcount-btn" data-fn="setQCount" data-arg="30" data-i18n="arr.q30">30問</button>
         </div>
-        <button class="arr-step-btn" data-fn="startArrSession">クイズ開始 →</button>
+        <button class="arr-step-btn" data-fn="startArrSession" data-i18n="arr.quiz_start">クイズ開始 →</button>
         <div class="arr-best-disp" id="arr-best-disp"></div>
       </div>
       <!-- STEP 3 -->
       <div class="arr-step-card">
         <div class="arr-step-badge">
-          <div class="arr-step-num">STEP 3</div>
-          <div class="arr-step-title">アレンジトレーニング</div>
+          <div class="arr-step-num" data-i18n="arr.step3">STEP 3</div>
+          <div class="arr-step-title" data-i18n="arr.step3_title">アレンジトレーニング</div>
         </div>
-        <div class="arr-step-sub">実際にダーツを投げて身体に覚えさせよう。2 → 170 順番に制覇。</div>
-        <button class="arr-step-btn" data-fn="showTraining">トレーニングを始める →</button>
+        <div class="arr-step-sub" data-i18n="arr.step3_sub">実際にダーツを投げて身体に覚えさせよう。2 → 170 順番に制覇。</div>
+        <button class="arr-step-btn" data-fn="showTraining" data-i18n="arr.step3_btn">トレーニングを始める →</button>
       </div>
       <!-- STEP 4 -->
       <div class="arr-step-card" style="margin-bottom:24px;">
         <div class="arr-step-badge">
-          <div class="arr-step-num">STEP 4</div>
-          <div class="arr-step-title">クエスト</div>
+          <div class="arr-step-num" data-i18n="arr.step4">STEP 4</div>
+          <div class="arr-step-title" data-i18n="arr.step4_title">クエスト</div>
         </div>
-        <div class="arr-step-sub">ストーリー形式でチェックアウトを攻略。フルルート＋ミス対応で実戦に近い練習ができる。</div>
-        <button class="arr-step-btn arr-step-btn-primary" data-fn="showQuestHome">クエストへ →</button>
+        <div class="arr-step-sub" data-i18n="arr.step4_sub">ストーリー形式でチェックアウトを攻略。フルルート＋ミス対応で実戦に近い練習ができる。</div>
+        <button class="arr-step-btn arr-step-btn-primary" data-fn="showQuestHome" data-i18n="arr.step4_btn">クエストへ →</button>
       </div>
     </div>
     <!-- トレーニングホーム -->
     <div class="arr-train-home" id="arr-train-home" style="display:none;">
       <div class="arr-train-home-hdr">
-        <button class="arr-train-back" data-fn="goArrSetup">← 戻る</button>
-        <div class="arr-train-home-title">アレンジトレーニング</div>
+        <button class="arr-train-back" data-fn="goArrSetup" data-i18n="arr.back">← 戻る</button>
+        <div class="arr-train-home-title" data-i18n="arr.training_title">アレンジトレーニング</div>
         <div class="arr-train-progress" id="arr-train-progress">0 / 0</div>
       </div>
       <div class="arr-total-prog-wrap">
@@ -295,10 +296,10 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
       </div>
       <div class="arr-session-strip" id="arr-session-strip" style="display:none;"></div>
       <div class="arr-train-continue-wrap" id="arr-train-continue-wrap" style="display:none;">
-        <button class="arr-train-continue-btn" data-fn="trainContinue">続きから → <span id="arr-train-continue-score"></span></button>
+        <button class="arr-train-continue-btn" data-fn="trainContinue" data-i18n="arr.continue">続きから → <span id="arr-train-continue-score"></span></button>
         <div style="display:flex;gap:8px;margin-top:8px;">
-          <button class="arr-train-random-btn" data-fn="trainRandom">🎲 ランダム練習</button>
-          <button class="arr-train-weak-btn" data-fn="trainWeakMode">🎯 苦手集中</button>
+          <button class="arr-train-random-btn" data-fn="trainRandom" data-i18n="arr.random">🎲 ランダム練習</button>
+          <button class="arr-train-weak-btn" data-fn="trainWeakMode" data-i18n="arr.weak_mode">🎯 苦手集中</button>
         </div>
       </div>
       <div class="arr-train-map" id="arr-train-map"></div>
@@ -306,7 +307,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     <!-- トレーニング練習 -->
     <div class="arr-train-prac" id="arr-train-prac" style="display:none;">
       <div class="arr-tp-hdr">
-        <button class="arr-tp-back" data-fn="trainBackToMap">← 一覧へ</button>
+        <button class="arr-tp-back" data-fn="trainBackToMap" data-i18n="arr.to_list">← 一覧へ</button>
         <div class="arr-tp-hdr-score" id="arr-tp-header-score">-</div>
         <div class="arr-tp-hdr-clears" id="arr-tp-header-clears">0回クリア</div>
       </div>
@@ -318,21 +319,21 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         <div class="arr-tp-rate" id="arr-tp-rate"></div>
         <div class="arr-tp-streak" id="arr-tp-streak"></div>
         <div class="arr-tp-hint-box" id="arr-tp-hint-box"></div>
-        <button class="arr-tp-hint-toggle" id="arr-tp-hint-btn" data-fn="trainToggleHint" style="display:none;">👁 ヒントを見る</button>
-        <div class="arr-tp-instruction">実際にダーツを投げて結果を入力</div>
+        <button class="arr-tp-hint-toggle" id="arr-tp-hint-btn" data-fn="trainToggleHint" style="display:none;" data-i18n="arr.hint_btn">👁 ヒントを見る</button>
+        <div class="arr-tp-instruction" data-i18n="arr.instruction">実際にダーツを投げて結果を入力</div>
         <div class="arr-tp-btns">
-          <button class="arr-tp-ok" id="arr-tp-ok-btn" data-fn="trainResult" data-arg="1">✓ できた</button>
-          <button class="arr-tp-ng" id="arr-tp-ng-btn" data-fn="trainResult" data-arg="0">✗ できなかった</button>
+          <button class="arr-tp-ok" id="arr-tp-ok-btn" data-fn="trainResult" data-arg="1" data-i18n="arr.ok">✓ できた</button>
+          <button class="arr-tp-ng" id="arr-tp-ng-btn" data-fn="trainResult" data-arg="0" data-i18n="arr.ng">✗ できなかった</button>
         </div>
         <div class="arr-tp-result-row" id="arr-tp-result-row" style="display:none;">
           <div class="arr-tp-unlock-msg" id="arr-tp-unlock-msg"></div>
           <div style="display:flex;gap:8px;width:100%;">
-            <button class="arr-tp-retry" data-fn="trainRetry">↩ もう一度</button>
-            <button class="arr-tp-next" id="arr-tp-next-btn" data-fn="trainNext" style="flex:2;">次のスコアへ →</button>
+            <button class="arr-tp-retry" data-fn="trainRetry" data-i18n="arr.retry">↩ もう一度</button>
+            <button class="arr-tp-next" id="arr-tp-next-btn" data-fn="trainNext" style="flex:2;" data-i18n="arr.next_score">次のスコアへ →</button>
           </div>
           <div style="display:flex;gap:8px;width:100%;margin-top:6px;">
-            <button class="arr-tp-prev" id="arr-tp-prev-btn" data-fn="trainPrev" style="flex:1;">← 前のスコア</button>
-            <button class="arr-tp-prev" data-fn="trainBackToMap" style="flex:1;">📋 一覧</button>
+            <button class="arr-tp-prev" id="arr-tp-prev-btn" data-fn="trainPrev" style="flex:1;" data-i18n="arr.prev_score">← 前のスコア</button>
+            <button class="arr-tp-prev" data-fn="trainBackToMap" style="flex:1;" data-i18n="arr.list">📋 一覧</button>
           </div>
         </div>
         <div class="arr-tp-tip" id="arr-tp-tip" style="display:none;"></div>
@@ -341,13 +342,13 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     <!-- クエストホーム -->
     <div class="arr-quest-home" id="arr-quest-home" style="display:none;">
       <div class="arr-quest-hdr" style="flex-wrap:nowrap;">
-        <button class="arr-train-back" data-fn="goArrSetup">← 戻る</button>
-        <div class="arr-train-home-title" style="font-size:13px;white-space:nowrap;">クエスト</div>
+        <button class="arr-train-back" data-fn="goArrSetup" data-i18n="arr.back">← 戻る</button>
+        <div class="arr-train-home-title" style="font-size:13px;white-space:nowrap;" data-i18n="arr.quest">クエスト</div>
         <div class="arr-quest-mode-seg" id="arr-quest-mode-seg">
-          <button id="arr-quest-mode-sim" onclick="setQuestRealThrow(false)">🎲 シミュ</button>
-          <button id="arr-quest-mode-real" onclick="setQuestRealThrow(true)">🎯 実投</button>
+          <button id="arr-quest-mode-sim" onclick="setQuestRealThrow(false)" data-i18n="arr.quest_sim">🎲 シミュ</button>
+          <button id="arr-quest-mode-real" onclick="setQuestRealThrow(true)" data-i18n="arr.quest_real">🎯 実投</button>
         </div>
-        <button class="arr-quest-weakness-btn" onclick="showQuestWeakness()">📊 弱点</button>
+        <button class="arr-quest-weakness-btn" onclick="showQuestWeakness()" data-i18n="arr.quest_weakness">📊 弱点</button>
       </div>
       <div id="arr-quest-home-sub" style="padding:6px 14px 2px;font-size:11px;color:var(--mut);">🎲 シミュ: ダーツが飛んでランダムに着弾 — ルートを覚えて正確に!</div>
       <div class="arr-quest-worlds" id="arr-quest-worlds"></div>
@@ -355,20 +356,20 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     <!-- 弱点分析パネル -->
     <div class="arr-quest-home" id="arr-quest-weakness" style="display:none;">
       <div class="arr-quest-hdr">
-        <button class="arr-train-back" onclick="showQuestHome()">← 戻る</button>
-        <div class="arr-train-home-title">📊 弱点分析</div>
+        <button class="arr-train-back" onclick="showQuestHome()" data-i18n="arr.back">← 戻る</button>
+        <div class="arr-train-home-title" data-i18n="arr.quest_weakness_title">📊 弱点分析</div>
       </div>
       <div id="arr-quest-weakness-body" style="flex:1;overflow-y:auto;padding:10px 14px 24px;"></div>
     </div>
     <!-- クエストプレイ -->
     <div class="arr-quest-play" id="arr-quest-play" style="display:none;">
       <div class="arr-quest-play-hdr">
-        <button class="arr-train-back" data-fn="quitQuestPlay">← 中断</button>
+        <button class="arr-train-back" data-fn="quitQuestPlay" data-i18n="arr.quit">← 中断</button>
         <div class="arr-quest-play-title" id="arr-quest-play-title">WORLD 1</div>
         <div class="arr-quest-miss-badge" id="arr-quest-miss-badge" style="font-size:10px;color:var(--mut);padding:2px 6px;border:1px solid var(--bd);border-radius:6px;">🎯 着弾ランダム</div>
       </div>
       <div class="arr-quest-score-wrap">
-        <div class="arr-quest-score-label">残り</div>
+        <div class="arr-quest-score-label" data-i18n="arr.remaining">残り</div>
         <div class="arr-quest-score-num" id="arr-quest-score-num">0</div>
       </div>
       <div class="arr-quest-progress" id="arr-quest-progress" style="display:none;"></div>
@@ -393,7 +394,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         <div class="quest-real-dart-label correct" id="quest-real-dart-label">D20</div>
         <div class="quest-real-sub" id="quest-real-sub"></div>
         <div class="quest-board-box" id="quest-real-board-box"></div>
-        <button class="quest-real-next" onclick="_questRealNext()">成功！ 次へ →</button>
+        <button class="quest-real-next" onclick="_questRealNext()" data-i18n="arr.success_next">成功！ 次へ →</button>
       </div>
       <div class="arr-quest-result hide" id="arr-quest-result"></div>
       <!-- A: CHECKOUTフラッシュ -->
@@ -434,7 +435,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
       <div class="arr-result hide" id="arr-result"></div>
       <div class="arr-answer-path hide" id="arr-answer-path"></div>
       <div class="arr-next-row hide" id="arr-next-row">
-        <button class="arr-next arr-next-q" id="arr-next-btn" data-fn="advanceArr">次の問題 →</button>
+        <button class="arr-next arr-next-q" id="arr-next-btn" data-fn="advanceArr" data-i18n="arr.next_q">次の問題 →</button>
       </div>
     </div>
     <!-- 終了画面 -->
@@ -451,9 +452,9 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
       <div id="arr-weak"></div>
       <div class="arr-review" id="arr-review"></div>
       <div class="arr-finish-btns">
-        <button class="arr-retry-btn" data-fn="startArrSession">もう一度</button>
-        <button class="arr-retry-weak-btn" id="arr-retry-weak-btn" data-fn="startArrWeakRetry" style="display:none;">苦手だけもう1回</button>
-        <button class="arr-back-btn" data-fn="goArrSetup">設定に戻る</button>
+        <button class="arr-retry-btn" data-fn="startArrSession" data-i18n="arr.quiz_again">もう一度</button>
+        <button class="arr-retry-weak-btn" id="arr-retry-weak-btn" data-fn="startArrWeakRetry" style="display:none;" data-i18n="arr.quiz_weak_retry">苦手だけもう1回</button>
+        <button class="arr-back-btn" data-fn="goArrSetup" data-i18n="arr.quiz_back">設定に戻る</button>
       </div>
     </div>
   </div><!-- /varr -->
@@ -471,7 +472,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
             <div class="z01-chip" data-fn="z01SetMode" data-arg="301">301</div>
             <div class="z01-chip on" data-fn="z01SetMode" data-arg="501">501</div>
             <div class="z01-chip" data-fn="z01SetMode" data-arg="701">701</div>
-            <div class="z01-chip" data-fn="z01SetMode" data-arg="0">カスタム</div>
+            <div class="z01-chip" data-fn="z01SetMode" data-arg="0" data-i18n="z01.custom">カスタム</div>
           </div>
           <div class="z01-custom-row" id="z01-custom-row" style="display:none;">
             <input type="number" class="z01-custom-input" id="z01-custom-val" min="1" max="9999" value="501" inputmode="numeric">
@@ -481,10 +482,10 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         <div class="z01-section">
           <div class="z01-label">LEGS</div>
           <div class="z01-chips" style="flex-wrap:nowrap;">
-            <div class="z01-chip on" data-fn="z01SetLegs" data-arg="1" style="padding:8px 10px;">1G先取</div>
-            <div class="z01-chip" data-fn="z01SetLegs" data-arg="3" style="padding:8px 10px;">2G先取</div>
-            <div class="z01-chip" data-fn="z01SetLegs" data-arg="5" style="padding:8px 10px;">3G先取</div>
-            <div class="z01-chip" data-fn="z01SetLegs" data-arg="0" style="padding:8px 10px;">カスタム</div>
+            <div class="z01-chip on" data-fn="z01SetLegs" data-arg="1" style="padding:8px 10px;" data-i18n="z01.legs_1">1G先取</div>
+            <div class="z01-chip" data-fn="z01SetLegs" data-arg="3" style="padding:8px 10px;" data-i18n="z01.legs_3">2G先取</div>
+            <div class="z01-chip" data-fn="z01SetLegs" data-arg="5" style="padding:8px 10px;" data-i18n="z01.legs_5">3G先取</div>
+            <div class="z01-chip" data-fn="z01SetLegs" data-arg="0" style="padding:8px 10px;" data-i18n="z01.legs_custom">カスタム</div>
           </div>
           <div class="z01-custom-row" id="z01-legs-custom-row" style="display:none;">
             <input type="number" class="z01-custom-input" id="z01-legs-custom-val" min="1" max="99" value="9" inputmode="numeric">
@@ -497,15 +498,15 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
             <div style="display:flex;align-items:center;gap:8px;">
               <span style="font-size:10px;color:var(--mut);letter-spacing:1px;font-weight:700;min-width:28px;">IN:</span>
               <div class="z01-chips" style="flex-wrap:nowrap;flex:1;">
-                <div class="z01-chip on" data-fn="z01SetIn" data-arg="0">ストレートイン</div>
-                <div class="z01-chip" data-fn="z01SetIn" data-arg="1">ダブルイン</div>
+                <div class="z01-chip on" data-fn="z01SetIn" data-arg="0" data-i18n="z01.straight_in">ストレートイン</div>
+                <div class="z01-chip" data-fn="z01SetIn" data-arg="1" data-i18n="z01.double_in">ダブルイン</div>
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
               <span style="font-size:10px;color:var(--mut);letter-spacing:1px;font-weight:700;min-width:28px;">OUT:</span>
               <div class="z01-chips" style="flex-wrap:nowrap;flex:1;">
-                <div class="z01-chip on" data-fn="z01SetOut" data-arg="0">ダブルアウト</div>
-                <div class="z01-chip" data-fn="z01SetOut" data-arg="1">シングルアウト</div>
+                <div class="z01-chip on" data-fn="z01SetOut" data-arg="0" data-i18n="z01.double_out">ダブルアウト</div>
+                <div class="z01-chip" data-fn="z01SetOut" data-arg="1" data-i18n="z01.single_out">シングルアウト</div>
               </div>
             </div>
           </div>
@@ -513,9 +514,9 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         <div class="z01-section">
           <div class="z01-label">PLAYERS</div>
           <div class="z01-chips">
-            <div class="z01-chip on" data-fn="z01SetPlayers" data-arg="1">1P ソロ</div>
-            <div class="z01-chip" data-fn="z01SetPlayers" data-arg="2">2P 対戦</div>
-            <div class="z01-chip" data-fn="z01SetPlayers" data-arg="3">vs CPU</div>
+            <div class="z01-chip on" data-fn="z01SetPlayers" data-arg="1" data-i18n="z01.solo">1P ソロ</div>
+            <div class="z01-chip" data-fn="z01SetPlayers" data-arg="2" data-i18n="z01.two_player">2P 対戦</div>
+            <div class="z01-chip" data-fn="z01SetPlayers" data-arg="3" data-i18n="z01.vs_cpu">vs CPU</div>
           </div>
         </div>
         <div class="z01-section" id="z01-names-section">
@@ -568,7 +569,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
           <div id="z01-cpu-desc" style="font-size:11px;color:var(--mut);padding:4px 2px;letter-spacing:0.5px;"></div>
         </div>
         <div class="z01-start-sticky">
-          <button class="z01-start-btn" data-fn="z01Start">GAME START</button>
+          <button class="z01-start-btn" data-fn="z01Start" data-i18n="z01.start">GAME START</button>
         </div>
       </div>
     </div>
@@ -604,10 +605,10 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
       </div>
       <!-- Action row: undo + hint + customize -->
       <div class="z01-action-row">
-        <button class="z01-ar-btn z01-ar-exit" data-fn="z01ConfirmExit">Exit</button>
-        <button class="z01-ar-btn z01-ar-undo" data-fn="z01Undo">↩ 取消</button>
-        <button class="z01-ar-btn z01-hint-toggle" id="z01-hint-toggle" data-fn="z01ToggleHint">ヒント ON</button>
-        <button class="z01-ar-btn" data-fn="z01OpenStats">Stats</button>
+        <button class="z01-ar-btn z01-ar-exit" data-fn="z01ConfirmExit" data-i18n="z01.exit">Exit</button>
+        <button class="z01-ar-btn z01-ar-undo" data-fn="z01Undo" data-i18n="z01.undo">↩ 取消</button>
+        <button class="z01-ar-btn z01-hint-toggle" id="z01-hint-toggle" data-fn="z01ToggleHint" data-i18n="z01.hint_on">ヒント ON</button>
+        <button class="z01-ar-btn" data-fn="z01OpenStats" data-i18n="z01.stats">Stats</button>
         <button class="z01-ar-btn" data-fn="toggleScEditor">⚙</button>
       </div>
       <!-- Input area -->
@@ -620,7 +621,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
           <div class="z01-tk del" data-fn="z01Kd">⌫</div><div class="z01-tk" data-fn="z01Kp" data-arg="0">0</div><div class="z01-tk enter" id="z01-enter" data-fn="z01Ok">Enter</div>
         </div>
         <!-- Finish: テンキーの直下、中央配置 -->
-        <button class="z01-finish-main" id="z01-bb-finish" data-fn="z01FinishBtn">Finish</button>
+        <button class="z01-finish-main" id="z01-bb-finish" data-fn="z01FinishBtn" data-i18n="z01.finish">Finish</button>
       </div>
     </div>
     <!-- Result screen -->
@@ -631,9 +632,9 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         <div class="z01-stats-table" id="z01-stats-table"></div>
         <div class="z01-avg-graph" id="z01-avg-graph"></div>
         <div class="z01-result-btns">
-          <button class="z01-result-again" data-fn="z01Again">もう一度</button>
-          <button class="z01-result-share" data-fn="shareZ01">📤 シェア</button>
-          <button class="z01-result-back" data-fn="z01BackSetup">設定に戻る</button>
+          <button class="z01-result-again" data-fn="z01Again" data-i18n="z01.again">もう一度</button>
+          <button class="z01-result-share" data-fn="shareZ01" data-i18n="z01.share" data-i18n-emoji="📤">📤 シェア</button>
+          <button class="z01-result-back" data-fn="z01BackSetup" data-i18n="z01.back_setup">設定に戻る</button>
         </div>
       </div>
     </div>
@@ -642,21 +643,21 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
       <div class="z01-leg-title" id="z01-leg-title">LEG WIN!</div>
       <div class="z01-leg-winner-name" id="z01-leg-winner-name"></div>
       <div class="z01-leg-stats" id="z01-leg-stats"></div>
-      <button class="z01-leg-btn" id="z01-leg-btn" data-fn="z01NextLeg">続ける →</button>
+      <button class="z01-leg-btn" id="z01-leg-btn" data-fn="z01NextLeg" data-i18n="z01.next_leg">続ける →</button>
     </div>
     <!-- Finish dart selector -->
     <div class="z01-finish-modal" id="z01-finish-modal" style="display:none;">
       <div class="z01-finish-inner">
-        <div class="z01-finish-title">何本目で上がりましたか？</div>
-        <button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="1">1本目で上がり</button>
-        <button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="2">2本目で上がり</button>
-        <button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="3">3本目で上がり</button>
+        <div class="z01-finish-title" data-i18n="z01.finish_title">何本目で上がりましたか？</div>
+        <button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="1" data-i18n="z01.finish_1">1本目で上がり</button>
+        <button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="2" data-i18n="z01.finish_2">2本目で上がり</button>
+        <button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="3" data-i18n="z01.finish_3">3本目で上がり</button>
       </div>
     </div>
     <!-- Mid-game stats overlay -->
     <div class="z01-midstats" id="z01-midstats" style="display:none;">
       <div class="z01-midstats-hdr">
-        <button class="z01-midstats-back" data-fn="z01CloseStats">← 戻る</button>
+        <button class="z01-midstats-back" data-fn="z01CloseStats" data-i18n="z01.midstats_back">← 戻る</button>
         <div class="z01-midstats-title">STATS</div>
         <div style="min-width:60px;"></div>
       </div>
@@ -665,28 +666,28 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     <!-- Exit confirmation overlay -->
     <div class="z01-exit-confirm" id="z01-exit-confirm" style="display:none;">
       <div class="z01-exit-box">
-        <div class="z01-exit-title">ゲームを終了しますか？</div>
-        <div class="z01-exit-sub">現在のゲームデータは保存されません</div>
+        <div class="z01-exit-title" data-i18n="z01.game_over">ゲームを終了しますか？</div>
+        <div class="z01-exit-sub" data-i18n="z01.game_over_sub">現在のゲームデータは保存されません</div>
         <div class="z01-exit-btns">
-          <button class="z01-exit-btn-no" data-fn="z01ExitNo">続ける</button>
-          <button class="z01-exit-btn-yes" data-fn="z01ExitYes">終了する</button>
+          <button class="z01-exit-btn-no" data-fn="z01ExitNo" data-i18n="z01.continue">続ける</button>
+          <button class="z01-exit-btn-yes" data-fn="z01ExitYes" data-i18n="z01.end">終了する</button>
         </div>
       </div>
     </div>
     <div class="z01-exit-confirm" id="z01-undo-confirm" style="display:none;">
       <div class="z01-exit-box">
-        <div class="z01-exit-title">直前のスコアを取り消しますか？</div>
+        <div class="z01-exit-title" data-i18n="z01.undo_confirm">直前のスコアを取り消しますか？</div>
         <div class="z01-exit-sub" id="z01-undo-sub"></div>
         <div class="z01-exit-btns">
-          <button class="z01-exit-btn-no" data-fn="z01UndoNo">キャンセル</button>
-          <button class="z01-exit-btn-yes" data-fn="z01UndoYes">取り消す</button>
+          <button class="z01-exit-btn-no" data-fn="z01UndoNo" data-i18n="z01.undo_cancel">キャンセル</button>
+          <button class="z01-exit-btn-yes" data-fn="z01UndoYes" data-i18n="z01.undo_yes">取り消す</button>
         </div>
       </div>
     </div>
     <!-- Score edit modal -->
     <div class="z01-edit-modal" id="z01-edit-modal" style="display:none;">
       <div class="z01-edit-inner">
-        <div class="z01-edit-title">スコア修正</div>
+        <div class="z01-edit-title" data-i18n="z01.edit_title">スコア修正</div>
         <div class="z01-edit-cur" id="z01-edit-cur"></div>
         <div class="z01-edit-tkg">
           <div class="z01-tk" data-fn="z01EditKp" data-arg="1">1</div><div class="z01-tk" data-fn="z01EditKp" data-arg="2">2</div><div class="z01-tk" data-fn="z01EditKp" data-arg="3">3</div>
@@ -694,7 +695,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
           <div class="z01-tk" data-fn="z01EditKp" data-arg="7">7</div><div class="z01-tk" data-fn="z01EditKp" data-arg="8">8</div><div class="z01-tk" data-fn="z01EditKp" data-arg="9">9</div>
           <div class="z01-tk del" data-fn="z01EditKd">⌫</div><div class="z01-tk" data-fn="z01EditKp" data-arg="0">0</div><div class="z01-tk enter" data-fn="z01EditOk">OK</div>
         </div>
-        <button class="z01-edit-cancel" data-fn="z01EditCancel">キャンセル</button>
+        <button class="z01-edit-cancel" data-fn="z01EditCancel" data-i18n="z01.edit_cancel">キャンセル</button>
       </div>
     </div>
   </div>
@@ -705,17 +706,17 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
 
   <!-- SETUP SCREEN -->
   <div id="sim-setup-screen">
-    <div class="sim-title">501 シミュレーター</div>
+    <div class="sim-title" data-i18n="sim.title">501 シミュレーター</div>
     <div class="sim-setup-card">
       <div class="sim-row">
-        <div class="sim-row-lbl">モード</div>
+        <div class="sim-row-lbl" data-i18n="sim.mode">モード</div>
         <div class="sim-seg">
-          <button id="simm0" class="sim-seg-btn active" data-fn="sim501SetMode0">ソロ</button>
-          <button id="simm1" class="sim-seg-btn" data-fn="sim501SetMode1">vs CPU</button>
+          <button id="simm0" class="sim-seg-btn active" data-fn="sim501SetMode0" data-i18n="sim.solo">ソロ</button>
+          <button id="simm1" class="sim-seg-btn" data-fn="sim501SetMode1" data-i18n="sim.vs_cpu">vs CPU</button>
         </div>
       </div>
       <div class="sim-row">
-        <div class="sim-row-lbl">プレイヤー</div>
+        <div class="sim-row-lbl" data-i18n="sim.player">プレイヤー</div>
         <select id="sim-plvl" class="sim-sel">
           <option value="0">初心者</option>
           <option value="1">アマ</option>
@@ -726,7 +727,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         </select>
       </div>
       <div class="sim-row" id="sim-cpu-row">
-        <div class="sim-row-lbl">CPU</div>
+        <div class="sim-row-lbl" data-i18n="sim.cpu">CPU</div>
         <select id="sim-clvl" class="sim-sel">
           <option value="0">初心者</option>
           <option value="1">アマ</option>
@@ -737,7 +738,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         </select>
       </div>
       <div class="sim-row">
-        <div class="sim-row-lbl">レグ数</div>
+        <div class="sim-row-lbl" data-i18n="sim.legs">レグ数</div>
         <select id="sim-legs" class="sim-sel">
           <option value="1">1 レグ</option>
           <option value="3" selected>3 レグ (Bo3)</option>
@@ -746,25 +747,25 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         </select>
       </div>
       <div class="sim-row sim-row-wrap" id="sim-first-row">
-        <div class="sim-row-lbl">先行</div>
+        <div class="sim-row-lbl" data-i18n="sim.first">先行</div>
         <div class="sim-seg sim-seg-4">
-          <button class="sim-seg-btn active" data-simfirst="player" data-fn="sim501First" data-arg="0">プレイヤー</button>
-          <button class="sim-seg-btn" data-simfirst="cpu" data-fn="sim501First" data-arg="1">CPU</button>
-          <button class="sim-seg-btn" data-simfirst="coin" data-fn="sim501First" data-arg="2">コイン</button>
-          <button class="sim-seg-btn" data-simfirst="cork" data-fn="sim501First" data-arg="3">コーク</button>
+          <button class="sim-seg-btn active" data-simfirst="player" data-fn="sim501First" data-arg="0" data-i18n="sim.first_player">プレイヤー</button>
+          <button class="sim-seg-btn" data-simfirst="cpu" data-fn="sim501First" data-arg="1" data-i18n="sim.first_cpu">CPU</button>
+          <button class="sim-seg-btn" data-simfirst="coin" data-fn="sim501First" data-arg="2" data-i18n="sim.first_coin">コイン</button>
+          <button class="sim-seg-btn" data-simfirst="cork" data-fn="sim501First" data-arg="3" data-i18n="sim.first_cork">コーク</button>
         </div>
       </div>
     </div>
-    <button class="sim-start-btn" data-fn="sim501Start">ゲームスタート</button>
+    <button class="sim-start-btn" data-fn="sim501Start" data-i18n="sim.start">ゲームスタート</button>
   </div>
 
   <!-- CORK SCREEN -->
   <div id="sim-cork-screen" style="display:none">
-    <div class="sim-title">コーク — ブルを狙え</div>
-    <div class="sim-cork-sub">ボードをタップして投げる</div>
+    <div class="sim-title" data-i18n="sim.cork_title">コーク — ブルを狙え</div>
+    <div class="sim-cork-sub" data-i18n="sim.cork_sub">ボードをタップして投げる</div>
     <div class="sim-board-wrap" id="sim-cork-wrap"></div>
     <div class="sim-cork-msg" id="sim-cork-msg"></div>
-    <button class="sim-cork-go" id="sim-cork-btn" style="display:none" data-fn="sim501CorkGo">スタート！</button>
+    <button class="sim-cork-go" id="sim-cork-btn" style="display:none" data-fn="sim501CorkGo" data-i18n="sim.cork_go">スタート！</button>
   </div>
 
   <!-- GAME SCREEN -->
@@ -800,7 +801,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     <div id="sim-leg-res-scr" class="sim-leg-res-scr">0 – 0</div>
     <!-- E: レグ別スタッツ比較 -->
     <div class="sim-leg-stats" id="sim-leg-stats" style="display:none"></div>
-    <button class="sim-leg-btn" data-fn="sim501NextLeg">次のレグへ →</button>
+    <button class="sim-leg-btn" data-fn="sim501NextLeg" data-i18n="sim.next_leg">次のレグへ →</button>
   </div>
 
   <!-- RESULT SCREEN -->
@@ -809,8 +810,8 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     <div id="sim-rs" class="sim-rs"></div>
     <!-- F: ヒートマップ -->
     <div id="sim-heatmaps" class="sim-heatmaps"></div>
-    <button class="sim-share-btn" data-fn="shareSim">📤 シェア</button>
-    <button class="sim-again-btn" data-fn="sim501Again">もう一度</button>
+    <button class="sim-share-btn" data-fn="shareSim" data-i18n="sim.share" data-i18n-emoji="📤">📤 シェア</button>
+    <button class="sim-again-btn" data-fn="sim501Again" data-i18n="sim.again">もう一度</button>
   </div>
 
 </div><!-- /vsim -->
@@ -818,8 +819,8 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
 <!-- Cricket view -->
 <div class="view hide" id="vckt" style="overflow:hidden;">
   <div class="cu-subtabs">
-    <div class="cu-subtab on" id="subCkt-game" data-fn="goSubCktGame">🎯 Cricket</div>
-    <div class="cu-subtab" id="subCkt-hist" data-fn="goSubCktHist">📊 履歴</div>
+    <div class="cu-subtab on" id="subCkt-game" data-fn="goSubCktGame" data-i18n="ckt.sub.game" data-i18n-emoji="🎯">🎯 Cricket</div>
+    <div class="cu-subtab" id="subCkt-hist" data-fn="goSubCktHist" data-i18n="ckt.sub.hist" data-i18n-emoji="📊">📊 履歴</div>
   </div>
   <div id="ckt-game-wrap" class="flex-col-grow">
     <!-- Setup screen -->
@@ -828,8 +829,8 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         <div class="z01-section">
           <div class="z01-label">PLAYERS</div>
           <div class="z01-chips">
-            <div class="z01-chip on" data-fn="cktSetPlayers" data-arg="3">vs CPU</div>
-            <div class="z01-chip" data-fn="cktSetPlayers" data-arg="2">2P 対戦</div>
+            <div class="z01-chip on" data-fn="cktSetPlayers" data-arg="3" data-i18n="ckt.vs_cpu">vs CPU</div>
+            <div class="z01-chip" data-fn="cktSetPlayers" data-arg="2" data-i18n="ckt.two_player">2P 対戦</div>
           </div>
         </div>
         <div class="z01-section" id="ckt-names-section">
@@ -873,7 +874,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
           <div id="ckt-cpu-desc" style="font-size:11px;color:var(--mut);padding:4px 2px;letter-spacing:0.5px;"></div>
         </div>
         <div class="z01-start-sticky">
-          <button class="z01-start-btn" data-fn="cktStart">GAME START</button>
+          <button class="z01-start-btn" data-fn="cktStart" data-i18n="ckt.start">GAME START</button>
         </div>
       </div>
     </div>
@@ -905,8 +906,8 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
           <div class="ckt-mult-btn" data-fn="cktSelectMult" data-arg="3" id="ckt-mult-t">T</div>
         </div>
         <div style="display:flex;gap:8px;margin-top:4px;">
-          <button class="ckt-action-btn" data-fn="cktUndoDart">↩ 取消</button>
-          <button class="ckt-action-btn ckt-exit-btn" data-fn="cktConfirmExit">Exit</button>
+          <button class="ckt-action-btn" data-fn="cktUndoDart" data-i18n="ckt.undo">↩ 取消</button>
+          <button class="ckt-action-btn ckt-exit-btn" data-fn="cktConfirmExit" data-i18n="ckt.exit">Exit</button>
         </div>
       </div>
     </div>
@@ -917,9 +918,9 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         <div class="z01-result-winner" id="ckt-result-winner"></div>
         <div class="z01-stats-table" id="ckt-stats-table"></div>
         <div class="z01-result-btns">
-          <button class="z01-result-again" data-fn="cktAgain">もう一度</button>
-          <button class="z01-result-share" data-fn="shareCkt">📤 シェア</button>
-          <button class="z01-result-back" data-fn="cktBackSetup">設定に戻る</button>
+          <button class="z01-result-again" data-fn="cktAgain" data-i18n="ckt.again">もう一度</button>
+          <button class="z01-result-share" data-fn="shareCkt" data-i18n="ckt.share" data-i18n-emoji="📤">📤 シェア</button>
+          <button class="z01-result-back" data-fn="cktBackSetup" data-i18n="ckt.back_setup">設定に戻る</button>
         </div>
       </div>
     </div>
@@ -929,11 +930,11 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
   <!-- Exit confirmation -->
   <div class="z01-exit-confirm" id="ckt-exit-confirm" style="display:none;">
     <div class="z01-exit-box">
-      <div class="z01-exit-title">ゲームを終了しますか？</div>
-      <div class="z01-exit-sub">現在のゲームデータは保存されません</div>
+      <div class="z01-exit-title" data-i18n="ckt.game_over">ゲームを終了しますか？</div>
+      <div class="z01-exit-sub" data-i18n="ckt.game_over_sub">現在のゲームデータは保存されません</div>
       <div class="z01-exit-btns">
-        <button class="z01-exit-btn-no" data-fn="cktExitNo">続ける</button>
-        <button class="z01-exit-btn-yes" data-fn="cktExitYes">終了する</button>
+        <button class="z01-exit-btn-no" data-fn="cktExitNo" data-i18n="ckt.continue">続ける</button>
+        <button class="z01-exit-btn-yes" data-fn="cktExitYes" data-i18n="ckt.end">終了する</button>
       </div>
     </div>
   </div>
@@ -942,21 +943,21 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
 <!-- Result overlay -->
 <div class="overlay" id="ovr">
   <div class="rbox">
-    <div class="rt">FINISH!</div>
+    <div class="rt" data-i18n="cu.finish">FINISH!</div>
     <div class="rs" id="rscore"></div>
-    <div style="font-size:10px;color:var(--mut);letter-spacing:1px;margin-bottom:6px;">トータルスコア</div>
+    <div style="font-size:10px;color:var(--mut);letter-spacing:1px;margin-bottom:6px;" data-i18n="cu.total_score">トータルスコア</div>
     <div class="rstats">
       <div class="rst rst-3da">
-        <div class="rv3da-label">3ダーツ平均</div>
+        <div class="rv3da-label" data-i18n="cu.three_dart_avg">3ダーツ平均</div>
         <div class="rv" id="ravg" style="font-size:28px;letter-spacing:1px;color:#b47fff;"></div>
         <div class="rv3da-sub" id="ravg-sub"></div>
       </div>
-      <div class="rst"><div class="rl">最高R</div><div class="rv" id="rbest" style="color:#4fc3f7;"></div></div>
-      <div class="rst"><div class="rl">ランク</div><div class="rv" id="rrank" style="color:#e8ff47;"></div></div>
+      <div class="rst"><div class="rl" data-i18n="cu.best_round">最高R</div><div class="rv" id="rbest" style="color:#4fc3f7;"></div></div>
+      <div class="rst"><div class="rl" data-i18n="cu.rank">ランク</div><div class="rv" id="rrank" style="color:#e8ff47;"></div></div>
     </div>
     <div class="rrounds" id="rrounds"></div>
-    <div class="rpb" id="rpb">🏆 自己ベスト更新！</div>
-    <div class="rdb" id="rdb">📅 本日のベスト更新！</div>
+    <div class="rpb" id="rpb" data-i18n="cu.pb" data-i18n-emoji="🏆">🏆 自己ベスト更新！</div>
+    <div class="rdb" id="rdb" data-i18n="cu.db" data-i18n-emoji="📅">📅 本日のベスト更新！</div>
     <div class="rank-table">
       <div class="rank-cell"><div class="rk">S+</div><div class="rs">1000+</div></div>
       <div class="rank-cell"><div class="rk">S</div><div class="rs">800-999</div></div>
@@ -968,10 +969,10 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
       <div class="rank-cell"><div class="rk">D</div><div class="rs">~299</div></div>
     </div>
     <div class="rbtns">
-      <button class="rb-new" id="rb-new">もう一度</button>
-      <button class="bx-share" id="bx-share">𝕏 シェア</button>
-      <button class="rb-share-img" id="rb-share-img">📤 シェア</button>
-      <button class="rb-hist" id="rb-hist">履歴を見る</button>
+      <button class="rb-new" id="rb-new" data-i18n="cu.new_game">もう一度</button>
+      <button class="bx-share" id="bx-share" data-i18n="cu.share_x">𝕏 シェア</button>
+      <button class="rb-share-img" id="rb-share-img" data-i18n="cu.share_img" data-i18n-emoji="📤">📤 シェア</button>
+      <button class="rb-hist" id="rb-hist" data-i18n="cu.history">履歴を見る</button>
     </div>
   </div>
 </div>
@@ -979,11 +980,11 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
 <!-- Confirm overlay -->
 <div class="overlay" id="ocfm">
   <div class="cbox">
-    <div class="ct">全件削除の確認</div>
+    <div class="ct" data-i18n="cfm.clear_title">全件削除の確認</div>
     <div class="cs">全ての履歴を削除します。<br>この操作は元に戻せません。</div>
     <div class="cbtns">
-      <button class="cc" id="cfm-cancel">キャンセル</button>
-      <button class="cok" id="cfm-ok">全件削除</button>
+      <button class="cc" id="cfm-cancel" data-i18n="cfm.cancel">キャンセル</button>
+      <button class="cok" id="cfm-ok" data-i18n="cfm.clear_ok">全件削除</button>
     </div>
   </div>
 </div>
@@ -991,11 +992,11 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
 <!-- Undo round confirm overlay -->
 <div class="overlay" id="oundo">
   <div class="cbox">
-    <div class="ct">前のラウンドを修正</div>
+    <div class="ct" data-i18n="cfm.undo_title">前のラウンドを修正</div>
     <div class="cs" id="undo-msg"></div>
     <div class="cbtns">
-      <button class="cc" id="undo-cancel">キャンセル</button>
-      <button class="cok" id="undo-ok" style="background:var(--acc2);">修正する</button>
+      <button class="cc" id="undo-cancel" data-i18n="cfm.cancel">キャンセル</button>
+      <button class="cok" id="undo-ok" style="background:var(--acc2);" data-i18n="cfm.undo_ok">修正する</button>
     </div>
   </div>
 </div>
@@ -1003,11 +1004,11 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
 <!-- Reset confirm overlay -->
 <div class="overlay" id="oreset">
   <div class="cbox">
-    <div class="ct">リセット確認</div>
+    <div class="ct" data-i18n="cfm.reset_title">リセット確認</div>
     <div class="cs">入力中のゲームをリセットします。<br>この操作は元に戻せません。</div>
     <div class="cbtns">
-      <button class="cc" id="reset-cancel">キャンセル</button>
-      <button class="cok" id="reset-ok">リセット</button>
+      <button class="cc" id="reset-cancel" data-i18n="cfm.cancel">キャンセル</button>
+      <button class="cok" id="reset-ok" data-i18n="cfm.reset_ok">リセット</button>
     </div>
   </div>
 </div>
@@ -1016,9 +1017,9 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
 <div class="arr-teiseki-panel hide" id="arr-teiseki-panel">
   <div class="arr-teiseki-header">
     <div class="arr-teiseki-tabs">
-      <button class="arr-t-tab on" data-fn="filterTeiseki" data-arg="99">170〜99</button>
-      <button class="arr-t-tab" data-fn="filterTeiseki" data-arg="41">100〜3</button>
-      <button class="arr-t-tab" data-fn="filterTeiseki" data-arg="501">削り戦術</button>
+      <button class="arr-t-tab on" data-fn="filterTeiseki" data-arg="99" data-i18n="arr.teiseki_170">170〜99</button>
+      <button class="arr-t-tab" data-fn="filterTeiseki" data-arg="41" data-i18n="arr.teiseki_100">100〜3</button>
+      <button class="arr-t-tab" data-fn="filterTeiseki" data-arg="501" data-i18n="arr.teiseki_kezuri">削り戦術</button>
     </div>
     <button class="arr-teiseki-close" data-fn="hideTeiseki">✕</button>
   </div>
@@ -1037,18 +1038,18 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
   </div>
 </div>
 <div id="pwa-banner">
-  <span>📱 ホーム画面に追加するとオフラインでも使えます</span>
-  <button id="pwa-install-btn">追加する</button>
+  <span data-i18n="pwa.msg">📱 ホーム画面に追加するとオフラインでも使えます</span>
+  <button id="pwa-install-btn" data-i18n="pwa.install">追加する</button>
   <button id="pwa-dismiss-btn">✕</button>
 </div>
 <!-- Shortcut editor (global fixed overlay, outside any view) -->
 <div class="sc-editor" id="sc-editor">
-  <div style="font-size:18px;font-weight:700;color:var(--acc);letter-spacing:2px;">⚙ ショートカット編集</div>
-  <div style="font-size:11px;color:var(--mut);">各ボタンの数値を入力してください（0〜180）</div>
+  <div style="font-size:18px;font-weight:700;color:var(--acc);letter-spacing:2px;" data-i18n="sc.title">⚙ ショートカット編集</div>
+  <div style="font-size:11px;color:var(--mut);" data-i18n="sc.desc">各ボタンの数値を入力してください（0〜180）</div>
   <div class="sc-edit-grid" id="sc-edit-grid"></div>
   <div class="sc-edit-btns" style="margin-top:8px;">
-    <button class="sc-edit-cancel" id="sc-edit-cancel" data-fn="toggleScEditor">キャンセル</button>
-    <button class="sc-edit-save" id="sc-edit-save" data-fn="saveScEditor">保存</button>
+    <button class="sc-edit-cancel" id="sc-edit-cancel" data-fn="toggleScEditor" data-i18n="sc.cancel">キャンセル</button>
+    <button class="sc-edit-save" id="sc-edit-save" data-fn="saveScEditor" data-i18n="sc.save">保存</button>
   </div>
 </div>
 
@@ -1060,6 +1061,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
   gtag('js', new Date());
   gtag('config', 'G-QYXJ1LZ2J1');
 </script>
+<script src="./js/i18n.js?v=20260408"></script>
 <script src="./js/sfx.js?v=20260407"></script>
 <script src="./js/caller.js?v=20260408b"></script>
 <script src="./js/data.js?v=20260407"></script>
