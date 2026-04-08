@@ -28,6 +28,17 @@ var _simG = {
   cThrows:0, cScored:0, cCoAttempts:0, cCoHits:0,
   corkPhase:0, corkPDist:999, corkCDist:999,
   busy:false,
+  // A: リアルタイムスタッツ用
+  pRoundNum:0, cRoundNum:0, pBestRound:0, cBestRound:0,
+  // C: ラウンド履歴
+  roundHistory:[], // [{who, darts:[{s,v}], total, scoreAfter}]
+  // D: CPU実況
+  cpuComment:'',
+  // F: ヒートマップ用着弾記録
+  pLands:[], cLands:[], // [{x,y}]
+  // E: レグ別スタッツ
+  legPThrows:0, legPScored:0, legCThrows:0, legCScored:0,
+  legPBest:0, legCBest:0, legPCoA:0, legPCoH:0, legCCoA:0, legCCoH:0,
 };
 
 // Timestamp when board was last drawn (prevents touch click-through)
@@ -168,12 +179,12 @@ function _simPlayerThrow(tapX,tapY) {
   var sig=_S_LVL[_simG.playerLvl].sigma;
   var land=_sNoise(tapX,tapY,sig);
   var dart=_sHit(land.x,land.y);
-  // track CO attempt at round start if score<=170
-  // (tracked at round-level below)
+  _simG.pLands.push({x:land.x,y:land.y}); // F: 着弾記録
   _simDraw(tapX,tapY,null,null,null);
   setTimeout(function(){
     _simDraw(tapX,tapY,land.x,land.y,null);
     if(typeof sfxImpact==='function') sfxImpact();
+    _simShowLandEffect(land.x,land.y,dart); // B: リップルエフェクト
     _simProcessDart('player',dart);
     _simG.busy=false;
   },320);
@@ -186,7 +197,7 @@ function _simCpuRound() {
   _simG.dartIdx=0; _simG.roundDarts=[];
   _simG.cRoundStart=_simG.cpuScore;
   // Track CO attempt
-  if (_simG.cpuScore<=170&&typeof CHECKOUT!=='undefined'&&CHECKOUT[_simG.cpuScore]) _simG.cCoAttempts++;
+  if (_simG.cpuScore<=170&&typeof CHECKOUT!=='undefined'&&CHECKOUT[_simG.cpuScore]) { _simG.cCoAttempts++; _simG.legCCoA++; }
   _simCpuDart();
 }
 
@@ -199,10 +210,12 @@ function _simCpuDart() {
     var sig=_S_LVL[_simG.cpuLvl].sigma;
     var land=_sNoise(pt.x,pt.y,sig);
     var dart=_sHit(land.x,land.y);
+    _simG.cLands.push({x:land.x,y:land.y}); // F: 着弾記録
     _simDraw(pt.x,pt.y,null,null,null);
     setTimeout(function(){
       _simDraw(pt.x,pt.y,land.x,land.y,null);
       if(typeof sfxImpact==='function') sfxImpact();
+      _simShowLandEffect(land.x,land.y,dart); // B: リップルエフェクト
       _simG.busy=false;
       _simProcessDart('cpu',dart);
     },350);
@@ -218,21 +231,26 @@ function _simProcessDart(who,dart) {
   var entry={s:res.s,v:res.v,bust:!!res.bust,checkout:!!res.checkout};
   _simG.roundDarts.push(entry);
   if (who==='player') {
-    _simG.pThrows++;
-    if(!res.bust){ _simG.playerScore-=res.v; _simG.pScored+=res.v; }
-    if(res.checkout) _simG.pCoHits++;
+    _simG.pThrows++; _simG.legPThrows++;
+    if(!res.bust){ _simG.playerScore-=res.v; _simG.pScored+=res.v; _simG.legPScored+=res.v; }
+    if(res.checkout) { _simG.pCoHits++; _simG.legPCoH++; }
   } else {
-    _simG.cThrows++;
-    if(!res.bust){ _simG.cpuScore-=res.v; _simG.cScored+=res.v; }
-    if(res.checkout) _simG.cCoHits++;
+    _simG.cThrows++; _simG.legCThrows++;
+    if(!res.bust){ _simG.cpuScore-=res.v; _simG.cScored+=res.v; _simG.legCScored+=res.v; }
+    if(res.checkout) { _simG.cCoHits++; _simG.legCCoH++; }
   }
+  // D: CPU実況コメント生成
+  if (who==='cpu') _simG.cpuComment = _simCpuComment(dart, res, score);
   _simRefresh();
   if (res.checkout) {
     if(typeof sfxCheckout==='function') sfxCheckout();
+    if(typeof callerSimCheckout==='function') callerSimCheckout(who);
+    _simShowCheckoutFlash(who); // B: チェックアウトフラッシュ
     setTimeout(function(){ _simEndLeg(who); },600);
     return;
   }
   if (res.bust) {
+    _simShowBustShake(); // B: バストシェイク
     // Restore score and reverse this round's pScored/cScored contributions
     if(who==='player') {
       _simG.pScored -= (_simG.pRoundStart - _simG.playerScore);
@@ -267,28 +285,51 @@ function _simProcessDart(who,dart) {
 
 // ---- End rounds & switch turns ----
 function _simEndPlayerRound() {
+  // C: ラウンド履歴記録
+  var roundTotal = _simG.pRoundStart - _simG.playerScore;
+  if (_simG.roundDarts.length > 0) {
+    _simG.pRoundNum++;
+    _simG.roundHistory.push({who:'player', num:_simG.pRoundNum, darts:_simG.roundDarts.slice(), total:roundTotal, scoreAfter:_simG.playerScore});
+    if (roundTotal > _simG.pBestRound) _simG.pBestRound = roundTotal;
+    if (roundTotal > _simG.legPBest) _simG.legPBest = roundTotal;
+    // 音声コーラー: ラウンドスコアコール
+    if (typeof callerScore === 'function') callerScore(roundTotal);
+  }
   _simG.dartIdx=0; _simG.roundDarts=[];
+  _simG.cpuComment='';
   if (_simG.mode==='solo') {
     _simG.pRoundStart=_simG.playerScore;
     _simRefresh();
     _simDrawHint();
+    _simRenderHistory(); // C: 履歴更新
     return;
   }
   _simG.curPlayer='cpu';
   _simG.cRoundStart=_simG.cpuScore;
   _simRefresh();
   _simDrawHint();
+  _simRenderHistory(); // C: 履歴更新
   setTimeout(function(){ _simCpuRound(); },500);
 }
 
 function _simEndCpuRound() {
+  // C: CPUラウンド履歴記録
+  var roundTotal = _simG.cRoundStart - _simG.cpuScore;
+  if (_simG.roundDarts.length > 0) {
+    _simG.cRoundNum++;
+    _simG.roundHistory.push({who:'cpu', num:_simG.cRoundNum, darts:_simG.roundDarts.slice(), total:roundTotal, scoreAfter:_simG.cpuScore});
+    if (roundTotal > _simG.cBestRound) _simG.cBestRound = roundTotal;
+    if (roundTotal > _simG.legCBest) _simG.legCBest = roundTotal;
+  }
   _simG.dartIdx=0; _simG.roundDarts=[];
+  _simG.cpuComment='';
   // Track player CO attempt for next round
-  if (_simG.playerScore<=170&&typeof CHECKOUT!=='undefined'&&CHECKOUT[_simG.playerScore]) _simG.pCoAttempts++;
+  if (_simG.playerScore<=170&&typeof CHECKOUT!=='undefined'&&CHECKOUT[_simG.playerScore]) { _simG.pCoAttempts++; _simG.legPCoA++; }
   _simG.curPlayer='player';
   _simG.pRoundStart=_simG.playerScore;
   _simRefresh();
   _simDrawHint();
+  _simRenderHistory(); // C: 履歴更新
 }
 
 // ============================================================
@@ -311,6 +352,21 @@ function _simShowLegOverlay(winner) {
   var scr=document.getElementById('sim-leg-res-scr');
   if(txt){ txt.textContent=winner==='player'?'🎯 LEG WIN!':'😞 CPU WIN'; txt.className='sim-leg-res-txt '+(winner==='player'?'win':'lose'); }
   if(scr) scr.textContent=_simG.playerLegs+' – '+_simG.cpuLegs;
+  // E: レグ別スタッツ比較
+  var legStats=document.getElementById('sim-leg-stats');
+  if(legStats&&_simG.mode==='cpu'){
+    var pA=_simG.legPThrows>0?(_simG.legPScored/_simG.legPThrows*3).toFixed(1):'—';
+    var cA=_simG.legCThrows>0?(_simG.legCScored/_simG.legCThrows*3).toFixed(1):'—';
+    var pCo=_simG.legPCoA>0?Math.round(_simG.legPCoH/_simG.legPCoA*100)+'%':'—';
+    var cCo=_simG.legCCoA>0?Math.round(_simG.legCCoH/_simG.legCCoA*100)+'%':'—';
+    var h='<div class="sim-leg-stat-hdr"><span>YOU</span><span></span><span>CPU</span></div>';
+    h+='<div class="sim-leg-stat-row"><b>'+pA+'</b><span>3本平均</span><b>'+cA+'</b></div>';
+    h+='<div class="sim-leg-stat-row"><b>'+(_simG.legPBest||'—')+'</b><span>最高R</span><b>'+(_simG.legCBest||'—')+'</b></div>';
+    h+='<div class="sim-leg-stat-row"><b>'+pCo+'</b><span>CO率</span><b>'+cCo+'</b></div>';
+    h+='<div class="sim-leg-stat-row"><b>'+_simG.legPThrows+'</b><span>本数</span><b>'+_simG.legCThrows+'</b></div>';
+    legStats.innerHTML=h;
+    legStats.style.display='';
+  } else if(legStats){ legStats.style.display='none'; }
   ov.classList.remove('hide');
   if(winner==='player'&&typeof sfxStreak==='function') sfxStreak();
 }
@@ -322,8 +378,13 @@ function _simNextLeg() {
   // Alternate first throw
   _simG.curPlayer=(_simG.curPlayer==='player')?'cpu':'player';
   _simG.pRoundStart=501; _simG.cRoundStart=501;
+  _simG.roundHistory=[];_simG.cpuComment='';
+  // E: レグ別スタッツリセット
+  _simG.legPThrows=0;_simG.legPScored=0;_simG.legCThrows=0;_simG.legCScored=0;
+  _simG.legPBest=0;_simG.legCBest=0;_simG.legPCoA=0;_simG.legPCoH=0;_simG.legCCoA=0;_simG.legCCoH=0;
   _simRefresh();
   _simDrawHint();
+  _simRenderHistory();
   if(_simG.curPlayer==='cpu') setTimeout(_simCpuRound,800);
 }
 
@@ -419,6 +480,11 @@ function sim501Start() {
   _simG.playerLegs=0;_simG.cpuLegs=0;
   _simG.pThrows=0;_simG.pScored=0;_simG.pCoAttempts=0;_simG.pCoHits=0;
   _simG.cThrows=0;_simG.cScored=0;_simG.cCoAttempts=0;_simG.cCoHits=0;
+  _simG.pRoundNum=0;_simG.cRoundNum=0;_simG.pBestRound=0;_simG.cBestRound=0;
+  _simG.roundHistory=[];_simG.cpuComment='';
+  _simG.pLands=[];_simG.cLands=[];
+  _simG.legPThrows=0;_simG.legPScored=0;_simG.legCThrows=0;_simG.legCScored=0;
+  _simG.legPBest=0;_simG.legCBest=0;_simG.legPCoA=0;_simG.legPCoH=0;_simG.legCCoA=0;_simG.legCCoH=0;
   if (_simG.firstThrow==='cork'&&_simG.mode!=='solo') { _simCorkInit(); return; }
   if (_simG.firstThrow==='coin') _simG.firstThrow=Math.random()<0.5?'player':'cpu';
   _simBeginGame();
@@ -498,6 +564,30 @@ function _simRefresh() {
       hn.style.display='none';
     }
   }
+  // A: リアルタイムスタッツ
+  var statsEl=document.getElementById('sim-live-stats');
+  if(statsEl){
+    var pAvg=_simG.pThrows>0?(_simG.pScored/_simG.pThrows*3).toFixed(1):'—';
+    var h='<span>AVG <b>'+pAvg+'</b></span>';
+    h+='<span>BEST <b>'+(_simG.pBestRound||'—')+'</b></span>';
+    var pC=_simG.pCoAttempts>0?Math.round(_simG.pCoHits/_simG.pCoAttempts*100)+'%':'—';
+    h+='<span>CO <b>'+pC+'</b></span>';
+    if(_simG.mode==='cpu'){
+      var cAvg=_simG.cThrows>0?(_simG.cScored/_simG.cThrows*3).toFixed(1):'—';
+      h+='<span class="sim-ls-cpu">CPU AVG <b>'+cAvg+'</b></span>';
+    }
+    statsEl.innerHTML=h;
+  }
+  // D: CPU実況コメント
+  var cmtEl=document.getElementById('sim-cpu-comment');
+  if(cmtEl){
+    if(_simG.cpuComment&&_simG.curPlayer==='cpu'){
+      cmtEl.textContent=_simG.cpuComment;
+      cmtEl.style.display='';
+    } else {
+      cmtEl.style.display='none';
+    }
+  }
 }
 
 // ============================================================
@@ -521,14 +611,120 @@ function _simShowResult() {
     var lg=isCpu?'<div class="sim-stat"><span>レグ</span><b>'+_simG.playerLegs+' – '+_simG.cpuLegs+'</b></div>':'';
     var hdr='<div class="sim-stat sim-stat-hdr"><span></span><b>YOU</b>'+(isCpu?'<b>CPU</b>':'')+'</div>';
     var avg='<div class="sim-stat"><span>3本平均</span><b>'+pA+'</b>'+(isCpu?'<b>'+cA+'</b>':'')+'</div>';
+    var best='<div class="sim-stat"><span>最高R</span><b>'+(_simG.pBestRound||'—')+'</b>'+(isCpu?'<b>'+(_simG.cBestRound||'—')+'</b>':'')+'</div>';
     var co ='<div class="sim-stat"><span>CO率</span><b>'+pC+'</b>'+(isCpu?'<b>'+cC+'</b>':'')+'</div>';
     var thr='<div class="sim-stat"><span>スロー数</span><b>'+_simG.pThrows+'</b>'+(isCpu?'<b>'+_simG.cThrows+'</b>':'')+'</div>';
-    rs.innerHTML=lg+hdr+avg+co+thr;
+    rs.innerHTML=lg+hdr+avg+best+co+thr;
+  }
+  // F: ヒートマップ描画
+  var hmEl=document.getElementById('sim-heatmaps');
+  if(hmEl){
+    var h='<div class="sim-hm-title">着弾分布</div>';
+    h+='<div class="sim-hm-row">';
+    h+='<div class="sim-hm-col"><div class="sim-hm-label">YOU ('+_simG.pLands.length+'本)</div>'+_simHeatmapSVG(_simG.pLands,'rgba(66,165,245,0.7)')+'</div>';
+    if(_simG.mode==='cpu'){
+      h+='<div class="sim-hm-col"><div class="sim-hm-label">CPU ('+_simG.cLands.length+'本)</div>'+_simHeatmapSVG(_simG.cLands,'rgba(239,83,80,0.7)')+'</div>';
+    }
+    h+='</div>';
+    hmEl.innerHTML=h;
   }
 }
 
 // ============================================================
-// _fns EXTENSION (must run after arr.js defines _fns)
+// B: 着弾エフェクト
+// ============================================================
+function _simShowLandEffect(lx,ly,dart) {
+  var wrap=document.getElementById('sim-board-wrap'); if(!wrap) return;
+  var svg=wrap.querySelector('svg'); if(!svg) return;
+  var rect=svg.getBoundingClientRect();
+  var px=(lx/240)*rect.width, py=(ly/240)*rect.height;
+  var ripple=document.createElement('div');
+  ripple.className='sim-land-ripple';
+  ripple.style.left=px+'px'; ripple.style.top=py+'px';
+  wrap.appendChild(ripple);
+  setTimeout(function(){ if(ripple.parentNode) ripple.parentNode.removeChild(ripple); },600);
+}
+
+function _simShowCheckoutFlash(who) {
+  var el=document.getElementById('sim-checkout-flash');
+  if(!el) return;
+  el.textContent=who==='player'?'CHECKOUT!':'CPU CHECKOUT!';
+  el.style.color=who==='player'?'#66bb6a':'#ef5350';
+  el.className='sim-checkout-flash'; void el.offsetWidth; el.classList.add('show');
+  setTimeout(function(){ el.className='sim-checkout-flash hide'; },1800);
+}
+
+function _simShowBustShake() {
+  var gs=document.getElementById('sim-game-screen'); if(!gs) return;
+  gs.classList.remove('sim-bust-shake'); void gs.offsetWidth; gs.classList.add('sim-bust-shake');
+  setTimeout(function(){ gs.classList.remove('sim-bust-shake'); },500);
+}
+
+// ============================================================
+// C: ラウンド履歴パネル
+// ============================================================
+function _simRenderHistory() {
+  var el=document.getElementById('sim-round-history'); if(!el) return;
+  var hist=_simG.roundHistory;
+  if(hist.length===0){ el.innerHTML=''; return; }
+  var h='';
+  // 直近10件を逆順で表示
+  var start=Math.max(0, hist.length-10);
+  for(var i=hist.length-1;i>=start;i--){
+    var r=hist[i];
+    var cls=r.who==='player'?'sim-rh-you':'sim-rh-cpu';
+    var label=r.who==='player'?'R'+r.num:'CPU R'+r.num;
+    var dStr=r.darts.map(function(d){ return d.bust?'<span class="sim-rh-bust">'+d.s+'</span>':(d.checkout?'<span class="sim-rh-co">'+d.s+'</span>':d.s); }).join(' → ');
+    h+='<div class="sim-rh-row '+cls+'">';
+    h+='<span class="sim-rh-label">'+label+'</span>';
+    h+='<span class="sim-rh-darts">'+dStr+'</span>';
+    h+='<span class="sim-rh-total">'+(r.total>0?r.total:'BUST')+'</span>';
+    h+='</div>';
+  }
+  el.innerHTML=h;
+}
+
+// ============================================================
+// D: CPU実況コメント生成
+// ============================================================
+function _simCpuComment(dart, res, scoreBefore) {
+  if (res.checkout) return '🎯 チェックアウト！ ' + dart.s + ' で上がり！';
+  if (res.bust) return '💥 バスト！ 残り' + scoreBefore + 'に戻る';
+  if (dart.v >= 60) return '🔥 ' + dart.s + '！ ナイスショット！';
+  if (dart.v >= 40) return '👍 ' + dart.s + ' — 堅実なスロー';
+  if (scoreBefore <= 170 && (scoreBefore - dart.v) > 170) return '😤 上がり目を逃した...';
+  if (dart.v === 0) return '😬 ボード外！ CPU ミスショット';
+  if (scoreBefore <= 40 && !dart.dbl) return '⚡ ダブルを外した！ チャンス！';
+  return '';
+}
+
+// ============================================================
+// F: ヒートマップSVG
+// ============================================================
+function _simHeatmapSVG(lands, color) {
+  var svg='<svg width="240" height="240" viewBox="0 0 240 240">';
+  // ボード背景（暗め）
+  svg+='<circle cx="120" cy="120" r="102" fill="#0a0a0a" stroke="#2a2a2a" stroke-width="1"/>';
+  svg+='<circle cx="120" cy="120" r="'+_S_RD+'" fill="none" stroke="#1a1a1a" stroke-width="0.5"/>';
+  svg+='<circle cx="120" cy="120" r="'+_S_RT2+'" fill="none" stroke="#1a1a1a" stroke-width="0.5"/>';
+  svg+='<circle cx="120" cy="120" r="'+_S_RT1+'" fill="none" stroke="#1a1a1a" stroke-width="0.5"/>';
+  svg+='<circle cx="120" cy="120" r="'+_S_RB+'" fill="none" stroke="#1a1a1a" stroke-width="0.5"/>';
+  // 着弾点プロット
+  lands.forEach(function(p){
+    svg+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.5" fill="'+color+'" opacity="0.55"/>';
+  });
+  // ラベル
+  for(var i=0;i<20;i++){
+    var la=-99+(i+0.5)*18;
+    var rad=la*Math.PI/180;
+    svg+='<text x="'+(120+108*Math.cos(rad)).toFixed(1)+'" y="'+(120+108*Math.sin(rad)).toFixed(1)+'" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#555">'+_S_SEGS[i]+'</text>';
+  }
+  svg+='</svg>';
+  return svg;
+}
+
+// ============================================================
+// ENHANCED RESULT SCREEN
 // ============================================================
 (function(){
   if(typeof _fns==='undefined') return;

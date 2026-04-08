@@ -3161,7 +3161,8 @@ var _fns = { kp: kp, kd: kd, doOk: doOk, commit: commit,
   trainRandom: trainRandom,
   trainPrev: trainPrev,
   showQuestHome: showQuestHome,
-  quitQuestPlay: quitQuestPlay
+  quitQuestPlay: quitQuestPlay,
+  shareCU: shareCU, shareZ01: shareZ01, shareSim: shareSim
 };
 
 function _exec(el) {
@@ -3214,6 +3215,67 @@ document.addEventListener('click', function(e) {
 });
 
 /* Onboarding */
+var _obStep = 0;
+var _obLevel = -1; // -1 = not selected
+
+function obGoStep(n) {
+  var cards = document.querySelectorAll('.ob-card');
+  var dots = document.querySelectorAll('.ob-dot');
+  for (var i = 0; i < cards.length; i++) {
+    if (i === _obStep) {
+      cards[i].classList.remove('ob-card-active');
+      cards[i].classList.add('ob-card-exit');
+    } else {
+      cards[i].classList.remove('ob-card-active', 'ob-card-exit');
+    }
+  }
+  for (var j = 0; j < dots.length; j++) {
+    dots[j].classList.toggle('on', j === n);
+  }
+  _obStep = n;
+  setTimeout(function() {
+    for (var k = 0; k < cards.length; k++) {
+      cards[k].classList.remove('ob-card-exit');
+      cards[k].classList.toggle('ob-card-active', k === n);
+    }
+  }, 50);
+}
+
+function obSelectLevel(lvl) {
+  _obLevel = lvl;
+  localStorage.setItem('user_level', String(lvl));
+  var btns = document.querySelectorAll('.ob-level-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.toggle('selected', Number(btns[i].getAttribute('data-level')) === lvl);
+  }
+  // Update recommendation card
+  var recs = [
+    { mode: 'CountUp を始めよう', why: 'まずはスコアを記録して\n自分の実力を把握しましょう！', emoji: '📊' },
+    { mode: '01 モードを試そう', why: '501でゲーム感覚を磨きましょう。\nCPU対戦もできます！', emoji: '🎮' },
+    { mode: 'アレンジトレーニングへ', why: 'アレンジ力を鍛えて\nフィニッシュ精度を上げましょう！', emoji: '🧠' }
+  ];
+  var rec = recs[lvl];
+  document.getElementById('ob-rec-emoji').textContent = rec.emoji;
+  document.getElementById('ob-rec-mode').textContent = rec.mode;
+  document.getElementById('ob-rec-why').textContent = rec.why;
+  // Auto-advance to step 2
+  setTimeout(function() { obGoStep(2); }, 400);
+}
+
+function obFinish() {
+  closeOnboard();
+  // Navigate to recommended tab based on level
+  if (_obLevel === 0 || _obLevel === -1) {
+    goTab('game');
+  } else if (_obLevel === 1) {
+    goTab('01');
+    goSub01Game();
+  } else if (_obLevel === 2) {
+    goTab('01');
+    setTimeout(function() { goSub01Arr(); }, 100);
+  }
+}
+
 function closeOnboard() {
   document.getElementById('onboard').classList.remove('show');
   localStorage.setItem('ob_done', '1');
@@ -3243,7 +3305,15 @@ updDisp();
 
 // イベントリスナー登録（onclick属性の代替）
 document.getElementById('gs-btn').addEventListener('click', gameStart);
-document.getElementById('ob-start').addEventListener('click', closeOnboard);
+document.getElementById('ob-skip').addEventListener('click', function() { closeOnboard(); goTab('game'); });
+document.getElementById('ob-next-0').addEventListener('click', function() { obGoStep(1); });
+document.getElementById('ob-go').addEventListener('click', obFinish);
+(function() {
+  var lvlBtns = document.querySelectorAll('.ob-level-btn');
+  for (var i = 0; i < lvlBtns.length; i++) {
+    lvlBtns[i].addEventListener('click', function() { obSelectLevel(Number(this.getAttribute('data-level'))); });
+  }
+})();
 document.getElementById('ngp-no').addEventListener('click', ngpNo);
 document.getElementById('ngp-yes').addEventListener('click', ngpYes);
 document.getElementById('ct-score').addEventListener('click', function(){ switchChart('score'); });
@@ -3254,6 +3324,7 @@ document.getElementById('btn-import').addEventListener('click', triggerImport);
 document.getElementById('btn-clr').addEventListener('click', openCfm);
 document.getElementById('rb-new').addEventListener('click', startNew);
 document.getElementById('bx-share').addEventListener('click', shareX);
+document.getElementById('rb-share-img').addEventListener('click', shareCU);
 document.getElementById('rb-hist').addEventListener('click', goHist);
 document.getElementById('cfm-cancel').addEventListener('click', closeCfm);
 document.getElementById('cfm-ok').addEventListener('click', delAll);

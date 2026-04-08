@@ -351,6 +351,294 @@ function shareX() {
   var url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
   window.open(url, '_blank');
 }
+/* ============================================================
+   SNS Share — Canvas Score Card Generator
+   ============================================================ */
+function generateShareCard(config) {
+  var scale = 2;
+  var W = 640 * scale, H = 900 * scale;
+  var canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#0a0a14';
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle grid lines
+  ctx.strokeStyle = 'rgba(232,255,71,0.03)';
+  ctx.lineWidth = 1 * scale;
+  var gridSize = 40 * scale;
+  for (var gx = gridSize; gx < W; gx += gridSize) {
+    ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke();
+  }
+  for (var gy = gridSize; gy < H; gy += gridSize) {
+    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+  }
+
+  // Accent border
+  var pad = 20 * scale;
+  var br = 24 * scale;
+  ctx.strokeStyle = '#e8ff47';
+  ctx.lineWidth = 3 * scale;
+  _roundRect(ctx, pad, pad, W - pad * 2, H - pad * 2, br);
+  ctx.stroke();
+
+  // Inner subtle border
+  ctx.strokeStyle = 'rgba(232,255,71,0.12)';
+  ctx.lineWidth = 1 * scale;
+  _roundRect(ctx, pad + 8 * scale, pad + 8 * scale, W - (pad + 8 * scale) * 2, H - (pad + 8 * scale) * 2, br - 4 * scale);
+  ctx.stroke();
+
+  // Header: app name
+  ctx.fillStyle = '#e8ff47';
+  ctx.font = 'bold ' + (28 * scale) + 'px "Bebas Neue", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.letterSpacing = (6 * scale) + 'px';
+  ctx.fillText('STEEL DARTS PRO', W / 2, 80 * scale);
+  ctx.letterSpacing = '0px';
+
+  // Mode name
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = (14 * scale) + 'px sans-serif';
+  ctx.fillText(config.modeName, W / 2, 108 * scale);
+
+  // Date
+  var now = new Date();
+  var dateStr = now.getFullYear() + '/' + (now.getMonth() + 1) + '/' + now.getDate();
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.font = (12 * scale) + 'px sans-serif';
+  ctx.fillText(dateStr, W / 2, 130 * scale);
+
+  // Decorative line
+  ctx.strokeStyle = 'rgba(232,255,71,0.2)';
+  ctx.lineWidth = 1 * scale;
+  ctx.beginPath();
+  ctx.moveTo(W * 0.2, 148 * scale);
+  ctx.lineTo(W * 0.8, 148 * scale);
+  ctx.stroke();
+
+  // Main stat label
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.font = (14 * scale) + 'px sans-serif';
+  ctx.fillText(config.mainLabel, W / 2, 185 * scale);
+
+  // Main stat value (large)
+  var mainColor = config.mainColor || '#ffffff';
+  ctx.fillStyle = mainColor;
+  ctx.font = 'bold ' + (80 * scale) + 'px "Bebas Neue", sans-serif';
+  ctx.fillText(config.mainValue, W / 2, 280 * scale);
+
+  // Sub value (rank, etc.)
+  if (config.subValue) {
+    ctx.fillStyle = config.subColor || '#e8ff47';
+    ctx.font = 'bold ' + (28 * scale) + 'px "Bebas Neue", sans-serif';
+    ctx.fillText(config.subValue, W / 2, 320 * scale);
+  }
+
+  // PB badge
+  if (config.isPB) {
+    var pbY = config.subValue ? 350 * scale : 320 * scale;
+    ctx.fillStyle = 'rgba(232,255,71,0.15)';
+    _roundRect(ctx, W / 2 - 80 * scale, pbY - 18 * scale, 160 * scale, 30 * scale, 15 * scale);
+    ctx.fill();
+    ctx.fillStyle = '#e8ff47';
+    ctx.font = 'bold ' + (13 * scale) + 'px sans-serif';
+    ctx.fillText('🏆 PERSONAL BEST', W / 2, pbY + 2 * scale);
+  }
+
+  // Stats grid
+  var statsY = (config.isPB ? 400 : (config.subValue ? 370 : 350)) * scale;
+  var stats = config.stats || [];
+  var colW = (W - pad * 4) / 2;
+  for (var si = 0; si < stats.length; si++) {
+    var col = si % 2;
+    var row = Math.floor(si / 2);
+    var sx = pad * 2 + col * colW + colW / 2;
+    var sy = statsY + row * 80 * scale;
+
+    // Stat background
+    ctx.fillStyle = 'rgba(255,255,255,0.03)';
+    _roundRect(ctx, pad * 2 + col * colW + 6 * scale, sy - 10 * scale, colW - 12 * scale, 65 * scale, 10 * scale);
+    ctx.fill();
+
+    // Label
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.font = (12 * scale) + 'px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(stats[si].label, sx, sy + 14 * scale);
+
+    // Value
+    ctx.fillStyle = stats[si].color || '#ffffff';
+    ctx.font = 'bold ' + (26 * scale) + 'px "Bebas Neue", sans-serif';
+    ctx.fillText(stats[si].value, sx, sy + 46 * scale);
+  }
+
+  // Footer line
+  var footY = H - 70 * scale;
+  ctx.strokeStyle = 'rgba(232,255,71,0.15)';
+  ctx.lineWidth = 1 * scale;
+  ctx.beginPath();
+  ctx.moveTo(W * 0.2, footY - 20 * scale);
+  ctx.lineTo(W * 0.8, footY - 20 * scale);
+  ctx.stroke();
+
+  // Footer hashtag
+  ctx.fillStyle = 'rgba(232,255,71,0.6)';
+  ctx.font = (14 * scale) + 'px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('#SteelDartsPro', W / 2, footY + 8 * scale);
+
+  return canvas;
+}
+
+function _roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function _doShare(canvas, shareText) {
+  canvas.toBlob(function(blob) {
+    var file = new File([blob], 'darts-score.png', { type: 'image/png' });
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: 'Steel Darts Pro', text: shareText }).catch(function() {});
+    } else {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'darts-score.png';
+      a.click();
+      setTimeout(function() { URL.revokeObjectURL(a.href); }, 5000);
+    }
+  }, 'image/png');
+}
+
+/* --- Share: CountUp --- */
+function shareCU() {
+  var score = g.total;
+  var rnk = rank(score);
+  var rc = rankColor(score);
+  var avg3 = (score / 8 * 3).toFixed(1);
+  var best = 0;
+  for (var i = 0; i < g.scores.length; i++) {
+    if (g.scores[i] > best) best = g.scores[i];
+  }
+  // Check PB
+  var h = getH();
+  var pb = 0;
+  for (var j = 0; j < h.length; j++) { if (h[j].score > pb) pb = h[j].score; }
+  var isPB = score >= pb && score > 0;
+
+  var canvas = generateShareCard({
+    modeName: 'COUNT-UP（8ラウンド）',
+    mainLabel: 'TOTAL SCORE',
+    mainValue: String(score),
+    mainColor: rc.b === 'var(--acc)' ? '#e8ff47' : rc.b,
+    subValue: 'RANK ' + rnk,
+    subColor: rc.b === 'var(--acc)' ? '#e8ff47' : rc.b,
+    isPB: isPB,
+    stats: [
+      { label: 'トータルスコア', value: String(score), color: '#e8ff47' },
+      { label: '3ダーツ平均', value: avg3, color: '#b47fff' },
+      { label: 'ベストラウンド', value: String(best), color: '#4fc3f7' },
+      { label: 'ランク', value: rnk, color: rc.b === 'var(--acc)' ? '#e8ff47' : rc.b }
+    ]
+  });
+  var text = 'スティールダーツ カウントアップ ' + score + '点（' + rnk + 'ランク） #SteelDartsPro #ダーツ';
+  _doShare(canvas, text);
+}
+
+/* --- Share: 01 --- */
+function shareZ01() {
+  var st0 = _z01.stats[0];
+  var avg = st0.rounds > 0 ? (st0.total / st0.rounds).toFixed(1) : '—';
+  var modeStr = String(_z01.mode);
+  var winner = '';
+  if (_z01.players === 3) {
+    winner = _z01.legWins[0] > _z01.legWins[1] ? 'WIN' : (_z01.legWins[1] > _z01.legWins[0] ? 'LOSE' : 'DRAW');
+  } else if (_z01.players === 2) {
+    if (_z01.legWins[0] > _z01.legWins[1]) winner = _z01.names[0] + ' WIN';
+    else if (_z01.legWins[1] > _z01.legWins[0]) winner = _z01.names[1] + ' WIN';
+    else winner = 'DRAW';
+  } else {
+    winner = 'FINISH';
+  }
+  var mainColor = winner === 'WIN' || winner.indexOf('WIN') >= 0 ? '#e8ff47' : (winner === 'LOSE' ? '#ff6b6b' : '#ffffff');
+
+  var stats = [
+    { label: '3ダーツ平均', value: avg, color: '#b47fff' },
+    { label: 'Legs Won', value: _z01.legWins[0] + ' – ' + _z01.legWins[1], color: '#e8ff47' },
+    { label: '100+', value: String(st0.c100), color: '#4fc3f7' },
+    { label: '140+', value: String(st0.c140), color: '#47ffb4' },
+    { label: '180s', value: String(st0.c180), color: '#ff6b35' },
+    { label: 'ハイフィニッシュ', value: st0.hiFin ? String(st0.hiFin) : '—', color: '#4fc3f7' }
+  ];
+  if (st0.bestLeg < 999) {
+    stats.push({ label: 'ベストレグ', value: st0.bestLeg + ' darts', color: '#e8ff47' });
+  }
+
+  var canvas = generateShareCard({
+    modeName: modeStr + ' — ' + (_z01.players === 3 ? 'vs CPU Lv.' + _z01.cpuLevel : (_z01.players === 2 ? '2P対戦' : 'ソロ')),
+    mainLabel: modeStr,
+    mainValue: winner,
+    mainColor: mainColor,
+    subValue: '3-Dart Avg: ' + avg,
+    subColor: '#b47fff',
+    isPB: false,
+    stats: stats
+  });
+  var text = modeStr + ' ' + winner + ' Avg:' + avg + ' #SteelDartsPro #ダーツ';
+  _doShare(canvas, text);
+}
+
+/* --- Share: Sim 501 --- */
+function shareSim() {
+  var pA = _simG.pThrows > 0 ? (_simG.pScored / _simG.pThrows * 3).toFixed(1) : '—';
+  var isCpu = _simG.mode === 'cpu';
+  var winner = '';
+  if (isCpu) {
+    winner = _simG.playerLegs > _simG.cpuLegs ? 'YOU WIN!' : 'CPU WIN';
+  } else {
+    winner = 'FINISH!';
+  }
+  var mainColor = winner === 'YOU WIN!' ? '#e8ff47' : (winner === 'CPU WIN' ? '#ff6b6b' : '#ffffff');
+  var pC = _simG.pCoAttempts > 0 ? Math.round(_simG.pCoHits / _simG.pCoAttempts * 100) + '%' : '—';
+
+  var stats = [
+    { label: '3本平均', value: pA, color: '#b47fff' },
+    { label: '最高ラウンド', value: String(_simG.pBestRound || '—'), color: '#4fc3f7' }
+  ];
+  if (isCpu) {
+    stats.push({ label: 'レグ', value: _simG.playerLegs + ' – ' + _simG.cpuLegs, color: '#e8ff47' });
+    var cA = _simG.cThrows > 0 ? (_simG.cScored / _simG.cThrows * 3).toFixed(1) : '—';
+    stats.push({ label: 'CPU平均', value: cA, color: '#ef5350' });
+  }
+  stats.push({ label: 'CO率', value: pC, color: '#47ffb4' });
+  stats.push({ label: 'スロー数', value: String(_simG.pThrows), color: 'rgba(255,255,255,0.7)' });
+
+  var lvlName = isCpu ? _S_LVL[_simG.cpuLvl].name : '';
+  var canvas = generateShareCard({
+    modeName: 'SIM 501' + (isCpu ? ' vs CPU（' + lvlName + '）' : ' ソロ'),
+    mainLabel: 'SIM 501',
+    mainValue: winner,
+    mainColor: mainColor,
+    subValue: 'Avg: ' + pA,
+    subColor: '#b47fff',
+    isPB: false,
+    stats: stats
+  });
+  var text = 'SIM 501 ' + winner + ' Avg:' + pA + ' #SteelDartsPro #ダーツ';
+  _doShare(canvas, text);
+}
+
 function goHist() { document.getElementById('ovr').classList.remove('show'); goTab('game'); goSubHist(); }
 
 /* Reset */
@@ -453,7 +741,7 @@ function localDateStr(d) { return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).sli
 function getTotals() { try { var t=JSON.parse(localStorage.getItem('dh_totals')||'{"games":0,"play_time":0,"c180":0,"best":0}'); if(!t.best) t.best=0; return t; } catch(e) { return {games:0,play_time:0,c180:0,best:0}; } }
 function saveTotals(t) { try { localStorage.setItem('dh_totals', JSON.stringify(t)); } catch(ex) { console.warn('saveTotals failed:', ex); } }
 function migrateTotals() { var ex=localStorage.getItem('dh_totals'); if(ex!==null){ try{ var t=JSON.parse(ex); if(!t.best){ var h=getH(); t.best=h.length?Math.max.apply(null,h.map(function(x){return x.score;})):0; saveTotals(t); } } catch(e){} return; } var h=getH(); if(!h.length) return; var t={games:h.length,play_time:0,c180:0,best:0}; for(var i=0;i<h.length;i++){ t.play_time+=(h[i].duration||0); if(h[i].score>t.best) t.best=h[i].score; var r=h[i].rounds||[]; for(var j=0;j<r.length;j++) if(r[j]===180) t.c180++; } saveTotals(t); }
-function saveH(e) { try { var h=getH(); h.unshift(e); localStorage.setItem('dh', JSON.stringify(h.slice(0,200))); var t=getTotals(); t.games+=1; t.play_time+=(e.duration||0); if(e.score>t.best) t.best=e.score; var r=e.rounds||[]; for(var i=0;i<r.length;i++) if(r[i]===180) t.c180++; saveTotals(t); } catch(ex) { console.warn('saveH failed:', ex); } }
+function saveH(e) { try { var h=getH(); h.unshift(e); localStorage.setItem('dh', JSON.stringify(h.slice(0,200))); var t=getTotals(); t.games+=1; t.play_time+=(e.duration||0); if(e.score>t.best) t.best=e.score; var r=e.rounds||[]; for(var i=0;i<r.length;i++) if(r[i]===180) t.c180++; saveTotals(t); updateDailyStreak(); } catch(ex) { console.warn('saveH failed:', ex); } }
 function openCfm() { document.getElementById('ocfm').classList.add('show'); }
 function closeCfm() { document.getElementById('ocfm').classList.remove('show'); }
 function delAll() { localStorage.removeItem('dh'); localStorage.removeItem('dh_totals'); closeCfm(); renderHist(); }
@@ -1276,27 +1564,26 @@ function renderHist() {
   if (rrateCard) rrateCard.style.display = 'block';
   switchRrate(_rrateMode);
 
-  // ストリーク計算
-  var streak = 0;
-  var today = new Date(); today.setHours(0,0,0,0);
-  var checkDay = new Date(today);
-  var usedDates = {};
-  for (var i=0; i<h.length; i++) {
-    var d = new Date(h[i].date); d.setHours(0,0,0,0);
-    usedDates[d.getTime()] = true;
-  }
-  // 今日または昨日からストリーク開始
-  if (!usedDates[today.getTime()]) checkDay.setDate(checkDay.getDate()-1);
-  while (usedDates[checkDay.getTime()]) {
-    streak++;
-    checkDay.setDate(checkDay.getDate()-1);
-  }
+  // ストリーク表示（localStorage永続化データを使用）
+  var streakData = getDailyStreak();
+  var streak = streakData.current;
+  // lastDateが今日でも昨日でもない場合、ストリークは切れている
+  var todayCheck = localDateStr(new Date());
+  var yestCheck = new Date(); yestCheck.setDate(yestCheck.getDate()-1);
+  var yestStr = localDateStr(yestCheck);
+  if (streakData.lastDate !== todayCheck && streakData.lastDate !== yestStr) streak = 0;
   var sb = document.getElementById('streak-badge');
   if (sb) {
     if (streak >= 2) {
-      var stTitle = streak >= 365 ? '🏆 伝説' : streak >= 100 ? '👑 ダーツの鬼' : streak >= 60 ? '💎 ダイヤモンド' : streak >= 30 ? '🔥 鉄人' : streak >= 14 ? '⚡ 常連' : streak >= 7 ? '✨ 週末戦士' : '';
-      sb.innerHTML = '<div class="streak-card"><div class="streak-fire">🔥</div><div class="streak-num">'+streak+'</div><div class="streak-lbl">日連続<br>プレー</div>'
+      var isGold = streak >= 7;
+      var stTitle = streak >= 365 ? '\uD83C\uDFC6 \u4F1D\u8AAC' : streak >= 100 ? '\uD83D\uDC51 \u30C0\u30FC\u30C4\u306E\u9B3C' : streak >= 60 ? '\uD83D\uDC8E \u30C0\u30A4\u30E4\u30E2\u30F3\u30C9' : streak >= 30 ? '\uD83D\uDD25 \u9244\u4EBA' : streak >= 14 ? '\u26A1 \u5E38\u9023' : streak >= 7 ? '\u2728 \u9031\u672B\u6226\u58EB' : '';
+      sb.innerHTML = '<div class="streak-card' + (isGold ? ' streak-gold' : '') + '"><div class="streak-fire">\uD83D\uDD25</div><div class="streak-num">' + streak + '</div><div class="streak-lbl">\u65E5\u9023\u7D9A<br>\u30D7\u30EC\u30FC</div>'
         + (stTitle ? '<div class="streak-title">' + stTitle + '</div>' : '')
+        + '<div class="streak-best">\u6700\u9AD8: ' + streakData.best + '\u65E5</div>'
+        + '</div>';
+    } else if (streak === 1) {
+      sb.innerHTML = '<div class="streak-card"><div class="streak-fire">\uD83D\uDD25</div><div class="streak-num">1</div><div class="streak-lbl">\u65E5\u9023\u7D9A<br>\u30D7\u30EC\u30FC</div>'
+        + (streakData.best >= 2 ? '<div class="streak-best">\u6700\u9AD8: ' + streakData.best + '\u65E5</div>' : '')
         + '</div>';
     } else {
       sb.innerHTML = '';
@@ -1336,7 +1623,8 @@ function renderHist() {
     } else {
       msg = '🎯 今週の平均スコア: <strong style="color:var(--acc);">' + thisAvg + '点</strong>　(' + thisWeekGames.length + 'G)';
     }
-    wEl.innerHTML = msg;
+    var reportBtn = buildWeeklyReport() ? ' <button onclick="showWeeklyReport()" style="background:none;border:1px solid var(--bdr);color:var(--acc);font-size:11px;padding:2px 8px;border-radius:6px;cursor:pointer;margin-left:6px;">\uD83D\uDCCA \u5148\u9031\u306E\u307E\u3068\u3081</button>' : '';
+    wEl.innerHTML = msg + reportBtn;
     wEl.style.display = 'block';
   })();
   renderPer(h);
@@ -2586,6 +2874,7 @@ function _z01SaveH(entry) {
     var h = _z01GetH();
     h.unshift(entry);
     localStorage.setItem('dh01', JSON.stringify(h.slice(0, 500)));
+    updateDailyStreak();
   } catch(ex) { console.warn('_z01SaveH failed:', ex); }
 }
 function _z01DelH(idx) {
@@ -3372,4 +3661,177 @@ function _renderXPBar() {
     + '<div class="xp-footer"><span>' + (d.xp - currReq) + ' / ' + (nextReq - currReq) + '</span><span>NEXT LV.' + (d.level + 1) + '</span></div>';
   el.style.display = 'block';
 }
+
+/* ============================================================
+   Daily Streak System (localStorage persisted)
+   ============================================================ */
+function getDailyStreak() {
+  try { return JSON.parse(localStorage.getItem('daily_streak') || '{"current":0,"best":0,"lastDate":""}'); }
+  catch(e) { return { current: 0, best: 0, lastDate: '' }; }
+}
+function saveDailyStreak(s) {
+  try { localStorage.setItem('daily_streak', JSON.stringify(s)); } catch(e) {}
+}
+// Migrate: seed daily_streak from existing history if not yet set
+(function migrateStreak() {
+  if (localStorage.getItem('daily_streak')) return;
+  var h = getH();
+  if (!h.length) return;
+  var today = new Date(); today.setHours(0,0,0,0);
+  var usedDates = {};
+  for (var i = 0; i < h.length; i++) {
+    if (!h[i].date) continue;
+    var d = new Date(h[i].date); d.setHours(0,0,0,0);
+    usedDates[d.getTime()] = true;
+  }
+  var checkDay = new Date(today);
+  if (!usedDates[today.getTime()]) checkDay.setDate(checkDay.getDate() - 1);
+  var streak = 0;
+  while (usedDates[checkDay.getTime()]) {
+    streak++;
+    checkDay.setDate(checkDay.getDate() - 1);
+  }
+  if (streak > 0) {
+    // Find the most recent game date
+    var lastD = new Date(h[0].date);
+    var lastStr = localDateStr(lastD);
+    saveDailyStreak({ current: streak, best: streak, lastDate: lastStr });
+  }
+})();
+function updateDailyStreak() {
+  var todayStr = localDateStr(new Date());
+  var s = getDailyStreak();
+  if (s.lastDate === todayStr) return; // already counted today
+  var yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  var yesterdayStr = localDateStr(yesterday);
+  var wasIncremented = false;
+  if (s.lastDate === yesterdayStr) {
+    s.current += 1;
+    wasIncremented = s.current > 1;
+  } else {
+    s.current = 1;
+  }
+  s.lastDate = todayStr;
+  if (s.current > s.best) { s.best = s.current; wasIncremented = true; }
+  saveDailyStreak(s);
+  if (wasIncremented && s.current >= 2) showStreakToast(s.current);
+}
+function showStreakToast(count) {
+  var el = document.getElementById('streak-toast');
+  if (!el) return;
+  el.textContent = '\uD83D\uDD25 ' + count + '\u65E5\u9023\u7D9A\uFF01\u8A18\u9332\u66F4\u65B0\uFF01';
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 2500);
+}
+
+/* ============================================================
+   Weekly Performance Report
+   ============================================================ */
+function getWeekBounds(refDate) {
+  var d = new Date(refDate);
+  d.setHours(0,0,0,0);
+  var day = d.getDay();
+  var diffToMon = (day === 0) ? -6 : 1 - day;
+  var mon = new Date(d); mon.setDate(d.getDate() + diffToMon);
+  var sun = new Date(mon); sun.setDate(mon.getDate() + 6); sun.setHours(23,59,59,999);
+  return { start: mon, end: sun };
+}
+function gamesInRange(start, end) {
+  var h = getH();
+  var results = [];
+  for (var i = 0; i < h.length; i++) {
+    if (!h[i].date) continue;
+    var gd = new Date(h[i].date);
+    if (gd >= start && gd <= end) results.push(h[i]);
+  }
+  return results;
+}
+function buildWeeklyReport() {
+  var now = new Date();
+  var thisWeek = getWeekBounds(now);
+  var prevWeekRef = new Date(thisWeek.start);
+  prevWeekRef.setDate(prevWeekRef.getDate() - 1);
+  var prevWeek = getWeekBounds(prevWeekRef);
+  var twoWeekRef = new Date(prevWeek.start);
+  twoWeekRef.setDate(twoWeekRef.getDate() - 1);
+  var twoWeeksAgo = getWeekBounds(twoWeekRef);
+
+  var prevGames = gamesInRange(prevWeek.start, prevWeek.end);
+  var twoAgoGames = gamesInRange(twoWeeksAgo.start, twoWeeksAgo.end);
+
+  if (prevGames.length === 0) return null;
+
+  var totalScore = 0, bestScore = 0, totalDur = 0;
+  for (var i = 0; i < prevGames.length; i++) {
+    totalScore += prevGames[i].score;
+    if (prevGames[i].score > bestScore) bestScore = prevGames[i].score;
+    totalDur += (prevGames[i].duration || 0);
+  }
+  var avgScore = Math.round(totalScore / prevGames.length);
+  var totalMin = Math.round(totalDur / 60);
+
+  var diff = null;
+  if (twoAgoGames.length > 0) {
+    var twoAgoTotal = 0;
+    for (var i = 0; i < twoAgoGames.length; i++) twoAgoTotal += twoAgoGames[i].score;
+    var twoAgoAvg = Math.round(twoAgoTotal / twoAgoGames.length);
+    diff = avgScore - twoAgoAvg;
+  }
+
+  var dateRange = (prevWeek.start.getMonth()+1) + '/' + prevWeek.start.getDate()
+    + ' \u301C ' + (prevWeek.end.getMonth()+1) + '/' + prevWeek.end.getDate();
+
+  return {
+    dateRange: dateRange,
+    games: prevGames.length,
+    totalMin: totalMin,
+    avgScore: avgScore,
+    bestScore: bestScore,
+    diff: diff
+  };
+}
+function showWeeklyReport() {
+  var report = buildWeeklyReport();
+  if (!report) return;
+  var diffHtml = '';
+  if (report.diff !== null) {
+    if (report.diff > 0) diffHtml = '<span style="color:#66bb6a;font-weight:700;">+' + report.diff + '\u70B9</span>';
+    else if (report.diff < 0) diffHtml = '<span style="color:#ff6b6b;font-weight:700;">' + report.diff + '\u70B9</span>';
+    else diffHtml = '<span style="color:var(--mut);">\u00B10\u70B9</span>';
+  } else {
+    diffHtml = '<span style="color:var(--mut);">\u2014</span>';
+  }
+  var modal = document.getElementById('weekly-report-modal');
+  if (!modal) return;
+  var streak = getDailyStreak();
+  document.getElementById('wr-body').innerHTML =
+    '<div class="wr-period">' + report.dateRange + '</div>' +
+    '<div class="wr-stats">' +
+      '<div class="wr-stat"><div class="wr-stat-val">' + report.games + ' <small>\u56DE</small></div><div class="wr-stat-lbl">\u30D7\u30EC\u30A4\u56DE\u6570</div></div>' +
+      '<div class="wr-stat"><div class="wr-stat-val">' + report.totalMin + ' <small>\u5206</small></div><div class="wr-stat-lbl">\u7DCF\u30D7\u30EC\u30A4\u6642\u9593</div></div>' +
+      '<div class="wr-stat"><div class="wr-stat-val" style="color:#b47fff;">' + report.avgScore + '</div><div class="wr-stat-lbl">\u5E73\u5747\u30B9\u30B3\u30A2 (CountUp)</div></div>' +
+      '<div class="wr-stat"><div class="wr-stat-val" style="color:#e8ff47;">' + report.bestScore + '</div><div class="wr-stat-lbl">\u30D9\u30B9\u30C8\u30B9\u30B3\u30A2</div></div>' +
+    '</div>' +
+    '<div class="wr-diff">\u524D\u9031\u6BD4: ' + diffHtml + '</div>' +
+    (streak.current >= 2 ? '<div class="wr-streak">\uD83D\uDD25 \u73FE\u5728 ' + streak.current + '\u65E5\u9023\u7D9A\u30D7\u30EC\u30FC\u4E2D\uFF08\u6700\u9AD8: ' + streak.best + '\u65E5\uFF09</div>' : '');
+  modal.classList.add('show');
+}
+function closeWeeklyReport() {
+  var modal = document.getElementById('weekly-report-modal');
+  if (modal) modal.classList.remove('show');
+}
+function checkAutoWeeklyReport() {
+  var now = new Date();
+  var thisWeek = getWeekBounds(now);
+  var weekKey = localDateStr(thisWeek.start);
+  var lastShown = localStorage.getItem('last_weekly_shown') || '';
+  if (lastShown === weekKey) return;
+  var report = buildWeeklyReport();
+  if (!report) return;
+  localStorage.setItem('last_weekly_shown', weekKey);
+  setTimeout(function(){ showWeeklyReport(); }, 800);
+}
+// Auto-check weekly report on page load
+checkAutoWeeklyReport();
 
