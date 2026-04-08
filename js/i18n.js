@@ -21,6 +21,7 @@ var _i18n = {
     'cu.sub.hist': '履歴',
 
     /* ---- CountUp game ---- */
+    'gs.tagline': 'スティールダーツの練習を、もっとスマートに',
     'cu.game_start': 'GAME START',
     'cu.round': 'ラウンド',
     'cu.total_score': 'トータルスコア',
@@ -281,6 +282,7 @@ var _i18n = {
     'cu.sub.hist': 'History',
 
     /* ---- CountUp game ---- */
+    'gs.tagline': 'Smart practice for steel darts',
     'cu.game_start': 'GAME START',
     'cu.round': 'Round',
     'cu.total_score': 'Total Score',
@@ -613,8 +615,26 @@ function _updateLangToggle() {
   }
 }
 
+/* ---- Theme toggle ---- */
+function _applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  var btn = document.getElementById('btn-theme');
+  if (btn) btn.textContent = theme === 'light' ? '☀️' : '🌙';
+}
+
+function toggleTheme() {
+  var current = document.documentElement.getAttribute('data-theme') || 'dark';
+  var next = current === 'dark' ? 'light' : 'dark';
+  _applyTheme(next);
+  try { localStorage.setItem('app_theme', next); } catch(e) {}
+}
+
 /* ---- Initialize on load ---- */
 document.addEventListener('DOMContentLoaded', function() {
   _applyI18n();
   _updateLangToggle();
+  /* Restore saved theme */
+  var savedTheme = 'dark';
+  try { savedTheme = localStorage.getItem('app_theme') || 'dark'; } catch(e) {}
+  _applyTheme(savedTheme);
 });

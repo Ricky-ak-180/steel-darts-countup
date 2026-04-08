@@ -1458,6 +1458,9 @@ select:focus-visible {
   .tab { font-size: 10px; padding: 5px 3px; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .gs-title { font-size: 38px; letter-spacing: 4px; white-space: nowrap; }
   .gs-btn { padding: 16px 48px; font-size: 28px; }
+  .gs-tagline { font-size: 11px; letter-spacing: 1px; }
+  .gs-features { gap: 6px 12px; max-width: 280px; }
+  .gs-feat { font-size: 10px; }
 }
 
 /* 横向き（landscape）対応 */
@@ -1830,3 +1833,367 @@ select:focus-visible {
 }
 .ckt-action-btn:active { opacity: 0.7; }
 .ckt-exit-btn { color: var(--red); border-color: rgba(255,71,87,0.3); }
+
+/* ============================================================
+   Light Theme
+   ============================================================ */
+[data-theme="light"] {
+  --bg: #f5f5f0; --sur: #ffffff; --sur2: #ededea;
+  --bdr: #e0e0d8; --acc: #c4a800; --acc2: #d4700a;
+  --txt: #1a1a2e; --mut: #6b6b80; --grn: #1a9960; --red: #d03040;
+  --card: #ffffff; --fg: #1a1a2e; --bd: #e0e0d8;
+}
+
+/* Grid pattern overlay */
+[data-theme="light"] body::before {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+}
+
+/* Score card gradient */
+[data-theme="light"] .scard {
+  background: linear-gradient(180deg, #f8f8f4 0%, #f0f0eb 100%);
+  border-color: rgba(196,168,0,0.2);
+}
+
+/* Total score glow */
+[data-theme="light"] .total {
+  text-shadow: 0 0 30px rgba(196,168,0,0.3), 0 0 60px rgba(196,168,0,0.1);
+}
+
+/* Round cell */
+[data-theme="light"] .rcell { background: var(--sur2); }
+@keyframes cellFlashLight { 0%{background:rgba(196,168,0,0.3);transform:scale(1.1);} 60%{background:rgba(196,168,0,0.1);} 100%{background:var(--sur2);transform:scale(1);} }
+[data-theme="light"] .rcell.flash { animation: cellFlashLight 0.55s ease-out; }
+
+/* Dot active pulse */
+[data-theme="light"] .dot.done { border-color: var(--acc); color: var(--acc); background: rgba(196,168,0,0.12); }
+[data-theme="light"] .dot.now { border-color: var(--acc2); color: var(--acc2); background: rgba(212,112,10,0.12); }
+
+/* Subtab active */
+[data-theme="light"] .cu-subtab.on { color: var(--acc); border-bottom-color: var(--acc); background: rgba(196,168,0,0.08); }
+
+/* Shortcut buttons */
+[data-theme="light"] .sc {
+  background: linear-gradient(160deg, #f0f0eb 0%, #e8e8e0 100%);
+  border-color: rgba(196,168,0,0.3);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+[data-theme="light"] .sc:nth-child(-n+4) {
+  background: linear-gradient(160deg, #faf5d0 0%, #f0eab0 100%);
+  border-color: rgba(196,168,0,0.6);
+  box-shadow: 0 3px 16px rgba(0,0,0,0.1), 0 0 12px rgba(196,168,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7);
+  color: #8a7500;
+}
+[data-theme="light"] .sc:active, [data-theme="light"] .sc.pressing {
+  background: var(--acc); color: #fff;
+}
+
+/* Tenkey display */
+[data-theme="light"] .tkd {
+  background: linear-gradient(180deg, #f8f8f4 0%, #f0f0eb 100%);
+  border-color: rgba(196,168,0,0.15);
+}
+
+/* Tenkey buttons */
+[data-theme="light"] .tk {
+  background: linear-gradient(180deg, #f6f6f2 0%, #eaeae4 100%);
+  border-color: #d0d0c8;
+  color: var(--txt);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+[data-theme="light"] .tk:active, [data-theme="light"] .tk.pressing {
+  background: var(--acc); color: #fff;
+}
+[data-theme="light"] .tk.del {
+  background: linear-gradient(180deg, #fff0f0 0%, #fde0e0 100%);
+  border-color: #e8b0b0; color: #c03030;
+}
+[data-theme="light"] .tk.del:active { background: var(--red); color: #fff; }
+[data-theme="light"] .tk.enter {
+  background: linear-gradient(180deg, #f6f6f2 0%, #eaeae4 100%);
+  border-color: #d0d0c8; color: var(--mut);
+}
+[data-theme="light"] .tk.enter.ready {
+  background: linear-gradient(145deg, #ff8844 0%, #ff5500 100%);
+  color: #fff; border-color: transparent;
+  box-shadow: 0 4px 24px rgba(255,80,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+/* Overlay backgrounds */
+[data-theme="light"] .overlay { background: rgba(245,245,240,0.93); }
+[data-theme="light"] .ngp.show::before { background: rgba(0,0,0,0.3); }
+
+/* Result box */
+[data-theme="light"] .rbox {
+  background: var(--sur);
+  border-color: var(--acc);
+  box-shadow: 0 0 40px rgba(196,168,0,0.1);
+}
+[data-theme="light"] .bx-share { background: #1a1a2e; color: #fff; }
+
+/* Confirm box */
+[data-theme="light"] .cbox {
+  box-shadow: 0 0 40px rgba(208,48,64,0.1);
+}
+
+/* Game start screen */
+[data-theme="light"] .game-start {
+  background: radial-gradient(ellipse at 50% 38%, #f5f5f0 0%, #ebebdf 68%);
+}
+[data-theme="light"] .gs-best { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .gs-btn {
+  background: linear-gradient(145deg, #d4b800 0%, #a89000 100%);
+  color: #fff;
+  box-shadow: 0 8px 32px rgba(196,168,0,0.3), 0 2px 8px rgba(0,0,0,0.15);
+}
+[data-theme="light"] .gs-goal-pill {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.12);
+  color: rgba(0,0,0,0.45);
+}
+[data-theme="light"] .gs-goal-pill.on {
+  background: rgba(196,168,0,0.12);
+  border-color: rgba(196,168,0,0.5);
+  color: var(--acc);
+}
+
+/* Profile card */
+[data-theme="light"] .pcard {
+  background: linear-gradient(145deg, #ffffff 0%, #f8f8f4 50%, #f0f0eb 100%);
+  border-color: rgba(196,168,0,0.2);
+}
+[data-theme="light"] .pcard::before {
+  background: radial-gradient(circle, rgba(196,168,0,0.06) 0%, transparent 70%);
+}
+[data-theme="light"] .pcard-app { color: rgba(0,0,0,0.2); }
+[data-theme="light"] .pcard-score { text-shadow: 0 0 30px rgba(196,168,0,0.25); }
+[data-theme="light"] .pcard-score-label { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .pcard-divider { border-top-color: rgba(0,0,0,0.08); }
+[data-theme="light"] .pcard-stat-lbl { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .pcard-badge { background: rgba(196,168,0,0.12); border-color: rgba(196,168,0,0.3); }
+
+/* Today card */
+[data-theme="light"] .tcard {
+  background: linear-gradient(145deg, #ffffff 0%, #fff8f4 100%);
+  border-color: rgba(212,112,10,0.2);
+}
+[data-theme="light"] .tcard::before {
+  background: radial-gradient(circle, rgba(212,112,10,0.05) 0%, transparent 70%);
+}
+[data-theme="light"] .tcard-badge { background: rgba(212,112,10,0.12); border-color: rgba(212,112,10,0.3); }
+[data-theme="light"] .tcard-date { color: rgba(0,0,0,0.2); }
+[data-theme="light"] .tcard-score { text-shadow: 0 0 20px rgba(212,112,10,0.2); }
+[data-theme="light"] .tcard-score-label { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .tcard-divider { border-top-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .tcard-stat-lbl { color: rgba(0,0,0,0.35); }
+
+/* Period table */
+[data-theme="light"] .pavg { color: var(--txt); }
+
+/* Onboarding */
+[data-theme="light"] .onboard { background: rgba(245,245,240,0.96); }
+
+/* 180 flash */
+[data-theme="light"] #flash-180 { background: rgba(196,168,0,0.08); }
+
+/* History items */
+[data-theme="light"] .hi-inner { background: var(--sur); }
+
+/* Shortcut editor */
+[data-theme="light"] .sc-editor { background: var(--bg); }
+
+/* Arrange train home */
+[data-theme="light"] .arr-train-home { background: var(--bg); }
+[data-theme="light"] .arr-session-strip { background: rgba(0,0,0,0.02); border-bottom-color: var(--bdr); }
+
+/* Arrange quiz card - active turn block */
+[data-theme="light"] .arr-turn-block {
+  border-color: rgba(196,168,0,0.25);
+  background: rgba(196,168,0,0.04);
+}
+
+/* Arrange tiles */
+[data-theme="light"] .arr-train-tile.locked { background: rgba(0,0,0,0.04); color: rgba(0,0,0,0.2); }
+[data-theme="light"] .arr-train-tile.unstarted { background: rgba(0,0,0,0.06); color: var(--fg); }
+
+/* Arrange flash overlays */
+[data-theme="light"] .arr-flash-overlay.success { background: rgba(230,255,240,0.92); }
+[data-theme="light"] .arr-flash-overlay.miss { background: rgba(255,240,230,0.92); }
+
+/* Chart tab active white text fix */
+[data-theme="light"] .chart-tab.on-avg { background: #555; color: #fff; border-color: #555; }
+
+/* Lang button hover */
+[data-theme="light"] .btn-lang:hover { background: rgba(196,168,0,0.08); }
+
+/* Cricket */
+[data-theme="light"] .ckt-num-btn {
+  background: linear-gradient(180deg, #f6f6f2 0%, #eaeae4 100%);
+  border-color: #d0d0c8;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+[data-theme="light"] .ckt-mult-btn {
+  background: var(--sur2);
+}
+
+/* Theme toggle button */
+.btn-theme {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 6px 4px;
+  border-radius: 6px;
+  line-height: 1;
+  color: var(--mut);
+  flex-shrink: 0;
+  min-width: 28px;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+/* ============================================================
+   Game Start Screen Enhancement
+   ============================================================ */
+.gs-tagline {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 2px;
+  margin-top: -4px;
+  margin-bottom: 4px;
+}
+.gs-features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 16px;
+  margin-top: 20px;
+  max-width: 320px;
+  opacity: 0;
+  animation: gsFeatIn 0.8s ease 0.3s forwards;
+}
+.gs-feat {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.gs-version {
+  position: absolute;
+  bottom: max(16px, env(safe-area-inset-bottom, 16px));
+  font-size: 10px;
+  color: rgba(255,255,255,0.15);
+  letter-spacing: 2px;
+  font-family: 'Bebas Neue', cursive;
+}
+@keyframes gsFeatIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   Result Screen Polish - Score glow & rank badge
+   ============================================================ */
+.rbox .rs {
+  position: relative;
+  text-shadow: 0 0 40px rgba(240,240,248,0.3), 0 0 80px rgba(232,255,71,0.15);
+}
+.rbox .rt {
+  text-shadow: 0 0 30px rgba(232,255,71,0.4);
+}
+.rbox .rstats {
+  background: linear-gradient(180deg, rgba(28,28,40,0.9) 0%, rgba(19,19,26,0.95) 100%);
+  border: 1px solid rgba(42,42,58,0.6);
+}
+.rbox #rrank {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 28px !important;
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px currentColor;
+}
+.rbox .rpb {
+  background: linear-gradient(90deg, transparent, rgba(232,255,71,0.08), transparent);
+  padding: 6px 12px;
+  border-radius: 8px;
+  animation: pbPulse 2s ease-in-out infinite;
+}
+.rbox .rdb {
+  background: linear-gradient(90deg, transparent, rgba(79,195,247,0.08), transparent);
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+@keyframes pbPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+/* Rank table highlight for current rank */
+.rank-cell.rank-active {
+  background: rgba(232,255,71,0.15);
+  border: 1px solid rgba(232,255,71,0.4);
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+.rank-cell.rank-active .rk {
+  text-shadow: 0 0 12px rgba(232,255,71,0.6);
+}
+
+/* ============================================================
+   Splash / Loading Screen
+   ============================================================ */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0a0a0f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: opacity 0.4s ease;
+}
+.splash.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+.splash-icon {
+  font-size: 56px;
+  animation: splashPulse 1.2s ease-in-out infinite;
+}
+.splash-title {
+  font-family: 'Bebas Neue', cursive;
+  font-size: clamp(28px, 8vw, 44px);
+  color: var(--acc);
+  letter-spacing: clamp(2px, 1vw, 8px);
+  text-shadow: 0 0 40px rgba(232,255,71,0.5);
+}
+.splash-bar {
+  width: 120px;
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.splash-bar-inner {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--acc), var(--acc2));
+  border-radius: 2px;
+  animation: splashLoad 0.6s ease forwards;
+}
+@keyframes splashPulse {
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(232,255,71,0.3)); }
+  50%      { filter: drop-shadow(0 0 32px rgba(232,255,71,0.8)); }
+}
+@keyframes splashLoad {
+  0%   { width: 0%; }
+  100% { width: 100%; }
+}

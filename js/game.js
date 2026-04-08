@@ -283,6 +283,7 @@ function showResult() {
   if (ravgSub) ravgSub.textContent = '';
   document.getElementById('rbest').textContent = Math.max.apply(null, g.scores);
   document.getElementById('rrank').textContent = rank(g.total);
+  /* Highlight active rank cell */ (function(){var r=rank(g.total),cells=document.querySelectorAll('.rank-cell');for(var i=0;i<cells.length;i++){cells[i].classList.remove('rank-active');var rk=cells[i].querySelector('.rk');if(rk&&rk.textContent===r)cells[i].classList.add('rank-active');}})();
   var html = '';
   for (var i=0;i<g.scores.length;i++) html += '<div class="rc"><div class="rv">'+g.scores[i]+'</div><div class="rl">R'+(i+1)+'</div></div>';
   document.getElementById('rrounds').innerHTML = html;
