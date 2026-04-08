@@ -1,4 +1,4 @@
-const CACHE = 'steeldarts-pro-v23';
+const CACHE = 'steeldarts-pro-v26';
 
 // JS/CSSはキャッシュしない（常に最新版をサーバーから取得）
 const PRECACHE = [

@@ -2265,14 +2265,15 @@ function _questShowThrow(dartStr) {
     var pEl = document.getElementById('quest-throw-pts');
     var hEl = document.getElementById('quest-throw-hint');
     if (result.hit) {
-      rEl.innerHTML = '✓ <span style="color:#66bb6a;">' + dartStr + ' ヒット！</span>';
+      rEl.innerHTML = '<span style="color:#66bb6a;font-size:28px;font-family:Bebas Neue,cursive;letter-spacing:3px;">HIT!</span><br><span style="color:#66bb6a;font-size:14px;">' + dartStr + '</span>';
       pEl.style.color = '#66bb6a';
       pEl.textContent = '−' + result.value;
     } else if (!landStr) {
-      rEl.innerHTML = '✗ <span style="color:#ef5350;">アウト（0点）</span>';
+      rEl.innerHTML = '<span style="color:#ef5350;font-size:28px;font-family:Bebas Neue,cursive;letter-spacing:3px;">OUT!</span><br><span style="color:#ef5350;font-size:12px;">ボード外（0点）</span>';
       pEl.textContent = '';
     } else {
-      rEl.innerHTML = '△ <span style="color:#ff9800;">' + landStr + ' に外れた</span>';
+      var landType = landStr[0]==='T'?'TRIPLE':landStr[0]==='D'?'DOUBLE':'SINGLE';
+      rEl.innerHTML = '<span style="color:#ff9800;font-size:24px;font-family:Bebas Neue,cursive;letter-spacing:2px;">'+landType+'...</span><br><span style="color:#ff9800;font-size:14px;">' + landStr + ' に外れた</span>';
       pEl.style.color = '#ff9800';
       pEl.textContent = result.value > 0 ? '−' + result.value : '';
     }
@@ -2338,6 +2339,18 @@ function _renderQuestWorlds() {
       html += '<button class="arr-quest-skip-btn" onclick="startQuestSkipChallenge('+wi+')">⚡ 飛び級に挑戦（5問 / 80%以上でこのワールド解放）</button>';
       html += '</div>';
     }
+    // F: ワールドプログレスバー
+    if (wUnlocked) {
+      var totalStars = 0, maxStars = w.stages.length * 3;
+      w.stages.forEach(function(s){ totalStars += _questGetProgress(s.id).stars; });
+      var pct = maxStars > 0 ? Math.round(totalStars / maxStars * 100) : 0;
+      var isPerfect = totalStars === maxStars && maxStars > 0;
+      html += '<div class="quest-world-progress">';
+      html += '<div class="quest-world-progress-track"><div class="quest-world-progress-fill" style="width:'+pct+'%;background:'+wColor+';"></div></div>';
+      html += '<span class="quest-world-progress-label" style="color:'+wColor+';">'+totalStars+'/'+maxStars+'⭐</span>';
+      if (isPerfect) html += '<span class="quest-world-perfect">PERFECT</span>';
+      html += '</div>';
+    }
     html += '</div></div>';
   });
   el.innerHTML = html;
@@ -2364,10 +2377,16 @@ function startQuestSkipChallenge(wi) {
   document.getElementById('arr-quest-home').style.display = 'none';
   var playEl = document.getElementById('arr-quest-play');
   playEl.style.display = 'flex';
-  document.getElementById('arr-quest-play-title').textContent = '⚡ 飛び級: '+w.label;
+  var titleEl = document.getElementById('arr-quest-play-title');
+  titleEl.textContent = '⚡ 飛び級: '+w.label;
+  titleEl.style.color = w.color;
+  var hdrEl = playEl.querySelector('.arr-quest-play-hdr');
+  hdrEl.classList.remove('boss-hdr'); titleEl.classList.remove('boss-title');
   document.getElementById('quest-throw-overlay').classList.add('hide');
   document.getElementById('quest-real-overlay').classList.add('hide');
   document.getElementById('arr-quest-result').className = 'arr-quest-result hide';
+  document.getElementById('quest-boss-intro').classList.add('hide');
+  document.getElementById('quest-boss-defeated').className = 'quest-boss-defeated hide';
   _updateModeBadge();
   _questNextScore();
 }
@@ -2390,12 +2409,29 @@ function startQuestStage(wi, si) {
   document.getElementById('arr-quest-home').style.display = 'none';
   var playEl = document.getElementById('arr-quest-play');
   playEl.style.display = 'flex';
-  document.getElementById('arr-quest-play-title').textContent = _QUEST_WORLDS[wi].label+' / '+stage.label;
+  var titleEl = document.getElementById('arr-quest-play-title');
+  titleEl.textContent = _QUEST_WORLDS[wi].label+' / '+stage.label;
+  // A: ワールドテーマカラーをタイトルに適用
+  titleEl.style.color = _QUEST_WORLDS[wi].color;
+  // D: ボス戦ヘッダー演出
+  var hdrEl = playEl.querySelector('.arr-quest-play-hdr');
+  if (stage.isBoss) { hdrEl.classList.add('boss-hdr'); titleEl.classList.add('boss-title'); }
+  else { hdrEl.classList.remove('boss-hdr'); titleEl.classList.remove('boss-title'); }
   document.getElementById('quest-throw-overlay').classList.add('hide');
   document.getElementById('quest-real-overlay').classList.add('hide');
   document.getElementById('arr-quest-result').className = 'arr-quest-result hide';
+  document.getElementById('quest-boss-intro').classList.add('hide');
+  document.getElementById('quest-boss-defeated').className = 'quest-boss-defeated hide';
   _updateModeBadge();
-  _questNextScore();
+  // D: ボス戦イントロ
+  if (stage.isBoss) {
+    var introEl = document.getElementById('quest-boss-intro');
+    document.getElementById('quest-boss-intro-sub').textContent = stage.label;
+    introEl.classList.remove('hide');
+    setTimeout(function(){ introEl.classList.add('hide'); _questNextScore(); }, 1800);
+  } else {
+    _questNextScore();
+  }
 }
 
 function _questNextScore() {
@@ -2460,15 +2496,26 @@ function _questNextScore() {
 function _questUpdateProgress() {
   var stage = _QUEST_WORLDS[_questG.worldIdx].stages[_questG.stageIdx];
   var cond = _questG.skipUnlockReq ? {type:'count',n:5,minAcc:0.8} : stage.cond;
-  var el = document.getElementById('arr-quest-progress');
+  var wrap = document.getElementById('quest-progress-bar-wrap');
+  var pct = 0, label = '', accTxt = '';
   if (cond.type==='streak') {
-    el.textContent = '連続 '+_questG.qStreak+' / '+cond.n;
+    pct = cond.n > 0 ? Math.min(100, Math.round(_questG.qStreak / cond.n * 100)) : 0;
+    label = '連続 ' + _questG.qStreak + '/' + cond.n;
   } else if (cond.type==='count') {
-    var acc = _questG.qCount>0 ? Math.round(_questG.qCorrect/_questG.qCount*100)+'%' : '-';
-    el.textContent = _questG.qCount+' / '+cond.n+'問  正答率 '+acc;
+    pct = cond.n > 0 ? Math.min(100, Math.round(_questG.qCount / cond.n * 100)) : 0;
+    label = _questG.qCount + '/' + cond.n + '問';
+    var acc = _questG.qCount > 0 ? Math.round(_questG.qCorrect / _questG.qCount * 100) : 0;
+    var accColor = acc >= 80 ? '#66bb6a' : acc >= 60 ? '#ff9800' : '#ef5350';
+    accTxt = '<span class="quest-progress-acc" style="color:'+accColor+';">' + (_questG.qCount>0 ? acc+'%' : '-') + '</span>';
   } else {
-    el.textContent = _questG.stageCleared ? '✓ クリア' : '挑戦中';
+    pct = _questG.stageCleared ? 100 : 50;
+    label = _questG.stageCleared ? '✓ クリア' : '挑戦中';
   }
+  var fillCls = pct >= 70 ? 'high' : pct >= 40 ? 'mid' : 'low';
+  wrap.innerHTML = '<div class="quest-progress-bar">'
+    + '<span class="quest-progress-txt">' + label + '</span>'
+    + '<div class="quest-progress-bar-track"><div class="quest-progress-bar-fill '+fillCls+'" style="width:'+pct+'%;"></div></div>'
+    + accTxt + '</div>';
 }
 
 function _questShowDartQ() {
@@ -2509,7 +2556,10 @@ function _questShowDartQ() {
   el.innerHTML = '';
   choices.forEach(function(val) {
     var btn = document.createElement('button');
-    btn.className = 'arr-quest-choice';
+    // A: タイプ別ボーダー色
+    var tc = val==='Bull'||val==='D-BULL'||val==='S-BULL' ? 'type-bull'
+      : val[0]==='T' ? 'type-t' : val[0]==='D' ? 'type-d' : 'type-s';
+    btn.className = 'arr-quest-choice ' + tc;
     btn.textContent = val;
     btn.onclick = function() { _questChoose(val, correct); };
     el.appendChild(btn);
@@ -2714,19 +2764,48 @@ function _questShowResult(cleared) {
 
   if (cleared && !_questG.weaknessMode) _questSaveProgress(stage.id, stars);
 
-  var starsHtml = _questG.weaknessMode ? '' : (stars>=1?'⭐':'☆')+(stars>=2?'⭐':'☆')+(stars>=3?'⭐':'☆');
+  // D: ボスクリア時 BOSS DEFEATED フラッシュ
+  if (cleared && stage.isBoss && !_questG.weaknessMode) {
+    var bdf = document.getElementById('quest-boss-defeated');
+    bdf.className = 'quest-boss-defeated'; void bdf.offsetWidth; bdf.classList.add('show');
+    setTimeout(function(){ bdf.className = 'quest-boss-defeated hide'; }, 2200);
+  }
+
+  // E: 星アニメーションHTML生成
+  var starsHtml = '';
+  if (!_questG.weaknessMode) {
+    for (var si=1; si<=3; si++) {
+      starsHtml += '<span class="quest-result-star'+(si<=stars?'':' empty')+'">'+(si<=stars?'⭐':'☆')+'</span>';
+    }
+  }
   var acc = _questG.qCount>0 ? Math.round(_questG.qCorrect/_questG.qCount*100) : 0;
-  var icon = _questG.weaknessMode ? '🎯' : cleared?'🎉':'💪';
-  var titleText = _questG.weaknessMode ? '特訓終了！' : cleared?'クリア！':'あと少し！';
-  var titleColor = _questG.weaknessMode ? '#42a5f5' : cleared?'#66bb6a':'#ff9800';
+  var icon = _questG.weaknessMode ? '🎯' : cleared?(stage.isBoss?'👑':'🎉'):'💪';
+  var titleText = _questG.weaknessMode ? '特訓終了！' : cleared?(stage.isBoss?'BOSS DEFEATED!':'クリア！'):'あと少し！';
+  var titleColor = _questG.weaknessMode ? '#42a5f5' : cleared?(stage.isBoss?'#ffc107':'#66bb6a'):'#ff9800';
   var sub = _questG.qCount+'問 ／ 正解 '+_questG.qCorrect+'問（'+acc+'%）';
   if (_questG.totalMiss>0) sub += '<br>ミス '+_questG.totalMiss+'回';
   if (_questG.totalWrong>0) sub += '<br>間違い '+_questG.totalWrong+'回';
 
+  // E: ワールドコンプリート検出
+  var worldComplete = false;
+  if (cleared && !_questG.weaknessMode) {
+    var w = _QUEST_WORLDS[_questG.worldIdx];
+    worldComplete = w.stages.every(function(s){ return _questGetProgress(s.id).clears > 0; });
+  }
+
   var next = _questNextStage(_questG.worldIdx, _questG.stageIdx);
-  var html = '<div class="arr-quest-result-icon">'+icon+'</div>';
+  var html = '';
+  // E: 紙吹雪（3つ星 or ワールドコンプリート）
+  if (cleared && (stars >= 3 || worldComplete) && !_questG.weaknessMode) {
+    html += '<div class="quest-confetti-wrap" id="quest-confetti-wrap"></div>';
+  }
+  html += '<div class="arr-quest-result-icon">'+icon+'</div>';
   html += '<div class="arr-quest-result-title" style="color:'+titleColor+';">'+titleText+'</div>';
   html += '<div class="arr-quest-result-stars">'+starsHtml+'</div>';
+  // E: WORLD COMPLETE テキスト
+  if (worldComplete) {
+    html += '<div style="font-family:Bebas Neue,cursive;font-size:24px;letter-spacing:3px;color:#ffc107;margin-bottom:8px;">WORLD COMPLETE!</div>';
+  }
   html += '<div class="arr-quest-result-sub">'+sub+'</div>';
   html += '<div class="arr-quest-result-btns">';
   if (_questG.weaknessMode) {
@@ -2744,6 +2823,28 @@ function _questShowResult(cleared) {
   var el = document.getElementById('arr-quest-result');
   el.innerHTML = html;
   el.className = 'arr-quest-result';
+  // E: 紙吹雪スポーン
+  if (cleared && (stars >= 3 || worldComplete) && !_questG.weaknessMode) {
+    _questSpawnConfetti();
+  }
+}
+
+/* E: 紙吹雪エフェクト */
+function _questSpawnConfetti() {
+  var wrap = document.getElementById('quest-confetti-wrap');
+  if (!wrap) return;
+  var colors = ['#ffc107','#66bb6a','#42a5f5','#ef5350','#e8ff47','#ff9800','#ab47bc'];
+  for (var i = 0; i < 40; i++) {
+    var c = document.createElement('div');
+    c.className = 'quest-confetti';
+    c.style.left = Math.random()*100 + '%';
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDuration = (1.5 + Math.random()*2) + 's';
+    c.style.animationDelay = (Math.random()*0.8) + 's';
+    c.style.width = (5 + Math.random()*6) + 'px';
+    c.style.height = (5 + Math.random()*6) + 'px';
+    wrap.appendChild(c);
+  }
 }
 
 function _questNextStage(wi, si) {
@@ -3031,7 +3132,7 @@ var _fns = { kp: kp, kd: kd, doOk: doOk, commit: commit,
   z01FinishBtn: z01FinishBtn, z01ToggleHint: z01ToggleHint, z01Undo: z01Undo, z01UndoNo: z01UndoNo, z01UndoYes: z01UndoYes,
   z01EditScore: z01EditScore, z01EditKp: z01EditKp, z01EditKd: z01EditKd,
   z01EditOk: z01EditOk, z01EditCancel: z01EditCancel,
-  z01FinishDart: z01FinishDart, z01OpenStats: z01OpenStats, z01CloseStats: z01CloseStats,
+  z01FinishDart: z01FinishDart, z01FinishCancel: z01FinishCancel, z01OpenStats: z01OpenStats, z01CloseStats: z01CloseStats,
   toggleScEditor: toggleScEditor, saveScEditor: saveScEditor,
   togglePause: togglePause,
   toggleSound: toggleSound,
@@ -3210,7 +3311,7 @@ function gsSetGoal(val) {
   } catch(e){}
 })();
 // Service Worker 登録（新バージョン検出時に自動リロード）
-if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator && !location.search.includes('nosw')) {
   navigator.serviceWorker.register('./sw.js').then(function(reg) {
     reg.addEventListener('updatefound', function() {
       var newSW = reg.installing;

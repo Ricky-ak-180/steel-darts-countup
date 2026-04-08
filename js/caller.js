@@ -1,0 +1,317 @@
+// ============================================================
+// caller.js — 音声コーラー
+// モード1: 事前生成音声ファイル再生（高品質 Neural TTS）
+// モード2: Web Speech API フォールバック
+// ============================================================
+
+var _callerOn = localStorage.getItem('caller') !== '0';
+var _callerMode = 'speech'; // 'audio' | 'speech'
+var _callerAudioBase = './audio/caller/';
+var _callerCache = {};      // filename -> AudioBuffer
+var _callerCtx = null;
+var _callerQueue = [];      // [{buffers:[], opts:{}}]
+var _callerPlaying = false;
+
+// Web Speech API 用
+var _callerVoice = null;
+var _speechQueue = [];
+var _speechBusy = false;
+
+// ---- 初期化 ----
+// manifest.json の存在確認だけ先に行う（AudioContext はユーザー操作時に作成）
+var _callerManifestReady = false;
+(function _callerInit() {
+  fetch(_callerAudioBase + 'manifest.json')
+    .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
+    .then(function(m) {
+      _callerMode = 'audio';
+      _callerManifestReady = true;
+      console.log('[Caller] Audio mode ready');
+      _callerInitSpeech(); // フォールバック音声も準備
+    })
+    .catch(function() {
+      _callerMode = 'speech';
+      console.log('[Caller] Speech mode (fallback)');
+      _callerInitSpeech();
+    });
+})();
+
+// ユーザー操作コンテキストで AudioContext を作成・取得
+function _callerGetCtx() {
+  if (_callerCtx) {
+    if (_callerCtx.state === 'suspended') _callerCtx.resume();
+    return _callerCtx;
+  }
+  if (!_callerManifestReady) return null;
+  try {
+    _callerCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // 作成直後に resume（一部ブラウザで suspended になる）
+    if (_callerCtx.state === 'suspended') _callerCtx.resume();
+    // よく使う音声を先読み
+    _callerPreload(['s0','s60','s100','s140','s180','gameshot_match','gameshot_leg','bust','caller_on']);
+    return _callerCtx;
+  } catch(e) {
+    return null;
+  }
+}
+
+function _callerInitSpeech() {
+  if (!window.speechSynthesis) return;
+  function pick() {
+    var voices = speechSynthesis.getVoices();
+    var best = null, bestScore = -1;
+    for (var i = 0; i < voices.length; i++) {
+      var v = voices[i]; if (!/^en/i.test(v.lang)) continue;
+      var s = 0;
+      if (/en[-_]GB/i.test(v.lang)) s += 50;
+      if (/neural|online|natural/i.test(v.name)) s += 100;
+      if (/google/i.test(v.name)) s += 40;
+      if (/david|hazel|ryan|sonia|libby/i.test(v.name)) s += 20;
+      if (s > bestScore) { bestScore = s; best = v; }
+    }
+    if (best) _callerVoice = best;
+  }
+  pick();
+  if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = pick;
+}
+
+// ---- Audio モード: ファイル読み込み ----
+function _callerPreload(names) {
+  names.forEach(function(n) { _callerLoad(n, function(){}); });
+}
+
+function _callerLoad(name, cb) {
+  if (_callerCache[name]) { cb(_callerCache[name]); return; }
+  var ctx = _callerGetCtx();
+  if (!ctx) { cb(null); return; }
+  var url = _callerAudioBase + name + '.mp3';
+  fetch(url)
+    .then(function(r) { return r.ok ? r.arrayBuffer() : Promise.reject('404'); })
+    .then(function(ab) { return ctx.decodeAudioData(ab); })
+    .then(function(buf) { _callerCache[name] = buf; cb(buf); })
+    .catch(function() { cb(null); });
+}
+
+// ---- Audio モード: 再生キュー ----
+function _callerPlay(plays, opts) {
+  if (!_callerOn) return;
+  if (_callerMode === 'audio') {
+    // ユーザー操作のコンテキストで AudioContext を作成・resume
+    var ctx = _callerGetCtx();
+    if (ctx) {
+      _callerQueue.push({ plays: plays, opts: opts || {} });
+      if (!_callerPlaying) _callerFlushAudio();
+      return;
+    }
+  }
+  // Speech フォールバック
+  if (opts && opts.text) {
+    _speechEnqueue(opts.text, opts);
+  }
+}
+
+function _callerFlushAudio() {
+  if (_callerQueue.length === 0) { _callerPlaying = false; return; }
+  _callerPlaying = true;
+  var item = _callerQueue.shift();
+  _callerPlaySequence(item.plays, 0, function() {
+    setTimeout(_callerFlushAudio, 60);
+  });
+}
+
+function _callerPlaySequence(names, idx, onDone) {
+  if (idx >= names.length) { onDone(); return; }
+  var name = names[idx];
+  if (name === null) {
+    // 無音ポーズ
+    setTimeout(function() { _callerPlaySequence(names, idx + 1, onDone); }, 300);
+    return;
+  }
+  _callerLoad(name, function(buf) {
+    if (!buf) {
+      _callerPlaySequence(names, idx + 1, onDone);
+      return;
+    }
+    var ctx = _callerGetCtx();
+    if (!ctx) { _callerPlaySequence(names, idx + 1, onDone); return; }
+    var doPlay = function() {
+      var source = ctx.createBufferSource();
+      source.buffer = buf;
+      var gain = ctx.createGain();
+      gain.gain.value = 1.0;
+      source.connect(gain);
+      gain.connect(ctx.destination);
+      source.onended = function() {
+        setTimeout(function() { _callerPlaySequence(names, idx + 1, onDone); }, 60);
+      };
+      source.start();
+    };
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(doPlay);
+    } else {
+      doPlay();
+    }
+  });
+}
+
+// ---- Speech フォールバックキュー ----
+function _speechEnqueue(text, opts) {
+  if (!window.speechSynthesis) return;
+  opts = opts || {};
+  var u = new SpeechSynthesisUtterance(text);
+  if (_callerVoice) u.voice = _callerVoice;
+  u.lang = 'en-GB';
+  u.rate = opts.rate || 1.0;
+  u.pitch = opts.pitch || 1.0;
+  u.volume = opts.volume || 1.0;
+  _speechQueue.push(u);
+  if (!_speechBusy) _speechFlush();
+}
+
+function _speechFlush() {
+  if (_speechQueue.length === 0) { _speechBusy = false; return; }
+  _speechBusy = true;
+  var u = _speechQueue.shift();
+  u.onend = function() { setTimeout(_speechFlush, 80); };
+  u.onerror = function() { setTimeout(_speechFlush, 80); };
+  speechSynthesis.speak(u);
+}
+
+// ---- スコアテキスト変換（Speech フォールバック用） ----
+var _SMAP = {
+  180:'One Hundred and Eighty!', 177:'One Hundred and Seventy Seven',
+  174:'One Hundred and Seventy Four', 171:'One Hundred and Seventy One',
+  170:'One Hundred and Seventy', 160:'One Hundred and Sixty',
+  158:'One Hundred and Fifty Eight', 157:'One Hundred and Fifty Seven',
+  150:'One Hundred and Fifty', 140:'One Hundred and Forty',
+  130:'One Hundred and Thirty', 120:'One Hundred and Twenty',
+  110:'One Hundred and Ten', 100:'One Hundred',
+};
+function _sText(n) {
+  if (n === 0) return 'No score.';
+  if (_SMAP[n]) return _SMAP[n];
+  var ones=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+  var tens=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+  if (n < 20) return ones[n];
+  if (n < 100) { var t=Math.floor(n/10),o=n%10; return tens[t]+(o?' '+ones[o]:''); }
+  var h=Math.floor(n/100), r=n%100;
+  var base=(h===1?'One Hundred':'Two Hundred');
+  return base + (r > 0 ? ' and ' + _sText(r) : '');
+}
+
+// ============================================================
+// PUBLIC API
+// ============================================================
+
+function callerScore(score) {
+  if (!_callerOn || score == null) return;
+  _callerPlay(['s' + score], {text: _sText(score)});
+}
+
+function callerGameShot(isMatchWin) {
+  if (!_callerOn) return;
+  var key = isMatchWin ? 'gameshot_match' : 'gameshot_leg';
+  var text = isMatchWin ? 'Game Shot! And the match!' : 'Game Shot! And the leg.';
+  _callerPlay([key], {text: text});
+}
+
+function callerBust() {
+  if (!_callerOn) return;
+  _callerPlay(['bust'], {text: 'Bust.'});
+}
+
+function callerRequire(remaining) {
+  if (!_callerOn || remaining <= 0 || remaining > 170) return;
+  _callerPlay(['r' + remaining], {text: 'You require ' + _sText(remaining)});
+}
+
+function callerSimCheckout(who) {
+  if (!_callerOn) return;
+  if (who === 'player') {
+    _callerPlay(['checkout'], {text: 'Checkout! Well done!'});
+  } else {
+    _callerPlay(['cpu_checkout'], {text: 'CPU checks out.'});
+  }
+}
+
+function callerFinish(total) {
+  if (!_callerOn) return;
+  // "Game over." → "Total score," → [スコア]
+  _callerPlay(['gameover', null, 'total_score', null, 's' + total], {text: 'Game over. Total score, ' + _sText(total)});
+}
+
+// 設定トグル
+function toggleCaller() {
+  _callerOn = !_callerOn;
+  localStorage.setItem('caller', _callerOn ? '1' : '0');
+  var btn = document.getElementById('btn-caller');
+  if (btn) btn.classList.toggle('caller-off', !_callerOn);
+  if (_callerOn) _callerPlay(['caller_on'], {text: 'Caller on.'});
+}
+
+// ボタン初期状態
+(function(){
+  var btn = document.getElementById('btn-caller');
+  if (btn && !_callerOn) btn.classList.add('caller-off');
+})();
+
+// ============================================================
+// game.js フック（キャッシュ対策: caller.js 側から強制パッチ）
+// game.js に古いキャッシュが当たっていてもコーラーが動くよう保険的にパッチ
+// game.js 側にすでにフックがある場合は二重コールを防ぐ
+// ============================================================
+(function _callerPatchGameFunctions() {
+  function patch() {
+    // CountUp: commit() — フックがなければパッチ
+    if (typeof commit === 'function' && !commit.toString().includes('callerScore') && !commit._callerPatched) {
+      var _origCommit = commit;
+      window.commit = function(total) { _origCommit.apply(this, arguments); callerScore(total); };
+      window.commit._callerPatched = true;
+    }
+
+    // 01: z01Ok() — フックがなければパッチ（スコアコールは _z01Commit 経由にする）
+    if (typeof z01Ok === 'function' && !z01Ok.toString().includes('callerScore') && !z01Ok._callerPatched) {
+      var _origZ01Ok = z01Ok;
+      window.z01Ok = function() { _origZ01Ok.apply(this, arguments); };
+      window.z01Ok._callerPatched = true;
+      // _z01Commit でスコア・バストをコール
+      if (typeof _z01Commit === 'function' && !_z01Commit.toString().includes('callerBust') && !_z01Commit._callerPatched) {
+        var _origZ01Commit = _z01Commit;
+        window._z01Commit = function(sc) {
+          var p = _z01.currentPlayer, rem = _z01.remain[p], after = rem - sc;
+          var bust = _z01.outRule === 0 ? (after < 0 || after === 1) : (after < 0);
+          _origZ01Commit.apply(this, arguments);
+          if (bust) { callerBust(); } else if (sc > 0) { callerScore(sc); }
+        };
+        window._z01Commit._callerPatched = true;
+      }
+    }
+
+    // 01: _z01LegEnd() — フックがなければパッチ
+    if (typeof _z01LegEnd === 'function' && !_z01LegEnd.toString().includes('callerGameShot') && !_z01LegEnd._callerPatched) {
+      var _origLegEnd = _z01LegEnd;
+      window._z01LegEnd = function(winner) {
+        _origLegEnd.apply(this, arguments);
+        var matchOver = _z01 && _z01.legWins && (_z01.legWins[winner] >= _z01.legs);
+        callerGameShot(matchOver);
+      };
+      window._z01LegEnd._callerPatched = true;
+    }
+
+    // CountUp: showResult() — フックがなければパッチ
+    if (typeof showResult === 'function' && !showResult.toString().includes('callerFinish') && !showResult._callerPatched) {
+      var _origShowResult = showResult;
+      window.showResult = function() {
+        _origShowResult.apply(this, arguments);
+        if (typeof g !== 'undefined' && g.total != null) callerFinish(g.total);
+      };
+      window.showResult._callerPatched = true;
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', patch);
+  } else {
+    patch();
+  }
+})();

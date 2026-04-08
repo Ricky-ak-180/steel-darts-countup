@@ -96,6 +96,8 @@ function commit(total) {
     else if (total >= 120) { showRoundFlash('GREAT!', '#47ffb4'); if (navigator.vibrate) navigator.vibrate(30); }
     else if (total >= 100) { showRoundFlash('NICE!', '#4fc3f7'); }
   }
+  // 音声コーラー
+  if (typeof callerScore === 'function') callerScore(total);
   showRoundPopup(total);
   var el = document.getElementById('total');
   el.textContent = g.total;
@@ -273,6 +275,8 @@ function showResult() {
   if (_rt) _rt.style.color = _rc.b;
   // Sound
   soundFinish(isPB);
+  // 音声コーラー
+  if (typeof callerFinish === 'function') callerFinish(g.total);
   var tda = (g.total / 8).toFixed(2);
   document.getElementById('ravg').textContent = tda;
   var ravgSub = document.getElementById('ravg-sub');
@@ -1657,7 +1661,6 @@ function _z01HintUpdate() {
   var finBtn = document.getElementById('z01-bb-finish');
   if (finBtn) {
     var canFinish = rem > 0 && rem <= 170 && !!coPath;
-    finBtn.classList.toggle('z01-bb-dim', !canFinish);
     finBtn.classList.toggle('finish-ready', canFinish);
   }
 }
@@ -1711,6 +1714,8 @@ function z01Ok() {
   if (isNaN(sc) || sc < 0 || sc > 180) return;
   if (sc === 180) { sound180(); show180(); setTimeout(launchConfetti, 150); }
   else { soundCommit(sc); }
+  // 音声コーラー
+  if (typeof callerScore === 'function') callerScore(sc);
   _z01Commit(sc);
 }
 
@@ -1730,6 +1735,7 @@ function _z01Commit(sc) {
   if (bust) {
     if (rem <= 170 && _z01.checkoutAttempts) _z01.checkoutAttempts[p].push({score: rem, success: false});
     soundCommit(0);
+    if (typeof callerBust === 'function') callerBust();
     var f = document.createElement('div');
     f.className = 'z01-bust-flash';
     document.body.appendChild(f);
@@ -2100,6 +2106,8 @@ function _z01LegEnd(winner) {
   } else {
     soundLegWin();
   }
+  // 音声コーラー: Game Shot
+  if (typeof callerGameShot === 'function') callerGameShot(matchOver);
   document.getElementById('z01-leg-overlay').style.display = 'flex';
   _z01Render();
 }
@@ -2728,7 +2736,7 @@ function z01ExitYes() {
 function z01FinishBtn() {
   var p = _z01.currentPlayer, rem = _z01.remain[p];
   var finEl = document.getElementById('z01-bb-finish');
-  if (!finEl || finEl.classList.contains('z01-bb-dim')) return;
+  if (!finEl || !finEl.classList.contains('finish-ready')) return;
   _z01BufUpdate(String(rem));
   z01Ok();
 }
@@ -3067,6 +3075,7 @@ function _z01BuildFinishModal(finishedScore) {
   if (can1) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="1"><span class="z01-finish-btn-main">1本目でフィニッシュ</span><span class="z01-finish-btn-sub">このターン1投目に決めた（計' + (baseDarts + 1) + '本）</span></button>';
   if (can2) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="2"><span class="z01-finish-btn-main">2本目でフィニッシュ</span><span class="z01-finish-btn-sub">このターン2投目に決めた（計' + (baseDarts + 2) + '本）</span></button>';
   h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="3"><span class="z01-finish-btn-main">3本目でフィニッシュ</span><span class="z01-finish-btn-sub">このターン3投フル使用（計' + (baseDarts + 3) + '本）</span></button>';
+  h += '<button class="z01-finish-cancel" data-fn="z01FinishCancel">← キャンセル（スコアを戻す）</button>';
   inner.innerHTML = h;
 }
 function z01FinishDart(dartNo) {
@@ -3082,6 +3091,52 @@ function z01FinishDart(dartNo) {
   _z01._pendingFinish = null;
   _z01.legWins[p]++;
   _z01LegEnd(p);
+}
+
+function z01FinishCancel() {
+  document.getElementById('z01-finish-modal').style.display = 'none';
+  var pf = _z01._pendingFinish;
+  if (!pf) return;
+  _z01._pendingFinish = null;
+  // Undo the committed score: revert remain, stats, and log
+  var p = pf.player, st = _z01.stats[p];
+  var log = _z01.log;
+  // Find the log entry that recorded the checkout
+  var n = _z01.players === 1 ? 1 : 2;
+  // The last log row with data for this player
+  for (var ri = log.length - 1; ri >= 0; ri--) {
+    if (log[ri].p[p] !== null) {
+      var data = log[ri].p[p];
+      _z01.remain[p] = data.scored + data.remain; // restore remaining
+      // Undo stats
+      st.rounds--;
+      st.total -= data.scored;
+      st.legRounds--;
+      if (data.scored >= 180) st.c180--;
+      else if (data.scored >= 140) st.c140--;
+      else if (data.scored >= 100) st.c100--;
+      if (st.first9.length > 0 && st.legRounds < 3) st.first9.pop();
+      if (data.scored > 0 && data.scored === st.hiFin) st.hiFin = 0; // reset hi finish
+      // Remove checkout attempt
+      if (_z01.checkoutAttempts && _z01.checkoutAttempts[p]) {
+        var ca = _z01.checkoutAttempts[p];
+        if (ca.length > 0) ca.pop();
+      }
+      // Remove log entry
+      log[ri].p[p] = null;
+      // If the log row is now all null and not the first row, check if we should remove trailing empty row
+      if (ri === log.length - 1) {
+        var allNull = true;
+        for (var j = 0; j < n; j++) { if (log[ri].p[j] !== null) { allNull = false; break; } }
+        if (allNull && log.length > 1) log.pop();
+      }
+      break;
+    }
+  }
+  _z01BufUpdate('');
+  _z01Render();
+  _z01HintUpdate();
+  _z01LogRender();
 }
 
 function z01OpenStats() {
