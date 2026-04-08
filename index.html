@@ -850,30 +850,16 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         </div>
         <div class="z01-section" id="ckt-cpu-section">
           <div class="z01-label">CPU LEVEL</div>
-          <div class="z01-cpu-tier">
-            <div class="z01-cpu-tier-label">初心者</div>
-            <div class="z01-chips">
-              <div class="z01-chip" data-fn="cktSetCpu" data-arg="1">LV1 入門</div>
-              <div class="z01-chip" data-fn="cktSetCpu" data-arg="2">LV2 初心者</div>
+          <div style="padding:4px 0 8px;">
+            <div id="ckt-cpu-level-disp" style="font-size:18px;font-weight:700;color:var(--acc);text-align:center;margin-bottom:8px;">LV4 中初級</div>
+            <input type="range" id="ckt-cpu-slider" min="1" max="12" value="4"
+                   style="width:100%;accent-color:var(--acc);cursor:pointer;"
+                   oninput="cktSetCpu(parseInt(this.value))">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mut);margin-top:3px;">
+              <span>入門</span><span>プロ</span>
             </div>
           </div>
-          <div class="z01-cpu-tier">
-            <div class="z01-cpu-tier-label">アマチュア</div>
-            <div class="z01-chips">
-              <div class="z01-chip" data-fn="cktSetCpu" data-arg="3">LV3 初級</div>
-              <div class="z01-chip on" data-fn="cktSetCpu" data-arg="4">LV4 中初級</div>
-              <div class="z01-chip" data-fn="cktSetCpu" data-arg="5">LV5 アマチュア</div>
-            </div>
-          </div>
-          <div class="z01-cpu-tier">
-            <div class="z01-cpu-tier-label">中級〜上級</div>
-            <div class="z01-chips">
-              <div class="z01-chip" data-fn="cktSetCpu" data-arg="6">LV6 中級</div>
-              <div class="z01-chip" data-fn="cktSetCpu" data-arg="7">LV7 中級+</div>
-              <div class="z01-chip" data-fn="cktSetCpu" data-arg="8">LV8 上級</div>
-            </div>
-          </div>
-          <div id="ckt-cpu-desc" style="font-size:11px;color:var(--mut);padding:4px 2px;letter-spacing:0.5px;"></div>
+          <div id="ckt-cpu-desc" style="font-size:12px;color:var(--mut);text-align:center;padding:2px;">MPR ~2.3</div>
         </div>
         <div class="z01-start-sticky">
           <button class="z01-start-btn" data-fn="cktStart" data-i18n="ckt.start">GAME START</button>
