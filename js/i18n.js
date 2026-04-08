@@ -617,9 +617,16 @@ function _updateLangToggle() {
 
 /* ---- Theme toggle ---- */
 function _applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
+  var root = document.documentElement;
+  // Add transition class for smooth theme switching
+  root.classList.add('theme-transition');
+  root.setAttribute('data-theme', theme);
   var btn = document.getElementById('btn-theme');
   if (btn) btn.textContent = theme === 'light' ? '☀️' : '🌙';
+  // Remove transition class after animation completes
+  setTimeout(function() {
+    root.classList.remove('theme-transition');
+  }, 300);
 }
 
 function toggleTheme() {

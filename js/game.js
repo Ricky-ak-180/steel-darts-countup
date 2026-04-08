@@ -6,6 +6,7 @@ let _gameStartTime = null;
 let _timerInterval = null;
 let _pausedElapsed = 0;
 let _timerPaused = false;
+let _undoOpenTime = null;
 
 function startTimer() {
   _pausedElapsed = 0;
@@ -89,7 +90,7 @@ function commit(total) {
   g.scores.push(total);
   g.total += total;
   buf = '';
-  if (total === 180) { sound180(); show180(); setTimeout(launchConfetti, 150); }
+  if (total === 180) { sound180(); show180(); setTimeout(launchConfetti, 150); if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 150]); }
   else {
     soundCommit(total);
     if (total >= 140) { showRoundFlash('EXCELLENT!', '#ff6b35'); if (navigator.vibrate) navigator.vibrate([40,30,40]); }
@@ -161,6 +162,7 @@ function updDisp() {
 /* Undo last round */
 function undoRound() {
   if (g.scores.length === 0) return;
+  _undoOpenTime = Date.now(); // Undoダイアログを開いた時刻を記録
   var prevRound = g.scores.length;
   var prevScore = g.scores[g.scores.length - 1];
   var msg = 'R' + prevRound + ' の ' + prevScore + ' pt を取り消して入力し直しますか？';
@@ -168,9 +170,14 @@ function undoRound() {
   document.getElementById('oundo').classList.add('show');
 }
 function closeUndo() {
+  _undoOpenTime = null;
   document.getElementById('oundo').classList.remove('show');
 }
 function doUndo() {
+  // Undoダイアログを開いていた時間をタイマーから除外
+  if (_gameStartTime && _undoOpenTime) {
+    _gameStartTime += (Date.now() - _undoOpenTime);
+  }
   closeUndo();
   if (g.scores.length === 0) return;
   var last = g.scores.pop();
@@ -180,8 +187,24 @@ function doUndo() {
   var rp = document.getElementById('round-popup');
   if (rp) rp.innerHTML = '';
   document.getElementById('total').textContent = g.total;
+  // Bug fix: total=0のときヒントを再表示する
   var hint = document.getElementById('total-hint');
-  if (hint && g.total > 0) hint.classList.add('hide');
+  if (hint) {
+    if (g.total > 0) hint.classList.add('hide');
+    else hint.classList.remove('hide');
+  }
+  // Round 1に戻った場合はタイマーをリセット（次の入力で再スタート）
+  if (g.scores.length === 0 && _gameStartTime) {
+    clearInterval(_timerInterval);
+    _timerInterval = null;
+    _gameStartTime = null;
+    _pausedElapsed = 0;
+    _timerPaused = false;
+    var timerEl = document.getElementById('timer-disp');
+    if (timerEl) timerEl.textContent = '';
+    var pb = document.getElementById('bpause');
+    if (pb) { pb.className = 'bpause'; pb.textContent = '⏸'; }
+  }
   drawRoundGrid();
   document.getElementById('rnum').innerHTML = g.round + ' <em>/ 8</em>';
   document.getElementById('bok').className = 'tk enter';
@@ -1431,11 +1454,18 @@ function renderRrateRows() {
 }
 
 /* Render history */
+// Pagination state for history
+var _histCurrentPage = 1;
+var _histItemsPerPage = 15;
+var _histTotalItems = 0;
+
 function renderHist() {
   migrateTotals();
   _renderDailyBadge();
   _renderXPBar();
   var h=getH();
+  _histTotalItems = h.length;
+  _histCurrentPage = 1; // Reset to first page when rendering
   var s3=document.getElementById('hs3');
   var a3=document.getElementById('ha3');
   var hl=document.getElementById('hlist');
@@ -1633,7 +1663,26 @@ function renderHist() {
   })();
   renderPer(h);
   setTimeout(function(){ drawChart(h); }, 50);
-  hl.innerHTML = h.map(function(x,idx){
+
+  // Pagination logic
+  var totalPages = Math.ceil(h.length / _histItemsPerPage);
+  var startIdx = (_histCurrentPage - 1) * _histItemsPerPage;
+  var endIdx = Math.min(startIdx + _histItemsPerPage, h.length);
+  var pageItems = h.slice(startIdx, endIdx);
+
+  // Show/hide pagination controls
+  var paginationEl = document.getElementById('hist-pagination');
+  if (totalPages > 1) {
+    paginationEl.style.display = 'flex';
+    document.getElementById('hist-prev-btn').disabled = _histCurrentPage === 1;
+    document.getElementById('hist-next-btn').disabled = _histCurrentPage === totalPages;
+    document.getElementById('hist-page-info').textContent = _histCurrentPage + ' / ' + totalPages;
+  } else {
+    paginationEl.style.display = 'none';
+  }
+
+  hl.innerHTML = pageItems.map(function(x,pageIdx){
+    var actualIdx = startIdx + pageIdx; // Preserve actual index for delete
     var isBest=x.score===best;
     var d=new Date(x.date);
     var ds=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+pad(d.getMinutes());
@@ -1656,7 +1705,72 @@ function renderHist() {
       if(c59>0)  parts.push('<span style="color:rgba(255,255,255,0.35);">59-:'+c59+'</span>');
       mini=parts.length?'<div style="font-size:10px;margin-top:3px;display:flex;gap:6px;">'+parts.join('')+'</div>':'';
     }
-    return '<div class="hi" data-idx="'+idx+'">'+
+    return '<div class="hi" data-idx="'+actualIdx+'">'+
+      '<div class="hi-del-bg">削除</div>'+
+      '<div class="hi-inner">'+
+      '<div class="hsc'+(isBest?' best':'')+'">'+x.score+'</div>'+
+      '<div class="hinf"><div class="hdate">'+ds+'　'+rank(x.score)+'ランク'+(x.duration?' ⏱'+Math.floor(x.duration/60)+'分'+(x.duration%60>0?x.duration%60+'秒':''):'')+'</div><div class="hpills">'+pills+'<span class="hpill" style="color:#b47fff;background:rgba(180,127,255,0.12);">3ダーツ平均:'+tda3+'</span></div>'+mini+'</div>'+
+      (isBest?'<div class="hbdg">BEST</div>':'')+
+      '</div>'+
+      '</div>';
+  }).join('');
+  _setupSwipeDelete(hl);
+
+  // Add pagination event listeners
+  document.getElementById('hist-prev-btn').onclick = function() {
+    if (_histCurrentPage > 1) {
+      _histCurrentPage--;
+      _renderHistPage();
+    }
+  };
+  document.getElementById('hist-next-btn').onclick = function() {
+    if (_histCurrentPage < totalPages) {
+      _histCurrentPage++;
+      _renderHistPage();
+    }
+  };
+}
+
+function _renderHistPage() {
+  // Re-render just the history list with the current page
+  var h = getH();
+  var hl = document.getElementById('hlist');
+  var best = h.length ? Math.max.apply(null, h.map(function(x){return x.score;})) : 0;
+  var totalPages = Math.ceil(h.length / _histItemsPerPage);
+  var startIdx = (_histCurrentPage - 1) * _histItemsPerPage;
+  var endIdx = Math.min(startIdx + _histItemsPerPage, h.length);
+  var pageItems = h.slice(startIdx, endIdx);
+
+  // Update pagination controls
+  var paginationEl = document.getElementById('hist-pagination');
+  document.getElementById('hist-prev-btn').disabled = _histCurrentPage === 1;
+  document.getElementById('hist-next-btn').disabled = _histCurrentPage === totalPages;
+  document.getElementById('hist-page-info').textContent = _histCurrentPage + ' / ' + totalPages;
+
+  hl.innerHTML = pageItems.map(function(x,pageIdx){
+    var actualIdx = startIdx + pageIdx;
+    var isBest=x.score===best;
+    var d=new Date(x.date);
+    var ds=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+pad(d.getMinutes());
+    var pills=(x.rounds||[]).map(function(r,i){return '<span class="hpill">R'+(i+1)+':'+r+'</span>';}).join('');
+    var tda3 = x.score ? (x.score / 8).toFixed(2) : '—';
+    var rds=x.rounds||[];
+    var mini='';
+    if(rds.length>0){
+      var c180=rds.filter(function(r){return r===180;}).length;
+      var c140=rds.filter(function(r){return r>=140&&r<180;}).length;
+      var c100=rds.filter(function(r){return r>=100&&r<140;}).length;
+      var c60=rds.filter(function(r){return r>=60&&r<100;}).length;
+      var c59=rds.filter(function(r){return r<60;}).length;
+      var parts=[];
+      if(c180>0) parts.push('<span style="color:#e8ff47;">180:'+c180+'</span>');
+      if(c140>0) parts.push('<span style="color:#47ffb4;">140+:'+c140+'</span>');
+      if(c100>0) parts.push('<span style="color:#4fc3f7;">100+:'+c100+'</span>');
+      if(c60>0)  parts.push('<span style="color:#9575cd;">60+:'+c60+'</span>');
+      if(c59>0)  parts.push('<span style="color:rgba(255,255,255,0.35);">59-:'+c59+'</span>');
+      mini=parts.length?'<div style="font-size:10px;margin-top:3px;display:flex;gap:6px;">'+parts.join('')+'</div>':'';
+    }
+    return '<div class="hi" data-idx="'+actualIdx+'">'+
       '<div class="hi-del-bg">削除</div>'+
       '<div class="hi-inner">'+
       '<div class="hsc'+(isBest?' best':'')+'">'+x.score+'</div>'+
@@ -1674,16 +1788,19 @@ function _setupSwipeDelete(hl) {
     var inner = el.querySelector('.hi-inner');
     var delBg = el.querySelector('.hi-del-bg');
     var startX = 0, startY = 0, startOffset = 0;
+    var hasMovedX = false;
     inner.addEventListener('touchstart', function(e) {
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
       startOffset = parseFloat(inner.style.transform.replace(/[^-\d.]/g,'')) || 0;
       inner.style.transition = 'none';
+      hasMovedX = false;
     }, {passive: true});
     inner.addEventListener('touchmove', function(e) {
       var cx = e.touches[0].clientX - startX;
       var cy = e.touches[0].clientY - startY;
       if (Math.abs(cy) > Math.abs(cx) + 5 && Math.abs(cx) < 10) return;
+      hasMovedX = true;
       var next = Math.max(-REVEAL, Math.min(0, startOffset + cx));
       inner.style.transform = 'translateX(' + next + 'px)';
     }, {passive: true});
@@ -1692,6 +1809,13 @@ function _setupSwipeDelete(hl) {
       inner.style.transition = 'transform 0.2s';
       inner.style.transform = cur < -REVEAL * 0.5 ? 'translateX(-' + REVEAL + 'px)' : '';
     }, {passive: true});
+    // Click on history item to show details (but not when swiping)
+    inner.addEventListener('click', function(e) {
+      if (!hasMovedX && e.target !== delBg && !delBg.contains(e.target)) {
+        var idx = parseInt(el.getAttribute('data-idx'), 10);
+        showGameDetail(idx);
+      }
+    });
     delBg.addEventListener('click', function() {
       var idx = parseInt(el.getAttribute('data-idx'), 10);
       delOne(idx);
@@ -1714,8 +1838,144 @@ function _setupSwipeDelete(hl) {
   }, {passive: true});
 }
 
+/* ============================================================
+   GAME DETAIL MODAL
+   ============================================================ */
+function showGameDetail(idx) {
+  var h = getH();
+  if (idx < 0 || idx >= h.length) return;
+  var game = h[idx];
+
+  // Round stats
+  var rounds = game.rounds || [];
+  var d = new Date(game.date);
+  var dateStr = d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+pad(d.getMinutes());
+
+  // Score distribution
+  var c180 = rounds.filter(function(r){return r===180;}).length;
+  var c140 = rounds.filter(function(r){return r>=140&&r<180;}).length;
+  var c100 = rounds.filter(function(r){return r>=100&&r<140;}).length;
+  var c60 = rounds.filter(function(r){return r>=60&&r<100;}).length;
+  var c59 = rounds.filter(function(r){return r<60;}).length;
+
+  // Calculate stats
+  var avgScore = game.score / rounds.length;
+  var maxRound = Math.max.apply(null, rounds) || 0;
+  var minRound = Math.min.apply(null, rounds.filter(function(r){return r>0;})) || 0;
+  var consistency = (Math.round(avgScore * 100) / 100);
+
+  // Build modal HTML
+  var roundsHtml = rounds.map(function(r, i) {
+    return '<div style="padding:6px;border:1px solid var(--bdr);border-radius:4px;text-align:center;background:var(--sur2);">' +
+      '<div style="font-size:10px;color:var(--mut);">R'+(i+1)+'</div>' +
+      '<div style="font-size:18px;font-family:\'Bebas Neue\',cursive;color:var(--acc);font-weight:700;">'+ r +'</div>' +
+      '</div>';
+  }).join('');
+
+  var html = '<div style="padding:12px;display:flex;flex-direction:column;gap:10px;">' +
+    '<div style="border-bottom:1px solid var(--bdr);padding-bottom:8px;">' +
+      '<div style="font-size:13px;color:var(--mut);margin-bottom:4px;">'+dateStr+'</div>' +
+      '<div style="font-size:28px;font-family:\'Bebas Neue\',cursive;color:var(--acc);font-weight:900;">'+game.score+'</div>' +
+      '<div style="font-size:11px;color:var(--txt);margin-top:2px;">'+rank(game.score)+'ランク</div>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;">' +
+      '<div style="background:var(--sur2);padding:8px;border-radius:4px;text-align:center;">' +
+        '<div style="color:var(--mut);font-size:10px;margin-bottom:2px;">3ダーツ平均</div>' +
+        '<div style="font-size:16px;font-family:\'Bebas Neue\',cursive;color:#b47fff;font-weight:700;">'+consistency.toFixed(2)+'</div>' +
+      '</div>' +
+      '<div style="background:var(--sur2);padding:8px;border-radius:4px;text-align:center;">' +
+        '<div style="color:var(--mut);font-size:10px;margin-bottom:2px;">所用時間</div>' +
+        '<div style="font-size:14px;color:var(--grn);">⏱'+(game.duration ? (Math.floor(game.duration/60)+'分'+(game.duration%60>0?game.duration%60+'秒':'')) : '—')+'</div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;font-size:11px;padding:6px;background:var(--sur2);border-radius:4px;">' +
+      '<div style="text-align:center;"><div style="color:#e8ff47;font-weight:700;">'+c180+'</div><div style="color:var(--mut);font-size:9px;">180</div></div>' +
+      '<div style="text-align:center;"><div style="color:#47ffb4;font-weight:700;">'+c140+'</div><div style="color:var(--mut);font-size:9px;">140+</div></div>' +
+      '<div style="text-align:center;"><div style="color:#4fc3f7;font-weight:700;">'+c100+'</div><div style="color:var(--mut);font-size:9px;">100+</div></div>' +
+      '<div style="text-align:center;"><div style="color:#9575cd;font-weight:700;">'+c60+'</div><div style="color:var(--mut);font-size:9px;">60+</div></div>' +
+      '<div style="text-align:center;"><div style="color:rgba(255,255,255,0.5);font-weight:700;">'+c59+'</div><div style="color:var(--mut);font-size:9px;">59-</div></div>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:12px;padding:6px;background:var(--sur2);border-radius:4px;">' +
+      '<div style="text-align:center;"><div style="color:var(--mut);font-size:9px;">最高</div><div style="font-family:\'Bebas Neue\',cursive;color:var(--acc);font-weight:700;">'+maxRound+'</div></div>' +
+      '<div style="text-align:center;"><div style="color:var(--mut);font-size:9px;">最低</div><div style="font-family:\'Bebas Neue\',cursive;color:#ff9944;font-weight:700;">'+minRound+'</div></div>' +
+      '<div style="text-align:center;"><div style="color:var(--mut);font-size:9px;">ラウンド数</div><div style="font-family:\'Bebas Neue\',cursive;color:var(--grn);font-weight:700;">'+rounds.length+'</div></div>' +
+    '</div>' +
+    '<div style="border-top:1px solid var(--bdr);padding-top:8px;">' +
+      '<div style="color:var(--mut);font-size:10px;margin-bottom:6px;">ラウンド別スコア</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">'+roundsHtml+'</div>' +
+    '</div>' +
+  '</div>';
+
+  // Show modal
+  var modal = document.createElement('div');
+  modal.id = 'game-detail-modal';
+  modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;z-index:1000;';
+  modal.innerHTML = '<div style="width:100%;background:var(--sur);border-radius:12px 12px 0 0;max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">'+
+    '<div style="padding:12px;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;">' +
+      '<div style="font-weight:700;font-size:14px;">ゲーム詳細</div>' +
+      '<button onclick="document.getElementById(\'game-detail-modal\').remove();" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--mut);">✕</button>' +
+    '</div>'+
+    html+
+  '</div>';
+  document.body.appendChild(modal);
+
+  // Register modal for Escape key and backdrop close
+  _registerModal('game-detail-modal', function() {
+    var m = document.getElementById('game-detail-modal');
+    if (m) m.remove();
+    _unregisterModal('game-detail-modal');
+  });
+  _setupModalBackdropClose(modal, function() {
+    var m = document.getElementById('game-detail-modal');
+    if (m) m.remove();
+    _unregisterModal('game-detail-modal');
+  });
+}
+
+/* ============================================================
+   MODAL DIALOG UTILITIES
+   ============================================================ */
+// Global modal list for Escape key and backdrop close
+var _openModals = [];
+
+function _registerModal(modalId, closeCallback) {
+  // Remove if already registered
+  _openModals = _openModals.filter(function(m) { return m.id !== modalId; });
+  // Add to stack
+  _openModals.push({ id: modalId, closeCallback: closeCallback });
+}
+
+function _unregisterModal(modalId) {
+  _openModals = _openModals.filter(function(m) { return m.id !== modalId; });
+}
+
+function _closeTopModal() {
+  if (_openModals.length > 0) {
+    var top = _openModals[_openModals.length - 1];
+    if (top.closeCallback) top.closeCallback();
+  }
+}
+
+// Add backdrop close functionality to a modal
+function _setupModalBackdropClose(modalEl, closeCallback) {
+  if (!modalEl) return;
+  modalEl.addEventListener('click', function(e) {
+    // Only close if clicked directly on the modal backdrop, not on content
+    if (e.target === modalEl) {
+      if (closeCallback) closeCallback();
+    }
+  });
+}
+
 /* Keyboard */
 document.addEventListener('keydown', function(e) {
+  // Escape key closes the topmost open modal
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    _closeTopModal();
+    return;
+  }
+
   if (document.getElementById('vhist').style.display !== 'none') return;
   var scEd = document.getElementById('sc-editor');
   if (scEd && scEd.classList.contains('show')) return;
@@ -1777,7 +2037,7 @@ function _z01CpuScore(remain) {
 function _z01InitStats(n) {
   var a = [];
   for (var i = 0; i < n; i++)
-    a.push({rounds:0, total:0, first9:[], c100:0, c140:0, c180:0, hiFin:0, bestLeg:999, worstLeg:0, legRounds:0, finishDarts:0, totalFinishDarts:0});
+    a.push({rounds:0, total:0, first9:[], c100:0, c140:0, c180:0, hiFin:0, bestLeg:999, worstLeg:0, legRounds:0, finishDarts:0, totalFinishDarts:0, bullHits:0});
   return a;
 }
 
@@ -1899,10 +2159,36 @@ function _z01Render() {
   var cp = _z01.currentPlayer;
   var st = _z01.stats[cp];
   var avg = st.rounds>0 ? (st.total/st.rounds).toFixed(1) : '-';
+  // Calculate current turn 3-dart average (if a score is being entered)
+  var currentTurn3DA = '-';
+  if (_z01._buf && _z01._buf !== '') {
+    var currentScore = parseInt(_z01._buf, 10);
+    if (!isNaN(currentScore) && currentScore > 0) {
+      currentTurn3DA = (currentScore / 3).toFixed(1);
+    }
+  }
+  // Calculate checkout percentage
+  var coPerc = '-';
+  if (_z01.checkoutAttempts && _z01.checkoutAttempts[cp] && _z01.checkoutAttempts[cp].length > 0) {
+    var coa = _z01.checkoutAttempts[cp];
+    var coSucc = 0;
+    for (var i = 0; i < coa.length; i++) {
+      if (coa[i].success) coSucc++;
+    }
+    coPerc = Math.round(100 * coSucc / coa.length) + '%';
+  }
+  // Calculate round prediction (estimated rounds to finish)
+  var roundPred = '-';
+  var avgRoundScore = st.rounds > 0 ? st.total / st.rounds : 0;
+  if (avgRoundScore > 0) {
+    var rem = _z01.remain[cp];
+    // Estimate how many more rounds needed (add 1 for the current round)
+    roundPred = Math.ceil(rem / avgRoundScore);
+  }
   var turnEl = document.getElementById('z01-turn-info');
   if (turnEl) {
     var nameStr = _z01PlayerName(cp);
-    turnEl.innerHTML = '<span style="color:var(--acc);font-size:15px;font-weight:700;letter-spacing:1px;">' + nameStr + '</span><span style="color:var(--mut);font-size:11px;margin-left:6px;">AVG <b style="color:var(--txt);">' + avg + '</b></span>';
+    turnEl.innerHTML = '<span style="color:var(--acc);font-size:15px;font-weight:700;letter-spacing:1px;">' + nameStr + '</span><span style="color:var(--mut);font-size:11px;margin-left:6px;">AVG <b style="color:var(--txt);">' + avg + '</b> / 3DA <b style="color:var(--txt);">' + currentTurn3DA + '</b> / CO% <b style="color:var(--txt);">' + coPerc + '</b> / EST <b style="color:var(--txt);">' + roundPred + '</b></span>';
   }
   var legEl = document.getElementById('z01-leg-info');
   if (_z01.legs > 1) {
@@ -2062,6 +2348,10 @@ function _z01Commit(sc) {
   st.rounds++; st.total += sc; st.legRounds++;
   if (st.legRounds <= 3) st.first9.push(sc);
   if (sc >= 180) st.c180++; else if (sc >= 140) st.c140++; else if (sc >= 100) st.c100++;
+  // Count Bull hits (25 or 50 points)
+  if (sc === 25 || sc === 50) st.bullHits++;
+  // Special vibration feedback for 180
+  if (sc === 180 && navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 150]);
   _z01BufUpdate('');
   // Update score log
   var logRow = _z01.log[_z01.log.length - 1];
@@ -2087,7 +2377,11 @@ function _z01Commit(sc) {
       _z01._pendingFinish = {player: p};
       _z01LogRender();
       _z01BuildFinishModal(sc);
-      document.getElementById('z01-finish-modal').style.display = 'flex';
+      var finMod = document.getElementById('z01-finish-modal');
+      finMod.style.display = 'flex';
+      // Register modal for Escape key and backdrop close
+      _registerModal('z01-finish-modal', z01FinishCancel);
+      _setupModalBackdropClose(finMod, z01FinishCancel);
     }
     return;
   }
@@ -2400,12 +2694,18 @@ function _z01LegEnd(winner) {
   }
   // 音声コーラー: Game Shot
   if (typeof callerGameShot === 'function') callerGameShot(matchOver);
-  document.getElementById('z01-leg-overlay').style.display = 'flex';
+  var legOv = document.getElementById('z01-leg-overlay');
+  legOv.style.display = 'flex';
+  // Register modal for Escape key and backdrop close
+  _registerModal('z01-leg-overlay', z01NextLeg);
+  _setupModalBackdropClose(legOv, z01NextLeg);
   _z01Render();
 }
 
 function z01NextLeg() {
-  document.getElementById('z01-leg-overlay').style.display = 'none';
+  var legOv = document.getElementById('z01-leg-overlay');
+  legOv.style.display = 'none';
+  _unregisterModal('z01-leg-overlay');
   _z01.currentLeg++;
   if (_z01.players !== 1) _z01.currentPlayer = (_z01.currentLeg - 1) % 2;
   else _z01.currentPlayer = 0;
@@ -2421,7 +2721,9 @@ function z01ShowResult() {
   _z01SaveH(_z01BuildHistEntry());
   if (typeof _dailyOnZ01 === 'function') _dailyOnZ01();
   if (typeof _addXP === 'function') _addXP(15, '01ゲーム');
-  document.getElementById('z01-leg-overlay').style.display = 'none';
+  var legOv = document.getElementById('z01-leg-overlay');
+  legOv.style.display = 'none';
+  _unregisterModal('z01-leg-overlay');
   document.getElementById('z01-game-wrap').style.display = 'none';
   document.getElementById('z01-result-wrap').style.display = '';
   var winner = -1;
@@ -2903,6 +3205,7 @@ function _z01BuildHistEntry() {
       hiFin: st.hiFin, bestLeg: st.bestLeg < 999 ? st.bestLeg : 0,
       worstLeg: st.worstLeg > 0 ? st.worstLeg : 0,
       legWins: _z01.legWins[i],
+      bullHits: st.bullHits,
       rounds: (_z01.roundScores && _z01.roundScores[i]) ? _z01.roundScores[i].slice() : [],
       checkouts: (_z01.checkoutAttempts && _z01.checkoutAttempts[i]) ? _z01.checkoutAttempts[i].slice() : []
     });
@@ -3017,13 +3320,21 @@ function z01BackSetup() {
   document.getElementById('z01-setup-wrap').style.display = '';
 }
 function z01ConfirmExit() {
-  document.getElementById('z01-exit-confirm').style.display = 'flex';
+  var exitCfm = document.getElementById('z01-exit-confirm');
+  exitCfm.style.display = 'flex';
+  // Register modal for Escape key and backdrop close
+  _registerModal('z01-exit-confirm', z01ExitNo);
+  _setupModalBackdropClose(exitCfm, z01ExitNo);
 }
 function z01ExitNo() {
-  document.getElementById('z01-exit-confirm').style.display = 'none';
+  var exitCfm = document.getElementById('z01-exit-confirm');
+  exitCfm.style.display = 'none';
+  _unregisterModal('z01-exit-confirm');
 }
 function z01ExitYes() {
-  document.getElementById('z01-exit-confirm').style.display = 'none';
+  var exitCfm = document.getElementById('z01-exit-confirm');
+  exitCfm.style.display = 'none';
+  _unregisterModal('z01-exit-confirm');
   z01BackSetup();
 }
 function z01FinishBtn() {
@@ -3054,7 +3365,11 @@ function z01EditScore(arg) {
   _z01EditState = {rowIdx: rowIdx, colIdx: colIdx, buf: String(data.scored)};
   var cur = document.getElementById('z01-edit-cur');
   if (cur) cur.textContent = String(data.scored);
-  document.getElementById('z01-edit-modal').style.display = 'flex';
+  var editMod = document.getElementById('z01-edit-modal');
+  editMod.style.display = 'flex';
+  // Register modal for Escape key and backdrop close
+  _registerModal('z01-edit-modal', z01EditCancel);
+  _setupModalBackdropClose(editMod, z01EditCancel);
 }
 function z01EditKp(arg) {
   var v = _z01EditState.buf + String(arg);
@@ -3071,7 +3386,9 @@ function z01EditKd() {
 function z01EditOk() {
   var v = parseInt(_z01EditState.buf, 10);
   if (isNaN(v) || v < 0 || v > 180) return;
-  document.getElementById('z01-edit-modal').style.display = 'none';
+  var editMod = document.getElementById('z01-edit-modal');
+  editMod.style.display = 'none';
+  _unregisterModal('z01-edit-modal');
   var rIdx = _z01EditState.rowIdx, cIdx = _z01EditState.colIdx;
   var log = _z01.log;
   // Recalculate remains from this row forward
@@ -3107,7 +3424,9 @@ function z01EditOk() {
   _z01LogRender(); _z01HintUpdate();
 }
 function z01EditCancel() {
-  document.getElementById('z01-edit-modal').style.display = 'none';
+  var editMod = document.getElementById('z01-edit-modal');
+  editMod.style.display = 'none';
+  _unregisterModal('z01-edit-modal');
 }
 
 function _z01UndoStats(p, sc) {
@@ -3158,10 +3477,16 @@ function z01Undo() {
   if (scored === null) return;
   var sub = document.getElementById('z01-undo-sub');
   if (sub) sub.textContent = playerName + ' の ' + scored + ' 点を取り消します';
-  document.getElementById('z01-undo-confirm').style.display = 'flex';
+  var undoCfm = document.getElementById('z01-undo-confirm');
+  undoCfm.style.display = 'flex';
+  // Register modal for Escape key and backdrop close
+  _registerModal('z01-undo-confirm', z01UndoNo);
+  _setupModalBackdropClose(undoCfm, z01UndoNo);
 }
 function z01UndoNo() {
-  document.getElementById('z01-undo-confirm').style.display = 'none';
+  var undoCfm = document.getElementById('z01-undo-confirm');
+  undoCfm.style.display = 'none';
+  _unregisterModal('z01-undo-confirm');
 }
 function _z01UndoExec() {
   var log = _z01.log;
@@ -3213,7 +3538,9 @@ function _z01UndoExec() {
   _z01Render(); _z01HintUpdate(); _z01LogRender();
 }
 function z01UndoYes() {
-  document.getElementById('z01-undo-confirm').style.display = 'none';
+  var undoCfm = document.getElementById('z01-undo-confirm');
+  undoCfm.style.display = 'none';
+  _unregisterModal('z01-undo-confirm');
   _z01UndoExec();
 }
 function _z01InitLog() {
@@ -3372,7 +3699,9 @@ function _z01BuildFinishModal(finishedScore) {
   inner.innerHTML = h;
 }
 function z01FinishDart(dartNo) {
-  document.getElementById('z01-finish-modal').style.display = 'none';
+  var finMod = document.getElementById('z01-finish-modal');
+  finMod.style.display = 'none';
+  _unregisterModal('z01-finish-modal');
   var pf = _z01._pendingFinish;
   if (!pf) return;
   var p = pf.player, st = _z01.stats[p];
@@ -3387,7 +3716,9 @@ function z01FinishDart(dartNo) {
 }
 
 function z01FinishCancel() {
-  document.getElementById('z01-finish-modal').style.display = 'none';
+  var finMod = document.getElementById('z01-finish-modal');
+  finMod.style.display = 'none';
+  _unregisterModal('z01-finish-modal');
   var pf = _z01._pendingFinish;
   if (!pf) return;
   _z01._pendingFinish = null;

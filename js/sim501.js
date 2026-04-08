@@ -162,7 +162,7 @@ function _simDraw(ax,ay,lx,ly,hintStr) {
   _simBoardAt = Date.now();
   function onTap(cx2,cy2){
     if(_simG.busy||_simG.curPlayer!=='player') return;
-    if(Date.now()-_simBoardAt < 400) return; // ignore click-through from previous UI tap
+    if(Date.now()-_simBoardAt < 200) return; // ignore click-through from previous UI tap
     var r=svg.getBoundingClientRect();
     _simPlayerThrow((cx2-r.left)*240/r.width,(cy2-r.top)*240/r.height);
   }
@@ -271,7 +271,7 @@ function _simProcessDart(who,dart) {
     setTimeout(function(){
       if(who==='player') _simEndPlayerRound();
       else _simEndCpuRound();
-    },400);
+    },200);
     return;
   }
   // Continue

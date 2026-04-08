@@ -1,56 +1,70 @@
-const CACHE = 'steeldarts-pro-v26';
-
-// JS/CSSはキャッシュしない（常に最新版をサーバーから取得）
-const PRECACHE = [
-  './',
-  './index.html',
-  './manifest.json',
+// Service Worker for Steel Darts Pro
+const CACHE_NAME = 'steel-darts-v1';
+const ASSETS_TO_CACHE = [
+  '/',
+  '/index.html',
+  '/css/app.css',
+  '/js/game.js',
+  '/js/cricket.js',
+  '/js/arr.js'
 ];
 
-self.addEventListener('install', function(e) {
-  e.waitUntil(caches.open(CACHE).then(function(c) { return c.addAll(PRECACHE); }));
+// Install event - cache essential assets
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(ASSETS_TO_CACHE).catch(() => {
+        console.log('Some assets could not be cached');
+      });
+    })
+  );
   self.skipWaiting();
 });
 
-self.addEventListener('activate', function(e) {
-  e.waitUntil(
-    caches.keys().then(function(ks) {
-      return Promise.all(ks.filter(function(k) { return k !== CACHE; }).map(function(k) { return caches.delete(k); }));
-    }).then(function() {
-      // 新バージョン起動時に全クライアントを強制リロード（最新コードを読み込む）
-      return self.clients.matchAll({ type: 'window' }).then(function(clients) {
-        clients.forEach(function(c) { c.navigate(c.url); });
-      });
+// Activate event - clean old caches
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
     })
   );
   self.clients.claim();
 });
 
-self.addEventListener('fetch', function(e) {
-  if (e.request.method !== 'GET') return;
-  var url = new URL(e.request.url);
-  var ext = url.pathname.split('.').pop();
-
-  // JS・CSSは常にネットワーク直取得（キャッシュ無効）
-  if (ext === 'js' || ext === 'css') {
-    e.respondWith(
-      fetch(e.request, { cache: 'no-store' }).catch(function() {
-        return caches.match(e.request);
-      })
-    );
+// Fetch event - serve from cache, fallback to network
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') {
     return;
   }
 
-  // その他はNetwork-first
-  e.respondWith(
-    fetch(e.request).then(function(res) {
-      if (res && res.ok) {
-        var clone = res.clone();
-        caches.open(CACHE).then(function(c) { c.put(e.request, clone); });
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      if (response) {
+        return response;
       }
-      return res;
-    }).catch(function() {
-      return caches.match(e.request);
+
+      return fetch(event.request).then(response => {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response;
+        }
+
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseToCache);
+        });
+
+        return response;
+      }).catch(() => {
+        if (event.request.destination === 'document') {
+          return caches.match('/index.html');
+        }
+      });
     })
   );
 });

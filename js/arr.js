@@ -612,7 +612,17 @@ function z01Kp(arg) {
 function z01Kd() { if (!_z01._buf) return; _z01BufUpdate(_z01._buf.slice(0,-1)); soundDel(); }
 
 function z01Ok() {
-  if (_z01._buf === '') return;
+  if (_z01._buf === '') {
+    // スコア0（空入力）のフィードバック
+    var t = document.createElement('div');
+    t.className = 'z01-event-toast';
+    t.textContent = 'スコアを入力してください';
+    t.style.color = '#ff9800';
+    document.body.appendChild(t);
+    setTimeout(function(){ t.parentNode && t.parentNode.removeChild(t); }, 1200);
+    soundDel();
+    return;
+  }
   var sc = parseInt(_z01._buf, 10);
   if (isNaN(sc) || sc < 0 || sc > 180) return;
   if (sc === 180) { sound180(); show180(); setTimeout(launchConfetti, 150); }
@@ -1813,6 +1823,11 @@ function _z01UndoExec() {
       }
     }
   }
+  _z01BufUpdate(''); // バッファと入力UIをリセット
+  // Undo時にペンディング中のアニメーションを削除
+  document.querySelectorAll('.z01-toast, .z01-flash, .z01-finish-toast').forEach(function(el) {
+    if (el.parentNode) el.parentNode.removeChild(el);
+  });
   _z01Render(); _z01HintUpdate(); _z01LogRender();
 }
 function z01UndoYes() {
@@ -3172,7 +3187,7 @@ function _exec(el) {
   el.classList.add('pressing');
   setTimeout(function(){ el.classList.remove('pressing'); }, 100);
   if (arg !== null) _fns[fn](parseInt(arg, 10));
-  else _fns[fn]();
+  else _fns[fn](el);
 }
 
 // touchstart: 視覚フィードバックのみ（passive:true、sc-editor中は何もしない）
@@ -3303,30 +3318,49 @@ drawRoundGrid();
 updDisp();
 (function(){ var btn = document.getElementById('btn-snd'); if (btn) btn.textContent = _sndOn ? '🔊' : '🔇'; })();
 
-// イベントリスナー登録（onclick属性の代替）
-document.getElementById('gs-btn').addEventListener('click', gameStart);
-document.getElementById('ob-skip').addEventListener('click', function() { closeOnboard(); goTab('game'); });
-document.getElementById('ob-next-0').addEventListener('click', function() { obGoStep(1); });
-document.getElementById('ob-go').addEventListener('click', obFinish);
+// イベントリスナー登録（DOMContentLoadedまたはload後に実行）
 (function() {
-  var lvlBtns = document.querySelectorAll('.ob-level-btn');
-  for (var i = 0; i < lvlBtns.length; i++) {
-    lvlBtns[i].addEventListener('click', function() { obSelectLevel(Number(this.getAttribute('data-level'))); });
+  function setupEventListeners() {
+    var el = {
+      'gs-btn': gameStart,
+      'ob-skip': function() { closeOnboard(); goTab('game'); },
+      'ob-next-0': function() { obGoStep(1); },
+      'ob-go': obFinish,
+      'ngp-no': ngpNo,
+      'ngp-yes': ngpYes,
+      'ct-score': function(){ switchChart('score'); },
+      'ct-avg': function(){ switchChart('avg'); },
+      'ct-time': function(){ switchChart('time'); },
+      'btn-export': exportData,
+      'btn-import': triggerImport,
+      'btn-clr': openCfm,
+      'rb-new': startNew,
+      'bx-share': shareX,
+      'rb-share-img': shareCU,
+      'rb-hist': goHist,
+      'cfm-cancel': closeCfm
+    };
+
+    for (var id in el) {
+      var elem = document.getElementById(id);
+      if (elem) {
+        elem.addEventListener('click', el[id]);
+      }
+    }
+
+    // ob-level-btns
+    var lvlBtns = document.querySelectorAll('.ob-level-btn');
+    for (var i = 0; i < lvlBtns.length; i++) {
+      lvlBtns[i].addEventListener('click', function() { obSelectLevel(Number(this.getAttribute('data-level'))); });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupEventListeners);
+  } else {
+    setupEventListeners();
   }
 })();
-document.getElementById('ngp-no').addEventListener('click', ngpNo);
-document.getElementById('ngp-yes').addEventListener('click', ngpYes);
-document.getElementById('ct-score').addEventListener('click', function(){ switchChart('score'); });
-document.getElementById('ct-avg').addEventListener('click', function(){ switchChart('avg'); });
-document.getElementById('ct-time').addEventListener('click', function(){ switchChart('time'); });
-document.getElementById('btn-export').addEventListener('click', exportData);
-document.getElementById('btn-import').addEventListener('click', triggerImport);
-document.getElementById('btn-clr').addEventListener('click', openCfm);
-document.getElementById('rb-new').addEventListener('click', startNew);
-document.getElementById('bx-share').addEventListener('click', shareX);
-document.getElementById('rb-share-img').addEventListener('click', shareCU);
-document.getElementById('rb-hist').addEventListener('click', goHist);
-document.getElementById('cfm-cancel').addEventListener('click', closeCfm);
 document.getElementById('cfm-ok').addEventListener('click', delAll);
 document.getElementById('undo-cancel').addEventListener('click', closeUndo);
 document.getElementById('undo-ok').addEventListener('click', doUndo);
@@ -3446,3 +3480,37 @@ if ('serviceWorker' in navigator && !location.search.includes('nosw')) {
     localStorage.setItem('pwa_banner_dismissed', '1');
   });
 })();
+
+// Share Arrangement result
+function shareArr() {
+  var score = _arr ? _arr.score : 0;
+  var grade = _arr ? _arr.grade : '—';
+  var difficulty = _arr ? _arr.difficulty : 'normal';
+  var questionsCount = _arr ? _arr.numQuestions : 10;
+
+  var diffLabel = '';
+  if (difficulty === 'easy') diffLabel = '初級';
+  else if (difficulty === 'normal') diffLabel = '中級';
+  else if (difficulty === 'hard') diffLabel = '上級';
+
+  var stats = [
+    { label: 'スコア', value: score + ' / 1000', color: '#e8ff47' },
+    { label: 'グレード', value: grade, color: '#4fc3f7' },
+    { label: '難易度', value: diffLabel, color: '#47ffb4' },
+    { label: '問題数', value: questionsCount + '問', color: '#b47fff' }
+  ];
+
+  var canvas = generateShareCard({
+    modeName: 'Arrangement（アレンジメント）',
+    mainLabel: 'グレード',
+    mainValue: grade,
+    mainColor: '#e8ff47',
+    subValue: 'Score: ' + score,
+    subColor: '#47ffb4',
+    isPB: false,
+    stats: stats
+  });
+
+  var text = 'Arrangement ' + grade + ' Score:' + score + ' #SteelDartsPro #ダーツ';
+  _doShare(canvas, text);
+}
