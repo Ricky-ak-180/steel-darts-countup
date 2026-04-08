@@ -926,9 +926,11 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
           </div>
           <div class="ckt-cg-miss" data-fn="cktMiss">Miss</div>
         </div>
-        <div style="display:flex;gap:8px;margin-top:6px;">
-          <button class="ckt-action-btn" data-fn="cktUndoDart" data-i18n="ckt.undo">↩ 取消</button>
-          <button class="ckt-action-btn ckt-exit-btn" data-fn="cktConfirmExit" data-i18n="ckt.exit">Exit</button>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <button class="ckt-action-btn" data-fn="cktUndoDart">↩ 1投</button>
+          <button class="ckt-action-btn" data-fn="cktUndoTurn">↩ ターン</button>
+          <button class="ckt-action-btn" id="ckt-snd-btn2" data-fn="cktToggleSound">🔊</button>
+          <button class="ckt-action-btn ckt-exit-btn" data-fn="cktConfirmExit">Exit</button>
         </div>
       </div>
     </div>
