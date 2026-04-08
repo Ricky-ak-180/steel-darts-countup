@@ -722,6 +722,8 @@ function goSub01Arr() {
 function goTab(tab) {
   var tsim=document.getElementById('tsim'); if(tsim) tsim.className='tab'+(tab==='sim'?' on':'');
   var vsim=document.getElementById('vsim'); if(vsim) vsim.className='view'+(tab==='sim'?'':' hide');
+  var tckt=document.getElementById('tckt'); if(tckt) tckt.className='tab'+(tab==='ckt'?' on':'');
+  var vckt=document.getElementById('vckt'); if(vckt) vckt.className='view'+(tab==='ckt'?'':' hide');
   document.getElementById('tgame').className = 'tab' + (tab==='game'?' on':'');
   document.getElementById('t01').className = 'tab' + (tab==='01'?' on':'');
   document.getElementById('vgame').className = 'view' + (tab==='game'?'':' hide');
@@ -733,6 +735,7 @@ function goTab(tab) {
     if (g.scores.length >= ROUNDS) document.getElementById('ngp').className = 'ngp show';
   }
   if (tab === '01') { goSub01Game(); _z01LoadDefaults(); z01SetCpu(_z01.cpuLevel); }
+  if (tab === 'ckt') { goSubCktGame(); cktSetCpu(_ckt.cpuLevel); }
 }
 
 /* Storage */

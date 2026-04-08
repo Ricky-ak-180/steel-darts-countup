@@ -46,6 +46,9 @@ body::before {
 .btn-snd { background: transparent; border: none; font-size: 16px; cursor: pointer; padding: 6px 8px; border-radius: 6px; line-height: 1; color: var(--mut); flex-shrink: 0; min-width: 36px; min-height: 36px; display: flex; align-items: center; justify-content: center; }
 .btn-caller { background: transparent; border: none; font-size: 14px; cursor: pointer; padding: 4px 6px; border-radius: 6px; line-height: 1; color: var(--acc); flex-shrink: 0; min-width: 32px; min-height: 32px; display: flex; align-items: center; justify-content: center; }
 .btn-caller.caller-off { opacity: 0.3; }
+.btn-lang { background: transparent; border: 1px solid var(--bdr); font-size: 10px; font-weight: 700; cursor: pointer; padding: 3px 6px; border-radius: 4px; line-height: 1; color: var(--mut); flex-shrink: 0; min-width: 28px; min-height: 28px; display: flex; align-items: center; justify-content: center; letter-spacing: 0.5px; transition: all 0.15s; }
+.btn-lang:hover { color: var(--txt); border-color: var(--acc); background: rgba(232,255,71,0.08); }
+.btn-lang:active { transform: scale(0.95); }
 
 /* Views */
 .view { display: flex; flex-direction: column; gap: 5px; flex: 1; min-height: 0; overflow: hidden; }
@@ -1610,3 +1613,220 @@ select:focus-visible {
   cursor: pointer;
   margin-top: 6px;
 }
+
+/* ============================================================
+   Cricket Game Styles
+   ============================================================ */
+.ckt-board {
+  background: var(--sur);
+  border: 1px solid var(--bdr);
+  border-radius: 10px;
+  padding: 6px 8px;
+  flex-shrink: 0;
+}
+.ckt-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 2px 0;
+}
+.ckt-hdr-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--mut);
+  text-align: center;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ckt-hdr-name.ckt-active-player {
+  color: var(--acc);
+  background: rgba(232,255,71,0.08);
+}
+.ckt-hdr-mid { width: 50px; }
+.ckt-points-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 0 4px;
+  border-bottom: 1px solid var(--bdr);
+}
+.ckt-points {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 28px;
+  text-align: center;
+  color: var(--txt);
+  line-height: 1;
+  transition: color 0.2s;
+}
+.ckt-points.ckt-active-player {
+  color: var(--acc);
+  text-shadow: 0 0 12px rgba(232,255,71,0.4);
+}
+.ckt-pts-mid {
+  font-size: 9px;
+  color: var(--mut);
+  letter-spacing: 2px;
+  text-align: center;
+  width: 50px;
+}
+.ckt-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(42,42,58,0.5);
+  transition: opacity 0.3s;
+}
+.ckt-row-closed { opacity: 0.35; }
+.ckt-number {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 18px;
+  color: var(--txt);
+  text-align: center;
+  width: 50px;
+  letter-spacing: 1px;
+}
+.ckt-marks {
+  text-align: center;
+  font-size: 18px;
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ckt-mark-empty { display: inline-block; width: 18px; }
+.ckt-mark-slash { color: var(--txt); font-weight: 700; }
+.ckt-mark-x { color: var(--acc); font-weight: 700; }
+.ckt-mark-closed { color: var(--grn); font-size: 16px; }
+.ckt-mpr-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 4px 0 0;
+  border-top: 1px solid var(--bdr);
+}
+.ckt-mpr {
+  font-size: 11px;
+  color: var(--mut);
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.ckt-mpr-mid {
+  font-size: 10px;
+  color: var(--mut);
+  text-align: center;
+  width: 50px;
+  letter-spacing: 1px;
+}
+
+/* Dart indicator */
+.ckt-dart-ind {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--acc);
+  padding: 4px;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+.ckt-dart-ind.ckt-p2 { color: var(--acc2); }
+
+/* CPU area */
+.ckt-cpu-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(255,107,53,0.06);
+  border: 1px solid rgba(255,107,53,0.15);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+/* Input area */
+.ckt-input {
+  padding: 6px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ckt-number-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+.ckt-number-btn {
+  background: linear-gradient(160deg, #1e1e2c 0%, #141420 100%);
+  border: 1px solid var(--bdr);
+  border-radius: 10px;
+  padding: 10px 4px;
+  text-align: center;
+  cursor: pointer;
+  font-family: 'Bebas Neue', cursive;
+  font-size: 22px;
+  color: var(--txt);
+  transition: all 0.1s;
+  touch-action: manipulation;
+}
+.ckt-number-btn.on {
+  background: var(--acc);
+  color: #000;
+  border-color: var(--acc);
+  box-shadow: 0 0 12px rgba(232,255,71,0.3);
+}
+.ckt-number-btn.ckt-closed {
+  opacity: 0.25;
+  pointer-events: none;
+}
+.ckt-number-btn:active, .ckt-number-btn.pressing {
+  transform: scale(0.94);
+  opacity: 0.8;
+}
+.ckt-mult-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+.ckt-mult-btn {
+  background: var(--sur2);
+  border: 1px solid var(--bdr);
+  border-radius: 10px;
+  padding: 10px 4px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--txt);
+  transition: all 0.1s;
+  touch-action: manipulation;
+}
+.ckt-mult-btn:active, .ckt-mult-btn.pressing {
+  background: var(--acc);
+  color: #000;
+  transform: scale(0.94);
+}
+.ckt-mult-btn.ckt-disabled {
+  opacity: 0.25;
+  pointer-events: none;
+}
+.ckt-action-btn {
+  flex: 1;
+  background: var(--sur2);
+  border: 1px solid var(--bdr);
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--mut);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.ckt-action-btn:active { opacity: 0.7; }
+.ckt-exit-btn { color: var(--red); border-color: rgba(255,71,87,0.3); }
