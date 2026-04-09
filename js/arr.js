@@ -3361,6 +3361,26 @@ updDisp();
     setupEventListeners();
   }
 })();
+
+// Direct button handlers to ensure click responsiveness
+(function() {
+  function attachButtonHandlers() {
+    var gsBtn = document.getElementById('gs-btn');
+    if (gsBtn) {
+      gsBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        gameStart();
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachButtonHandlers);
+  } else {
+    attachButtonHandlers();
+  }
+})();
+
 document.getElementById('cfm-ok').addEventListener('click', delAll);
 document.getElementById('undo-cancel').addEventListener('click', closeUndo);
 document.getElementById('undo-ok').addEventListener('click', doUndo);

@@ -1,5 +1,5 @@
 // Service Worker for Steel Darts Pro
-const CACHE_NAME = 'steel-darts-v1';
+const CACHE_NAME = 'steel-darts-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -37,30 +37,32 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event - Network First strategy
+// Always try network first, fall back to cache for offline support
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') {
     return;
   }
 
   event.respondWith(
-    caches.match(event.request).then(response => {
-      if (response) {
+    fetch(event.request).then(response => {
+      if (!response || response.status !== 200) {
         return response;
       }
 
-      return fetch(event.request).then(response => {
-        if (!response || response.status !== 200 || response.type !== 'basic') {
+      // Update cache with fresh response
+      const responseToCache = response.clone();
+      caches.open(CACHE_NAME).then(cache => {
+        cache.put(event.request, responseToCache);
+      });
+
+      return response;
+    }).catch(() => {
+      // Network failed - serve from cache (offline support)
+      return caches.match(event.request).then(response => {
+        if (response) {
           return response;
         }
-
-        const responseToCache = response.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, responseToCache);
-        });
-
-        return response;
-      }).catch(() => {
         if (event.request.destination === 'document') {
           return caches.match('/index.html');
         }
