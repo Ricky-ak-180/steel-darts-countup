@@ -449,7 +449,7 @@ function _cktCpuDart(dartNum) {
   var targetIdx = _cktCpuChooseTarget();
   var targetEl = document.getElementById('ckt-cpu-target');
   if (targetEl) {
-    targetEl.textContent = (targetIdx === 6 ? 'BULL' : CKT_NUMBERS[targetIdx]) + ' を狙っています';
+    targetEl.textContent = t('ckt.targeting').replace('{target}', targetIdx === 6 ? 'BULL' : CKT_NUMBERS[targetIdx]);
   }
 
   setTimeout(function() {
@@ -800,7 +800,7 @@ function _cktRenderMprTrend(h) {
   var recent = h.slice(0, 10).reverse();
   if (recent.length === 0) return '';
   var html = '<div style="margin-top:12px;padding:10px;background:rgba(232,255,71,0.05);border-radius:8px;">';
-  html += '<div style="font-size:10px;color:var(--mut);letter-spacing:1px;margin-bottom:6px;">MPR推移（最新10試合）</div>';
+  html += '<div style="font-size:10px;color:var(--mut);letter-spacing:1px;margin-bottom:6px;">'+t('ckt.mpr_trend')+'</div>';
   html += '<div style="display:flex;gap:2px;align-items:flex-end;height:60px;">';
   var maxMpr = Math.max.apply(null, recent.map(function(g){ return g.mpr[0] || 0; }));
   var maxMpr2 = Math.max(maxMpr, 3);
@@ -828,7 +828,7 @@ function _cktRenderLevelStats(h) {
   var levels = Object.keys(levelTotal).map(function(x){ return parseInt(x, 10); }).sort(function(a,b){ return b - a; });
   if (levels.length === 0) return '';
   var html = '<div style="margin-top:12px;padding:10px;background:rgba(232,255,71,0.05);border-radius:8px;">';
-  html += '<div style="font-size:10px;color:var(--mut);letter-spacing:1px;margin-bottom:6px;">レベル別勝率</div>';
+  html += '<div style="font-size:10px;color:var(--mut);letter-spacing:1px;margin-bottom:6px;">'+t('ckt.win_by_lv')+'</div>';
   html += '<div style="display:grid;grid-template-columns:repeat(' + Math.min(levels.length, 6) + ',1fr);gap:4px;">';
   levels.forEach(function(lv) {
     var wins = levelWins[lv] || 0;
@@ -876,7 +876,7 @@ function _cktRenderHistory() {
   var h = _cktGetHistory();
 
   if (h.length === 0) {
-    wrap.innerHTML = '<div style="padding:24px;text-align:center;color:var(--mut);font-size:13px;">まだ履歴がありません</div>';
+    wrap.innerHTML = '<div style="padding:24px;text-align:center;color:var(--mut);font-size:13px;">'+t('empty.no_ckt_hist')+'</div>';
     return;
   }
 
@@ -900,12 +900,12 @@ function _cktRenderHistory() {
   html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:10px;padding:12px;margin-bottom:10px;">';
   html += '<div style="font-size:10px;color:var(--mut);letter-spacing:1px;margin-bottom:10px;text-align:center;">STATS SUMMARY</div>';
   html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;">';
-  html += _cktStatCard('総試合', h.length + '戦');
-  html += _cktStatCard('対CPU勝率', cpuWinRate);
-  html += _cktStatCard('平均MPR', avgMpr > 0 ? avgMpr.toFixed(2) : '—');
-  html += _cktStatCard('最高MPR', bestMpr > 0 ? bestMpr.toFixed(2) : '—');
-  html += _cktStatCard('平均R数', avgRounds > 0 ? avgRounds.toFixed(1) : '—');
-  html += _cktStatCard('2P試合', twoPGames.length + '戦');
+  html += _cktStatCard(t('ckt.total_games'), h.length);
+  html += _cktStatCard(t('ckt.cpu_win_rate'), cpuWinRate);
+  html += _cktStatCard(t('ckt.avg_mpr'), avgMpr > 0 ? avgMpr.toFixed(2) : '—');
+  html += _cktStatCard(t('ckt.best_mpr'), bestMpr > 0 ? bestMpr.toFixed(2) : '—');
+  html += _cktStatCard(t('ckt.avg_rounds'), avgRounds > 0 ? avgRounds.toFixed(1) : '—');
+  html += _cktStatCard(t('ckt.two_p'), twoPGames.length);
   html += '</div></div>';
 
   // MPR推移とレベル別成績
@@ -994,18 +994,36 @@ function cktExitNo() {
 function shareCkt() {
   var mpr0 = _ckt.stats[0].rounds > 0 ? (_ckt.stats[0].totalMarks / _ckt.stats[0].rounds).toFixed(2) : '0.00';
   var mpr1 = _ckt.stats[1].rounds > 0 ? (_ckt.stats[1].totalMarks / _ckt.stats[1].rounds).toFixed(2) : '0.00';
-  var text = '🎯 Cricket Result\n';
-  text += _ckt.names[0] + ': MPR ' + mpr0 + ' / ' + _ckt.points[0] + 'pts\n';
-  text += _ckt.names[1] + ': MPR ' + mpr1 + ' / ' + _ckt.points[1] + 'pts\n';
-  text += _ckt.round + ' rounds';
-
-  if (navigator.share) {
-    navigator.share({text: text}).catch(function(){});
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(function() {
-      alert('コピーしました');
-    }).catch(function(){});
+  var winner = '';
+  var mainColor = '#ffffff';
+  if (_ckt.winner === 0) {
+    winner = _ckt.names[0] + ' WIN';
+    mainColor = '#e8ff47';
+  } else if (_ckt.winner === 1) {
+    winner = _ckt.names[1] + ' WIN';
+    mainColor = _ckt.players === 2 ? '#ff6b6b' : '#4fc3f7';
+  } else {
+    winner = 'DRAW';
   }
+
+  var canvas = generateShareCard({
+    modeName: 'CRICKET' + (_ckt.players === 2 ? ' — ' + t('g.mode_vs_cpu') : ' — ' + t('g.mode_2p')),
+    mainLabel: 'CRICKET',
+    mainValue: winner,
+    mainColor: mainColor,
+    subValue: 'MPR ' + mpr0,
+    subColor: '#b47fff',
+    isPB: false,
+    stats: [
+      { label: _ckt.names[0] + ' MPR', value: mpr0, color: '#b47fff' },
+      { label: _ckt.names[1] + ' MPR', value: mpr1, color: '#ef5350' },
+      { label: _ckt.names[0] + ' Pts', value: String(_ckt.points[0]), color: '#e8ff47' },
+      { label: _ckt.names[1] + ' Pts', value: String(_ckt.points[1]), color: '#4fc3f7' },
+      { label: 'Rounds', value: String(_ckt.round), color: 'rgba(255,255,255,0.7)' }
+    ]
+  });
+  var text = '🎯 Cricket ' + winner + ' MPR:' + mpr0 + '\nhttps://ricky-ak-180.github.io/steel-darts-countup/\n#SteelDartsPro #Darts';
+  _doShare(canvas, text);
 }
 
 // ============================================================
@@ -1088,14 +1106,21 @@ document.addEventListener('keydown', function(e) {
   _fns.cktExitYes    = cktExitYes;
   _fns.cktExitNo     = cktExitNo;
   _fns.shareCkt      = shareCkt;
+  _fns.goTabProfile  = goTabProfile;
+  _fns.editPlayerName = editPlayerName;
+  _fns.setGoal = setGoal;
 })();
 
 // Move vckt inside .app if it was placed outside (HTML structure issue)
 (function(){
-  var vckt = document.getElementById('vckt');
   var app  = document.querySelector('.app');
+  var vckt = document.getElementById('vckt');
   if (app && vckt && !app.contains(vckt)) {
     app.appendChild(vckt);
+  }
+  var vprofile = document.getElementById('vprofile');
+  if (app && vprofile && !app.contains(vprofile)) {
+    app.appendChild(vprofile);
   }
 })();
 
@@ -1113,9 +1138,9 @@ function renderCktStats() {
   if (!container) return;
 
   // タブ UI
-  var tabs = ['day', 'week', 'month'].map(function(t) {
-    return '<div class="ckt-stats-tab ' + (_cktStatsTab === t ? 'on' : '') + '" data-tab="' + t + '">' +
-      (t === 'day' ? '本日' : t === 'week' ? '今週' : '今月') + '</div>';
+  var tabs = ['day', 'week', 'month'].map(function(k) {
+    return '<div class="ckt-stats-tab ' + (_cktStatsTab === k ? 'on' : '') + '" data-tab="' + k + '">' +
+      (k === 'day' ? t('period.today') : k === 'week' ? t('period.week') : t('period.month')) + '</div>';
   }).join('');
 
   // フィルタリング
@@ -1135,7 +1160,7 @@ function renderCktStats() {
   });
 
   if (!filtered.length) {
-    container.innerHTML = '<div class="ckt-stats-empty">データなし</div>';
+    container.innerHTML = '<div class="ckt-stats-empty">'+t('empty.no_data')+'</div>';
     setupCktStatsTabs();
     return;
   }
@@ -1153,18 +1178,26 @@ function renderCktStats() {
     else if (latestMpr < prevMpr) trend = '<span style="color:#4fc3f7;font-weight:900;">▼</span>';
   }
 
+  var weekStats = _cktStatsTab === 'week' ? getWeeklyStats() : null;
+  var weekTrend = '';
+  if (weekStats && filtered.length > 1) {
+    var recentAvg = (filtered.slice(0, Math.min(3, filtered.length)).reduce(function(sum, g) { return sum + (g.mpr || 0); }, 0) / Math.min(3, filtered.length)).toFixed(2);
+    if (parseFloat(recentAvg) > parseFloat(avgMpr)) weekTrend = '<span style="color:#ff6b35;font-weight:900;">▲</span>';
+    else if (parseFloat(recentAvg) < parseFloat(avgMpr)) weekTrend = '<span style="color:#4fc3f7;font-weight:900;">▼</span>';
+  }
+
   var html = '<div class="ckt-stats-tabs">' + tabs + '</div>' +
     '<div class="ckt-stats-grid">' +
       '<div class="ckt-stat-card">' +
-        '<div style="color:var(--mut);font-size:10px;letter-spacing:1px;">平均MPR</div>' +
-        '<div style="font-size:24px;font-family:\'Bebas Neue\',cursive;color:#47ffb4;font-weight:700;margin-top:4px;">' + avgMpr + ' ' + trend + '</div>' +
+        '<div style="color:var(--mut);font-size:10px;letter-spacing:1px;">'+t('ckt.avg_mpr')+'</div>' +
+        '<div style="font-size:24px;font-family:\'Bebas Neue\',cursive;color:#47ffb4;font-weight:700;margin-top:4px;">' + avgMpr + ' ' + (weekTrend || trend) + '</div>' +
       '</div>' +
       '<div class="ckt-stat-card">' +
-        '<div style="color:var(--mut);font-size:10px;letter-spacing:1px;">最高MPR</div>' +
+        '<div style="color:var(--mut);font-size:10px;letter-spacing:1px;">'+t('ckt.best_mpr')+'</div>' +
         '<div style="font-size:24px;font-family:\'Bebas Neue\',cursive;color:var(--acc);font-weight:700;margin-top:4px;">' + maxMpr.toFixed(2) + '</div>' +
       '</div>' +
       '<div class="ckt-stat-card">' +
-        '<div style="color:var(--mut);font-size:10px;letter-spacing:1px;">ゲーム数</div>' +
+        '<div style="color:var(--mut);font-size:10px;letter-spacing:1px;">'+t('ckt.game_count')+'</div>' +
         '<div style="font-size:24px;font-family:\'Bebas Neue\',cursive;color:var(--grn);font-weight:700;margin-top:4px;">' + filtered.length + '</div>' +
       '</div>' +
     '</div>';
@@ -1273,4 +1306,58 @@ function drawCktChart() {
     ctx.fillStyle = '#47ffb4';
     ctx.fill();
   });
+}
+
+function renderCktSparkline(games, width, height) {
+  if (!games || games.length < 2) return '';
+
+  width = width || 60;
+  height = height || 20;
+  var mprs = games.slice(0, 10).map(function(g) { return g.mpr || 0; });
+  if (mprs.length === 0) return '';
+
+  var min = Math.min.apply(null, mprs);
+  var max = Math.max.apply(null, mprs);
+  var range = max - min || 1;
+
+  var points = mprs.map(function(m, i) {
+    return {
+      x: (i / (mprs.length - 1)) * width,
+      y: height - ((m - min) / range) * height
+    };
+  });
+
+  var svg = '<svg width="' + width + '" height="' + height + '" style="display:inline;margin:0 4px;vertical-align:middle;">';
+  svg += '<polyline points="' + points.map(function(p) { return p.x + ',' + p.y; }).join(' ') + '" style="fill:none;stroke:#47ffb4;stroke-width:1;"/>';
+  svg += '</svg>';
+  return svg;
+}
+
+function getWeeklyStats() {
+  var h = _cktGetHistory();
+  if (!h.length) return null;
+
+  var now = new Date();
+  var weekStart = new Date(now);
+  weekStart.setDate(weekStart.getDate() - 6);
+
+  var weekGames = h.filter(function(g) {
+    var gd = new Date(g.date);
+    return gd >= weekStart;
+  });
+
+  if (!weekGames.length) return null;
+
+  var mprs = weekGames.map(function(g) { return g.mpr || 0; });
+  var avgMpr = (mprs.reduce(function(a, b) { return a + b; }, 0) / mprs.length).toFixed(2);
+  var maxMpr = Math.max.apply(null, mprs);
+  var minMpr = Math.min.apply(null, mprs);
+
+  return {
+    avg: avgMpr,
+    max: maxMpr,
+    min: minMpr,
+    count: weekGames.length,
+    games: weekGames
+  };
 }

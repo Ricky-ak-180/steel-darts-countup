@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ricky-ak-180.github.io/steel-darts-countup/sitemap.xml

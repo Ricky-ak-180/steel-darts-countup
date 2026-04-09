@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#0a0a0f"/>
+    </radialGradient>
+    <radialGradient id="board" cx="50%" cy="50%" r="45%">
+      <stop offset="0%" stop-color="#2a2a3a"/>
+      <stop offset="60%" stop-color="#1c1c28"/>
+      <stop offset="100%" stop-color="#13131a"/>
+    </radialGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e8ff47"/>
+      <stop offset="100%" stop-color="#c4e600"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle grid -->
+  <g stroke="rgba(232,255,71,0.03)" stroke-width="1">
+    <line x1="0" y1="0" x2="1200" y2="630" />
+    <line x1="400" y1="0" x2="400" y2="630" />
+    <line x1="800" y1="0" x2="800" y2="630" />
+    <line x1="0" y1="210" x2="1200" y2="210" />
+    <line x1="0" y1="420" x2="1200" y2="420" />
+  </g>
+
+  <!-- Dartboard (right side, decorative) -->
+  <g transform="translate(900, 315)" opacity="0.2">
+    <circle r="200" fill="url(#board)" stroke="#3a3a4a" stroke-width="2"/>
+    <circle r="150" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+    <circle r="100" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+    <circle r="50" fill="none" stroke="#e8ff47" stroke-width="2" opacity="0.5"/>
+    <circle r="20" fill="#e8ff47" opacity="0.6"/>
+  </g>
+
+  <!-- Border -->
+  <rect x="16" y="16" width="1168" height="598" rx="16" fill="none" stroke="#e8ff47" stroke-width="2" opacity="0.4"/>
+
+  <!-- App name -->
+  <text x="100" y="200" font-family="'Bebas Neue', sans-serif" font-size="72" font-weight="bold" fill="#e8ff47" letter-spacing="8">STEEL DARTS PRO</text>
+
+  <!-- Tagline -->
+  <text x="100" y="260" font-family="sans-serif" font-size="24" fill="rgba(255,255,255,0.7)">Score Tracker &amp; Practice App</text>
+
+  <!-- Features -->
+  <text x="100" y="340" font-family="sans-serif" font-size="20" fill="rgba(255,255,255,0.5)">Count-Up / 01 / Cricket / CPU Simulation</text>
+  <text x="100" y="375" font-family="sans-serif" font-size="20" fill="rgba(255,255,255,0.5)">Checkout Training / Statistics / Offline PWA</text>
+
+  <!-- CTA -->
+  <rect x="100" y="420" width="280" height="52" rx="26" fill="url(#accent)"/>
+  <text x="240" y="453" font-family="sans-serif" font-size="20" font-weight="bold" fill="#0a0a0f" text-anchor="middle">Free - Play Now</text>
+
+  <!-- Dart emoji/icon -->
+  <text x="100" y="130" font-size="48">🎯</text>
+
+  <!-- Footer -->
+  <text x="600" y="600" font-family="sans-serif" font-size="14" fill="rgba(255,255,255,0.25)" text-anchor="middle">#SteelDartsPro</text>
+</svg>

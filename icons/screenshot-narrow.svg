@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#0a0a0f"/>
+    </radialGradient>
+    <linearGradient id="acc" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e8ff47"/>
+      <stop offset="100%" stop-color="#c4e600"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="390" height="844" fill="url(#bg)"/>
+
+  <!-- Status bar area -->
+  <rect y="0" width="390" height="48" fill="rgba(10,10,15,0.8)"/>
+
+  <!-- Tab bar -->
+  <rect y="48" width="390" height="44" fill="rgba(20,20,30,0.9)"/>
+  <rect x="8" y="52" width="80" height="36" rx="18" fill="#e8ff47"/>
+  <text x="48" y="76" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0a0a0f" text-anchor="middle">CountUp</text>
+  <text x="130" y="76" font-family="sans-serif" font-size="13" fill="rgba(255,255,255,0.5)" text-anchor="middle">01</text>
+  <text x="200" y="76" font-family="sans-serif" font-size="13" fill="rgba(255,255,255,0.5)" text-anchor="middle">Cricket</text>
+  <text x="280" y="76" font-family="sans-serif" font-size="13" fill="rgba(255,255,255,0.5)" text-anchor="middle">Sim</text>
+
+  <!-- Sub tabs -->
+  <rect y="92" width="195" height="36" fill="rgba(232,255,71,0.1)"/>
+  <text x="97" y="115" font-family="sans-serif" font-size="12" fill="#e8ff47" text-anchor="middle">Game</text>
+  <text x="292" y="115" font-family="sans-serif" font-size="12" fill="rgba(255,255,255,0.4)" text-anchor="middle">History</text>
+
+  <!-- Round indicator -->
+  <text x="20" y="160" font-family="sans-serif" font-size="11" fill="rgba(255,255,255,0.5)">ROUND</text>
+  <text x="20" y="180" font-family="'Bebas Neue',sans-serif" font-size="22" font-weight="bold" fill="#ffffff">1 / 8</text>
+
+  <!-- Score display -->
+  <text x="195" y="270" font-family="'Bebas Neue',sans-serif" font-size="96" font-weight="bold" fill="#ffffff" text-anchor="middle">0</text>
+  <text x="195" y="300" font-family="sans-serif" font-size="12" fill="rgba(255,255,255,0.35)" text-anchor="middle">Tap shortcut or enter score</text>
+
+  <!-- Round boxes -->
+  <g transform="translate(20, 320)">
+    <rect width="40" height="32" rx="4" fill="rgba(232,255,71,0.1)" stroke="#e8ff47" stroke-width="1"/>
+    <text x="20" y="14" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.5)" text-anchor="middle">R1</text>
+    <text x="20" y="27" font-family="sans-serif" font-size="10" fill="rgba(255,255,255,0.3)" text-anchor="middle">--</text>
+  </g>
+
+  <!-- Shortcut buttons -->
+  <g transform="translate(12, 380)">
+    <rect width="84" height="56" rx="8" fill="rgba(232,255,71,0.08)" stroke="rgba(232,255,71,0.3)" stroke-width="1"/>
+    <text x="42" y="36" font-family="'Bebas Neue',sans-serif" font-size="28" fill="#e8ff47" text-anchor="middle">140</text>
+
+    <rect x="92" width="84" height="56" rx="8" fill="rgba(232,255,71,0.08)" stroke="rgba(232,255,71,0.3)" stroke-width="1"/>
+    <text x="134" y="36" font-family="'Bebas Neue',sans-serif" font-size="28" fill="#e8ff47" text-anchor="middle">100</text>
+
+    <rect x="184" width="84" height="56" rx="8" fill="rgba(232,255,71,0.08)" stroke="rgba(232,255,71,0.3)" stroke-width="1"/>
+    <text x="226" y="36" font-family="'Bebas Neue',sans-serif" font-size="28" fill="#e8ff47" text-anchor="middle">85</text>
+
+    <rect x="276" width="84" height="56" rx="8" fill="rgba(232,255,71,0.08)" stroke="rgba(232,255,71,0.3)" stroke-width="1"/>
+    <text x="318" y="36" font-family="'Bebas Neue',sans-serif" font-size="28" fill="#e8ff47" text-anchor="middle">81</text>
+  </g>
+
+  <!-- Numpad -->
+  <g transform="translate(12, 560)">
+    <rect width="116" height="56" rx="8" fill="rgba(255,255,255,0.05)"/>
+    <text x="58" y="36" font-family="sans-serif" font-size="24" fill="rgba(255,255,255,0.7)" text-anchor="middle">1</text>
+
+    <rect x="124" width="116" height="56" rx="8" fill="rgba(255,255,255,0.05)"/>
+    <text x="182" y="36" font-family="sans-serif" font-size="24" fill="rgba(255,255,255,0.7)" text-anchor="middle">2</text>
+
+    <rect x="248" width="116" height="56" rx="8" fill="rgba(255,255,255,0.05)"/>
+    <text x="306" y="36" font-family="sans-serif" font-size="24" fill="rgba(255,255,255,0.7)" text-anchor="middle">3</text>
+  </g>
+
+  <g transform="translate(12, 624)">
+    <rect width="116" height="56" rx="8" fill="rgba(255,255,255,0.05)"/>
+    <text x="58" y="36" font-family="sans-serif" font-size="24" fill="rgba(255,255,255,0.7)" text-anchor="middle">4</text>
+
+    <rect x="124" width="116" height="56" rx="8" fill="rgba(255,255,255,0.05)"/>
+    <text x="182" y="36" font-family="sans-serif" font-size="24" fill="rgba(255,255,255,0.7)" text-anchor="middle">5</text>
+
+    <rect x="248" width="116" height="56" rx="8" fill="rgba(255,255,255,0.05)"/>
+    <text x="306" y="36" font-family="sans-serif" font-size="24" fill="rgba(255,255,255,0.7)" text-anchor="middle">6</text>
+  </g>
+
+  <g transform="translate(12, 688)">
+    <rect width="116" height="56" rx="8" fill="rgba(255,255,255,0.05)"/>
+    <text x="58" y="36" font-family="sans-serif" font-size="24" fill="rgba(255,255,255,0.7)" text-anchor="middle">7</text>
+
+    <rect x="124" width="116" height="56" rx="8" fill="rgba(255,255,255,0.05)"/>
+    <text x="182" y="36" font-family="sans-serif" font-size="24" fill="rgba(255,255,255,0.7)" text-anchor="middle">8</text>
+
+    <rect x="248" width="116" height="56" rx="8" fill="rgba(255,255,255,0.05)"/>
+    <text x="306" y="36" font-family="sans-serif" font-size="24" fill="rgba(255,255,255,0.7)" text-anchor="middle">9</text>
+  </g>
+
+  <g transform="translate(12, 752)">
+    <rect width="116" height="56" rx="8" fill="rgba(255,100,100,0.15)"/>
+    <text x="58" y="36" font-family="sans-serif" font-size="20" fill="#ff6b6b" text-anchor="middle">DEL</text>
+
+    <rect x="124" width="116" height="56" rx="8" fill="rgba(255,255,255,0.05)"/>
+    <text x="182" y="36" font-family="sans-serif" font-size="24" fill="rgba(255,255,255,0.7)" text-anchor="middle">0</text>
+
+    <rect x="248" width="116" height="56" rx="8" fill="rgba(232,255,71,0.15)"/>
+    <text x="306" y="36" font-family="sans-serif" font-size="18" font-weight="bold" fill="#e8ff47" text-anchor="middle">Enter</text>
+  </g>
+</svg>

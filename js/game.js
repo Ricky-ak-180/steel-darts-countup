@@ -1,4 +1,11 @@
 /* ===== GAME LOGIC ===== */
+function _toast(msg, dur) {
+  var el = document.createElement('div');
+  el.className = 'toast-msg'; el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(function(){ el.classList.add('show'); }, 10);
+  setTimeout(function(){ el.classList.remove('show'); setTimeout(function(){ el.remove(); }, 300); }, dur || 2000);
+}
 const ROUNDS = 8;
 let g = { round: 1, scores: [], total: 0 };
 let buf = '';
@@ -148,13 +155,13 @@ function updDisp() {
   var be = document.getElementById('bok');
   if (!buf) {
     ve.textContent = '—'; ve.className = 'tkv empty';
-    he.textContent = '合計点を入力してください';
+    he.textContent = t('g.enter_hint');
     be.className = 'tk enter';
   } else {
     var v = parseInt(buf, 10);
     var ok = !isNaN(v) && v >= 0 && v <= 180;
     ve.textContent = buf; ve.className = 'tkv';
-    he.textContent = ok ? ('= ' + v + ' pt') : '⚠ 0〜180で入力';
+    he.textContent = ok ? ('= ' + v + ' pt') : t('g.range_warn');
     be.className = ok ? 'tk enter ready' : 'tk enter';
   }
 }
@@ -165,7 +172,7 @@ function undoRound() {
   _undoOpenTime = Date.now(); // Undoダイアログを開いた時刻を記録
   var prevRound = g.scores.length;
   var prevScore = g.scores[g.scores.length - 1];
-  var msg = 'R' + prevRound + ' の ' + prevScore + ' pt を取り消して入力し直しますか？';
+  var msg = t('g.undo_msg').replace('{r}', prevRound).replace('{s}', prevScore);
   document.getElementById('undo-msg').textContent = msg;
   document.getElementById('oundo').classList.add('show');
 }
@@ -234,21 +241,21 @@ function updatePace() {
   var h = getH();
   var best = 0;
   for (var i=0; i<h.length; i++) if(h[i].score > best) best = h[i].score;
-  var pbText = 'このペース → 予測 <strong style="color:var(--acc);font-size:13px;">' + pred + '点</strong> <span style="color:var(--mut);">(' + predRank + 'ランク)</span>';
+  var pbText = t('g.pace_pred') + '<strong style="color:var(--acc);font-size:13px;">' + pred + t('g.pace_pts') + '</strong> <span style="color:var(--mut);">(' + predRank + (t('g.pace_rank') ? ' ' + t('g.pace_rank') : '') + ')</span>';
   if (best > 0) {
     if (pred > best) {
-      pbText += ' <span style="color:#ff6b35;font-weight:bold;">🔥 自己ベスト更新ペース！</span>';
+      pbText += ' <span style="color:#ff6b35;font-weight:bold;">' + t('g.pace_pb_beat') + '</span>';
     } else {
-      pbText += ' <span style="color:var(--mut);">自己ベスト:' + best + '点</span>';
+      pbText += ' <span style="color:var(--mut);">' + t('g.pace_pb') + best + t('g.pace_pts') + '</span>';
     }
   }
-  // 目標スコア進捗
+  // Goal progress
   var goal = parseInt(localStorage.getItem('cu_goal') || '0', 10);
   if (goal > 0) {
     var pct = Math.min(100, Math.round(pred / goal * 100));
     var goalColor = pct >= 100 ? '#66bb6a' : pct >= 80 ? '#ffd54f' : '#ff6b6b';
     pbText += '<div style="margin-top:4px;display:flex;align-items:center;gap:6px;">'
-      + '<span style="font-size:10px;color:var(--mut);">目標 ' + goal + '点</span>'
+      + '<span style="font-size:10px;color:var(--mut);">' + t('g.pace_goal') + goal + t('g.pace_pts') + '</span>'
       + '<div style="flex:1;background:rgba(255,255,255,0.08);border-radius:4px;height:5px;overflow:hidden;">'
       + '<div style="width:' + pct + '%;height:100%;background:' + goalColor + ';border-radius:4px;transition:width 0.4s;"></div>'
       + '</div>'
@@ -325,10 +332,10 @@ function showResult() {
   if (_nextR) {
     var diff = _nextR.s - g.total;
     var perRound = Math.ceil(diff / 8);
-    rankUpEl.innerHTML = '<span style="color:var(--acc2);">あと <strong>' + diff + '点</strong> で ' + _nextR.r + ' ランク</span>'
-      + '<span style="color:var(--mut);font-size:10px;margin-left:6px;">（1R平均+' + perRound + '点）</span>';
+    rankUpEl.innerHTML = '<span style="color:var(--acc2);"><strong>' + t('g.rank_need').replace('{d}', diff).replace('{r}', _nextR.r) + '</strong></span>'
+      + '<span style="color:var(--mut);font-size:10px;margin-left:6px;">' + t('g.rank_per_r').replace('{n}', perRound) + '</span>';
   } else {
-    rankUpEl.innerHTML = '<span style="color:var(--acc);">👑 最高ランク S+ 達成！</span>';
+    rankUpEl.innerHTML = '<span style="color:var(--acc);">' + t('g.rank_max') + '</span>';
   }
   // タイム表示をTOTAL SCOREの下に
   var timeEl = document.querySelector('.ovr-time');
@@ -353,7 +360,13 @@ function showResult() {
   document.getElementById('ovr').classList.add('show');
   // デイリーチャレンジ & XP更新
   _dailyOnCountUp(g.total, g.scores);
-  _addXP(10 + Math.floor(g.total / 100), 'カウントアップ');
+  _addXP(10 + Math.floor(g.total / 100), t('xp.countup'));
+  // Leaderboard submission
+  if (typeof lbOnGameEnd === 'function') {
+    lbOnGameEnd('cu', g.total, { avg: (g.total / 8 * 3).toFixed(1), rank: rank(g.total) });
+  }
+  // Challenge check
+  _checkChallengeResult(g.total);
 }
 function startNew() {
   document.getElementById('ovr').classList.remove('show');
@@ -367,11 +380,9 @@ function shareX() {
   var score = g.total;
   var rnk = rank(score);
   var appUrl = 'https://ricky-ak-180.github.io/steel-darts-countup/';
-  var text = 'スティールダーツ カウントアップ\n' +
-    'スコア: ' + score + '点\n' +
-    'ランク: ' + rnk + '\n' +
-    appUrl + '\n' +
-    '#スティールダーツ #ダーツ #カウントアップ';
+  var text = (_currentLang==='en')
+    ? 'Steel Darts Count-Up\nScore: ' + score + '\nRank: ' + rnk + '\n' + appUrl + '\n#SteelDarts #Darts #CountUp'
+    : 'スティールダーツ カウントアップ\nスコア: ' + score + '点\nランク: ' + rnk + '\n' + appUrl + '\n#スティールダーツ #ダーツ #カウントアップ';
   var url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
   window.open(url, '_blank');
 }
@@ -507,11 +518,16 @@ function generateShareCard(config) {
   ctx.lineTo(W * 0.8, footY - 20 * scale);
   ctx.stroke();
 
+  // Footer URL
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.font = (11 * scale) + 'px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('ricky-ak-180.github.io/steel-darts-countup', W / 2, footY + 4 * scale);
+
   // Footer hashtag
   ctx.fillStyle = 'rgba(232,255,71,0.6)';
   ctx.font = (14 * scale) + 'px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('#SteelDartsPro', W / 2, footY + 8 * scale);
+  ctx.fillText('#SteelDartsPro', W / 2, footY + 28 * scale);
 
   return canvas;
 }
@@ -570,13 +586,13 @@ function shareCU() {
     subColor: rc.b === 'var(--acc)' ? '#e8ff47' : rc.b,
     isPB: isPB,
     stats: [
-      { label: 'トータルスコア', value: String(score), color: '#e8ff47' },
-      { label: '3ダーツ平均', value: avg3, color: '#b47fff' },
-      { label: 'ベストラウンド', value: String(best), color: '#4fc3f7' },
-      { label: 'ランク', value: rnk, color: rc.b === 'var(--acc)' ? '#e8ff47' : rc.b }
+      { label: t('g.stat_total_score'), value: String(score), color: '#e8ff47' },
+      { label: t('g.stat_3dart_avg'), value: avg3, color: '#b47fff' },
+      { label: t('g.stat_best_round'), value: String(best), color: '#4fc3f7' },
+      { label: t('g.stat_rank'), value: rnk, color: rc.b === 'var(--acc)' ? '#e8ff47' : rc.b }
     ]
   });
-  var text = 'スティールダーツ カウントアップ ' + score + '点（' + rnk + 'ランク） #SteelDartsPro #ダーツ';
+  var text = t('g.share_cu').replace('{s}', score).replace('{r}', rnk);
   _doShare(canvas, text);
 }
 
@@ -598,19 +614,19 @@ function shareZ01() {
   var mainColor = winner === 'WIN' || winner.indexOf('WIN') >= 0 ? '#e8ff47' : (winner === 'LOSE' ? '#ff6b6b' : '#ffffff');
 
   var stats = [
-    { label: '3ダーツ平均', value: avg, color: '#b47fff' },
+    { label: t('g.stat_3dart_avg'), value: avg, color: '#b47fff' },
     { label: 'Legs Won', value: _z01.legWins[0] + ' – ' + _z01.legWins[1], color: '#e8ff47' },
     { label: '100+', value: String(st0.c100), color: '#4fc3f7' },
     { label: '140+', value: String(st0.c140), color: '#47ffb4' },
     { label: '180s', value: String(st0.c180), color: '#ff6b35' },
-    { label: 'ハイフィニッシュ', value: st0.hiFin ? String(st0.hiFin) : '—', color: '#4fc3f7' }
+    { label: t('g.stat_hi_fin'), value: st0.hiFin ? String(st0.hiFin) : '—', color: '#4fc3f7' }
   ];
   if (st0.bestLeg < 999) {
-    stats.push({ label: 'ベストレグ', value: st0.bestLeg + ' darts', color: '#e8ff47' });
+    stats.push({ label: t('g.stat_best_leg'), value: st0.bestLeg + ' darts', color: '#e8ff47' });
   }
 
   var canvas = generateShareCard({
-    modeName: modeStr + ' — ' + (_z01.players === 3 ? 'vs CPU Lv.' + _z01.cpuLevel : (_z01.players === 2 ? '2P対戦' : 'ソロ')),
+    modeName: modeStr + ' — ' + (_z01.players === 3 ? t('g.mode_vs_cpu') + _z01.cpuLevel : (_z01.players === 2 ? t('g.mode_2p') : t('g.mode_solo'))),
     mainLabel: modeStr,
     mainValue: winner,
     mainColor: mainColor,
@@ -619,7 +635,7 @@ function shareZ01() {
     isPB: false,
     stats: stats
   });
-  var text = modeStr + ' ' + winner + ' Avg:' + avg + ' #SteelDartsPro #ダーツ';
+  var text = t('g.share_z01').replace('{m}', modeStr).replace('{w}', winner).replace('{a}', avg);
   _doShare(canvas, text);
 }
 
@@ -637,20 +653,20 @@ function shareSim() {
   var pC = _simG.pCoAttempts > 0 ? Math.round(_simG.pCoHits / _simG.pCoAttempts * 100) + '%' : '—';
 
   var stats = [
-    { label: '3本平均', value: pA, color: '#b47fff' },
-    { label: '最高ラウンド', value: String(_simG.pBestRound || '—'), color: '#4fc3f7' }
+    { label: t('g.stat_3avg'), value: pA, color: '#b47fff' },
+    { label: t('g.stat_best_r'), value: String(_simG.pBestRound || '—'), color: '#4fc3f7' }
   ];
   if (isCpu) {
-    stats.push({ label: 'レグ', value: _simG.playerLegs + ' – ' + _simG.cpuLegs, color: '#e8ff47' });
+    stats.push({ label: 'Legs', value: _simG.playerLegs + ' – ' + _simG.cpuLegs, color: '#e8ff47' });
     var cA = _simG.cThrows > 0 ? (_simG.cScored / _simG.cThrows * 3).toFixed(1) : '—';
-    stats.push({ label: 'CPU平均', value: cA, color: '#ef5350' });
+    stats.push({ label: t('g.stat_cpu_avg'), value: cA, color: '#ef5350' });
   }
-  stats.push({ label: 'CO率', value: pC, color: '#47ffb4' });
-  stats.push({ label: 'スロー数', value: String(_simG.pThrows), color: 'rgba(255,255,255,0.7)' });
+  stats.push({ label: t('g.stat_co_rate'), value: pC, color: '#47ffb4' });
+  stats.push({ label: t('g.stat_throws'), value: String(_simG.pThrows), color: 'rgba(255,255,255,0.7)' });
 
   var lvlName = isCpu ? _S_LVL[_simG.cpuLvl].name : '';
   var canvas = generateShareCard({
-    modeName: 'SIM 501' + (isCpu ? ' vs CPU（' + lvlName + '）' : ' ソロ'),
+    modeName: 'SIM 501' + (isCpu ? ' vs CPU (' + lvlName + ')' : ' ' + t('g.mode_solo')),
     mainLabel: 'SIM 501',
     mainValue: winner,
     mainColor: mainColor,
@@ -659,7 +675,7 @@ function shareSim() {
     isPB: false,
     stats: stats
   });
-  var text = 'SIM 501 ' + winner + ' Avg:' + pA + ' #SteelDartsPro #ダーツ';
+  var text = '🎯 SIM 501 ' + winner + ' Avg:' + pA + '\nhttps://ricky-ak-180.github.io/steel-darts-countup/\n#SteelDartsPro #Darts';
   _doShare(canvas, text);
 }
 
@@ -748,6 +764,9 @@ function goTab(tab) {
   var vsim=document.getElementById('vsim'); if(vsim) vsim.className='view'+(tab==='sim'?'':' hide');
   var tckt=document.getElementById('tckt'); if(tckt) tckt.className='tab'+(tab==='ckt'?' on':'');
   var vckt=document.getElementById('vckt'); if(vckt) vckt.className='view'+(tab==='ckt'?'':' hide');
+  var btnProfile=document.getElementById('btn-profile'); if(btnProfile) btnProfile.className='btn-profile'+(tab==='profile'?' on':'');
+  var vprofile=document.getElementById('vprofile'); if(vprofile) vprofile.className='view'+(tab==='profile'?'':' hide');
+  var sp=document.getElementById('settings-panel'); if(sp) sp.classList.add('hide');
   document.getElementById('tgame').className = 'tab' + (tab==='game'?' on':'');
   document.getElementById('t01').className = 'tab' + (tab==='01'?' on':'');
   document.getElementById('vgame').className = 'view' + (tab==='game'?'':' hide');
@@ -760,6 +779,327 @@ function goTab(tab) {
   }
   if (tab === '01') { goSub01Game(); _z01LoadDefaults(); z01SetCpu(_z01.cpuLevel); }
   if (tab === 'ckt') { goSubCktGame(); cktSetCpu(_ckt.cpuLevel); }
+  if (tab === 'profile') { renderProfileCard(); }
+}
+
+function goTabProfile() {
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('on'); });
+  var bp = document.getElementById('btn-profile'); if (bp) bp.classList.add('on');
+  document.querySelectorAll('.view').forEach(function(v) { v.classList.add('hide'); });
+  document.getElementById('vprofile').classList.remove('hide');
+  // close settings panel when switching to profile
+  var sp = document.getElementById('settings-panel'); if (sp) sp.classList.add('hide');
+  renderProfileCard();
+  // Load leaderboard
+  if (typeof lbRenderBoard === 'function') {
+    lbRenderBoard('lb-board', 'cu', { weekly: false });
+  }
+}
+
+/* ---- Leaderboard tab switch ---- */
+function lbSwitchTab(tab) {
+  var g = document.getElementById('lb-tab-global');
+  var w = document.getElementById('lb-tab-weekly');
+  if (g) g.classList.toggle('on', tab === 'global');
+  if (w) w.classList.toggle('on', tab === 'weekly');
+  if (typeof lbRenderBoard === 'function') {
+    lbRenderBoard('lb-board', 'cu', { weekly: tab === 'weekly' });
+  }
+}
+
+/* ---- Challenge share (CountUp) ---- */
+function challengeShareCU() {
+  var h = getH();
+  if (!h || !h.length) { _toast(t('lb.no_scores')); return; }
+  var best = 0;
+  for (var i = 0; i < h.length; i++) { if (h[i].score > best) best = h[i].score; }
+  if (typeof challengeCreate === 'function') {
+    var url = challengeCreate('cu', best);
+    var text = '⚔️ ' + t('lb.challenge_share') + '\n' + url;
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(function() { _toast(t('ckt.copied')); });
+    }
+  }
+}
+
+/* ---- Challenge result check (after CountUp game) ---- */
+function _checkChallengeResult(score) {
+  if (typeof challengeGetActive !== 'function') return;
+  var c = challengeGetActive();
+  if (!c || c.m !== 'cu') return;
+  var area = document.getElementById('challenge-result-area');
+  if (!area) return;
+  var won = score >= c.s;
+  area.innerHTML = '<div class="challenge-result ' + (won ? 'win' : 'lose') + '">' +
+    '⚔️ vs ' + (c.n || 'Player') + ': ' + c.s + ' → ' + t(won ? 'lb.challenge_win' : 'lb.challenge_lose') +
+    '</div>';
+  if (typeof challengeClear === 'function') challengeClear();
+}
+
+function toggleSettings() {
+  var sp = document.getElementById('settings-panel');
+  if (sp) sp.classList.toggle('hide');
+}
+
+function _getPersonalBests() {
+  var h01 = _z01GetH() || [];
+  var hCU = getH() || [];
+  var hCkt = _cktGetHistory() || [];
+
+  var best01 = 0, bestCU = 0, bestCkt = 0;
+
+  if (h01.length) {
+    for (var i = 0; i < h01.length; i++) {
+      if (h01[i].data && h01[i].data[0] && h01[i].data[0].bestLeg > best01) {
+        best01 = h01[i].data[0].bestLeg;
+      }
+    }
+  }
+
+  if (hCU.length) {
+    for (var i = 0; i < hCU.length; i++) {
+      if (hCU[i].score > bestCU) {
+        bestCU = hCU[i].score;
+      }
+    }
+  }
+
+  if (hCkt.length) {
+    for (var i = 0; i < hCkt.length; i++) {
+      if (hCkt[i].mpr > bestCkt) {
+        bestCkt = hCkt[i].mpr;
+      }
+    }
+  }
+
+  return {
+    '01': best01,
+    'CountUp': bestCU,
+    'Cricket': bestCkt.toFixed(2)
+  };
+}
+
+function _getAchievements() {
+  var level = _getXP().level || 1;
+  var achievements = [];
+
+  var milestones = [5, 10, 20, 30];
+  for (var i = 0; i < milestones.length; i++) {
+    if (level >= milestones[i]) {
+      achievements.push({ level: milestones[i], unlocked: true });
+    } else {
+      achievements.push({ level: milestones[i], unlocked: false });
+    }
+  }
+
+  return achievements;
+}
+
+function _getLifetimeStats() {
+  var h01 = _z01GetH() || [];
+  var hCU = getH() || [];
+  var hCkt = _cktGetHistory() || [];
+  var totals = getTotals();
+
+  var totalGames = h01.length + hCU.length + hCkt.length;
+  var totalPlayTime = totals.play_time || 0;
+  var hours = Math.floor(totalPlayTime / 3600);
+  var minutes = Math.floor((totalPlayTime % 3600) / 60);
+
+  return {
+    playTime: hours + 'h ' + minutes + 'm',
+    totalGames: totalGames,
+    achievements: _getAchievements().filter(function(a) { return a.unlocked; }).length
+  };
+}
+
+function getPlayerName() {
+  return localStorage.getItem('player_name') || 'Player';
+}
+function setPlayerName(name) {
+  name = (name || '').trim().substring(0, 20);
+  if (!name) name = 'Player';
+  localStorage.setItem('player_name', name);
+}
+function editPlayerName() {
+  var nameEl = document.querySelector('.profile-name');
+  if (!nameEl || nameEl.querySelector('input')) return;
+  var current = getPlayerName();
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.value = current;
+  input.maxLength = 20;
+  input.style.cssText = 'background:var(--bg2);color:var(--txt);border:1px solid var(--acc);border-radius:6px;padding:4px 8px;font-size:16px;width:140px;outline:none;';
+  nameEl.innerHTML = '🎯 ';
+  nameEl.appendChild(input);
+  input.focus();
+  input.select();
+  function save() {
+    setPlayerName(input.value);
+    renderProfileCard();
+  }
+  input.addEventListener('blur', save);
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { input.removeEventListener('blur', save); save(); }
+  });
+}
+
+function _getTodaySession() {
+  var today = localDateStr(new Date());
+  var result = { cu: [], z01: [], ckt: [] };
+  var hCU = getH() || [];
+  for (var i = 0; i < hCU.length; i++) {
+    if (hCU[i].date && localDateStr(new Date(hCU[i].date)) === today) result.cu.push(hCU[i]);
+  }
+  var h01 = _z01GetH() || [];
+  for (var i = 0; i < h01.length; i++) {
+    if (h01[i].date && localDateStr(new Date(h01[i].date)) === today) result.z01.push(h01[i]);
+  }
+  var hCkt = _cktGetHistory() || [];
+  for (var i = 0; i < hCkt.length; i++) {
+    if (hCkt[i].date && localDateStr(new Date(hCkt[i].date)) === today) result.ckt.push(hCkt[i]);
+  }
+  return result;
+}
+
+function _getRecentTrend() {
+  var result = {};
+  // CountUp
+  var hCU = getH() || [];
+  if (hCU.length >= 2) {
+    var recent3 = hCU.slice(0, Math.min(3, hCU.length));
+    var allAvg = hCU.reduce(function(s, g) { return s + g.score; }, 0) / hCU.length;
+    var recAvg = recent3.reduce(function(s, g) { return s + g.score; }, 0) / recent3.length;
+    result.cu = { recent: Math.round(recAvg), all: Math.round(allAvg), diff: Math.round(recAvg - allAvg) };
+  }
+  // 01
+  var h01 = _z01GetH() || [];
+  if (h01.length >= 2) {
+    var r3 = h01.slice(0, Math.min(3, h01.length));
+    var allA = h01.reduce(function(s, g) { return s + (g.data[0].avg || 0); }, 0) / h01.length;
+    var recA = r3.reduce(function(s, g) { return s + (g.data[0].avg || 0); }, 0) / r3.length;
+    result.z01 = { recent: recA.toFixed(1), all: allA.toFixed(1), diff: (recA - allA).toFixed(1) };
+  }
+  // Cricket
+  var hCkt = _cktGetHistory() || [];
+  if (hCkt.length >= 2) {
+    var c3 = hCkt.slice(0, Math.min(3, hCkt.length));
+    var aM = hCkt.reduce(function(s, g) { return s + (g.mpr ? g.mpr[0] : 0); }, 0) / hCkt.length;
+    var rM = c3.reduce(function(s, g) { return s + (g.mpr ? g.mpr[0] : 0); }, 0) / c3.length;
+    result.ckt = { recent: rM.toFixed(2), all: aM.toFixed(2), diff: (rM - aM).toFixed(2) };
+  }
+  return result;
+}
+
+function _renderGoalRow(label, key, values, unit) {
+  var current = parseFloat(localStorage.getItem(key) || '0');
+  var html = '<div style="margin-bottom:10px;"><div style="font-size:11px;color:var(--mut);margin-bottom:4px;">' + label + '</div><div style="display:flex;gap:4px;flex-wrap:wrap;">';
+  for (var i = 0; i < values.length; i++) {
+    var v = values[i];
+    var lbl = v === 0 ? 'OFF' : v + unit;
+    var isOn = current === v;
+    html += '<div data-fn="setGoal" data-goal-key="' + key + '" data-goal-val="' + v + '" style="padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid ' + (isOn ? 'var(--acc)' : 'var(--bdr)') + ';background:' + (isOn ? 'var(--acc)' : 'transparent') + ';color:' + (isOn ? '#000' : 'var(--txt)') + ';">' + lbl + '</div>';
+  }
+  html += '</div></div>';
+  return html;
+}
+
+function setGoal(el) {
+  var key = el.getAttribute('data-goal-key');
+  var val = el.getAttribute('data-goal-val');
+  if (!key || val === null) return;
+  localStorage.setItem(key, val);
+  renderProfileCard();
+}
+
+function renderProfileCard() {
+  var xpData = _getXP();
+  var level = xpData.level || 1;
+  var title = _getLevelTitle(level);
+  var streak = JSON.parse(localStorage.getItem('daily_streak') || '{"current":0,"best":0}');
+  var bests = _getPersonalBests();
+  var achievements = _getAchievements();
+  var stats = _getLifetimeStats();
+  var playerName = getPlayerName();
+
+  var streakPercent = Math.min(100, (streak.current / 30) * 100);
+
+  // Recent trends
+  var trend = _getRecentTrend();
+  var session = _getTodaySession();
+  var sessionTotal = session.cu.length + session.z01.length + session.ckt.length;
+
+  var html = '<div class="profile-card">' +
+    '<div class="profile-header">' +
+      '<div class="profile-name-level">' +
+        '<div class="profile-name" data-fn="editPlayerName" style="cursor:pointer;">🎯 ' + playerName + ' <span style="font-size:12px;opacity:0.6;">✏️</span></div>' +
+        '<div class="profile-level">LV.' + level + '</div>' +
+      '</div>' +
+      (title ? '<div class="profile-title">「' + title + '」</div>' : '') +
+    '</div>' +
+
+    (sessionTotal > 0 ? '<div class="profile-section" style="border-left:3px solid var(--acc);padding-left:12px;">' +
+      '<div class="profile-section-title">Today\'s Session</div>' +
+      (session.cu.length ? '<div class="profile-record-row"><span>CountUp:</span><span class="profile-record-value">' + t('prf.session_games').replace('{n}', session.cu.length).replace('{v}', Math.max.apply(null, session.cu.map(function(g){return g.score;}))) + '</span></div>' : '') +
+      (session.z01.length ? '<div class="profile-record-row"><span>01:</span><span class="profile-record-value">' + t('prf.session_games').replace('{n}', session.z01.length).replace('{v}', 'Avg ' + Math.max.apply(null, session.z01.map(function(g){return g.data[0].avg||0;})).toFixed(1)) + '</span></div>' : '') +
+      (session.ckt.length ? '<div class="profile-record-row"><span>Cricket:</span><span class="profile-record-value">' + t('prf.session_games').replace('{n}', session.ckt.length).replace('{v}', 'MPR ' + Math.max.apply(null, session.ckt.map(function(g){return g.mpr?g.mpr[0]:0;})).toFixed(2)) + '</span></div>' : '') +
+    '</div>' : '') +
+
+    '<div class="profile-section">' +
+      '<div class="profile-section-title">Personal Records</div>' +
+      '<div class="profile-record-row"><span>' + t('prf.01_best') + '</span><span class="profile-record-value">' + bests['01'] + '</span></div>' +
+      '<div class="profile-record-row"><span>' + t('prf.cu_best') + '</span><span class="profile-record-value">' + bests['CountUp'] + '</span></div>' +
+      '<div class="profile-record-row"><span>' + t('prf.ckt_best') + '</span><span class="profile-record-value">' + bests['Cricket'] + '</span></div>' +
+    '</div>' +
+
+    '<div class="profile-section">' +
+      '<div class="profile-section-title">Recent Trend <span style="font-size:10px;color:var(--mut);">' + t('prf.trend_sub') + '</span></div>' +
+      (trend.cu ? '<div class="profile-record-row"><span>CountUp:</span><span class="profile-record-value">' + trend.cu.recent + ' <span style="font-size:11px;color:' + (trend.cu.diff >= 0 ? '#66bb6a' : '#ef5350') + ';">' + (trend.cu.diff >= 0 ? '▲' : '▼') + Math.abs(trend.cu.diff) + '</span></span></div>' : '') +
+      (trend.z01 ? '<div class="profile-record-row"><span>01 Avg:</span><span class="profile-record-value">' + trend.z01.recent + ' <span style="font-size:11px;color:' + (parseFloat(trend.z01.diff) >= 0 ? '#66bb6a' : '#ef5350') + ';">' + (parseFloat(trend.z01.diff) >= 0 ? '▲' : '▼') + Math.abs(parseFloat(trend.z01.diff)) + '</span></span></div>' : '') +
+      (trend.ckt ? '<div class="profile-record-row"><span>Cricket MPR:</span><span class="profile-record-value">' + trend.ckt.recent + ' <span style="font-size:11px;color:' + (parseFloat(trend.ckt.diff) >= 0 ? '#66bb6a' : '#ef5350') + ';">' + (parseFloat(trend.ckt.diff) >= 0 ? '▲' : '▼') + Math.abs(parseFloat(trend.ckt.diff)) + '</span></span></div>' : '') +
+      (!trend.cu && !trend.z01 && !trend.ckt ? '<div style="color:var(--mut);font-size:12px;padding:8px 0;">' + t('prf.no_trend') + '</div>' : '') +
+    '</div>' +
+
+    '<div class="profile-section">' +
+      '<div class="profile-section-title">Achievements</div>' +
+      '<div class="profile-achievements">';
+
+  for (var i = 0; i < achievements.length; i++) {
+    var ach = achievements[i];
+    html += '<div class="achievement-badge ' + (ach.unlocked ? 'unlocked' : 'locked') + '">' +
+      (ach.unlocked ? '✅' : '🔒') + ' ' + t('prf.lv_achieved').replace('{n}', ach.level) +
+    '</div>';
+  }
+
+  html += '</div>' +
+    '</div>' +
+
+    '<div class="profile-section">' +
+      '<div class="profile-section-title">Daily Streak</div>' +
+      '<div class="profile-streak-display">🔥 ' + t('prf.streak_current').replace('{n}', streak.current) + '</div>' +
+      '<div class="profile-streak-bar-bg"><div class="profile-streak-bar" style="width:' + streakPercent + '%"></div></div>' +
+      '<div class="profile-streak-best">' + t('prf.streak_best').replace('{n}', streak.best) + '</div>' +
+    '</div>' +
+
+    '<div class="profile-section">' +
+      '<div class="profile-section-title">Stats Summary</div>' +
+      '<div class="profile-stat-row"><span>' + t('prf.play_time') + '</span><span class="profile-stat-value">' + stats.playTime + '</span></div>' +
+      '<div class="profile-stat-row"><span>' + t('prf.total_games') + '</span><span class="profile-stat-value">' + stats.totalGames + t('prf.games_unit') + '</span></div>' +
+      '<div class="profile-stat-row"><span>' + t('prf.achieved') + '</span><span class="profile-stat-value">' + stats.achievements + t('prf.count_unit') + '</span></div>' +
+    '</div>' +
+
+    '<div class="profile-section">' +
+      '<div class="profile-section-title">Goals</div>' +
+      _renderGoalRow(t('prf.cu_goal'), 'cu_goal', [0, 600, 800, 1000, 1200], 'pts') +
+      _renderGoalRow(t('prf.z01_goal'), 'z01_goal', [0, 40, 50, 60, 70], '') +
+      _renderGoalRow(t('prf.ckt_goal'), 'ckt_goal', [0, 1.5, 2.0, 2.5, 3.0], '') +
+    '</div>' +
+  '</div>';
+
+  var wrap = document.getElementById('profile-card-wrap');
+  if (wrap) wrap.innerHTML = html;
 }
 
 /* Storage */
@@ -870,8 +1210,14 @@ var _sndOn = localStorage.getItem('snd') !== '0';
 function toggleSound() {
   _sndOn = !_sndOn;
   localStorage.setItem('snd', _sndOn ? '1' : '0');
+  _updSndBtn();
+}
+function _updSndBtn() {
   var btn = document.getElementById('btn-snd');
-  if (btn) btn.textContent = _sndOn ? '🔊' : '🔇';
+  if (!btn) return;
+  var icon = _sndOn ? '🔊' : '🔇';
+  var sp = btn.querySelector('span');
+  if (sp) { btn.firstChild.textContent = icon + ' '; } else { btn.textContent = icon; }
 }
 function _ctx() { if (!_actx) { try { _actx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} } return _actx; }
 function _tone(freq, type, dur, vol, delay) {
@@ -1183,7 +1529,7 @@ function drawChart(hist) {
 // inputのchangeイベントをJSで設定（iPhoneのSafari対応）
 function exportData() {
   var h = getH();
-  if (!h.length) { alert('履歴がありません'); return; }
+  if (!h.length) { _toast(t('g.no_history')); return; }
   var json = JSON.stringify({ version: 2, exported: new Date().toISOString(), data: h, totals: getTotals() }, null, 2);
   var blob = new Blob([json], { type: 'application/json' });
   var url = URL.createObjectURL(blob);
@@ -1237,9 +1583,9 @@ function importData(input) {
       }
       saveTotals(t);
       renderHist();
-      alert(newGames.length + '件のデータを追加しました（重複は除外）');
+      _toast(t('io.imported').replace('{n}', newGames.length));
     } catch(err) {
-      alert('読み込みに失敗しました: ' + err.message);
+      _toast(t('io.import_err').replace('{e}', err.message));
     }
     input.value = ''; // リセット
   };
@@ -1249,7 +1595,7 @@ function importData(input) {
 /* 01 Export / Import */
 function exportZ01Data() {
   var h = _z01GetH();
-  if (!h.length) { alert('01の履歴がありません'); return; }
+  if (!h.length) { _toast(t('g.no_history')); return; }
   var json = JSON.stringify({ version: 1, exported: new Date().toISOString(), data: h }, null, 2);
   var blob = new Blob([json], { type: 'application/json' });
   var url = URL.createObjectURL(blob);
@@ -1285,9 +1631,9 @@ function importZ01Data(input) {
       current.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
       localStorage.setItem('dh01', JSON.stringify(current.slice(0, 500)));
       renderZ01Hist();
-      alert(newGames.length + '件のデータを追加しました（重複は除外）');
+      _toast(t('io.imported').replace('{n}', newGames.length));
     } catch(err) {
-      alert('読み込みに失敗しました: ' + err.message);
+      _toast(t('io.import_err').replace('{e}', err.message));
     }
     input.value = '';
   };
@@ -1352,14 +1698,14 @@ function renderPer(h) {
   }
   function fmtTime(sec) {
     var m = Math.floor(sec/60), s = sec%60;
-    return m>0 ? m+'分'+(s>0?s+'秒':'') : (s>0 ? s+'秒' : '—');
+    return m>0 ? t('dur.m_s').replace('{m}',m).replace('{s}',s) : (s>0 ? t('dur.s').replace('{s}',s) : '—');
   }
   // タブに応じた合計プレイ時間
-  var ptMap = { day: { sec: totalSecDay, lbl: '本日' }, week: { sec: totalSecWeek, lbl: '今週' }, month: { sec: totalSecMonth, lbl: '今月' } };
+  var ptMap = { day: { sec: totalSecDay, lbl: t('period.today') }, week: { sec: totalSecWeek, lbl: t('period.week') }, month: { sec: totalSecMonth, lbl: t('period.month') } };
   var ptInfo = ptMap[pTab] || ptMap['day'];
   var ptFooter = '';
   var s=getPer(h,pTab);
-  var tabs=[['day','日別'],['week','週別'],['month','月別']].map(function(t){
+  var tabs=[['day',t('period.day_tab')],['week',t('period.week_tab')],['month',t('period.month_tab')]].map(function(t){
     return '<div class="ptab'+(pTab===t[0]?' on':'')+'" data-t="'+t[0]+'">'+t[1]+'</div>';
   }).join('');
   var rows=s.length?s.map(function(r, ridx){
@@ -1376,7 +1722,7 @@ function renderPer(h) {
     if(m60>0)  mp.push('<span style="color:#9575cd;">60+:'+m60+'</span>');
     if(m59>0)  mp.push('<span style="color:rgba(255,255,255,0.35);">59-:'+m59+'</span>');
     var durM=Math.floor((r.duration||0)/60), durS=(r.duration||0)%60;
-    var durStr=r.duration>0?(durM>0?durM+'分'+(durS>0?durS+'秒':''):durS+'秒'):'';
+    var durStr=r.duration>0?(durM>0?t('dur.m_s').replace('{m}',durM).replace('{s}',durS):t('dur.s').replace('{s}',durS)):'';
     var timeTag=durStr?'<span style="color:var(--grn);margin-left:auto;">⏱ '+durStr+'</span>':'';
     var mHtml=(mp.length||durStr)?'<div style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:3px 6px 4px;border-top:1px solid var(--bdr);font-size:12px;font-weight:700;opacity:0.9;">'+mp.join('')+timeTag+'</div>':'';
     // 3-Dart Avg計算
@@ -1398,11 +1744,11 @@ function renderPer(h) {
       '<div class="p180">'+(r.c180>0?r.c180:'—')+'</div>'+
       mHtml+
       '</div>';
-  }).join('') : '<div class="pempty">データなし</div>';
+  }).join('') : '<div class="pempty">'+t('empty.no_data')+'</div>';
   w.innerHTML='<div class="pcrd">'+
     '<div class="ptabs" id="ptabs">'+tabs+'</div>'+
     '<div class="pgrid">'+
-    '<div class="phd"><span>期間</span><span>最高点</span><span>平均点</span><span>3ダーツ平均</span><span>回数</span><span>180</span></div>'+
+    '<div class="phd"><span>Period</span><span>Best</span><span>Avg</span><span>3-Dart Avg</span><span>Games</span><span>180</span></div>'+
     rows+'</div>'+ptFooter+'</div>';
   document.getElementById('ptabs').addEventListener('click',function(e){
     var t=e.target.getAttribute('data-t');
@@ -1434,7 +1780,7 @@ function renderRrateRows() {
   var total = rounds.length;
   var rrateRows = document.getElementById('rrate-rows');
   if (!rrateRows) return;
-  if (!total) { rrateRows.innerHTML='<div style="text-align:center;color:var(--mut);font-size:12px;padding:8px 0;">データなし</div>'; return; }
+  if (!total) { rrateRows.innerHTML='<div style="text-align:center;color:var(--mut);font-size:12px;padding:8px 0;">'+t('empty.no_data')+'</div>'; return; }
   var bands = [
     { lbl:'180',  color:'#e8ff47', fn:function(s){return s===180;} },
     { lbl:'140+', color:'#47ffb4', fn:function(s){return s>=140&&s<180;} },
@@ -1477,7 +1823,7 @@ function renderHist() {
     if (rc) rc.style.display = 'none';
     var sb = document.getElementById('streak-badge');
     if (sb) sb.textContent = '';
-    hl.innerHTML='<div class="hempty"><div class="ei">🎯</div>まだ記録がありません。<br>ゲームを完了すると自動で保存されます。</div>';
+    hl.innerHTML='<div class="hempty"><div class="ei">🎯</div>'+t('empty.no_record').replace('\n','<br>')+'</div>';
     return;
   }
   var sc=h.map(function(x){return x.score;});
@@ -1498,8 +1844,8 @@ function renderHist() {
     if (h[i].date && localDateStr(new Date(h[i].date)) === todayStrH && h[i].score > todayBestScore) todayBestScore = h[i].score;
   }
   var todayBestHtml = todayBestScore > 0
-    ? '<div class="sv" style="color:var(--acc);">'+todayBestScore+'</div><div class="sl">本日ベスト</div>'
-    : '<div class="sv" style="color:var(--mut);">—</div><div class="sl">本日ベスト</div>';
+    ? '<div class="sv" style="color:var(--acc);">'+todayBestScore+'</div><div class="sl">'+t('prf.today_best')+'</div>'
+    : '<div class="sv" style="color:var(--mut);">—</div><div class="sl">'+t('prf.today_best')+'</div>';
   // 直近30G平均
   var sl30s=h.slice(0,30), s30s=0;
   for(var i=0;i<sl30s.length;i++) s30s+=sl30s[i].score;
@@ -1516,7 +1862,7 @@ function renderHist() {
   // 累計統計（dh_totalsから取得 — 200件上限に依存しない真の累計）
   var totals = getTotals();
   var allDurH = Math.floor(totals.play_time/3600), allDurM = Math.floor((totals.play_time%3600)/60);
-  var allDurStr = allDurH > 0 ? allDurH+'時間'+allDurM+'分' : allDurM+'分';
+  var allDurStr = allDurH > 0 ? t('dur.h_m').replace('{h}',allDurH).replace('{m}',allDurM) : t('dur.m').replace('{m}',allDurM);
   var profileBest = Math.max(totals.best || 0, best);
   var bestRankLabel = rank(profileBest);
   var rankColors = { 'S+': ['#ffd700','#000'], 'S': ['#e8ff47','#000'], 'A': ['#47ffb4','#000'], 'B': ['#4fc3f7','#000'], 'C': ['#ff6b35','#fff'], 'D': ['#6b6b88','#fff'] };
@@ -1526,14 +1872,14 @@ function renderHist() {
     pc.style.display = 'block';
     pc.innerHTML =
       '<div class="pcard">' +
-        '<div class="pcard-brand"><span class="pcard-badge">🏆 累計成績</span><span class="pcard-app">🎯 Steel Darts Pro</span></div>' +
+        '<div class="pcard-brand"><span class="pcard-badge">🏆 '+t('an.career').replace('🎮 ','')+'</span><span class="pcard-app">🎯 Steel Darts Pro</span></div>' +
         '<div class="pcard-score">' + profileBest + '</div>' +
         '<div class="pcard-score-label">Personal Best</div>' +
         '<div class="pcard-rank" style="background:'+rc2[0]+';color:'+rc2[1]+';">' + bestRankLabel + ' RANK</div>' +
         '<hr class="pcard-divider">' +
         '<div class="pcard-stats">' +
           '<div class="pcard-stat"><div class="pcard-stat-val" style="color:rgba(255,255,255,0.7);">' + totals.games + '</div><div class="pcard-stat-lbl">Total Games</div></div>' +
-          '<div class="pcard-stat"><div class="pcard-stat-val" style="color:#ffd700;">×' + totals.c180 + '</div><div class="pcard-stat-lbl">通算 180</div></div>' +
+          '<div class="pcard-stat"><div class="pcard-stat-val" style="color:#ffd700;">×' + totals.c180 + '</div><div class="pcard-stat-lbl">' + t('an.total_180') + '</div></div>' +
           '<div class="pcard-stat"><div class="pcard-stat-val" style="color:var(--grn);font-size:22px;">' + allDurStr + '</div><div class="pcard-stat-lbl">Total Play Time</div></div>' +
         '</div>' +
       '</div>';
@@ -1552,18 +1898,18 @@ function renderHist() {
       for(var i=0;i<todayGames.length;i++){ var r2=todayGames[i].rounds||[]; for(var j=0;j<r2.length;j++) if(r2[j]===180) today180++; }
       var todayDurSec = 0; for(var i=0;i<todayGames.length;i++) todayDurSec += (todayGames[i].duration||0);
       var tdm=Math.floor(todayDurSec/60), tds=todayDurSec%60;
-      var todayTimeStr = tdm>0 ? tdm+'分'+(tds>0?tds+'秒':'') : (tds>0?tds+'秒':'—');
+      var todayTimeStr = tdm>0 ? tdm+'m'+(tds>0?' '+tds+'s':'') : (tds>0?tds+'s':'—');
       var todayRankLabel = rank(todayBest2);
       var trc = rankColors[todayRankLabel] || ['#444','#fff'];
       tc.innerHTML =
         '<div class="tcard">' +
-          '<div class="tcard-brand"><span class="tcard-badge">📅 今日の成績</span><span class="tcard-date">' + todayStr2 + '</span></div>' +
+          '<div class="tcard-brand"><span class="tcard-badge">' + t('an.today') + '</span><span class="tcard-date">' + todayStr2 + '</span></div>' +
           '<div class="tcard-score">' + todayBest2 + '</div>' +
           '<div class="tcard-score-label">Today\'s Best</div>' +
           '<div class="tcard-rank" style="background:'+trc[0]+';color:'+trc[1]+';">' + todayRankLabel + ' RANK</div>' +
           '<hr class="tcard-divider">' +
           '<div class="tcard-stats">' +
-            '<div class="tcard-stat"><div class="tcard-stat-val" style="color:#b47fff;">' + todayAvg3da + '</div><div class="tcard-stat-lbl">3ダーツ平均</div></div>' +
+            '<div class="tcard-stat"><div class="tcard-stat-val" style="color:#b47fff;">' + todayAvg3da + '</div><div class="tcard-stat-lbl">' + t('g.stat_3dart_avg') + '</div></div>' +
             '<div class="tcard-stat"><div class="tcard-stat-val" style="color:#ffd700;">×' + today180 + '</div><div class="tcard-stat-lbl">180</div></div>' +
             '<div class="tcard-stat"><div class="tcard-stat-val" style="color:rgba(255,255,255,0.7);">' + todayGames.length + '</div><div class="tcard-stat-lbl">Games</div></div>' +
             '<div class="tcard-stat"><div class="tcard-stat-val" style="color:var(--grn);font-size:18px;">' + todayTimeStr + '</div><div class="tcard-stat-lbl">Time</div></div>' +
@@ -1575,8 +1921,8 @@ function renderHist() {
   }
   s3.style.gridTemplateColumns = 'repeat(2,1fr)';
   s3.innerHTML=
-    '<div class="sc3" style="position:relative;">'+(arrow30s?'<div style="position:absolute;top:6px;right:8px;font-size:13px;line-height:1;">'+arrow30s+'</div>':'')+'<div class="sv" style="color:#fff;">'+avg30s+'</div><div class="sl">直近30G 平均</div></div>'+
-    '<div class="sc3" style="position:relative;">'+(avg30sp!==null&&avg30s>avg30sp?'<div style="position:absolute;top:6px;right:8px;font-size:13px;line-height:1;color:#ff6b35;font-weight:900;">▲</div>':avg30sp!==null&&avg30s<avg30sp?'<div style="position:absolute;top:6px;right:8px;font-size:13px;line-height:1;color:#4fc3f7;font-weight:900;">▼</div>':'')+'<div class="sv" style="color:#b47fff;font-size:30px;letter-spacing:0;">'+(avg30s?(avg30s/8).toFixed(2):'—')+'</div><div class="sl">直近30G 3ダーツ平均</div></div>';
+    '<div class="sc3" style="position:relative;">'+(arrow30s?'<div style="position:absolute;top:6px;right:8px;font-size:13px;line-height:1;">'+arrow30s+'</div>':'')+'<div class="sv" style="color:#fff;">'+avg30s+'</div><div class="sl">Last 30G Avg</div></div>'+
+    '<div class="sc3" style="position:relative;">'+(avg30sp!==null&&avg30s>avg30sp?'<div style="position:absolute;top:6px;right:8px;font-size:13px;line-height:1;color:#ff6b35;font-weight:900;">▲</div>':avg30sp!==null&&avg30s<avg30sp?'<div style="position:absolute;top:6px;right:8px;font-size:13px;line-height:1;color:#4fc3f7;font-weight:900;">▼</div>':'')+'<div class="sv" style="color:#b47fff;font-size:30px;letter-spacing:0;">'+(avg30s?(avg30s/8).toFixed(2):'—')+'</div><div class="sl">Last 30G '+t('g.stat_3dart_avg')+'</div></div>';
   // 直近30G平均（1本化）
   var sl30=h.slice(0,30), s30=0;
   for(var j=0;j<sl30.length;j++) s30+=sl30[j].score;
@@ -1590,7 +1936,7 @@ function renderHist() {
     if (avg30 > avg30prev) arrow30 = '<span style="color:#ff6b35;font-size:22px;font-weight:900;line-height:1;"> ▲</span>';
     else if (avg30 < avg30prev) arrow30 = '<span style="color:#4fc3f7;font-size:22px;font-weight:900;line-height:1;"> ▼</span>';
   }
-  a3.innerHTML = '<div class="ac"><div class="av">'+(avg30!==null?avg30:'—')+arrow30+'</div><div class="al">直近30G 平均スコア</div></div>';
+  a3.innerHTML = '<div class="ac"><div class="av">'+(avg30!==null?avg30:'—')+arrow30+'</div><div class="al">Last 30G Avg Score</div></div>';
 
   // スコア分布
   _rrateH = h;
@@ -1610,14 +1956,18 @@ function renderHist() {
   if (sb) {
     if (streak >= 2) {
       var isGold = streak >= 7;
-      var stTitle = streak >= 365 ? '\uD83C\uDFC6 \u4F1D\u8AAC' : streak >= 100 ? '\uD83D\uDC51 \u30C0\u30FC\u30C4\u306E\u9B3C' : streak >= 60 ? '\uD83D\uDC8E \u30C0\u30A4\u30E4\u30E2\u30F3\u30C9' : streak >= 30 ? '\uD83D\uDD25 \u9244\u4EBA' : streak >= 14 ? '\u26A1 \u5E38\u9023' : streak >= 7 ? '\u2728 \u9031\u672B\u6226\u58EB' : '';
-      sb.innerHTML = '<div class="streak-card' + (isGold ? ' streak-gold' : '') + '"><div class="streak-fire">\uD83D\uDD25</div><div class="streak-num">' + streak + '</div><div class="streak-lbl">\u65E5\u9023\u7D9A<br>\u30D7\u30EC\u30FC</div>'
+      var stTitle = (_currentLang==='en') ?
+        (streak >= 365 ? '🏆 Legend' : streak >= 100 ? '👑 Darts Addict' : streak >= 60 ? '💎 Diamond' : streak >= 30 ? '🔥 Iron Will' : streak >= 14 ? '⚡ Dedicated' : streak >= 7 ? '✨ Weekly Warrior' : '') :
+        (streak >= 365 ? '🏆 伝説' : streak >= 100 ? '👑 ダーツの鬼' : streak >= 60 ? '💎 ダイヤモンド' : streak >= 30 ? '🔥 鉄人' : streak >= 14 ? '⚡ 常連' : streak >= 7 ? '✨ 週末戦士' : '');
+      var _streakLbl = t('badge.streak_unit').replace('\n','<br>');
+      sb.innerHTML = '<div class="streak-card' + (isGold ? ' streak-gold' : '') + '"><div class="streak-fire">🔥</div><div class="streak-num">' + streak + '</div><div class="streak-lbl">' + _streakLbl + '</div>'
         + (stTitle ? '<div class="streak-title">' + stTitle + '</div>' : '')
-        + '<div class="streak-best">\u6700\u9AD8: ' + streakData.best + '\u65E5</div>'
+        + '<div class="streak-best">' + t('prf.streak_best').replace('{n}', streakData.best) + '</div>'
         + '</div>';
     } else if (streak === 1) {
-      sb.innerHTML = '<div class="streak-card"><div class="streak-fire">\uD83D\uDD25</div><div class="streak-num">1</div><div class="streak-lbl">\u65E5\u9023\u7D9A<br>\u30D7\u30EC\u30FC</div>'
-        + (streakData.best >= 2 ? '<div class="streak-best">\u6700\u9AD8: ' + streakData.best + '\u65E5</div>' : '')
+      var _streakLbl1 = t('badge.streak_unit').replace('\n','<br>');
+      sb.innerHTML = '<div class="streak-card"><div class="streak-fire">🔥</div><div class="streak-num">1</div><div class="streak-lbl">' + _streakLbl1 + '</div>'
+        + (streakData.best >= 2 ? '<div class="streak-best">' + t('prf.streak_best').replace('{n}', streakData.best) + '</div>' : '')
         + '</div>';
     } else {
       sb.innerHTML = '';
@@ -1627,13 +1977,13 @@ function renderHist() {
   var titleEl = document.getElementById('profile-titles');
   if (titleEl) {
     var titles = [];
-    var t = getTotals();
-    if (t.games >= 100) titles.push('🎯 百戦錬磨');
-    if (t.c180 >= 50) titles.push('💯 180マスター');
-    if (t.best >= 1000) titles.push('👑 S+到達');
-    if (streak >= 7) titles.push('✨ 週末戦士');
-    if (streak >= 30) titles.push('🔥 鉄人');
-    if (streak >= 100) titles.push('💎 ダーツの鬼');
+    var tt = getTotals();
+    if (tt.games >= 100) titles.push(t('badge.veteran'));
+    if (tt.c180 >= 50) titles.push(t('badge.180master'));
+    if (tt.best >= 1000) titles.push(t('badge.splus'));
+    if (streak >= 7) titles.push(t('badge.weekly'));
+    if (streak >= 30) titles.push(t('badge.iron'));
+    if (streak >= 100) titles.push(t('badge.demon'));
     titleEl.innerHTML = titles.length ? titles.join(' ') : '';
     titleEl.style.display = titles.length ? 'block' : 'none';
   }
@@ -1651,13 +2001,13 @@ function renderHist() {
     if (lastWeekGames.length > 0) {
       var lastAvg = Math.round(lastWeekGames.reduce(function(a,g){return a+g.score;},0)/lastWeekGames.length);
       var diff = thisAvg - lastAvg;
-      if (diff > 0) msg = '📈 先週より <strong style="color:#66bb6a;">+' + diff + '点アップ ↑</strong>　(今週平均 '+thisAvg+'点)';
-      else if (diff < 0) msg = '📉 先週より <strong style="color:#ff9944;">' + Math.abs(diff) + '点ダウン ↓</strong>　(今週平均 '+thisAvg+'点)';
-      else msg = '➡ <span style="color:var(--mut);">先週と同じ</span>　(今週平均 '+thisAvg+'点)';
+      if (diff > 0) msg = '📈 <strong style="color:#66bb6a;">+' + diff + ' vs last week ↑</strong> (this week avg '+thisAvg+')';
+      else if (diff < 0) msg = '📉 <strong style="color:#ff9944;">-' + Math.abs(diff) + ' vs last week ↓</strong> (this week avg '+thisAvg+')';
+      else msg = '➡ <span style="color:var(--mut);">Same as last week</span> (this week avg '+thisAvg+')';
     } else {
-      msg = '🎯 今週の平均スコア: <strong style="color:var(--acc);">' + thisAvg + '点</strong>　(' + thisWeekGames.length + 'G)';
+      msg = '🎯 This week avg: <strong style="color:var(--acc);">' + thisAvg + '</strong> (' + thisWeekGames.length + 'G)';
     }
-    var reportBtn = buildWeeklyReport() ? ' <button onclick="showWeeklyReport()" style="background:none;border:1px solid var(--bdr);color:var(--acc);font-size:11px;padding:2px 8px;border-radius:6px;cursor:pointer;margin-left:6px;">\uD83D\uDCCA \u5148\u9031\u306E\u307E\u3068\u3081</button>' : '';
+    var reportBtn = buildWeeklyReport() ? ' <button onclick="showWeeklyReport()" style="background:none;border:1px solid var(--bdr);color:var(--acc);font-size:11px;padding:2px 8px;border-radius:6px;cursor:pointer;margin-left:6px;">'+t('wr.btn')+'</button>' : '';
     wEl.innerHTML = msg + reportBtn;
     wEl.style.display = 'block';
   })();
@@ -1706,10 +2056,10 @@ function renderHist() {
       mini=parts.length?'<div style="font-size:10px;margin-top:3px;display:flex;gap:6px;">'+parts.join('')+'</div>':'';
     }
     return '<div class="hi" data-idx="'+actualIdx+'">'+
-      '<div class="hi-del-bg">削除</div>'+
+      '<div class="hi-del-bg">' + t('an.delete') + '</div>'+
       '<div class="hi-inner">'+
       '<div class="hsc'+(isBest?' best':'')+'">'+x.score+'</div>'+
-      '<div class="hinf"><div class="hdate">'+ds+'　'+rank(x.score)+'ランク'+(x.duration?' ⏱'+Math.floor(x.duration/60)+'分'+(x.duration%60>0?x.duration%60+'秒':''):'')+'</div><div class="hpills">'+pills+'<span class="hpill" style="color:#b47fff;background:rgba(180,127,255,0.12);">3ダーツ平均:'+tda3+'</span></div>'+mini+'</div>'+
+      '<div class="hinf"><div class="hdate">'+ds+'　'+rank(x.score)+(x.duration?' ⏱'+Math.floor(x.duration/60)+'m'+(x.duration%60>0?' '+x.duration%60+'s':''):'')+'</div><div class="hpills">'+pills+'<span class="hpill" style="color:#b47fff;background:rgba(180,127,255,0.12);">'+t('g.stat_3dart_avg')+':'+tda3+'</span></div>'+mini+'</div>'+
       (isBest?'<div class="hbdg">BEST</div>':'')+
       '</div>'+
       '</div>';
@@ -1771,10 +2121,10 @@ function _renderHistPage() {
       mini=parts.length?'<div style="font-size:10px;margin-top:3px;display:flex;gap:6px;">'+parts.join('')+'</div>':'';
     }
     return '<div class="hi" data-idx="'+actualIdx+'">'+
-      '<div class="hi-del-bg">削除</div>'+
+      '<div class="hi-del-bg">' + t('an.delete') + '</div>'+
       '<div class="hi-inner">'+
       '<div class="hsc'+(isBest?' best':'')+'">'+x.score+'</div>'+
-      '<div class="hinf"><div class="hdate">'+ds+'　'+rank(x.score)+'ランク'+(x.duration?' ⏱'+Math.floor(x.duration/60)+'分'+(x.duration%60>0?x.duration%60+'秒':''):'')+'</div><div class="hpills">'+pills+'<span class="hpill" style="color:#b47fff;background:rgba(180,127,255,0.12);">3ダーツ平均:'+tda3+'</span></div>'+mini+'</div>'+
+      '<div class="hinf"><div class="hdate">'+ds+'　'+rank(x.score)+(x.duration?' ⏱'+Math.floor(x.duration/60)+'m'+(x.duration%60>0?' '+x.duration%60+'s':''):'')+'</div><div class="hpills">'+pills+'<span class="hpill" style="color:#b47fff;background:rgba(180,127,255,0.12);">'+t('g.stat_3dart_avg')+':'+tda3+'</span></div>'+mini+'</div>'+
       (isBest?'<div class="hbdg">BEST</div>':'')+
       '</div>'+
       '</div>';
@@ -1876,7 +2226,7 @@ function showGameDetail(idx) {
     '<div style="border-bottom:1px solid var(--bdr);padding-bottom:8px;">' +
       '<div style="font-size:13px;color:var(--mut);margin-bottom:4px;">'+dateStr+'</div>' +
       '<div style="font-size:28px;font-family:\'Bebas Neue\',cursive;color:var(--acc);font-weight:900;">'+game.score+'</div>' +
-      '<div style="font-size:11px;color:var(--txt);margin-top:2px;">'+rank(game.score)+'ランク</div>' +
+      '<div style="font-size:11px;color:var(--txt);margin-top:2px;">'+(_currentLang==='en'?'Rank ':'')+ rank(game.score)+(_currentLang==='ja'?'ランク':'')+'</div>' +
     '</div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;">' +
       '<div style="background:var(--sur2);padding:8px;border-radius:4px;text-align:center;">' +
@@ -1884,8 +2234,8 @@ function showGameDetail(idx) {
         '<div style="font-size:16px;font-family:\'Bebas Neue\',cursive;color:#b47fff;font-weight:700;">'+consistency.toFixed(2)+'</div>' +
       '</div>' +
       '<div style="background:var(--sur2);padding:8px;border-radius:4px;text-align:center;">' +
-        '<div style="color:var(--mut);font-size:10px;margin-bottom:2px;">所用時間</div>' +
-        '<div style="font-size:14px;color:var(--grn);">⏱'+(game.duration ? (Math.floor(game.duration/60)+'分'+(game.duration%60>0?game.duration%60+'秒':'')) : '—')+'</div>' +
+        '<div style="color:var(--mut);font-size:10px;margin-bottom:2px;">'+(_currentLang==='en'?'Duration':'所用時間')+'</div>' +
+        '<div style="font-size:14px;color:var(--grn);">⏱'+(game.duration ? t('dur.m_s').replace('{m}',Math.floor(game.duration/60)).replace('{s}',game.duration%60) : '—')+'</div>' +
       '</div>' +
     '</div>' +
     '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;font-size:11px;padding:6px;background:var(--sur2);border-radius:4px;">' +
@@ -2304,9 +2654,9 @@ function _z01Commit(sc) {
   var bust = _z01.outRule===0 ? (after<0||after===1) : (after<0);
   if (_z01.inRule === 1 && st.rounds === 0 && sc === 0) {
     (function(){
-      var t = document.createElement('div'); t.className = 'z01-event-toast bogey';
-      t.textContent = 'ダブルインが必要です'; document.body.appendChild(t);
-      setTimeout(function(){ t.parentNode && t.parentNode.removeChild(t); }, 1800);
+      var tt = document.createElement('div'); tt.className = 'z01-event-toast bogey';
+      tt.textContent = t('s.double_in_req'); document.body.appendChild(tt);
+      setTimeout(function(){ tt.parentNode && tt.parentNode.removeChild(tt); }, 1800);
     })();
     _z01BufUpdate(''); return;
   }
@@ -2761,9 +3111,9 @@ function z01ShowResult() {
     ['100+', function(s){ return s.c100; }],
     ['140+', function(s){ return s.c140; }],
     ['180s', function(s){ return s.c180; }],
-    ['ハイフィニッシュ', function(s){ return s.hiFin||'-'; }],
-    ['ベストレグ', function(s){ return s.bestLeg<999?s.bestLeg+' 本':'-'; }],
-    ['ワーストレグ', function(s){ return s.worstLeg>0?s.worstLeg+' 本':'-'; }],
+    [t('g.stat_hi_fin'), function(s){ return s.hiFin||'-'; }],
+    [t('g.stat_best_leg'), function(s){ return s.bestLeg<999?s.bestLeg:'-'; }],
+    [t('g.stat_worst_leg'), function(s){ return s.worstLeg>0?s.worstLeg:'-'; }],
     ['Legs Won', function(s,i){ return _z01.legWins[i]; }]
   ];
   var n = _z01.stats.length;
@@ -2797,7 +3147,7 @@ function renderZ01Hist() {
   if (!wrap) return;
   var h = _z01GetH();
   if (!h.length) {
-    wrap.innerHTML = '<div class="hempty"><div class="ei">🎮</div>まだ記録がありません。<br>ゲームを完了すると自動で保存されます。</div>';
+    wrap.innerHTML = '<div class="hempty"><div class="ei">🎮</div>'+t('empty.no_record').replace('\n','<br>')+'</div>';
     return;
   }
   // --- Compute cumulative stats (solo + vs CPU/2P すべて対象) ---
@@ -2834,7 +3184,7 @@ function renderZ01Hist() {
   var html = '';
   // === 1. Profile card ===
   html += '<div class="pcard">';
-  html += '<div class="pcard-brand"><span class="pcard-badge">🎮 累計成績</span><span class="pcard-app">Steel Darts Pro</span></div>';
+  html += '<div class="pcard-brand"><span class="pcard-badge">'+t('an.career')+'</span><span class="pcard-app">Steel Darts Pro</span></div>';
   html += '<div class="pcard-score">' + bestAvgStr + '</div>';
   html += '<div class="pcard-score-label">Personal Best AVG</div>';
   html += '<hr class="pcard-divider">';
@@ -2901,8 +3251,8 @@ function renderZ01Hist() {
     ];
     var total = allRounds.length;
     html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px;">';
-    html += '<div style="font-size:10px;color:var(--mut);letter-spacing:2px;margin-bottom:2px;">削りスコア分布（直近30G / ' + total + 'ラウンド）</div>';
-    html += '<div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:10px;">残り171以上のラウンドのみ集計（上がり目が出たラウンドは除く）</div>';
+    html += '<div style="font-size:10px;color:var(--mut);letter-spacing:2px;margin-bottom:2px;">'+t('an.score_dist').replace('{n}',total)+'</div>';
+    html += '<div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:10px;">'+t('an.score_dist_note')+'</div>';
     bands.forEach(function(b){
       var cnt = allRounds.filter(function(s){ return s>=b.min && s<=b.max; }).length;
       var pct = total > 0 ? Math.round(cnt/total*100) : 0;
@@ -2924,15 +3274,15 @@ function renderZ01Hist() {
       if (g.data[0].checkouts && g.data[0].checkouts.length) allCOs = allCOs.concat(g.data[0].checkouts);
     });
     var cats = [
-      {min:161, max:170, label:'161〜170', stars:5, desc:'トリプル2本 ＋ ダブルブル必須　最高難易度'},
-      {min:131, max:160, label:'131〜160', stars:4, desc:'トリプル2本 → ダブルで上がれる'},
-      {min:101, max:130, label:'101〜130', stars:3, desc:'トリプル1〜2本 → ダブルでフィニッシュ'},
-      {min:61,  max:100, label:'61〜100',  stars:2, desc:'トリプルが外れても、シングル2本 → ダブルで上がれる'},
-      {min:41,  max:60,  label:'41〜60',   stars:1, desc:'シングル＋ダブルの2本フィニッシュ'},
-      {min:2,   max:40,  label:'2〜40',    stars:1, desc:'偶数はダブル1投、奇数はシングル→ダブルの2本'}
+      {min:161, max:170, label:'161-170', stars:5, desc:t('an.co_161')},
+      {min:131, max:160, label:'131-160', stars:4, desc:t('an.co_131')},
+      {min:101, max:130, label:'101-130', stars:3, desc:t('an.co_101')},
+      {min:61,  max:100, label:'61-100',  stars:2, desc:t('an.co_61')},
+      {min:41,  max:60,  label:'41-60',   stars:1, desc:t('an.co_41')},
+      {min:2,   max:40,  label:'2-40',    stars:1, desc:t('an.co_2')}
     ];
     html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
-    html += '<div style="padding:10px 12px 4px;font-size:10px;color:var(--mut);letter-spacing:2px;">チェックアウト成功率（難易度別）</div>';
+    html += '<div style="padding:10px 12px 4px;font-size:10px;color:var(--mut);letter-spacing:2px;">'+t('an.co_rate')+'</div>';
     html += '<div style="padding:0 12px 8px;font-size:10px;color:rgba(255,255,255,0.25);border-bottom:1px solid var(--bdr);">残り170以下（上がり目あり）になったラウンドを全データ集計</div>';
     cats.forEach(function(c){
       var attempts = allCOs.filter(function(a){ return a.score>=c.min && a.score<=c.max; });
@@ -3076,7 +3426,7 @@ function renderZ01Hist() {
       if (b.total === 0) {
         html += '<div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04);opacity:0.35;">';
         html += '<div style="font-size:12px;color:var(--mut);">CU ' + cat.label + '</div>';
-        html += '<div style="font-size:10px;color:var(--mut);">データなし</div>';
+        html += '<div style="font-size:10px;color:var(--mut);">'+t('empty.no_data')+'</div>';
         html += '</div>';
       } else {
         var pct = Math.round(b.wins / b.total * 100);
@@ -3096,8 +3446,8 @@ function renderZ01Hist() {
   })();
   // === 6. Export / Import ===
   html += '<div class="exp-row">';
-  html += '<button class="bexp" id="btn-z01-export">📤 エクスポート</button>';
-  html += '<button class="bexp" id="btn-z01-import">📥 インポート</button>';
+  html += '<button class="bexp" id="btn-z01-export">📤 Export</button>';
+  html += '<button class="bexp" id="btn-z01-import">📥 Import</button>';
   html += '</div>';
   // === 7. Game list ===
   html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
@@ -3105,7 +3455,7 @@ function renderZ01Hist() {
   h.forEach(function(g, idx) {
     var d = new Date(g.date);
     var dateStr = d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
-    var outStr = g.outRule===0 ? 'ダブル' : 'シングル';
+    var outStr = g.outRule===0 ? 'Double' : 'Single';
     var legsStr = g.legs > 1 ? 'BO'+g.legs : '1 Leg';
     var isBest = (idx === bestHIdx);
     html += '<div style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);">';
@@ -3232,8 +3582,8 @@ function _z01RenderAvgGraph() {
   }
   pts = pts.slice(-30);
   if (pts.length < 2) {
-    el.innerHTML = '<div class="z01-avg-graph-hdr"><span class="z01-avg-graph-label">AVG推移</span></div>' +
-      '<div class="z01-avg-graph-empty">あと' + (2 - pts.length) + 'ゲームでグラフが表示されます</div>';
+    el.innerHTML = '<div class="z01-avg-graph-hdr"><span class="z01-avg-graph-label">'+t('an.avg_graph').replace('{n}','')+'</span></div>' +
+      '<div class="z01-avg-graph-empty">'+t('an.avg_graph_need').replace('{n}', (2 - pts.length))+'</div>';
     return;
   }
   var n = pts.length;
@@ -3295,7 +3645,7 @@ function _z01RenderAvgGraph() {
     '</svg>';
   el.innerHTML =
     '<div class="z01-avg-graph-hdr">' +
-      '<span class="z01-avg-graph-label">AVG推移（直近' + n + 'ゲーム）</span>' +
+      '<span class="z01-avg-graph-label">'+t('an.avg_graph').replace('{n}',n)+'</span>' +
       '<span class="z01-avg-graph-trend" style="color:' + trendCol + ';">' + trendTxt + '</span>' +
     '</div>' + svg;
 }
@@ -3350,7 +3700,7 @@ function z01ToggleHint() {
   var btn = document.getElementById('z01-hint-toggle');
   if (btn) {
     btn.classList.toggle('on', _z01HintOn);
-    btn.textContent = _z01HintOn ? 'ヒント OFF' : 'ヒント ON';
+    btn.textContent = _z01HintOn ? 'Hint OFF' : 'Hint ON';
   }
   _z01HintUpdate();
 }
@@ -3809,22 +4159,27 @@ function z01CloseStats() {
 /* ============================================================
    デイリーチャレンジシステム
    ============================================================ */
+var _DAILY_POOL_TEXT = {
+  ja: { cu_100x3:'100点以上のラウンドを3回出す', cu_100x5:'100点以上のラウンドを5回出す', cu_avg80:'3ダーツ平均80以上でゲーム完了', cu_avg90:'3ダーツ平均90以上でゲーム完了', cu_game2:'カウントアップを2ゲームプレイ', cu_game3:'カウントアップを3ゲームプレイ', cu_500:'スコア500点以上を達成', cu_700:'スコア700点以上を達成', cu_140:'140以上のラウンドを1回出す', cu_180:'180を1回出す', arr_quiz:'アレンジクイズを1回クリア', arr_combo3:'クイズで3コンボ以上達成', arr_perfect:'クイズで正解率100%', cu_no_miss:'ミス(0点)なしでゲーム完了', z01_play:'01ゲームを1回プレイ' },
+  en: { cu_100x3:'Score 100+ in 3 rounds', cu_100x5:'Score 100+ in 5 rounds', cu_avg80:'Finish with 80+ 3-dart avg', cu_avg90:'Finish with 90+ 3-dart avg', cu_game2:'Play 2 Count-Up games', cu_game3:'Play 3 Count-Up games', cu_500:'Score 500+', cu_700:'Score 700+', cu_140:'Hit a 140+ round', cu_180:'Hit a 180', arr_quiz:'Complete 1 checkout quiz', arr_combo3:'3+ combo in quiz', arr_perfect:'100% quiz accuracy', cu_no_miss:'Complete with no 0-point rounds', z01_play:'Play 1 game of 01' }
+};
+function _dcText(id) { return (_DAILY_POOL_TEXT[_currentLang] || _DAILY_POOL_TEXT.ja)[id] || id; }
 var _DAILY_POOL = [
-  { id: 'cu_100x3', text: '100点以上のラウンドを3回出す', icon: '🎯', check: function(s){ return (s.cu_high_rounds || 0) >= 3; } },
-  { id: 'cu_100x5', text: '100点以上のラウンドを5回出す', icon: '🎯', check: function(s){ return (s.cu_high_rounds || 0) >= 5; } },
-  { id: 'cu_avg80', text: '3ダーツ平均80以上でゲーム完了', icon: '📊', check: function(s){ return !!s.cu_avg80; } },
-  { id: 'cu_avg90', text: '3ダーツ平均90以上でゲーム完了', icon: '📊', check: function(s){ return !!s.cu_avg90; } },
-  { id: 'cu_game2', text: 'カウントアップを2ゲームプレイ', icon: '🔁', check: function(s){ return (s.cu_games || 0) >= 2; } },
-  { id: 'cu_game3', text: 'カウントアップを3ゲームプレイ', icon: '🔁', check: function(s){ return (s.cu_games || 0) >= 3; } },
-  { id: 'cu_500', text: 'スコア500点以上を達成', icon: '⭐', check: function(s){ return !!s.cu_500; } },
-  { id: 'cu_700', text: 'スコア700点以上を達成', icon: '👑', check: function(s){ return !!s.cu_700; } },
-  { id: 'cu_140', text: '140以上のラウンドを1回出す', icon: '🔥', check: function(s){ return !!s.cu_140; } },
-  { id: 'cu_180', text: '180を1回出す', icon: '💯', check: function(s){ return !!s.cu_180; } },
-  { id: 'arr_quiz', text: 'アレンジクイズを1回クリア', icon: '📝', check: function(s){ return !!s.arr_quiz; } },
-  { id: 'arr_combo3', text: 'クイズで3コンボ以上達成', icon: '⚡', check: function(s){ return !!s.arr_combo3; } },
-  { id: 'arr_perfect', text: 'クイズで正解率100%', icon: '💎', check: function(s){ return !!s.arr_perfect; } },
-  { id: 'cu_no_miss', text: 'ミス(0点)なしでゲーム完了', icon: '🛡', check: function(s){ return !!s.cu_no_miss; } },
-  { id: 'z01_play', text: '01ゲームを1回プレイ', icon: '🎮', check: function(s){ return !!s.z01_play; } },
+  { id: 'cu_100x3', icon: '🎯', check: function(s){ return (s.cu_high_rounds || 0) >= 3; } },
+  { id: 'cu_100x5', icon: '🎯', check: function(s){ return (s.cu_high_rounds || 0) >= 5; } },
+  { id: 'cu_avg80', icon: '📊', check: function(s){ return !!s.cu_avg80; } },
+  { id: 'cu_avg90', icon: '📊', check: function(s){ return !!s.cu_avg90; } },
+  { id: 'cu_game2', icon: '🔁', check: function(s){ return (s.cu_games || 0) >= 2; } },
+  { id: 'cu_game3', icon: '🔁', check: function(s){ return (s.cu_games || 0) >= 3; } },
+  { id: 'cu_500', icon: '⭐', check: function(s){ return !!s.cu_500; } },
+  { id: 'cu_700', icon: '👑', check: function(s){ return !!s.cu_700; } },
+  { id: 'cu_140', icon: '🔥', check: function(s){ return !!s.cu_140; } },
+  { id: 'cu_180', icon: '💯', check: function(s){ return !!s.cu_180; } },
+  { id: 'arr_quiz', icon: '📝', check: function(s){ return !!s.arr_quiz; } },
+  { id: 'arr_combo3', icon: '⚡', check: function(s){ return !!s.arr_combo3; } },
+  { id: 'arr_perfect', icon: '💎', check: function(s){ return !!s.arr_perfect; } },
+  { id: 'cu_no_miss', icon: '🛡', check: function(s){ return !!s.cu_no_miss; } },
+  { id: 'z01_play', icon: '🎮', check: function(s){ return !!s.z01_play; } },
 ];
 
 function _getDailyChallenge() {
@@ -3865,7 +4220,7 @@ function _updateDailyProgress(key, value) {
     var claimedKey = 'daily_claimed_' + dc.date;
     if (!localStorage.getItem(claimedKey)) {
       localStorage.setItem(claimedKey, '1');
-      setTimeout(function(){ launchConfetti(); _addXP(50, 'デイリーチャレンジ達成'); }, 500);
+      setTimeout(function(){ launchConfetti(); _addXP(50, t('xp.daily')); }, 500);
     }
   }
 }
@@ -3914,16 +4269,16 @@ function _renderDailyBadge() {
   var dc = _getDailyChallenge();
   var el = document.getElementById('daily-challenge-card');
   if (!el) return;
-  var html = '<div class="dc-header"><span class="dc-title">📅 デイリーチャレンジ</span><span class="dc-count">' + dc.completed.length + '/' + dc.missions.length + '</span></div>';
+  var html = '<div class="dc-header"><span class="dc-title">'+t('dc.title')+'</span><span class="dc-count">' + dc.completed.length + '/' + dc.missions.length + '</span></div>';
   for (var i = 0; i < dc.missions.length; i++) {
     var m = null;
     for (var j = 0; j < _DAILY_POOL.length; j++) { if (_DAILY_POOL[j].id === dc.missions[i]) { m = _DAILY_POOL[j]; break; } }
     if (!m) continue;
     var done = dc.completed.indexOf(dc.missions[i]) >= 0;
-    html += '<div class="dc-mission' + (done ? ' dc-done' : '') + '"><span class="dc-icon">' + m.icon + '</span><span class="dc-text">' + m.text + '</span><span class="dc-check">' + (done ? '✅' : '⬜') + '</span></div>';
+    html += '<div class="dc-mission' + (done ? ' dc-done' : '') + '"><span class="dc-icon">' + m.icon + '</span><span class="dc-text">' + _dcText(m.id) + '</span><span class="dc-check">' + (done ? '✅' : '⬜') + '</span></div>';
   }
   if (dc.completed.length === dc.missions.length) {
-    html += '<div class="dc-complete">🎉 全ミッション達成！ +50 XP</div>';
+    html += '<div class="dc-complete">'+t('dc.complete')+'</div>';
   }
   el.innerHTML = html;
   el.style.display = 'block';
@@ -3974,6 +4329,15 @@ function _showLevelUp(level) {
 }
 
 function _getLevelTitle(lv) {
+  if (_currentLang === 'en') {
+    if (lv >= 30) return '🏆 Legend';
+    if (lv >= 25) return '👑 Grand Master';
+    if (lv >= 20) return '💎 Master';
+    if (lv >= 15) return '⚡ Expert';
+    if (lv >= 10) return '🔥 Advanced';
+    if (lv >= 5)  return '⭐ Intermediate';
+    return '';
+  }
   if (lv >= 30) return '🏆 レジェンド';
   if (lv >= 25) return '👑 グランドマスター';
   if (lv >= 20) return '💎 マスター';
@@ -4131,25 +4495,28 @@ function showWeeklyReport() {
   if (!report) return;
   var diffHtml = '';
   if (report.diff !== null) {
-    if (report.diff > 0) diffHtml = '<span style="color:#66bb6a;font-weight:700;">+' + report.diff + '\u70B9</span>';
-    else if (report.diff < 0) diffHtml = '<span style="color:#ff6b6b;font-weight:700;">' + report.diff + '\u70B9</span>';
-    else diffHtml = '<span style="color:var(--mut);">\u00B10\u70B9</span>';
+    var ptLbl = _currentLang==='en' ? '' : '\u70B9';
+    if (report.diff > 0) diffHtml = '<span style="color:#66bb6a;font-weight:700;">+' + report.diff + ptLbl+'</span>';
+    else if (report.diff < 0) diffHtml = '<span style="color:#ff6b6b;font-weight:700;">' + report.diff + ptLbl+'</span>';
+    else diffHtml = '<span style="color:var(--mut);">\u00B10'+ptLbl+'</span>';
   } else {
     diffHtml = '<span style="color:var(--mut);">\u2014</span>';
   }
   var modal = document.getElementById('weekly-report-modal');
   if (!modal) return;
   var streak = getDailyStreak();
+  var _gUnit = _currentLang==='en' ? '' : '\u56DE';
+  var _mUnit = _currentLang==='en' ? 'min' : '\u5206';
   document.getElementById('wr-body').innerHTML =
     '<div class="wr-period">' + report.dateRange + '</div>' +
     '<div class="wr-stats">' +
-      '<div class="wr-stat"><div class="wr-stat-val">' + report.games + ' <small>\u56DE</small></div><div class="wr-stat-lbl">\u30D7\u30EC\u30A4\u56DE\u6570</div></div>' +
-      '<div class="wr-stat"><div class="wr-stat-val">' + report.totalMin + ' <small>\u5206</small></div><div class="wr-stat-lbl">\u7DCF\u30D7\u30EC\u30A4\u6642\u9593</div></div>' +
-      '<div class="wr-stat"><div class="wr-stat-val" style="color:#b47fff;">' + report.avgScore + '</div><div class="wr-stat-lbl">\u5E73\u5747\u30B9\u30B3\u30A2 (CountUp)</div></div>' +
-      '<div class="wr-stat"><div class="wr-stat-val" style="color:#e8ff47;">' + report.bestScore + '</div><div class="wr-stat-lbl">\u30D9\u30B9\u30C8\u30B9\u30B3\u30A2</div></div>' +
+      '<div class="wr-stat"><div class="wr-stat-val">' + report.games + ' <small>'+_gUnit+'</small></div><div class="wr-stat-lbl">'+t('wr.games')+'</div></div>' +
+      '<div class="wr-stat"><div class="wr-stat-val">' + report.totalMin + ' <small>'+_mUnit+'</small></div><div class="wr-stat-lbl">'+t('wr.playtime')+'</div></div>' +
+      '<div class="wr-stat"><div class="wr-stat-val" style="color:#b47fff;">' + report.avgScore + '</div><div class="wr-stat-lbl">'+t('wr.avg_cu')+'</div></div>' +
+      '<div class="wr-stat"><div class="wr-stat-val" style="color:#e8ff47;">' + report.bestScore + '</div><div class="wr-stat-lbl">'+t('wr.best_score')+'</div></div>' +
     '</div>' +
-    '<div class="wr-diff">\u524D\u9031\u6BD4: ' + diffHtml + '</div>' +
-    (streak.current >= 2 ? '<div class="wr-streak">\uD83D\uDD25 \u73FE\u5728 ' + streak.current + '\u65E5\u9023\u7D9A\u30D7\u30EC\u30FC\u4E2D\uFF08\u6700\u9AD8: ' + streak.best + '\u65E5\uFF09</div>' : '');
+    '<div class="wr-diff">'+t('wr.vs_prev')+' ' + diffHtml + '</div>' +
+    (streak.current >= 2 ? '<div class="wr-streak">'+t('wr.streak_msg').replace('{n}', streak.current)+'</div>' : '');
   modal.classList.add('show');
 }
 function closeWeeklyReport() {

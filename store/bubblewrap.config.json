@@ -1,0 +1,39 @@
+{
+  "host": "ricky-ak-180.github.io",
+  "name": "Steel Darts Pro",
+  "shortName": "Darts Pro",
+  "startUrl": "/steel-darts-countup/",
+  "webManifestUrl": "https://ricky-ak-180.github.io/steel-darts-countup/manifest.json",
+  "themeColor": "#0a0a0f",
+  "navigationColor": "#0a0a0f",
+  "navigationColorDark": "#0a0a0f",
+  "navigationDividerColor": "#0a0a0f",
+  "navigationDividerColorDark": "#0a0a0f",
+  "backgroundColor": "#0a0a0f",
+  "packageId": "io.github.rickyak180.steeldartspro",
+  "appVersionName": "2.0.0",
+  "appVersionCode": 1,
+  "display": "standalone",
+  "orientation": "portrait",
+  "iconUrl": "https://ricky-ak-180.github.io/steel-darts-countup/icons/icon-512.png",
+  "maskableIconUrl": "https://ricky-ak-180.github.io/steel-darts-countup/icons/icon-maskable-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "enableNotifications": false,
+  "enableSiteSettingsShortcut": false,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fallbackType": "customtabs",
+  "signing": {
+    "keyAlias": "steeldartspro",
+    "keyStorePassword": "TODO:SET_YOUR_PASSWORD",
+    "keyPassword": "TODO:SET_YOUR_PASSWORD",
+    "keyStorePath": "./steeldartspro.keystore"
+  },
+  "_comment_build_steps": [
+    "1. Install Java JDK 11+ and Android SDK",
+    "2. npx @nicolo-ribaudo/bubblewrap init --manifest https://ricky-ak-180.github.io/steel-darts-countup/manifest.json",
+    "3. npx @nicolo-ribaudo/bubblewrap build",
+    "4. Upload generated .aab to Google Play Console",
+    "5. Replace sha256_cert_fingerprints in .well-known/assetlinks.json with: keytool -list -v -keystore steeldartspro.keystore | grep SHA256"
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "rules": {
+    "leaderboard": {
+      "$mode": {
+        ".read": true,
+        ".indexOn": ["score"],
+        "$uid": {
+          ".write": "auth != null && $uid === auth.uid",
+          ".validate": "newData.hasChildren(['uid', 'name', 'score', 'ts'])",
+          "uid": {
+            ".validate": "newData.val() === auth.uid"
+          },
+          "name": {
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 16"
+          },
+          "score": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1440"
+          },
+          "ts": {
+            ".validate": "newData.val() === now"
+          },
+          "avg": {
+            ".validate": "newData.isString()"
+          },
+          "rank": {
+            ".validate": "newData.isString()"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
+    },
+    "weekly": {
+      "$week": {
+        "$mode": {
+          ".read": true,
+          ".indexOn": ["score"],
+          "$uid": {
+            ".write": "auth != null && $uid === auth.uid",
+            ".validate": "newData.hasChildren(['uid', 'name', 'score', 'ts'])",
+            "uid": {
+              ".validate": "newData.val() === auth.uid"
+            },
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 16"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1440"
+            },
+            "ts": {
+              ".validate": "newData.val() === now"
+            },
+            "$other": {
+              ".validate": "newData.isString() || newData.isNumber()"
+            }
+          }
+        }
+      }
+    }
+  }
+}

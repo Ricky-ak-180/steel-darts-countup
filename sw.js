@@ -1,12 +1,17 @@
 // Service Worker for Steel Darts Pro
-const CACHE_NAME = 'steel-darts-v2';
+const CACHE_NAME = 'steel-darts-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/css/app.css',
-  '/js/game.js',
-  '/js/cricket.js',
-  '/js/arr.js'
+  '/css/app.min.css',
+  '/js/i18n.min.js',
+  '/js/sfx.min.js',
+  '/js/caller.min.js',
+  '/js/data.min.js',
+  '/js/game.min.js',
+  '/js/arr.min.js',
+  '/js/sim501.min.js',
+  '/js/cricket.min.js'
 ];
 
 // Install event - cache essential assets

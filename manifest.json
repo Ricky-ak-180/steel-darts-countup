@@ -1,17 +1,55 @@
 {
-  "name": "Steel Darts Pro",
+  "name": "Steel Darts Pro — Score Tracker & Practice",
   "short_name": "Darts Pro",
-  "description": "スティールダーツ スコア管理・練習アプリ",
-  "start_url": "./",
+  "description": "Steel darts score tracker & practice app — Count-Up, 01, Cricket, CPU simulation, checkout training. Free & offline.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "/steel-darts-countup/",
   "display": "standalone",
   "background_color": "#0a0a0f",
   "theme_color": "#0a0a0f",
   "orientation": "portrait",
+  "categories": ["sports", "games", "utilities"],
+  "lang": "ja",
+  "dir": "ltr",
   "icons": [
     {
-      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAAAMjElEQVR42u2dW4wdRRCGv9l7dnd2d3Z272F3797ubnZ3d3Z3lz0kJBcSSAgJkJgQEhJCCCGEQAgg5EEIIYQQQgghJCQkJCQkJCQkJCSUlJSUlJSUlJSUlJQkSZIkSZIkSZIkSZIkSZIkSZL8B/wHOoFmkA==",
-      "sizes": "128x128",
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
       "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icons/screenshot-narrow.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Count-Up game screen with score input"
+    },
+    {
+      "src": "icons/screenshot-wide.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Steel Darts Pro — Score tracker & practice app"
     }
   ]
 }

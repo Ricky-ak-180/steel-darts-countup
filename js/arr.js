@@ -21,14 +21,18 @@ var _trainHintVis  = false;
 var _trainWeakQueue = [];
 var _trainSession = { correct: 0, attempts: 0, combo: 0 };
 
+var _TRAIN_DIFF_JA = ['⬜ 入門','🟦 初級','🟨 中級','🟧 上級','🟥 難しい','🟣 超難'];
+var _TRAIN_DIFF_EN = ['⬜ Beginner','🟦 Easy','🟨 Medium','🟧 Hard','🟥 Very Hard','🟣 Expert'];
 var _TRAIN_DIFF = [
-  { key:'beginner', label:'⬜ 入門',   color:'#66bb6a', from:2,   to:40  },
-  { key:'easy',     label:'🟦 初級',   color:'#4fc3f7', from:41,  to:60  },
-  { key:'normal',   label:'🟨 中級',   color:'#ffd54f', from:61,  to:100 },
-  { key:'hard',     label:'🟧 上級',   color:'#ff9800', from:101, to:130 },
-  { key:'vhard',    label:'🟥 難しい', color:'#ef5350', from:131, to:160 },
-  { key:'expert',   label:'🟣 超難',   color:'#ab47bc', from:161, to:170 }
+  { key:'beginner', color:'#66bb6a', from:2,   to:40  },
+  { key:'easy',     color:'#4fc3f7', from:41,  to:60  },
+  { key:'normal',   color:'#ffd54f', from:61,  to:100 },
+  { key:'hard',     color:'#ff9800', from:101, to:130 },
+  { key:'vhard',    color:'#ef5350', from:131, to:160 },
+  { key:'expert',   color:'#ab47bc', from:161, to:170 }
 ];
+(function(){ var labels = (_currentLang==='en') ? _TRAIN_DIFF_EN : _TRAIN_DIFF_JA;
+  for(var i=0;i<_TRAIN_DIFF.length;i++) _TRAIN_DIFF[i].label = labels[i]; })();
 function _trainDiff(score) {
   for (var i = 0; i < _TRAIN_DIFF.length; i++) {
     if (score >= _TRAIN_DIFF[i].from && score <= _TRAIN_DIFF[i].to) return _TRAIN_DIFF[i];
@@ -114,7 +118,7 @@ function trainWeakMode() {
     return (ea.c/ea.a) - (eb.c/eb.a); // 成功率が低い順
   });
   if (weak.length === 0) {
-    alert('苦手スコアが見つかりません。もっとトレーニングを積んでから試してみましょう！');
+    alert(t('tr.no_weak'));
     return;
   }
   // 苦手スコアキューをセットして最初のスコアからスタート
@@ -124,11 +128,112 @@ function trainWeakMode() {
   setTimeout(function(){
     var info = document.getElementById('arr-train-weak-info');
     if (info) {
-      info.innerHTML = '🎯 苦手スコア集中モード (' + weak.length + '個) ｜ 次: ' +
+      info.innerHTML = t('tr.weak_mode').replace('{n}', weak.length) +
         weak.slice(1, 4).join(' → ') + (weak.length > 4 ? ' …' : '');
       info.style.display = 'block';
     }
   }, 100);
+}
+
+function getWeakScores() {
+  var d = _trainLoad();
+  var weak = _TRAIN_SCORES.filter(function(s){
+    if (_trainIsBogey(s)) return false;
+    var e = _trainEntry(s, d);
+    return e.a >= 1 && (e.c / e.a) < 0.6;
+  }).sort(function(a, b){
+    var ea = _trainEntry(a, d), eb = _trainEntry(b, d);
+    return (ea.c/ea.a) - (eb.c/eb.a);
+  });
+  return weak;
+}
+
+function recommendRoutine() {
+  try {
+    var xpData = typeof _getXP === 'function' ? _getXP() : {level: 1};
+    var level = xpData.level || 1;
+    var d = _trainLoad();
+    var weak = getWeakScores();
+
+    var routines = [];
+
+    // Weak score concentration drill
+    if (weak.length > 0) {
+      routines.push({
+        stars: '★★★☆☆',
+        title: t('tr.weak_drill'),
+        desc: t('tr.weak_desc'),
+        action: 'trainWeakMode'
+      });
+    }
+
+    // Skill builder for beginners/intermediate
+    if (level <= 10) {
+      routines.push({
+        stars: '★★☆☆☆',
+        title: t('tr.skill_builder'),
+        desc: t('tr.skill_desc_beg'),
+        action: 'trainStart',
+        arg: '20'
+      });
+    } else if (level <= 20) {
+      routines.push({
+        stars: '★★★☆☆',
+        title: t('tr.skill_builder'),
+        desc: t('tr.skill_desc_mid'),
+        action: 'trainContinue'
+      });
+    }
+
+    // Challenge mode for advanced
+    if (level >= 15) {
+      routines.push({
+        stars: '★★★★☆',
+        title: t('tr.challenge'),
+        desc: t('tr.challenge_desc'),
+        action: 'trainRandom'
+      });
+    }
+
+    return routines;
+  } catch(e) {
+    console.error('recommendRoutine error:', e);
+    return [];
+  }
+}
+
+function renderTrainingRoutineBuilder() {
+  try {
+    var routines = recommendRoutine();
+    if (!routines || routines.length === 0) return '';
+
+    var html = '<div style="background:rgba(232,255,71,0.08);border:1px solid rgba(232,255,71,0.15);border-radius:8px;padding:12px;margin-bottom:12px;">' +
+      '<div style="font-size:11px;color:var(--acc);font-weight:900;letter-spacing:1.5px;margin-bottom:10px;text-transform:uppercase;">推奨ルーチン</div>';
+
+    routines.forEach(function(routine) {
+      var actionHtml = '';
+      if (routine.action === 'trainWeakMode') {
+        actionHtml = ' data-fn="trainWeakMode"';
+      } else if (routine.action === 'trainStart' && routine.arg) {
+        actionHtml = ' data-fn="trainStart" data-arg="' + routine.arg + '"';
+      } else if (routine.action === 'trainContinue') {
+        actionHtml = ' data-fn="trainContinue"';
+      } else if (routine.action === 'trainRandom') {
+        actionHtml = ' data-fn="trainRandom"';
+      }
+
+      html += '<button style="width:100%;text-align:left;background:var(--sur);border:1px solid var(--bdr);border-radius:6px;padding:10px;margin-bottom:8px;cursor:pointer;transition:all 0.15s;color:var(--txt);display:flex;flex-direction:column;gap:4px;"' + actionHtml + '>' +
+        '<div style="font-size:14px;font-weight:700;letter-spacing:1px;">' + routine.stars + '  ' + routine.title + '</div>' +
+        '<div style="font-size:12px;color:var(--mut);">→ ' + routine.desc + '</div>' +
+      '</button>';
+    });
+
+    html += '</div>';
+    return html;
+  } catch(e) {
+    console.error('renderTrainingRoutineBuilder error:', e);
+    return '';
+  }
 }
 
 function trainStart(score) {
@@ -156,14 +261,14 @@ function _applyTrainHintVis() {
   var box = document.getElementById('arr-tp-hint-box');
   var btn = document.getElementById('arr-tp-hint-btn');
   box.style.display = _trainHintVis ? '' : 'none';
-  if (btn) btn.textContent = _trainHintVis ? '🙈 ヒントを隠す' : '👁 ヒントを見る';
+  if (btn) btn.textContent = _trainHintVis ? t('tr.hide_hint') : t('tr.show_hint');
 }
 
 function _renderTrainPrac(score, entry) {
   if (!entry) { var d = _trainLoad(); entry = _trainEntry(score, d); }
   var c = entry.c;
   document.getElementById('arr-tp-header-score').textContent = score;
-  document.getElementById('arr-tp-header-clears').textContent = c + '回クリア';
+  document.getElementById('arr-tp-header-clears').textContent = t('tr.clears').replace('{n}', c);
   document.getElementById('arr-tp-score-big').textContent = score;
   var stars = '';
   for (var i = 0; i < _TRAIN_MASTER; i++) stars += (i < Math.min(c, _TRAIN_MASTER)) ? '★' : '☆';
@@ -210,12 +315,12 @@ function trainResult(ok) {
   for (var i = 0; i < _TRAIN_MASTER; i++) stars += (i < Math.min(c, _TRAIN_MASTER)) ? '★' : '☆';
   if (c >= _TRAIN_PERFECT) stars = '🌟 PERFECT';
   document.getElementById('arr-tp-stars').textContent = stars;
-  document.getElementById('arr-tp-header-clears').textContent = c + '回クリア';
+  document.getElementById('arr-tp-header-clears').textContent = t('tr.clears').replace('{n}', c);
   document.getElementById('arr-tp-rate').textContent = _trainRateText(entry);
   var streakEl = document.getElementById('arr-tp-streak');
   if (streakEl) {
-    if (_trainSession.combo >= 5) streakEl.textContent = '⚡ ' + _trainSession.combo + '連続！！';
-    else if (_trainSession.combo >= 3) streakEl.textContent = '🔥 ' + _trainSession.combo + '連続！';
+    if (_trainSession.combo >= 5) streakEl.textContent = t('tr.streak5').replace('{n}', _trainSession.combo);
+    else if (_trainSession.combo >= 3) streakEl.textContent = t('tr.streak3').replace('{n}', _trainSession.combo);
     else streakEl.textContent = '';
   }
   var body = document.getElementById('arr-tp-body');
@@ -235,11 +340,11 @@ function trainResult(ok) {
   }
   var unlockEl = document.getElementById('arr-tp-unlock-msg');
   var next = _trainNextScore(_trainCurrent);
-  if (ok && c === 1 && next) unlockEl.textContent = '🔓 ' + next + ' をアンロック！';
-  else if (ok && c === _TRAIN_HINT_HIDE) unlockEl.textContent = '✨ ヒントが自動非表示に';
-  else if (ok && c >= _TRAIN_PERFECT && c === _TRAIN_PERFECT) unlockEl.textContent = '🌟 PERFECTマスター！';
+  if (ok && c === 1 && next) unlockEl.textContent = t('tr.unlock').replace('{s}', next);
+  else if (ok && c === _TRAIN_HINT_HIDE) unlockEl.textContent = t('tr.hint_hidden');
+  else if (ok && c >= _TRAIN_PERFECT && c === _TRAIN_PERFECT) unlockEl.textContent = t('tr.perfect');
   else unlockEl.textContent = '';
-  document.getElementById('arr-tp-next-btn').textContent = next ? '次のスコアへ →' : '一覧へ戻る';
+  document.getElementById('arr-tp-next-btn').textContent = next ? t('tr.next_score') : t('tr.back_list');
   var prevBtn = document.getElementById('arr-tp-prev-btn');
   if (prevBtn) prevBtn.style.display = _TRAIN_SCORES.indexOf(_trainCurrent) > 0 ? '' : 'none';
   document.getElementById('arr-tp-result-row').style.display = '';
@@ -295,13 +400,14 @@ function _renderTrainMap() {
     if (!_trainIsBogey(s)) { total++; if (_trainEntry(s, d).c >= _TRAIN_MASTER) mastered++; }
   });
   var pct = total > 0 ? Math.round(mastered / total * 100) : 0;
-  document.getElementById('arr-train-progress').textContent = mastered + ' / ' + total + ' マスター (' + pct + '%)';
+  var progEl = document.getElementById('arr-train-progress');
+  if (progEl) progEl.textContent = mastered + ' / ' + total + ' ' + t('tr.mastered') + ' (' + pct + '%)';
   var fill = document.getElementById('arr-total-prog-fill');
   if (fill) fill.style.width = pct + '%';
   var strip = document.getElementById('arr-session-strip');
   if (strip && _trainSession.attempts > 0) {
     var sRate = Math.round(_trainSession.correct / _trainSession.attempts * 100);
-    strip.innerHTML = '📊 本日: ' + _trainSession.attempts + '回試行　' + _trainSession.correct + '回成功　' + sRate + '%';
+    strip.innerHTML = t('tr.session').replace('{a}', _trainSession.attempts).replace('{c}', _trainSession.correct).replace('{r}', sRate);
     strip.style.display = 'flex';
   }
   var continueScore = null;
@@ -311,13 +417,14 @@ function _renderTrainMap() {
     if (!_trainIsBogey(sc) && _trainEntry(sc, d).c < _TRAIN_MASTER) { continueScore = sc; break; }
   }
   var contWrap = document.getElementById('arr-train-continue-wrap');
-  if (continueScore !== null) {
-    document.getElementById('arr-train-continue-score').textContent = continueScore;
+  if (continueScore !== null && contWrap) {
+    var scoreEl = document.getElementById('arr-train-continue-score');
+    if (scoreEl) scoreEl.textContent = continueScore;
     contWrap.style.display = '';
-  } else {
+  } else if (contWrap) {
     contWrap.style.display = 'none';
   }
-  var html = '';
+  var html = renderTrainingRoutineBuilder();
   _TRAIN_DIFF.forEach(function(diff) {
     var tiles = [];
     for (var k = 0; k < _TRAIN_SCORES.length; k++) {
@@ -444,7 +551,9 @@ function z01SetPlayers(arg) {
   else document.getElementById('z01-name2').style.display = (arg===2)?'':'none';
   document.getElementById('z01-cpu-section').style.display = (arg===3)?'':'none';
 }
-var _Z01_CPU_NAMES = ['','入門','初心者','初級','中初級','アマチュア','中級','中級+','上級','上級+','準プロ','プロ','エリート'];
+var _Z01_CPU_NAMES = (_currentLang==='en') ?
+  ['','Beginner','Novice','Easy','Low-Mid','Amateur','Mid','Mid+','Hard','Hard+','Semi-Pro','Pro','Elite'] :
+  ['','入門','初心者','初級','中初級','アマチュア','中級','中級+','上級','上級+','準プロ','プロ','エリート'];
 function z01SetCpu(arg) {
   _z01.cpuLevel = arg;
   document.querySelectorAll('#z01-setup-wrap [data-fn="z01SetCpu"]').forEach(function(el){
@@ -613,13 +722,12 @@ function z01Kd() { if (!_z01._buf) return; _z01BufUpdate(_z01._buf.slice(0,-1));
 
 function z01Ok() {
   if (_z01._buf === '') {
-    // スコア0（空入力）のフィードバック
-    var t = document.createElement('div');
-    t.className = 'z01-event-toast';
-    t.textContent = 'スコアを入力してください';
-    t.style.color = '#ff9800';
-    document.body.appendChild(t);
-    setTimeout(function(){ t.parentNode && t.parentNode.removeChild(t); }, 1200);
+    var tt = document.createElement('div');
+    tt.className = 'z01-event-toast';
+    tt.textContent = t('g.enter_hint');
+    tt.style.color = '#ff9800';
+    document.body.appendChild(tt);
+    setTimeout(function(){ tt.parentNode && tt.parentNode.removeChild(tt); }, 1200);
     soundDel();
     return;
   }
@@ -637,9 +745,9 @@ function _z01Commit(sc) {
   var bust = _z01.outRule===0 ? (after<0||after===1) : (after<0);
   if (_z01.inRule === 1 && st.rounds === 0 && sc === 0) {
     (function(){
-      var t = document.createElement('div'); t.className = 'z01-event-toast bogey';
-      t.textContent = 'ダブルインが必要です'; document.body.appendChild(t);
-      setTimeout(function(){ t.parentNode && t.parentNode.removeChild(t); }, 1800);
+      var tt = document.createElement('div'); tt.className = 'z01-event-toast bogey';
+      tt.textContent = t('s.double_in_req'); document.body.appendChild(tt);
+      setTimeout(function(){ tt.parentNode && tt.parentNode.removeChild(tt); }, 1800);
     })();
     _z01BufUpdate(''); return;
   }
@@ -895,7 +1003,7 @@ function _z01CpuTurn() {
 
   // チェックアウト演出
   cpuArea.classList.toggle('checkout-mode', !!isCheckout);
-  var targetText = isCheckout ? '⚠ チェックアウト挑戦！' : '— T20 狙い —';
+  var targetText = isCheckout ? '⚠ Checkout attempt!' : '— Aiming T20 —';
   if (targetRow) {
     targetRow.innerHTML = targetText + (isCheckout ? '' : '<span class="z01-cpu-thinking-dots" id="z01-cpu-dots"></span>');
     targetRow.className = 'z01-cpu-target-row' + (isCheckout ? ' checkout' : '');
@@ -964,7 +1072,7 @@ function _z01CpuTurn() {
   setTimeout(function(){
     if (dotTimer) clearInterval(dotTimer);
     var cumScore = 0;
-    if (targetRow) { targetRow.textContent = isCheckout ? '⚠ チェックアウト挑戦！' : ''; targetRow.className = 'z01-cpu-target-row' + (isCheckout?' checkout':''); }
+    if (targetRow) { targetRow.textContent = isCheckout ? '⚠ Checkout attempt!' : ''; targetRow.className = 'z01-cpu-target-row' + (isCheckout?' checkout':''); }
 
     _z01ShowCpuDart(0, labels[0]);
     cumScore += _scoreFromLabel(labels[0]);
@@ -1011,11 +1119,11 @@ function _z01LegEnd(winner) {
     soundLegWin();
   }
   document.getElementById('z01-leg-title').textContent = matchOver ? 'MATCH WIN!' : 'LEG WIN!';
-  document.getElementById('z01-leg-winner-name').textContent = _z01PlayerName(winner) + ' の勝利！';
-  document.getElementById('z01-leg-stats').textContent = (_z01.stats[winner].finishDarts || (_z01.stats[winner].legRounds * 3)) + ' 本';
+  document.getElementById('z01-leg-winner-name').textContent = _z01PlayerName(winner) + ' WIN!';
+  document.getElementById('z01-leg-stats').textContent = (_z01.stats[winner].finishDarts || (_z01.stats[winner].legRounds * 3)) + t('g.darts_unit');
   var btn = document.getElementById('z01-leg-btn');
-  if (matchOver) { btn.setAttribute('data-fn','z01ShowResult'); btn.textContent = '結果を見る →'; }
-  else { btn.setAttribute('data-fn','z01NextLeg'); btn.textContent = '次のLegへ →'; }
+  if (matchOver) { btn.setAttribute('data-fn','z01ShowResult'); btn.textContent = 'View Results →'; }
+  else { btn.setAttribute('data-fn','z01NextLeg'); btn.textContent = 'Next Leg →'; }
   document.getElementById('z01-leg-overlay').style.display = 'flex';
   _z01Render();
 }
@@ -1052,7 +1160,7 @@ function z01ShowResult() {
     } else if (winner === 1) {
       titleEl.textContent = 'YOU LOSE...';
       titleEl.style.color = 'rgba(255,100,100,0.9)';
-      winnerEl.innerHTML = '🤖 CPU Lv.' + _z01.cpuLevel + ' の勝利';
+      winnerEl.innerHTML = '🤖 CPU Lv.' + _z01.cpuLevel + ' WIN';
     } else {
       titleEl.textContent = 'DRAW'; titleEl.style.color = '';
       winnerEl.textContent = '';
@@ -1068,14 +1176,14 @@ function z01ShowResult() {
     winnerEl.textContent = '';
   }
   var rows = [
-    ['3ダーツ平均', function(s,i){ return s.rounds>0?(s.total/s.rounds).toFixed(1):'-'; }],
-    ['First 9 avg', function(s){ if(!s.first9.length)return'-'; var t=0; for(var j=0;j<s.first9.length;j++)t+=s.first9[j]; return(t/s.first9.length).toFixed(1); }],
+    [t('g.stat_3dart_avg'), function(s,i){ return s.rounds>0?(s.total/s.rounds).toFixed(1):'-'; }],
+    ['First 9 Avg', function(s){ if(!s.first9.length)return'-'; var tt=0; for(var j=0;j<s.first9.length;j++)tt+=s.first9[j]; return(tt/s.first9.length).toFixed(1); }],
     ['100+', function(s){ return s.c100; }],
     ['140+', function(s){ return s.c140; }],
     ['180s', function(s){ return s.c180; }],
-    ['ハイフィニッシュ', function(s){ return s.hiFin||'-'; }],
-    ['ベストレグ', function(s){ return s.bestLeg<999?s.bestLeg+' 本':'-'; }],
-    ['ワーストレグ', function(s){ return s.worstLeg>0?s.worstLeg+' 本':'-'; }],
+    [t('g.stat_hi_fin'), function(s){ return s.hiFin||'-'; }],
+    [t('g.stat_best_leg'), function(s){ return s.bestLeg<999?s.bestLeg+t('g.darts_unit'):'-'; }],
+    [t('g.stat_worst_leg'), function(s){ return s.worstLeg>0?s.worstLeg+t('g.darts_unit'):'-'; }],
     ['Legs Won', function(s,i){ return _z01.legWins[i]; }]
   ];
   var n = _z01.stats.length;
@@ -1109,7 +1217,7 @@ function renderZ01Hist() {
   if (!wrap) return;
   var h = _z01GetH();
   if (!h.length) {
-    wrap.innerHTML = '<div class="hempty"><div class="ei">🎮</div>まだ記録がありません。<br>ゲームを完了すると自動で保存されます。</div>';
+    wrap.innerHTML = '<div class="hempty"><div class="ei">🎮</div>' + t('an.no_history') + '</div>';
     return;
   }
   // --- Compute cumulative stats (solo + vs CPU/2P すべて対象) ---
@@ -1146,15 +1254,15 @@ function renderZ01Hist() {
   var html = '';
   // === 1. Profile card ===
   html += '<div class="pcard">';
-  html += '<div class="pcard-brand"><span class="pcard-badge">🎮 累計成績</span><span class="pcard-app">Steel Darts Pro</span></div>';
+  html += '<div class="pcard-brand"><span class="pcard-badge">' + t('an.career') + '</span><span class="pcard-app">Steel Darts Pro</span></div>';
   html += '<div class="pcard-score">' + bestAvgStr + '</div>';
   html += '<div class="pcard-score-label">Personal Best AVG</div>';
   html += '<hr class="pcard-divider">';
   html += '<div class="pcard-stats">';
   html += '<div class="pcard-stat"><div class="pcard-stat-val" style="color:rgba(255,255,255,0.7);">' + h.length + '</div><div class="pcard-stat-lbl">Total Games</div></div>';
-  html += '<div class="pcard-stat"><div class="pcard-stat-val" style="color:#ffd700;">×' + all180 + '</div><div class="pcard-stat-lbl">通算 180</div></div>';
-  html += '<div class="pcard-stat"><div class="pcard-stat-val" style="color:#b47fff;">×' + all140 + '</div><div class="pcard-stat-lbl">140+ 累計</div></div>';
-  html += '<div class="pcard-stat"><div class="pcard-stat-val" style="color:var(--grn);font-size:' + (bestLeg?'22px':'28px') + ';">' + (bestLeg ? bestLeg+' 本' : '-') + '</div><div class="pcard-stat-lbl">Best Leg</div></div>';
+  html += '<div class="pcard-stat"><div class="pcard-stat-val" style="color:#ffd700;">×' + all180 + '</div><div class="pcard-stat-lbl">' + t('an.total_180') + '</div></div>';
+  html += '<div class="pcard-stat"><div class="pcard-stat-val" style="color:#b47fff;">×' + all140 + '</div><div class="pcard-stat-lbl">' + t('an.total_140') + '</div></div>';
+  html += '<div class="pcard-stat"><div class="pcard-stat-val" style="color:var(--grn);font-size:' + (bestLeg?'22px':'28px') + ';">' + (bestLeg ? bestLeg + t('g.darts_unit') : '-') + '</div><div class="pcard-stat-lbl">Best Leg</div></div>';
   html += '</div></div>';
   // === 2. Today's card ===
   if (todayGames.length > 0) {
@@ -1162,11 +1270,11 @@ function renderZ01Hist() {
     var todayBestAvg = todayAvgs.length ? Math.max.apply(null,todayAvgs).toFixed(2) : '-';
     var today180 = todayGames.reduce(function(acc,g){return acc+g.data.reduce(function(a,p){return a+p.c180;},0);},0);
     var todayBestLegs = todayGames.map(function(g){return g.data[0].bestLeg;}).filter(function(v){return v>0;});
-    var todayBL = todayBestLegs.length ? Math.min.apply(null,todayBestLegs)+' 本' : '-';
+    var todayBL = todayBestLegs.length ? Math.min.apply(null,todayBestLegs)+t('g.darts_unit') : '-';
     var todayF9s = todayGames.map(function(g){return g.data[0].f9avg;}).filter(function(v){return v>0;});
     var todayBestF9 = todayF9s.length ? Math.max.apply(null,todayF9s).toFixed(2) : '-';
     html += '<div class="tcard">';
-    html += '<div class="tcard-brand"><span class="tcard-badge">📅 今日の成績</span><span class="tcard-date">' + todayStr + '</span></div>';
+    html += '<div class="tcard-brand"><span class="tcard-badge">' + t('an.today') + '</span><span class="tcard-date">' + todayStr + '</span></div>';
     html += '<div class="tcard-score">' + todayBestAvg + '</div>';
     html += '<div class="tcard-score-label">Today\'s Best AVG</div>';
     html += '<hr class="tcard-divider">';
@@ -1184,16 +1292,16 @@ function renderZ01Hist() {
     html += '<div style="text-align:center;background:var(--bg);border-radius:8px;padding:12px 4px;position:relative;">';
     if (arrow) html += '<div style="position:absolute;top:6px;right:8px;line-height:1;">' + arrow + '</div>';
     html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:32px;color:#fff;">' + avgRecent + '</div>';
-    html += '<div style="font-size:9px;color:var(--mut);letter-spacing:1px;">直近' + recent30.length + 'G AVG</div></div>';
+    html += '<div style="font-size:9px;color:var(--mut);letter-spacing:1px;">' + t('an.recent_avg').replace('{n}', recent30.length) + '</div></div>';
     html += '<div style="text-align:center;background:var(--bg);border-radius:8px;padding:12px 4px;">';
     html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:32px;color:#b47fff;">' + avgF9 + '</div>';
-    html += '<div style="font-size:9px;color:var(--mut);letter-spacing:1px;">直近' + (f9recent.length||recent30.length) + 'G F9 AVG</div></div>';
+    html += '<div style="font-size:9px;color:var(--mut);letter-spacing:1px;">' + t('an.recent_f9').replace('{n}', f9recent.length||recent30.length) + '</div></div>';
     html += '</div></div>';
   }
   // === 4. AVG trend chart ===
   if (trend30.length > 1) {
     html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px;">';
-    html += '<div style="font-size:10px;color:var(--mut);letter-spacing:2px;margin-bottom:8px;">AVG 推移（直近' + trend30.length + 'G）</div>';
+    html += '<div style="font-size:10px;color:var(--mut);letter-spacing:2px;margin-bottom:8px;">' + t('an.avg_trend').replace('{n}', trend30.length) + '</div>';
     html += '<canvas id="z01-hist-chart" height="80" style="width:100%;display:block;"></canvas>';
     html += '</div>';
   }
@@ -1213,8 +1321,8 @@ function renderZ01Hist() {
     ];
     var total = allRounds.length;
     html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px;">';
-    html += '<div style="font-size:10px;color:var(--mut);letter-spacing:2px;margin-bottom:2px;">削りスコア分布（直近30G / ' + total + 'ラウンド）</div>';
-    html += '<div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:10px;">残り171以上のラウンドのみ集計（上がり目が出たラウンドは除く）</div>';
+    html += '<div style="font-size:10px;color:var(--mut);letter-spacing:2px;margin-bottom:2px;">' + t('an.score_dist').replace('{n}', total) + '</div>';
+    html += '<div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:10px;">' + t('an.score_dist_note') + '</div>';
     bands.forEach(function(b){
       var cnt = allRounds.filter(function(s){ return s>=b.min && s<=b.max; }).length;
       var pct = total > 0 ? Math.round(cnt/total*100) : 0;
@@ -1236,16 +1344,16 @@ function renderZ01Hist() {
       if (g.data[0].checkouts && g.data[0].checkouts.length) allCOs = allCOs.concat(g.data[0].checkouts);
     });
     var cats = [
-      {min:161, max:170, label:'161〜170', stars:5, desc:'トリプル2本 ＋ ダブルブル必須　最高難易度'},
-      {min:131, max:160, label:'131〜160', stars:4, desc:'トリプル2本 → ダブルで上がれる'},
-      {min:101, max:130, label:'101〜130', stars:3, desc:'トリプル1〜2本 → ダブルでフィニッシュ'},
-      {min:61,  max:100, label:'61〜100',  stars:2, desc:'トリプルが外れても、シングル2本 → ダブルで上がれる'},
-      {min:41,  max:60,  label:'41〜60',   stars:1, desc:'シングル＋ダブルの2本フィニッシュ'},
-      {min:2,   max:40,  label:'2〜40',    stars:1, desc:'偶数はダブル1投、奇数はシングル→ダブルの2本'}
+      {min:161, max:170, label:'161-170', stars:5, desc:t('an.co_161')},
+      {min:131, max:160, label:'131-160', stars:4, desc:t('an.co_131')},
+      {min:101, max:130, label:'101-130', stars:3, desc:t('an.co_101')},
+      {min:61,  max:100, label:'61-100',  stars:2, desc:t('an.co_61')},
+      {min:41,  max:60,  label:'41-60',   stars:1, desc:t('an.co_41')},
+      {min:2,   max:40,  label:'2-40',    stars:1, desc:t('an.co_2')}
     ];
     html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
-    html += '<div style="padding:10px 12px 4px;font-size:10px;color:var(--mut);letter-spacing:2px;">チェックアウト成功率（難易度別）</div>';
-    html += '<div style="padding:0 12px 8px;font-size:10px;color:rgba(255,255,255,0.25);border-bottom:1px solid var(--bdr);">残り170以下（上がり目あり）になったラウンドを全データ集計</div>';
+    html += '<div style="padding:10px 12px 4px;font-size:10px;color:var(--mut);letter-spacing:2px;">' + t('an.co_rate') + '</div>';
+    html += '<div style="padding:0 12px 8px;font-size:10px;color:rgba(255,255,255,0.25);border-bottom:1px solid var(--bdr);">' + t('an.co_rate_note') + '</div>';
     cats.forEach(function(c){
       var attempts = allCOs.filter(function(a){ return a.score>=c.min && a.score<=c.max; });
       var wins = attempts.filter(function(a){ return a.success; }).length;
@@ -1258,7 +1366,7 @@ function renderZ01Hist() {
       html += '<div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04);' + (noData?'opacity:0.45;':'') + '">';
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">';
       html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:18px;color:var(--acc);min-width:70px;">' + c.label + '</div>';
-      html += '<div style="font-size:9px;color:#ffd54f;letter-spacing:1px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1px;"><span style="font-size:8px;color:var(--mut);letter-spacing:0.5px;">難易度</span>' + stars + '</div>';
+      html += '<div style="font-size:9px;color:#ffd54f;letter-spacing:1px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1px;"><span style="font-size:8px;color:var(--mut);letter-spacing:0.5px;">' + t('an.difficulty') + '</span>' + stars + '</div>';
       html += '<div style="font-size:10px;color:var(--mut);flex:1;line-height:1.4;">' + c.desc + '</div>';
       if (noData) {
         html += '<div style="font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:1px;">未挑戦</div>';
@@ -1287,7 +1395,7 @@ function renderZ01Hist() {
     var days = Object.keys(bk).sort(function(a,b){return b.localeCompare(a);}).slice(0,14);
     if (!days.length) return;
     html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
-    html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">期間別成績（直近14日）</div>';
+    html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">' + t('an.period_14d') + '</div>';
     days.forEach(function(day){
       var games = bk[day];
       var avgs2 = games.map(function(g){return g.data[0].avg;}).filter(function(v){return v>0;});
@@ -1300,7 +1408,7 @@ function renderZ01Hist() {
       html += '<div style="font-size:10px;color:var(--mut);min-width:28px;">' + games.length + 'G</div>';
       html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:20px;color:var(--acc);flex:1;">' + dayAvg + '</div>';
       html += '<div style="font-size:10px;color:var(--mut);">AVG</div>';
-      if (blDay) html += '<div style="font-size:10px;color:var(--grn);margin-left:8px;">' + blDay + ' 本</div>';
+      if (blDay) html += '<div style="font-size:10px;color:var(--grn);margin-left:8px;">' + blDay + t('g.darts_unit') + '</div>';
       if (day180) html += '<div style="font-size:10px;color:#e8ff47;margin-left:8px;">×' + day180 + ' 180</div>';
       html += '</div>';
     });
@@ -1322,12 +1430,12 @@ function renderZ01Hist() {
     var keys = Object.keys(records);
     if (!keys.length) return;
     html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
-    html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">対戦成績</div>';
+    html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">' + t('an.matchup') + '</div>';
     keys.forEach(function(key){
       var rec = records[key];
       var names = rec.key.split(' vs ');
       html += '<div style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04);">';
-      html += '<div style="font-size:11px;color:var(--acc);margin-bottom:6px;">' + rec.key + ' (' + rec.games + '戦)</div>';
+      html += '<div style="font-size:11px;color:var(--acc);margin-bottom:6px;">' + rec.key + ' (' + rec.games + 'G)</div>';
       html += '<div style="display:flex;gap:8px;">';
       names.forEach(function(name){
         var w = rec.wins[name]||0;
@@ -1358,9 +1466,9 @@ function renderZ01Hist() {
     });
     // カテゴリ定義
     var cats = [
-      { label: '〜399（低）', min: 0,   max: 399 },
-      { label: '400〜599（中）', min: 400, max: 599 },
-      { label: '600〜（高）',  min: 600, max: Infinity }
+      { label: t('an.corr_low'), min: 0,   max: 399 },
+      { label: t('an.corr_mid'), min: 400, max: 599 },
+      { label: t('an.corr_high'),  min: 600, max: Infinity }
     ];
     var buckets = cats.map(function(){ return { wins: 0, total: 0 }; });
     z01H2P.forEach(function(g){
@@ -1381,14 +1489,14 @@ function renderZ01Hist() {
     var hasData = buckets.some(function(b){ return b.total > 0; });
     if (!hasData) return;
     html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
-    html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">📈 カウントアップ × 01 相関</div>';
-    html += '<div style="padding:8px 12px;font-size:10px;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(255,255,255,0.04);">同じ日のカウントアップAVGと01勝率（Player 1）の相関</div>';
+    html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">📈 ' + t('an.corr') + '</div>';
+    html += '<div style="padding:8px 12px;font-size:10px;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(255,255,255,0.04);">' + t('an.corr_desc') + '</div>';
     cats.forEach(function(cat, ci){
       var b = buckets[ci];
       if (b.total === 0) {
         html += '<div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04);opacity:0.35;">';
         html += '<div style="font-size:12px;color:var(--mut);">CU ' + cat.label + '</div>';
-        html += '<div style="font-size:10px;color:var(--mut);">データなし</div>';
+        html += '<div style="font-size:10px;color:var(--mut);">'+t('empty.no_data')+'</div>';
         html += '</div>';
       } else {
         var pct = Math.round(b.wins / b.total * 100);
@@ -1398,7 +1506,7 @@ function renderZ01Hist() {
         html += '<div style="font-size:12px;color:var(--mut);">CU ' + cat.label + '</div>';
         html += '<div style="font-size:12px;font-weight:700;color:' + barColor + ';">' + pct + '%</div>';
         html += '</div>';
-        html += '<div style="font-size:10px;color:var(--mut);margin-bottom:4px;">01 勝率: ' + b.wins + '勝/' + b.total + '戦</div>';
+        html += '<div style="font-size:10px;color:var(--mut);margin-bottom:4px;">' + t('an.win_rate') + ' ' + b.wins + 'W/' + b.total + 'G</div>';
         html += '<div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px;overflow:hidden;">';
         html += '<div style="width:' + pct + '%;height:100%;background:' + barColor + ';border-radius:4px;transition:width 0.4s;"></div>';
         html += '</div></div>';
@@ -1408,16 +1516,16 @@ function renderZ01Hist() {
   })();
   // === 6. Export / Import ===
   html += '<div class="exp-row">';
-  html += '<button class="bexp" id="btn-z01-export">📤 エクスポート</button>';
-  html += '<button class="bexp" id="btn-z01-import">📥 インポート</button>';
+  html += '<button class="bexp" id="btn-z01-export">📤 Export</button>';
+  html += '<button class="bexp" id="btn-z01-import">📥 Import</button>';
   html += '</div>';
   // === 7. Game list ===
   html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;">';
-  html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">ゲーム履歴</div>';
+  html += '<div style="padding:10px 12px;font-size:10px;color:var(--mut);letter-spacing:2px;border-bottom:1px solid var(--bdr);">' + t('an.history') + '</div>';
   h.forEach(function(g, idx) {
     var d = new Date(g.date);
     var dateStr = d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
-    var outStr = g.outRule===0 ? 'ダブル' : 'シングル';
+    var outStr = g.outRule===0 ? 'Double' : 'Single';
     var legsStr = g.legs > 1 ? 'BO'+g.legs : '1 Leg';
     var isBest = (idx === bestHIdx);
     html += '<div style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);">';
@@ -1435,7 +1543,7 @@ function renderZ01Hist() {
         html += '<div style="font-size:11px;color:' + (isW?'var(--acc)':'var(--mut)') + ';font-weight:700;margin-bottom:4px;">' + p.name + ' ' + p.legWins + 'W</div>';
         html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">';
         html += '<div style="text-align:center;"><div style="font-family:\'Bebas Neue\',cursive;font-size:20px;color:var(--acc);">' + (p.avg>0?p.avg.toFixed(2):'-') + '</div><div style="font-size:8px;color:var(--mut);">AVG</div></div>';
-        html += '<div style="text-align:center;"><div style="font-family:\'Bebas Neue\',cursive;font-size:18px;color:var(--grn);">' + (p.bestLeg>0?p.bestLeg+' 本':'-') + '</div><div style="font-size:8px;color:var(--mut);">Best Leg</div></div>';
+        html += '<div style="text-align:center;"><div style="font-family:\'Bebas Neue\',cursive;font-size:18px;color:var(--grn);">' + (p.bestLeg>0?p.bestLeg+t('g.darts_unit'):'-') + '</div><div style="font-size:8px;color:var(--mut);">Best Leg</div></div>';
         html += '</div></div>';
       });
       html += '</div>';
@@ -1455,7 +1563,7 @@ function renderZ01Hist() {
       });
       html += '</div>';
     }
-    html += '<div style="text-align:right;margin-top:4px;"><button style="background:transparent;border:none;color:var(--mut);font-size:10px;cursor:pointer;padding:2px 4px;" data-fn="_z01DelH" data-arg="' + idx + '">削除</button></div>';
+    html += '<div style="text-align:right;margin-top:4px;"><button style="background:transparent;border:none;color:var(--mut);font-size:10px;cursor:pointer;padding:2px 4px;" data-fn="_z01DelH" data-arg="' + idx + '">' + t('an.delete') + '</button></div>';
     html += '</div>';
   });
   html += '</div>';
@@ -1543,7 +1651,7 @@ function _z01RenderAvgGraph() {
   pts = pts.slice(-30);
   if (pts.length < 2) {
     el.innerHTML = '<div class="z01-avg-graph-hdr"><span class="z01-avg-graph-label">AVG推移</span></div>' +
-      '<div class="z01-avg-graph-empty">あと' + (2 - pts.length) + 'ゲームでグラフが表示されます</div>';
+      '<div class="z01-avg-graph-empty">' + t('an.avg_graph_need').replace('{n}', 2 - pts.length) + '</div>';
     return;
   }
   var n = pts.length;
@@ -1605,7 +1713,7 @@ function _z01RenderAvgGraph() {
     '</svg>';
   el.innerHTML =
     '<div class="z01-avg-graph-hdr">' +
-      '<span class="z01-avg-graph-label">AVG推移（直近' + n + 'ゲーム）</span>' +
+      '<span class="z01-avg-graph-label">' + t('an.avg_graph').replace('{n}', n) + '</span>' +
       '<span class="z01-avg-graph-trend" style="color:' + trendCol + ';">' + trendTxt + '</span>' +
     '</div>' + svg;
 }
@@ -1770,7 +1878,7 @@ function z01Undo() {
   }
   if (scored === null) return;
   var sub = document.getElementById('z01-undo-sub');
-  if (sub) sub.textContent = playerName + ' の ' + scored + ' 点を取り消します';
+  if (sub) sub.textContent = 'Undo ' + playerName + ' — ' + scored + ' pts';
   document.getElementById('z01-undo-confirm').style.display = 'flex';
 }
 function z01UndoNo() {
@@ -1972,10 +2080,10 @@ function _z01BuildFinishModal(finishedScore) {
     can1 = finishedScore <= 20 || finishedScore === 25 || finishedScore === 50;
     can2 = finishedScore <= 60;
   }
-  var h = '<div class="z01-finish-title">何本目で上がりましたか？</div>';
-  if (can1) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="1"><span class="z01-finish-btn-main">1本目で上がり</span><span class="z01-finish-btn-sub">Ace finish</span></button>';
-  if (can2) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="2"><span class="z01-finish-btn-main">2本目で上がり</span><span class="z01-finish-btn-sub">2-dart finish</span></button>';
-  h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="3"><span class="z01-finish-btn-main">3本目で上がり</span><span class="z01-finish-btn-sub">3-dart finish</span></button>';
+  var h = '<div class="z01-finish-title">Which dart finished?</div>';
+  if (can1) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="1"><span class="z01-finish-btn-main">1st Dart</span><span class="z01-finish-btn-sub">Ace finish</span></button>';
+  if (can2) h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="2"><span class="z01-finish-btn-main">2nd Dart</span><span class="z01-finish-btn-sub">2-dart finish</span></button>';
+  h += '<button class="z01-finish-btn" data-fn="z01FinishDart" data-arg="3"><span class="z01-finish-btn-main">3rd Dart</span><span class="z01-finish-btn-sub">3-dart finish</span></button>';
   inner.innerHTML = h;
 }
 function z01FinishDart(dartNo) {
@@ -2037,54 +2145,54 @@ function z01CloseStats() {
 /* _questMissMode removed — replaced by animation-based random outcome */
 
 var _QUEST_WORLDS = [
-  { id:'w0', label:'WORLD 1', subtitle:'入門の丘', color:'#66bb6a', icon:'🌱',
-    desc:'ダブルアウトの基礎を学ぶ', unlockReq:null,
+  { id:'w0', label:'WORLD 1', subtitle:'The Basics', color:'#66bb6a', icon:'🌱',
+    desc:'Learn double-out fundamentals', unlockReq:null,
     stages:[
-      { id:'w0s0', label:'D20をきめろ', sub:'40点スタート・1本フィニッシュ',
+      { id:'w0s0', label:'Hit D20', sub:'Start on 40 — 1-dart finish',
         pool:[40], cond:{type:'clear'}, isBoss:false },
-      { id:'w0s1', label:'ダブルを狙え', sub:'ランダムダブル 3連続クリア',
+      { id:'w0s1', label:'Double Practice', sub:'Random doubles, 3 in a row',
         pool:'double_easy', cond:{type:'streak',n:3}, isBoss:false },
-      { id:'w0s2', label:'🔥 BOSS: ダブル全制覇', sub:'ランダムダブル 10問 / 80%以上',
+      { id:'w0s2', label:'🔥 BOSS: Double Master', sub:'Random doubles 10Q / 80%+',
         pool:'double_all', cond:{type:'count',n:10,minAcc:0.8}, isBoss:true }
     ]
   },
-  { id:'w1', label:'WORLD 2', subtitle:'2本の城', color:'#4fc3f7', icon:'🏰',
-    desc:'2本フィニッシュをマスター', unlockReq:'w0s2',
+  { id:'w1', label:'WORLD 2', subtitle:'Two-Dart Castle', color:'#4fc3f7', icon:'🏰',
+    desc:'Master 2-dart finishes', unlockReq:'w0s2',
     stages:[
-      { id:'w1s0', label:'100点を上がれ', sub:'T20→D20の2本フィニッシュ',
+      { id:'w1s0', label:'Finish 100', sub:'T20 → D20 two-dart finish',
         pool:[100], cond:{type:'clear'}, isBoss:false },
-      { id:'w1s1', label:'2本コンボ', sub:'2本フィニッシュ 5問 / 70%以上',
+      { id:'w1s1', label:'2-Dart Combo', sub:'2-dart finishes 5Q / 70%+',
         pool:'two_dart_easy', cond:{type:'count',n:5,minAcc:0.7}, isBoss:false },
-      { id:'w1s2', label:'🔥 BOSS: 2本チャレンジ', sub:'2本フィニッシュ 15問 / 75%以上',
+      { id:'w1s2', label:'🔥 BOSS: 2-Dart Challenge', sub:'2-dart finishes 15Q / 75%+',
         pool:'two_dart_all', cond:{type:'count',n:15,minAcc:0.75}, isBoss:true }
     ]
   },
-  { id:'w2', label:'WORLD 3', subtitle:'3本の要塞', color:'#ff9800', icon:'⚔️',
-    desc:'3本フィニッシュを攻略せよ', unlockReq:'w1s2',
+  { id:'w2', label:'WORLD 3', subtitle:'Three-Dart Fortress', color:'#ff9800', icon:'⚔️',
+    desc:'Conquer 3-dart finishes', unlockReq:'w1s2',
     stages:[
-      { id:'w2s0', label:'160点を上がれ', sub:'T20→T20→D20の3本フィニッシュ',
+      { id:'w2s0', label:'Finish 160', sub:'T20 → T20 → D20 three-dart finish',
         pool:[160], cond:{type:'clear'}, isBoss:false },
-      { id:'w2s1', label:'定番ルート制覇', sub:'3本フィニッシュ 10問 / 60%以上',
+      { id:'w2s1', label:'Classic Routes', sub:'3-dart finishes 10Q / 60%+',
         pool:'three_dart_common', cond:{type:'count',n:10,minAcc:0.6}, isBoss:false },
-      { id:'w2s2', label:'🔥 BOSS: 170チャレンジ', sub:'上級スコア 20問 / 55%以上',
+      { id:'w2s2', label:'🔥 BOSS: 170 Challenge', sub:'Advanced scores 20Q / 55%+',
         pool:'three_dart_hard', cond:{type:'count',n:20,minAcc:0.55}, isBoss:true }
     ]
   },
-  { id:'w3', label:'👑 FINAL', subtitle:'最終試練', color:'#ef5350', icon:'👑',
-    desc:'全スコアランダム総合チャレンジ', unlockReq:'w2s2',
+  { id:'w3', label:'👑 FINAL', subtitle:'The Final Test', color:'#ef5350', icon:'👑',
+    desc:'Random all-score challenge', unlockReq:'w2s2',
     stages:[
-      { id:'w3s0', label:'最終試練', sub:'全スコアランダム 20問 / 75%以上',
+      { id:'w3s0', label:'Final Test', sub:'All scores random 20Q / 75%+',
         pool:'all', cond:{type:'count',n:20,minAcc:0.75}, isBoss:true }
     ]
   },
-  { id:'w4', label:'💀 裏ボス', subtitle:'削り戦術', color:'#9c27b0', icon:'💀',
-    desc:'フィニッシュ不可点数から活路を切り開く削り戦術', unlockReq:'w3s0',
+  { id:'w4', label:'💀 SECRET', subtitle:'Setup Shots', color:'#9c27b0', icon:'💀',
+    desc:'Navigate bogey numbers with smart setup shots', unlockReq:'w3s0',
     stages:[
-      { id:'w4s0', label:'170超えの削り方', sub:'171〜180点から残り120へ削る 5問 / 60%以上',
+      { id:'w4s0', label:'Above 170', sub:'171-180: set up to leave 120. 5Q / 60%+',
         pool:'skezuri_high', cond:{type:'count',n:5,minAcc:0.6}, isSkezuri:true },
-      { id:'w4s1', label:'不可能スコア突破', sub:'169/168/166/165/163/162点の対処 8問 / 60%以上',
+      { id:'w4s1', label:'Bogey Buster', sub:'Handle 169/168/166/165/163/162. 8Q / 60%+',
         pool:'skezuri_impossible', cond:{type:'count',n:8,minAcc:0.6}, isSkezuri:true },
-      { id:'w4s2', label:'💀 裏ボス: 削り完全制覇', sub:'全削りシナリオ 15問 / 70%以上',
+      { id:'w4s2', label:'💀 SECRET BOSS: Setup Master', sub:'All setup scenarios 15Q / 70%+',
         pool:'skezuri_all', cond:{type:'count',n:15,minAcc:0.7}, isBoss:true, isSkezuri:true }
     ]
   }
@@ -2234,7 +2342,7 @@ function _questDartPos(dartStr) {
 function _questShowThrow(dartStr) {
   var overlay = document.getElementById('quest-throw-overlay');
   var isWrongThrow = !!_questG.wrongCorrect;
-  document.getElementById('quest-throw-label').textContent = dartStr + (isWrongThrow ? ' を投げた...' : ' を狙う！');
+  document.getElementById('quest-throw-label').textContent = dartStr + (isWrongThrow ? ' thrown...' : ' — Aiming!');
   document.getElementById('quest-throw-result-text').textContent = '';
   document.getElementById('quest-throw-pts').textContent = '';
   document.getElementById('quest-throw-hint').textContent = '';
@@ -2284,17 +2392,17 @@ function _questShowThrow(dartStr) {
       pEl.style.color = '#66bb6a';
       pEl.textContent = '−' + result.value;
     } else if (!landStr) {
-      rEl.innerHTML = '<span style="color:#ef5350;font-size:28px;font-family:Bebas Neue,cursive;letter-spacing:3px;">OUT!</span><br><span style="color:#ef5350;font-size:12px;">ボード外（0点）</span>';
+      rEl.innerHTML = '<span style="color:#ef5350;font-size:28px;font-family:Bebas Neue,cursive;letter-spacing:3px;">OUT!</span><br><span style="color:#ef5350;font-size:12px;">Off the board (0 pts)</span>';
       pEl.textContent = '';
     } else {
       var landType = landStr[0]==='T'?'TRIPLE':landStr[0]==='D'?'DOUBLE':'SINGLE';
-      rEl.innerHTML = '<span style="color:#ff9800;font-size:24px;font-family:Bebas Neue,cursive;letter-spacing:2px;">'+landType+'...</span><br><span style="color:#ff9800;font-size:14px;">' + landStr + ' に外れた</span>';
+      rEl.innerHTML = '<span style="color:#ff9800;font-size:24px;font-family:Bebas Neue,cursive;letter-spacing:2px;">'+landType+'...</span><br><span style="color:#ff9800;font-size:14px;">Landed on ' + landStr + '</span>';
       pEl.style.color = '#ff9800';
       pEl.textContent = result.value > 0 ? '−' + result.value : '';
     }
     // 不正解時: 正解を表示してリセット
     if (_questG.wrongCorrect) {
-      hEl.textContent = '正解は ' + _questG.wrongCorrect + ' でした';
+      hEl.textContent = 'Correct answer: ' + _questG.wrongCorrect;
       _questG.wrongCorrect = null;
     }
 
@@ -2553,9 +2661,9 @@ function _questShowDartQ() {
   }
   _questG.path = path;
   var nLeft = path.length;
-  var label = _questG.dartNum+'本目は何を狙う？';
-  if (nLeft===1) label = _questG.dartNum+'本目でフィニッシュ！何を狙う？';
-  else label = _questG.dartNum+'本目は？（あと'+nLeft+'本でフィニッシュ可能）';
+  var label = 'Dart ' + _questG.dartNum + ' — what do you aim for?';
+  if (nLeft===1) label = 'Dart ' + _questG.dartNum + ' — Finish! What do you aim for?';
+  else label = 'Dart ' + _questG.dartNum + '? (' + nLeft + '-dart finish possible)';
   document.getElementById('arr-quest-q-label').textContent = label;
 
   var correct = path[0];
@@ -2906,11 +3014,11 @@ function _questShowRealThrow(dartStr, wasCorrect) {
   var titleEl = document.getElementById('quest-real-title');
   var dartEl  = document.getElementById('quest-real-dart-label');
   var subEl   = document.getElementById('quest-real-sub');
-  titleEl.textContent = wasCorrect ? '✓ 正解！' : '✗ 不正解...';
+  titleEl.textContent = wasCorrect ? '✓ Correct!' : '✗ Wrong...';
   titleEl.className   = 'quest-real-title ' + (wasCorrect ? 'correct' : 'wrong');
   dartEl.textContent  = dartStr;
   dartEl.className    = 'quest-real-dart-label ' + (wasCorrect ? 'correct' : 'wrong');
-  subEl.textContent   = wasCorrect ? '実際に狙ってみましょう' : '正解は ' + dartStr + ' — 練習として狙ってみましょう';
+  subEl.textContent   = wasCorrect ? 'Now throw it for real!' : 'Answer: ' + dartStr + ' — try throwing it anyway!';
   document.getElementById('quest-real-board-box').innerHTML = _buildBoardSVG(dartStr, null);
   document.getElementById('quest-real-overlay').classList.remove('hide');
 }
@@ -2923,7 +3031,7 @@ function _questRealNext() {
   document.getElementById('quest-real-overlay').classList.add('hide');
 
   var overlay = document.getElementById('quest-throw-overlay');
-  document.getElementById('quest-throw-label').textContent = dartStr + ' を狙う！';
+  document.getElementById('quest-throw-label').textContent = dartStr + ' — Aiming!';
   document.getElementById('quest-throw-result-text').textContent = '';
   document.getElementById('quest-throw-pts').textContent = '';
   document.getElementById('quest-throw-hint').textContent = '';
@@ -3000,17 +3108,16 @@ function _renderWeakness() {
   scores.sort(function(a,b){ return _weaknessAcc(d[a]) - _weaknessAcc(d[b]); });
   var el = document.getElementById('arr-quest-weakness-body');
   if (scores.length === 0) {
-    el.innerHTML = '<div class="wk-empty">まだデータがありません。<br>クエストを練習すると記録されます。</div>';
+    el.innerHTML = '<div class="wk-empty">'+t('empty.no_quest').replace('\n','<br>')+'</div>';
     return;
   }
   var weak = scores.filter(function(s){ return _weaknessAcc(d[s]) < 0.75; });
   var html = '';
   // 弱点特訓ボタン
   if (weak.length > 0) {
-    html += '<button class="wk-train-btn" onclick="startWeaknessTraining()">🎯 弱点スコアで特訓（'+weak.length+'種）</button>';
+    html += '<button class="wk-train-btn" onclick="startWeaknessTraining()">🎯 ' + t('tr.weak_drill') + ' ('+weak.length+')</button>';
   }
-  // 苦手スコア
-  html += '<div class="wk-section-title">正答率（2回以上練習したスコア）</div>';
+  html += '<div class="wk-section-title">Accuracy (scores practised 2+ times)</div>';
   scores.forEach(function(s) {
     var rec = d[s]; var acc = _weaknessAcc(rec);
     var pct = Math.round(acc * 100);
@@ -3033,7 +3140,7 @@ function startWeaknessTraining() {
   var pool = Object.keys(d).map(Number).filter(function(s){
     return d[s].a >= 2 && _weaknessAcc(d[s]) < 0.75 && _isCheckable(s);
   });
-  if (pool.length === 0) { alert('弱点スコアがまだありません'); return; }
+  if (pool.length === 0) { _toast(t('empty.no_weak')); return; }
   // 重みづけ（超苦手は3倍）
   var weighted = [];
   pool.forEach(function(s) {
@@ -3092,7 +3199,7 @@ function _questShowSkezuriQ() {
   var sk = _questG.skezuriSetup;
   var correct = sk.shot;
   document.getElementById('arr-quest-q-label').textContent =
-    _questG.currentScore+'点 — 1本目で削る！何を狙う？';
+    _questG.currentScore + ' — Setup shot! What do you aim for?';
   var decoys = _arrShuffle(_ARR_TRIPLE_POOL.filter(function(d){return d!==correct;})).slice(0,3);
   var choices = _arrShuffle([correct].concat(decoys));
   var el = document.getElementById('arr-quest-choices');
@@ -3177,7 +3284,8 @@ var _fns = { kp: kp, kd: kd, doOk: doOk, commit: commit,
   trainPrev: trainPrev,
   showQuestHome: showQuestHome,
   quitQuestPlay: quitQuestPlay,
-  shareCU: shareCU, shareZ01: shareZ01, shareSim: shareSim
+  shareCU: shareCU, shareZ01: shareZ01, shareSim: shareSim,
+  toggleSettings: toggleSettings
 };
 
 function _exec(el) {
@@ -3316,7 +3424,7 @@ buildScRow();
 drawDots();
 drawRoundGrid();
 updDisp();
-(function(){ var btn = document.getElementById('btn-snd'); if (btn) btn.textContent = _sndOn ? '🔊' : '🔇'; })();
+_updSndBtn();
 
 // イベントリスナー登録（DOMContentLoadedまたはload後に実行）
 (function() {
@@ -3509,20 +3617,20 @@ function shareArr() {
   var questionsCount = _arr ? _arr.numQuestions : 10;
 
   var diffLabel = '';
-  if (difficulty === 'easy') diffLabel = '初級';
-  else if (difficulty === 'normal') diffLabel = '中級';
-  else if (difficulty === 'hard') diffLabel = '上級';
+  if (difficulty === 'easy') diffLabel = (_currentLang==='en') ? 'Easy' : '初級';
+  else if (difficulty === 'normal') diffLabel = (_currentLang==='en') ? 'Normal' : '中級';
+  else if (difficulty === 'hard') diffLabel = (_currentLang==='en') ? 'Hard' : '上級';
 
   var stats = [
-    { label: 'スコア', value: score + ' / 1000', color: '#e8ff47' },
-    { label: 'グレード', value: grade, color: '#4fc3f7' },
-    { label: '難易度', value: diffLabel, color: '#47ffb4' },
-    { label: '問題数', value: questionsCount + '問', color: '#b47fff' }
+    { label: 'Score', value: score + ' / 1000', color: '#e8ff47' },
+    { label: 'Grade', value: grade, color: '#4fc3f7' },
+    { label: t('an.difficulty'), value: diffLabel, color: '#47ffb4' },
+    { label: 'Questions', value: String(questionsCount), color: '#b47fff' }
   ];
 
   var canvas = generateShareCard({
-    modeName: 'Arrangement（アレンジメント）',
-    mainLabel: 'グレード',
+    modeName: 'Checkout Quiz',
+    mainLabel: 'Grade',
     mainValue: grade,
     mainColor: '#e8ff47',
     subValue: 'Score: ' + score,
@@ -3531,6 +3639,6 @@ function shareArr() {
     stats: stats
   });
 
-  var text = 'Arrangement ' + grade + ' Score:' + score + ' #SteelDartsPro #ダーツ';
+  var text = '🎯 Checkout Quiz ' + grade + ' Score:' + score + '\nhttps://ricky-ak-180.github.io/steel-darts-countup/\n#SteelDartsPro #Darts';
   _doShare(canvas, text);
 }

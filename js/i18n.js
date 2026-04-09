@@ -22,6 +22,11 @@ var _i18n = {
 
     /* ---- CountUp game ---- */
     'gs.tagline': 'スティールダーツの練習を、もっとスマートに',
+    'gs.feat_stats': '📊 詳細な統計・履歴',
+    'gs.feat_streak': '🔥 デイリーストリーク',
+    'set.sound': 'サウンド',
+    'set.caller': 'コーラー',
+    'set.theme': 'テーマ',
     'cu.game_start': 'GAME START',
     'cu.round': 'ラウンド',
     'cu.total_score': 'トータルスコア',
@@ -245,6 +250,142 @@ var _i18n = {
     'arr.teiseki_100': '100〜3',
     'arr.teiseki_kezuri': '削り戦術',
 
+    /* ---- Profile ---- */
+    'prf.01_best': '01モード最高:',
+    'prf.cu_best': 'CountUp最高:',
+    'prf.ckt_best': 'Cricket最高MPR:',
+    'prf.trend_sub': '直近3G vs 全体平均',
+    'prf.streak_current': '現在 {n}日連続',
+    'prf.streak_best': '最高: {n}日',
+    'prf.play_time': 'プレイ時間:',
+    'prf.total_games': '総ゲーム数:',
+    'prf.achieved': '達成実績:',
+    'prf.games_unit': '試合',
+    'prf.count_unit': '個',
+    'prf.session_games': '{n}試合 / Best {v}',
+    'prf.cu_goal': 'CountUp 目標',
+    'prf.z01_goal': '01 Avg 目標',
+    'prf.ckt_goal': 'Cricket MPR 目標',
+    'prf.no_trend': '2ゲーム以上プレイするとトレンドが表示されます',
+    'prf.lv_achieved': 'LV.{n}達成',
+
+    /* ---- Game (CountUp) ---- */
+    'g.enter_hint': '合計点を入力してください',
+    'g.range_warn': '⚠ 0〜180で入力',
+    'g.undo_msg': 'R{r} の {s} pt を取り消して入力し直しますか？',
+    'g.pace_pred': 'このペース → 予測 ',
+    'g.pace_pts': '点',
+    'g.pace_rank': 'ランク',
+    'g.pace_pb_beat': '🔥 自己ベスト更新ペース！',
+    'g.pace_pb': '自己ベスト:',
+    'g.pace_goal': '目標 ',
+    'g.rank_need': 'あと {d}点 で {r} ランク',
+    'g.rank_per_r': '（1R平均+{n}点）',
+    'g.rank_max': '👑 最高ランク S+ 達成！',
+    'g.share_cu': '🎯 カウントアップ {s}点（{r}ランク）\n無料ダーツ練習アプリ→ https://ricky-ak-180.github.io/steel-darts-countup/\n#SteelDartsPro #ダーツ',
+    'g.share_z01': '🎯 {m} {w} Avg:{a}\n無料ダーツ練習アプリ→ https://ricky-ak-180.github.io/steel-darts-countup/\n#SteelDartsPro #ダーツ',
+    'g.stat_3dart_avg': '3ダーツ平均',
+    'g.stat_total_score': 'トータルスコア',
+    'g.stat_best_round': 'ベストラウンド',
+    'g.stat_rank': 'ランク',
+    'g.stat_3avg': '3本平均',
+    'g.stat_best_r': '最高ラウンド',
+    'g.stat_co_rate': 'CO率',
+    'g.stat_throws': 'スロー数',
+    'g.stat_cpu_avg': 'CPU平均',
+    'g.stat_hi_fin': 'ハイフィニッシュ',
+    'g.stat_best_leg': 'ベストレグ',
+    'g.stat_worst_leg': 'ワーストレグ',
+    'g.mode_vs_cpu': 'vs CPU Lv.',
+    'g.mode_2p': '2P対戦',
+    'g.mode_solo': 'ソロ',
+    'g.no_history': '履歴がありません',
+    'g.darts_unit': '本',
+
+    /* ---- Sim 501 ---- */
+    's.cork_msg': 'ブルを狙って投げる — ボードをタップ！',
+    's.you': 'あなた:',
+    's.dist': '距離',
+    's.you_first': 'あなたの先行！',
+    's.cpu_first': 'CPUの先行！',
+    's.you_first_start': 'あなたの先行でスタート！',
+    's.cpu_first_start': 'CPUの先行でスタート！',
+    's.checkout_hint': '上がり目:',
+    's.3avg': '3本平均',
+    's.best_r': '最高R',
+    's.co_rate': 'CO率',
+    's.darts_count': '本数',
+    's.legs': 'レグ',
+    's.throws': 'スロー数',
+    's.landing': '着弾分布',
+    's.landing_count': '{n}本',
+    's.cpu_co': '🎯 チェックアウト！ {s} で上がり！',
+    's.cpu_bust': '💥 バスト！ 残り{n}に戻る',
+    's.cpu_nice': '🔥 {s}！ ナイスショット！',
+    's.cpu_solid': '👍 {s} — 堅実なスロー',
+    's.cpu_missed_co': '😤 上がり目を逃した...',
+    's.cpu_miss': '😬 ボード外！ CPU ミスショット',
+    's.cpu_dbl_miss': '⚡ ダブルを外した！ チャンス！',
+    's.double_in_req': 'ダブルインが必要です',
+
+    /* ---- Training (arr) ---- */
+    'tr.no_weak': '苦手スコアが見つかりません。もっとトレーニングを積んでから試してみましょう！',
+    'tr.weak_mode': '🎯 苦手スコア集中モード ({n}個) ｜ 次: ',
+    'tr.weak_drill': '苦手スコア集中ドリル',
+    'tr.weak_desc': 'あなたの成功率が60%未満のスコアを集中訓練',
+    'tr.skill_builder': 'スキルビルダー',
+    'tr.skill_desc_beg': '基礎スコア (20,19,18) の反復練習で確実性を強化',
+    'tr.skill_desc_mid': 'LV別進捗を参考に推奨スコアで反復練習',
+    'tr.challenge': 'チャレンジモード',
+    'tr.challenge_desc': 'マスター済みスコアでスピード・精度UP',
+    'tr.hide_hint': '🙈 ヒントを隠す',
+    'tr.show_hint': '👁 ヒントを見る',
+    'tr.clears': '{n}回クリア',
+    'tr.streak5': '⚡ {n}連続！！',
+    'tr.streak3': '🔥 {n}連続！',
+    'tr.unlock': '🔓 {s} をアンロック！',
+    'tr.hint_hidden': '✨ ヒントが自動非表示に',
+    'tr.perfect': '🌟 PERFECTマスター！',
+    'tr.next_score': '次のスコアへ →',
+    'tr.back_list': '一覧へ戻る',
+    'tr.session': '📊 本日: {a}回試行　{c}回成功　{r}%',
+    'tr.mastered': 'マスター',
+    'tr.recommended': '推奨ルーチン',
+
+    /* ---- Analysis (01) ---- */
+    'an.career': '🎮 累計成績',
+    'an.today': '📅 今日の成績',
+    'an.total_180': '通算 180',
+    'an.total_140': '140+ 累計',
+    'an.recent_avg': '直近{n}G AVG',
+    'an.recent_f9': '直近{n}G F9 AVG',
+    'an.avg_trend': 'AVG 推移（直近{n}G）',
+    'an.score_dist': '削りスコア分布（直近30G / {n}ラウンド）',
+    'an.score_dist_note': '残り171以上のラウンドのみ集計（上がり目が出たラウンドは除く）',
+    'an.co_rate': 'チェックアウト成功率（難易度別）',
+    'an.co_rate_note': '残り170以下（上がり目あり）になったラウンドを全データ集計',
+    'an.difficulty': '難易度',
+    'an.co_161': 'トリプル2本 ＋ ダブルブル必須　最高難易度',
+    'an.co_131': 'トリプル2本 → ダブルで上がれる',
+    'an.co_101': 'トリプル1〜2本 → ダブルでフィニッシュ',
+    'an.co_61': 'トリプルが外れても、シングル2本 → ダブルで上がれる',
+    'an.co_41': 'シングル＋ダブルの2本フィニッシュ',
+    'an.co_2': '偶数はダブル1投、奇数はシングル→ダブルの2本',
+    'an.period': '期間別成績',
+    'an.period_14d': '期間別成績（直近14日）',
+    'an.matchup': '対戦成績',
+    'an.corr': 'カウントアップ × 01 相関',
+    'an.corr_desc': '同じ日のカウントアップAVGと01勝率（Player 1）の相関',
+    'an.corr_low': '〜399（低）',
+    'an.corr_mid': '400〜599（中）',
+    'an.corr_high': '600〜（高）',
+    'an.win_rate': '01 勝率:',
+    'an.history': 'ゲーム履歴',
+    'an.delete': '削除',
+    'an.no_history': '🎮 まだ記録がありません。',
+    'an.avg_graph_need': 'あと{n}ゲームでグラフが表示されます',
+    'an.avg_graph': 'AVG推移（直近{n}ゲーム）',
+
     /* ---- Shortcut editor ---- */
     'sc.title': '⚙ ショートカット編集',
     'sc.desc': '各ボタンの数値を入力してください（0〜180）',
@@ -259,6 +400,148 @@ var _i18n = {
     'ob.next': '次へ',
     'ob.start': '始めよう!',
     'ob.skip': 'スキップ',
+
+    /* ---- Empty states ---- */
+    'empty.no_record': 'まだ記録がありません。\nゲームを完了すると自動で保存されます。',
+    'empty.no_data': 'データなし',
+    'empty.no_quest': 'まだデータがありません。\nクエストを練習すると記録されます。',
+    'empty.no_weak': '弱点スコアがまだありません',
+    'empty.no_ckt_hist': 'まだ履歴がありません',
+
+    /* ---- Sim501 ---- */
+    's.your_turn': 'あなたのターン',
+    's.tap_board': 'ボードをタップ',
+    's.cpu_turn': 'CPU ターン',
+
+    /* ---- Cricket stats ---- */
+    'ckt.mpr_trend': 'MPR推移（最新10試合）',
+    'ckt.win_by_lv': 'レベル別勝率',
+    'ckt.total_games': '総試合',
+    'ckt.cpu_win_rate': '対CPU勝率',
+    'ckt.avg_mpr': '平均MPR',
+    'ckt.best_mpr': '最高MPR',
+    'ckt.avg_rounds': '平均R数',
+    'ckt.two_p': '2P試合',
+    'ckt.targeting': '{target} を狙っています',
+    'ckt.copied': 'コピーしました',
+    'ckt.game_count': 'ゲーム数',
+
+    /* ---- Period tabs ---- */
+    'period.today': '本日',
+    'period.week': '今週',
+    'period.month': '今月',
+    'period.day_tab': '日別',
+    'period.week_tab': '週別',
+    'period.month_tab': '月別',
+
+    /* ---- Duration ---- */
+    'dur.h_m': '{h}時間{m}分',
+    'dur.m_s': '{m}分{s}秒',
+    'dur.m': '{m}分',
+    'dur.s': '{s}秒',
+
+    /* ---- Profile extras ---- */
+    'prf.today_best': '本日ベスト',
+
+    /* ---- Weekly report ---- */
+    'wr.btn': '📊 先週のまとめ',
+    'wr.title': '📊 先週のまとめ',
+    'wr.games': 'プレイ回数',
+    'wr.playtime': '総プレイ時間',
+    'wr.avg_cu': '平均スコア (CountUp)',
+    'wr.best_score': 'ベストスコア',
+    'wr.vs_prev': '前週比:',
+    'wr.streak_msg': '🔥 現在 {n}日連続プレー中',
+
+    /* ---- Daily challenge ---- */
+    'dc.title': '📅 デイリーチャレンジ',
+    'dc.complete': '🎉 全ミッション達成！ +50 XP',
+    'dc.cu_100x3': '100点以上のラウンドを3回出す',
+    'dc.cu_play3': 'カウントアップを3回プレイ',
+    'dc.cu_140': '140点以上のラウンドを出す',
+    'dc.cu_180': '180ラウンドを出す',
+    'dc.cu_800': 'カウントアップで800点以上',
+    'dc.cu_avg100': '全ラウンド平均100点以上',
+    'dc.arr_3': 'アレンジ問題を3問解く',
+    'dc.arr_5': 'アレンジ問題を5問連続正解',
+    'dc.arr_10': 'アレンジ問題を10問解く',
+    'dc.arr_streak5': 'アレンジ5問連続正解',
+    'dc.cu_nounder60': '60未満のラウンドなしでクリア',
+    'dc.cu_1000': 'カウントアップで1000点以上',
+    'dc.cu_bull3': 'BULL(50点)を3回以上入れる',
+    'dc.ckt_play': 'Cricketを1回プレイ',
+    'dc.z01_play': '01ゲームを1回プレイ',
+
+    /* ---- XP source ---- */
+    'xp.countup': 'カウントアップ',
+    'xp.daily': 'デイリーチャレンジ達成',
+
+    /* ---- Titles / badges ---- */
+    'badge.veteran': '🎯 百戦錬磨',
+    'badge.180master': '💯 180マスター',
+    'badge.splus': '👑 S+到達',
+    'badge.weekly': '✨ 週末戦士',
+    'badge.iron': '🔥 鉄人',
+    'badge.demon': '💎 ダーツの鬼',
+    'badge.streak_unit': '日連続\nプレー',
+
+    /* ---- Import/Export ---- */
+    'io.imported': '{n}件のデータを追加しました（重複は除外）',
+    'io.import_err': '読み込みに失敗しました: {e}',
+
+    /* ---- Leaderboard ---- */
+    'lb.title': 'リーダーボード',
+    'lb.global': '総合',
+    'lb.weekly': '今週',
+    'lb.loading': '読み込み中...',
+    'lb.no_scores': 'まだスコアがありません',
+    'lb.submitted': 'スコアを送信しました！',
+    'lb.not_pb': '自己ベストではないため送信されませんでした',
+    'lb.you': 'あなた',
+    'lb.your_best_not_ranked': 'あなたのスコアはトップ20圏外です',
+    'lb.enter_name': '表示名を入力',
+    'lb.name_placeholder': 'ニックネーム（16文字以内）',
+    'lb.cancel': 'キャンセル',
+    'lb.ok': 'OK',
+    'lb.challenge_title': 'チャレンジ対戦！',
+    'lb.challenge_scored': 'のスコア:',
+    'lb.challenge_in': '',
+    'lb.challenge_accept': '受けて立つ！',
+    'lb.challenge_btn': 'チャレンジを送る',
+    'lb.challenge_win': '勝利！相手のスコアを超えました！',
+    'lb.challenge_lose': '惜しい！もう一度挑戦しよう',
+    'lb.challenge_share': 'スコアを共有して友達に挑戦しよう',
+    'lb.offline': 'オフラインのためリーダーボードは利用できません',
+
+    /* ---- Onboarding ---- */
+    'ob.desc': 'スティールダーツの総合スコア管理アプリ',
+    'ob.feat1': 'CountUp / 01 スコア記録',
+    'ob.feat2': 'スコア推移・ランク分析',
+    'ob.feat3': 'アレンジ学習・クイズ',
+    'ob.lv_title': 'あなたのレベルは？',
+    'ob.lv_desc': 'おすすめのモードをご案内します',
+    'ob.lv_beginner': '🔰 初心者',
+    'ob.lv_beginner_sub': 'ダーツを始めたばかり',
+    'ob.lv_mid': '🎯 中級者',
+    'ob.lv_mid_sub': 'Rt.5前後・基本は分かる',
+    'ob.lv_adv': '🏆 上級者',
+    'ob.lv_adv_sub': 'Rt.10以上・アレンジも得意',
+    'ob.start_heading': 'まずはここから',
+
+    /* ---- Confirm dialogs ---- */
+    'confirm.delete_all': '全ての履歴を削除します。\nこの操作は元に戻せません。',
+    'confirm.reset_game': '入力中のゲームをリセットします。\nこの操作は元に戻せません。',
+
+    /* ---- Aria labels ---- */
+    'aria.tabs': 'ゲームモード選択',
+    'aria.snd': 'サウンドのオン/オフ',
+    'aria.caller': 'コーラーのオン/オフ',
+    'aria.lang': '言語切替',
+    'aria.theme': 'テーマ切替',
+    'aria.pause': '一時停止',
+    'aria.undo': '直前のラウンドを取り消す',
+    'aria.reset': 'ゲームをリセットする',
+    'aria.score': '現在のスコア',
 
     /* ---- Common ---- */
     'common.score': '点数',
@@ -283,6 +566,11 @@ var _i18n = {
 
     /* ---- CountUp game ---- */
     'gs.tagline': 'Smart practice for steel darts',
+    'gs.feat_stats': '📊 Detailed Stats & History',
+    'gs.feat_streak': '🔥 Daily Streak',
+    'set.sound': 'Sound',
+    'set.caller': 'Caller',
+    'set.theme': 'Theme',
     'cu.game_start': 'GAME START',
     'cu.round': 'Round',
     'cu.total_score': 'Total Score',
@@ -361,7 +649,7 @@ var _i18n = {
     'z01.share': '📤 Share',
     'z01.back_setup': 'Back to Setup',
     'z01.custom': 'Custom',
-    'z01.custom_start': 'pt start',
+    'z01.custom_start': 'Points',
     'z01.straight_in': 'Straight In',
     'z01.double_in': 'Double In',
     'z01.double_out': 'Double Out',
@@ -393,7 +681,7 @@ var _i18n = {
     'cpu.lv1': 'LV1 Novice',
     'cpu.lv2': 'LV2 Beginner',
     'cpu.lv3': 'LV3 Basic',
-    'cpu.lv4': 'LV4 Low-Mid',
+    'cpu.lv4': 'LV4 Intermediate',
     'cpu.lv5': 'LV5 Amateur',
     'cpu.lv6': 'LV6 Intermediate',
     'cpu.lv7': 'LV7 Intermediate+',
@@ -451,11 +739,11 @@ var _i18n = {
     'ckt.end': 'End Game',
 
     /* ---- Arrange ---- */
-    'arr.roadmap': 'Arrange Mastery Roadmap',
-    'arr.roadmap_sub': 'Kezuri = strategic scoring to bring remaining points within checkout range (170 or less)',
+    'arr.roadmap': 'Checkout Mastery Roadmap',
+    'arr.roadmap_sub': 'Learn to set up and hit checkouts — bringing your remaining score within finishing range (170 or less)',
     'arr.step1': 'STEP 1',
     'arr.step1_title': 'Arrange Table',
-    'arr.step1_sub': 'Start by studying the table to learn the basics. Includes kezuri tactics and bogey avoidance.',
+    'arr.step1_sub': 'Start by studying the table to learn the basics. Includes checkout tactics and bogey avoidance.',
     'arr.step1_btn': 'Open Table →',
     'arr.step2': 'STEP 2',
     'arr.step2_title': 'Arrange Quiz',
@@ -469,14 +757,14 @@ var _i18n = {
     'arr.q30': '30 Q',
     'arr.quiz_start': 'Start Quiz →',
     'arr.step3': 'STEP 3',
-    'arr.step3_title': 'Arrange Training',
+    'arr.step3_title': 'Checkout Training',
     'arr.step3_sub': 'Throw real darts to build muscle memory. Conquer scores from 2 to 170 in order.',
     'arr.step3_btn': 'Start Training →',
     'arr.step4': 'STEP 4',
     'arr.step4_title': 'Quest',
     'arr.step4_sub': 'Story-driven checkout challenges. Full routes and miss handling for match-like practice.',
     'arr.step4_btn': 'Go to Quest →',
-    'arr.training_title': 'Arrange Training',
+    'arr.training_title': 'Checkout Training',
     'arr.back': '← Back',
     'arr.continue': 'Continue →',
     'arr.random': '🎲 Random Practice',
@@ -504,7 +792,143 @@ var _i18n = {
     'arr.quiz_back': 'Back to Setup',
     'arr.teiseki_170': '170-99',
     'arr.teiseki_100': '100-3',
-    'arr.teiseki_kezuri': 'Kezuri Tactics',
+    'arr.teiseki_kezuri': 'Checkout Tactics',
+
+    /* ---- Profile ---- */
+    'prf.01_best': '01 Best:',
+    'prf.cu_best': 'Count-Up Best:',
+    'prf.ckt_best': 'Cricket Best MPR:',
+    'prf.trend_sub': 'Last 3 games vs overall avg',
+    'prf.streak_current': '{n}-day streak',
+    'prf.streak_best': 'Best: {n} days',
+    'prf.play_time': 'Play Time:',
+    'prf.total_games': 'Total Games:',
+    'prf.achieved': 'Achievements:',
+    'prf.games_unit': '',
+    'prf.count_unit': '',
+    'prf.session_games': '{n} games / Best {v}',
+    'prf.cu_goal': 'Count-Up Target',
+    'prf.z01_goal': '01 Avg Target',
+    'prf.ckt_goal': 'Cricket MPR Target',
+    'prf.no_trend': 'Play 2+ games to see trends',
+    'prf.lv_achieved': 'LV.{n} Achieved',
+
+    /* ---- Game (CountUp) ---- */
+    'g.enter_hint': 'Enter your score',
+    'g.range_warn': '⚠ Enter 0-180',
+    'g.undo_msg': 'Undo R{r} score of {s}?',
+    'g.pace_pred': 'Projected: ',
+    'g.pace_pts': '',
+    'g.pace_rank': '',
+    'g.pace_pb_beat': '🔥 On PB pace!',
+    'g.pace_pb': 'PB:',
+    'g.pace_goal': 'Target ',
+    'g.rank_need': '{d} more for {r} rank',
+    'g.rank_per_r': '(need +{n}/round)',
+    'g.rank_max': '👑 Highest rank S+ achieved!',
+    'g.share_cu': '🎯 Count-Up {s} ({r} rank)\nFree darts practice app → https://ricky-ak-180.github.io/steel-darts-countup/\n#SteelDartsPro #Darts',
+    'g.share_z01': '🎯 {m} {w} Avg:{a}\nFree darts practice app → https://ricky-ak-180.github.io/steel-darts-countup/\n#SteelDartsPro #Darts',
+    'g.stat_3dart_avg': '3-Dart Avg',
+    'g.stat_total_score': 'Total Score',
+    'g.stat_best_round': 'Best Round',
+    'g.stat_rank': 'Rank',
+    'g.stat_3avg': '3-Dart Avg',
+    'g.stat_best_r': 'Best Round',
+    'g.stat_co_rate': 'Checkout %',
+    'g.stat_throws': 'Darts Thrown',
+    'g.stat_cpu_avg': 'CPU Avg',
+    'g.stat_hi_fin': 'High Finish',
+    'g.stat_best_leg': 'Best Leg',
+    'g.stat_worst_leg': 'Worst Leg',
+    'g.mode_vs_cpu': 'vs CPU Lv.',
+    'g.mode_2p': '2-Player',
+    'g.mode_solo': 'Solo',
+    'g.no_history': 'No history yet',
+    'g.darts_unit': ' darts',
+
+    /* ---- Sim 501 ---- */
+    's.cork_msg': 'Aim for the bull — tap the board!',
+    's.you': 'You:',
+    's.dist': 'dist',
+    's.you_first': 'You throw first!',
+    's.cpu_first': 'CPU throws first!',
+    's.you_first_start': 'You throw first — Start!',
+    's.cpu_first_start': 'CPU throws first — Start!',
+    's.checkout_hint': 'Checkout:',
+    's.3avg': '3-Dart Avg',
+    's.best_r': 'Best Rd',
+    's.co_rate': 'Checkout %',
+    's.darts_count': 'Darts',
+    's.legs': 'Legs',
+    's.throws': 'Darts Thrown',
+    's.landing': 'Dart Landings',
+    's.landing_count': '{n}',
+    's.cpu_co': '🎯 Checkout! {s} to finish!',
+    's.cpu_bust': '💥 Bust! Back to {n}',
+    's.cpu_nice': '🔥 {s}! Great shot!',
+    's.cpu_solid': '👍 {s} — Solid throw',
+    's.cpu_missed_co': '😤 Missed the checkout...',
+    's.cpu_miss': '😬 Off the board! CPU missed',
+    's.cpu_dbl_miss': '⚡ Missed the double! Your chance!',
+    's.double_in_req': 'Double-in required',
+
+    /* ---- Training (arr) ---- */
+    'tr.no_weak': 'No weak scores found. Keep practising and try again!',
+    'tr.weak_mode': '🎯 Weak Score Mode ({n}) | Next: ',
+    'tr.weak_drill': 'Weak Score Drill',
+    'tr.weak_desc': 'Focus on scores where your success rate is under 60%',
+    'tr.skill_builder': 'Skill Builder',
+    'tr.skill_desc_beg': 'Build consistency with base scores (20, 19, 18)',
+    'tr.skill_desc_mid': 'Recommended scores based on your level progress',
+    'tr.challenge': 'Challenge Mode',
+    'tr.challenge_desc': 'Push speed and accuracy on mastered checkouts',
+    'tr.hide_hint': '🙈 Hide Hint',
+    'tr.show_hint': '👁 Show Hint',
+    'tr.clears': '{n} clears',
+    'tr.streak5': '⚡ {n} in a row!!',
+    'tr.streak3': '🔥 {n} in a row!',
+    'tr.unlock': '🔓 {s} unlocked!',
+    'tr.hint_hidden': '✨ Hint auto-hidden',
+    'tr.perfect': '🌟 PERFECT Master!',
+    'tr.next_score': 'Next Score →',
+    'tr.back_list': 'Back to List',
+    'tr.session': '📊 Today: {a} attempts, {c} hits, {r}%',
+    'tr.mastered': 'Mastered',
+    'tr.recommended': 'Recommended Routine',
+
+    /* ---- Analysis (01) ---- */
+    'an.career': '🎮 Career Stats',
+    'an.today': '📅 Today\'s Stats',
+    'an.total_180': 'Total 180s',
+    'an.total_140': '140+ Total',
+    'an.recent_avg': 'Last {n}G AVG',
+    'an.recent_f9': 'Last {n}G F9 AVG',
+    'an.avg_trend': 'AVG Trend (Last {n}G)',
+    'an.score_dist': 'Scoring Distribution (Last 30G / {n} rounds)',
+    'an.score_dist_note': 'Rounds with 171+ remaining only (excludes checkout rounds)',
+    'an.co_rate': 'Checkout Rate (by difficulty)',
+    'an.co_rate_note': 'All attempts with 170 or less remaining',
+    'an.difficulty': 'Diff.',
+    'an.co_161': 'Two trebles + D-Bull required. Maximum difficulty',
+    'an.co_131': 'Two trebles → double to finish',
+    'an.co_101': '1-2 trebles → double finish',
+    'an.co_61': 'If treble misses, single-single → double out',
+    'an.co_41': 'Single + double, 2-dart finish',
+    'an.co_2': 'Even: one double. Odd: single → double',
+    'an.period': 'Performance by Period',
+    'an.period_14d': 'Performance by Period (Last 14 days)',
+    'an.matchup': 'Head-to-Head Record',
+    'an.corr': 'Count-Up × 01 Correlation',
+    'an.corr_desc': 'Same-day Count-Up AVG vs 01 win rate (Player 1)',
+    'an.corr_low': '≤399 (Low)',
+    'an.corr_mid': '400-599 (Mid)',
+    'an.corr_high': '600+ (High)',
+    'an.win_rate': '01 Win %:',
+    'an.history': 'Game History',
+    'an.delete': 'Delete',
+    'an.no_history': '🎮 No games recorded yet.',
+    'an.avg_graph_need': '{n} more games to show graph',
+    'an.avg_graph': 'AVG Trend (Last {n} games)',
 
     /* ---- Shortcut editor ---- */
     'sc.title': '⚙ Edit Shortcuts',
@@ -520,6 +944,148 @@ var _i18n = {
     'ob.next': 'Next',
     'ob.start': "Let's Go!",
     'ob.skip': 'Skip',
+
+    /* ---- Empty states ---- */
+    'empty.no_record': 'No games recorded yet.\nComplete a game to save automatically.',
+    'empty.no_data': 'No data',
+    'empty.no_quest': 'No data yet.\nPractise quests to start tracking.',
+    'empty.no_weak': 'No weak scores found yet',
+    'empty.no_ckt_hist': 'No matches recorded yet',
+
+    /* ---- Sim501 ---- */
+    's.your_turn': 'Your turn',
+    's.tap_board': 'Tap the board',
+    's.cpu_turn': 'CPU turn',
+
+    /* ---- Cricket stats ---- */
+    'ckt.mpr_trend': 'MPR Trend (Last 10 games)',
+    'ckt.win_by_lv': 'Win Rate by Level',
+    'ckt.total_games': 'Total',
+    'ckt.cpu_win_rate': 'CPU Win %',
+    'ckt.avg_mpr': 'Avg MPR',
+    'ckt.best_mpr': 'Best MPR',
+    'ckt.avg_rounds': 'Avg Rnds',
+    'ckt.two_p': '2P Games',
+    'ckt.targeting': 'Targeting {target}',
+    'ckt.copied': 'Copied',
+    'ckt.game_count': 'Games',
+
+    /* ---- Period tabs ---- */
+    'period.today': 'Today',
+    'period.week': 'This Week',
+    'period.month': 'This Month',
+    'period.day_tab': 'Daily',
+    'period.week_tab': 'Weekly',
+    'period.month_tab': 'Monthly',
+
+    /* ---- Duration ---- */
+    'dur.h_m': '{h}h {m}m',
+    'dur.m_s': '{m}m {s}s',
+    'dur.m': '{m}m',
+    'dur.s': '{s}s',
+
+    /* ---- Profile extras ---- */
+    'prf.today_best': 'Today Best',
+
+    /* ---- Weekly report ---- */
+    'wr.btn': '📊 Last Week',
+    'wr.title': '📊 Weekly Summary',
+    'wr.games': 'Games Played',
+    'wr.playtime': 'Total Play Time',
+    'wr.avg_cu': 'Avg Score (CountUp)',
+    'wr.best_score': 'Best Score',
+    'wr.vs_prev': 'vs Previous:',
+    'wr.streak_msg': '🔥 Currently on a {n}-day streak',
+
+    /* ---- Daily challenge ---- */
+    'dc.title': '📅 Daily Challenge',
+    'dc.complete': '🎉 All missions complete! +50 XP',
+    'dc.cu_100x3': 'Score 100+ in 3 rounds',
+    'dc.cu_play3': 'Play Count-Up 3 times',
+    'dc.cu_140': 'Score 140+ in a round',
+    'dc.cu_180': 'Hit a 180 round',
+    'dc.cu_800': 'Score 800+ in Count-Up',
+    'dc.cu_avg100': 'Average 100+ across all rounds',
+    'dc.arr_3': 'Answer 3 checkout questions',
+    'dc.arr_5': 'Get 5 consecutive correct answers',
+    'dc.arr_10': 'Answer 10 checkout questions',
+    'dc.arr_streak5': '5 correct answers in a row',
+    'dc.cu_nounder60': 'Complete without any round under 60',
+    'dc.cu_1000': 'Score 1000+ in Count-Up',
+    'dc.cu_bull3': 'Hit BULL (50) 3 or more times',
+    'dc.ckt_play': 'Play 1 Cricket match',
+    'dc.z01_play': 'Play 1 game of 01',
+
+    /* ---- XP source ---- */
+    'xp.countup': 'Count-Up',
+    'xp.daily': 'Daily Challenge Complete',
+
+    /* ---- Titles / badges ---- */
+    'badge.veteran': '🎯 Veteran',
+    'badge.180master': '💯 180 Master',
+    'badge.splus': '👑 S+ Achiever',
+    'badge.weekly': '✨ Weekly Warrior',
+    'badge.iron': '🔥 Iron Player',
+    'badge.demon': '💎 Darts Demon',
+    'badge.streak_unit': 'Day\nStreak',
+
+    /* ---- Import/Export ---- */
+    'io.imported': '{n} games imported (duplicates excluded)',
+    'io.import_err': 'Import failed: {e}',
+
+    /* ---- Leaderboard ---- */
+    'lb.title': 'Leaderboard',
+    'lb.global': 'All-Time',
+    'lb.weekly': 'This Week',
+    'lb.loading': 'Loading...',
+    'lb.no_scores': 'No scores yet',
+    'lb.submitted': 'Score submitted!',
+    'lb.not_pb': 'Not a personal best — score not submitted',
+    'lb.you': 'You',
+    'lb.your_best_not_ranked': 'Your score is outside the top 20',
+    'lb.enter_name': 'Enter display name',
+    'lb.name_placeholder': 'Nickname (max 16 chars)',
+    'lb.cancel': 'Cancel',
+    'lb.ok': 'OK',
+    'lb.challenge_title': 'Challenge!',
+    'lb.challenge_scored': 'scored',
+    'lb.challenge_in': 'in',
+    'lb.challenge_accept': 'Accept!',
+    'lb.challenge_btn': 'Send Challenge',
+    'lb.challenge_win': 'You win! Beat the challenger!',
+    'lb.challenge_lose': 'Close! Try again',
+    'lb.challenge_share': 'Share your score to challenge a friend',
+    'lb.offline': 'Leaderboard unavailable offline',
+
+    /* ---- Onboarding ---- */
+    'ob.desc': 'All-in-one score tracker for steel darts',
+    'ob.feat1': 'Count-Up / 01 score tracking',
+    'ob.feat2': 'Score trends & rank analysis',
+    'ob.feat3': 'Checkout practice & quizzes',
+    'ob.lv_title': 'What is your level?',
+    'ob.lv_desc': "We'll recommend the best mode for you",
+    'ob.lv_beginner': '🔰 Beginner',
+    'ob.lv_beginner_sub': 'Just getting started',
+    'ob.lv_mid': '🎯 Intermediate',
+    'ob.lv_mid_sub': 'Know the basics, ~Rt.5',
+    'ob.lv_adv': '🏆 Advanced',
+    'ob.lv_adv_sub': 'Rt.10+, confident on checkouts',
+    'ob.start_heading': 'Start here',
+
+    /* ---- Confirm dialogs ---- */
+    'confirm.delete_all': 'Delete all history.\nThis cannot be undone.',
+    'confirm.reset_game': 'Reset the current game.\nThis cannot be undone.',
+
+    /* ---- Aria labels ---- */
+    'aria.tabs': 'Game mode selection',
+    'aria.snd': 'Toggle sound',
+    'aria.caller': 'Toggle caller',
+    'aria.lang': 'Switch language',
+    'aria.theme': 'Switch theme',
+    'aria.pause': 'Pause',
+    'aria.undo': 'Undo last round',
+    'aria.reset': 'Reset game',
+    'aria.score': 'Current score',
 
     /* ---- Common ---- */
     'common.score': 'Score',
@@ -602,6 +1168,12 @@ function _applyI18n() {
       }
     }
   }
+  /* aria-label i18n */
+  var ariaEls = document.querySelectorAll('[data-i18n-aria]');
+  for (var j = 0; j < ariaEls.length; j++) {
+    var aKey = ariaEls[j].getAttribute('data-i18n-aria');
+    if (aKey) ariaEls[j].setAttribute('aria-label', t(aKey));
+  }
 }
 
 /**
@@ -609,10 +1181,12 @@ function _applyI18n() {
  */
 function _updateLangToggle() {
   var btn = document.getElementById('btn-lang');
-  if (btn) {
-    btn.textContent = _currentLang === 'ja' ? 'EN' : 'JA';
-    btn.title = _currentLang === 'ja' ? 'Switch to English' : '日本語に切り替え';
-  }
+  if (!btn) return;
+  var lbl = _currentLang === 'ja' ? 'EN' : 'JA';
+  var sp = btn.querySelector('#lang-label');
+  if (sp) { sp.textContent = lbl; btn.firstChild.textContent = '\uD83C\uDF10 '; }
+  else { btn.textContent = lbl; }
+  btn.title = _currentLang === 'ja' ? 'Switch to English' : '日本語に切り替え';
 }
 
 /* ---- Theme toggle ---- */
@@ -622,7 +1196,11 @@ function _applyTheme(theme) {
   root.classList.add('theme-transition');
   root.setAttribute('data-theme', theme);
   var btn = document.getElementById('btn-theme');
-  if (btn) btn.textContent = theme === 'light' ? '☀️' : '🌙';
+  if (btn) {
+    var icon = theme === 'light' ? '☀️' : '🌙';
+    var sp = btn.querySelector('span');
+    if (sp) { btn.firstChild.textContent = icon + ' '; } else { btn.textContent = icon; }
+  }
   // Remove transition class after animation completes
   setTimeout(function() {
     root.classList.remove('theme-transition');
