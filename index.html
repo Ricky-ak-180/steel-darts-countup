@@ -1033,6 +1033,24 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
   <div id="profile-card-wrap" class="profile-card-wrap flex-col-grow">
     <!-- Profile card will be rendered here -->
   </div>
+
+  <!-- Leaderboard Section -->
+  <div style="padding:0 12px;margin-top:16px;">
+    <h3 style="font-size:15px;color:var(--acc);margin-bottom:12px;" data-i18n="lb.title">Leaderboard</h3>
+    <div class="lb-tabs">
+      <div class="lb-tab on" id="lb-tab-global" onclick="lbSwitchTab('global')" data-i18n="lb.global">All-Time</div>
+      <div class="lb-tab" id="lb-tab-weekly" onclick="lbSwitchTab('weekly')" data-i18n="lb.weekly">This Week</div>
+    </div>
+    <div id="lb-board"></div>
+  </div>
+
+  <!-- Challenge Section -->
+  <div style="padding:0 12px;margin-top:20px;">
+    <div id="challenge-result-area"></div>
+    <button class="btn-challenge" onclick="challengeShareCU()" style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(232,255,71,0.3);background:rgba(232,255,71,0.08);color:var(--acc);font-size:14px;font-weight:600;cursor:pointer;">
+      <span>⚔️</span> <span data-i18n="lb.challenge_btn">Send Challenge</span>
+    </button>
+  </div>
 </div><!-- /vprofile -->
 
 <!-- Result overlay -->
