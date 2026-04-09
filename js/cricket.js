@@ -880,6 +880,9 @@ function _cktRenderHistory() {
     return;
   }
 
+  // Show Cricket statistics
+  renderCktStats();
+
   // Aggregate stats (Player 1 = user perspective)
   var cpuGames = h.filter(function(g){ return g.players === 3; });
   var twoPGames = h.filter(function(g){ return g.players === 2; });
@@ -1095,3 +1098,179 @@ document.addEventListener('keydown', function(e) {
     app.appendChild(vckt);
   }
 })();
+
+/* ============================================================
+   CRICKET STATISTICS & ANALYTICS
+   ============================================================ */
+
+var _cktStatsTab = 'day';
+
+function renderCktStats() {
+  var h = _cktGetHistory();
+  if (!h.length) return;
+
+  var container = document.getElementById('ckt-stats-container');
+  if (!container) return;
+
+  // タブ UI
+  var tabs = ['day', 'week', 'month'].map(function(t) {
+    return '<div class="ckt-stats-tab ' + (_cktStatsTab === t ? 'on' : '') + '" data-tab="' + t + '">' +
+      (t === 'day' ? '本日' : t === 'week' ? '今週' : '今月') + '</div>';
+  }).join('');
+
+  // フィルタリング
+  var now = new Date();
+  var filtered = h.filter(function(g) {
+    var gd = new Date(g.date);
+    if (_cktStatsTab === 'day') {
+      return gd.toDateString() === now.toDateString();
+    } else if (_cktStatsTab === 'week') {
+      var weekStart = new Date(now);
+      weekStart.setDate(weekStart.getDate() - (now.getDay() || 7) + 1);
+      return gd >= weekStart;
+    } else {
+      return gd.getFullYear() === now.getFullYear() &&
+             gd.getMonth() === now.getMonth();
+    }
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = '<div class="ckt-stats-empty">データなし</div>';
+    setupCktStatsTabs();
+    return;
+  }
+
+  // 統計計算
+  var mprs = filtered.map(function(g) { return g.mpr || 0; });
+  var avgMpr = (mprs.reduce(function(a, b) { return a + b; }, 0) / mprs.length).toFixed(2);
+  var maxMpr = Math.max.apply(null, mprs);
+  var minMpr = Math.min.apply(null, mprs);
+  var trend = '';
+  if (filtered.length >= 2) {
+    var latestMpr = filtered[0].mpr || 0;
+    var prevMpr = filtered[1].mpr || 0;
+    if (latestMpr > prevMpr) trend = '<span style="color:#ff6b35;font-weight:900;">▲</span>';
+    else if (latestMpr < prevMpr) trend = '<span style="color:#4fc3f7;font-weight:900;">▼</span>';
+  }
+
+  var html = '<div class="ckt-stats-tabs">' + tabs + '</div>' +
+    '<div class="ckt-stats-grid">' +
+      '<div class="ckt-stat-card">' +
+        '<div style="color:var(--mut);font-size:10px;letter-spacing:1px;">平均MPR</div>' +
+        '<div style="font-size:24px;font-family:\'Bebas Neue\',cursive;color:#47ffb4;font-weight:700;margin-top:4px;">' + avgMpr + ' ' + trend + '</div>' +
+      '</div>' +
+      '<div class="ckt-stat-card">' +
+        '<div style="color:var(--mut);font-size:10px;letter-spacing:1px;">最高MPR</div>' +
+        '<div style="font-size:24px;font-family:\'Bebas Neue\',cursive;color:var(--acc);font-weight:700;margin-top:4px;">' + maxMpr.toFixed(2) + '</div>' +
+      '</div>' +
+      '<div class="ckt-stat-card">' +
+        '<div style="color:var(--mut);font-size:10px;letter-spacing:1px;">ゲーム数</div>' +
+        '<div style="font-size:24px;font-family:\'Bebas Neue\',cursive;color:var(--grn);font-weight:700;margin-top:4px;">' + filtered.length + '</div>' +
+      '</div>' +
+    '</div>';
+
+  container.innerHTML = html;
+  setupCktStatsTabs();
+  drawCktChart();
+}
+
+function setupCktStatsTabs() {
+  var tabs = document.querySelectorAll('.ckt-stats-tab');
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      _cktStatsTab = tab.getAttribute('data-tab');
+      renderCktStats();
+    });
+  });
+}
+
+function drawCktChart() {
+  var h = _cktGetHistory();
+  var wrap = document.getElementById('ckt-chart-wrap');
+  var canvas = document.getElementById('ckt-chart');
+
+  if (!wrap || !canvas || h.length < 2) {
+    if (wrap) wrap.style.display = 'none';
+    return;
+  }
+
+  wrap.style.display = 'block';
+
+  // 直近30ゲーム、古い順に逆順
+  var base = h.slice(0, 30).reverse();
+  var scores = base.map(function(g, i) {
+    var window10 = base.slice(Math.max(0, i - 9), i + 1);
+    var sum = 0;
+    for (var j = 0; j < window10.length; j++) sum += window10[j].mpr || 0;
+    return Math.round((sum / window10.length) * 100) / 100;
+  });
+
+  var dpr = window.devicePixelRatio || 1;
+  var W = canvas.offsetWidth || 300;
+  var H = 120;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  var min = Math.min.apply(null, scores);
+  var max = Math.max.apply(null, scores);
+  var range = max - min || 1;
+  var pad = { top: 10, right: 10, bottom: 20, left: 36 };
+  var gw = W - pad.left - pad.right;
+  var gh = H - pad.top - pad.bottom;
+
+  // グリッド
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  for (var g = 0; g <= 4; g++) {
+    var gy = pad.top + (gh / 4) * g;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, gy);
+    ctx.lineTo(pad.left + gw, gy);
+    ctx.stroke();
+    var lv = Math.round(max - (range / 4) * g * 100) / 100;
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(lv, pad.left - 4, gy + 3);
+  }
+
+  // グラフデータ計算
+  var pts = scores.map(function(s, i) {
+    return {
+      x: pad.left + (i / (scores.length - 1)) * gw,
+      y: pad.top + gh - ((s - min) / range) * gh
+    };
+  });
+
+  // グラデーション塗り
+  var grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + gh);
+  grad.addColorStop(0, 'rgba(71,255,180,0.3)');
+  grad.addColorStop(1, 'rgba(71,255,180,0)');
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pad.top + gh);
+  pts.forEach(function(p) { ctx.lineTo(p.x, p.y); });
+  ctx.lineTo(pts[pts.length-1].x, pad.top + gh);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // 折れ線
+  ctx.beginPath();
+  ctx.strokeStyle = '#47ffb4';
+  ctx.lineWidth = 2;
+  pts.forEach(function(p, i) {
+    if (i === 0) ctx.moveTo(p.x, p.y);
+    else ctx.lineTo(p.x, p.y);
+  });
+  ctx.stroke();
+
+  // ドット
+  pts.forEach(function(p) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#47ffb4';
+    ctx.fill();
+  });
+}

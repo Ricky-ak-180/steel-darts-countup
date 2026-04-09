@@ -2488,3 +2488,11 @@ button, a[role="button"], [role="tab"], [role="button"] {
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+/* Cricket Statistics */
+.ckt-stats-tabs { display: flex; gap: 6px; margin-bottom: 8px; border-bottom: 1px solid var(--bdr); padding-bottom: 6px; }
+.ckt-stats-tab { flex: 1; text-align: center; padding: 6px; font-size: 11px; font-weight: 700; color: var(--mut); cursor: pointer; border-radius: 4px; transition: all 0.15s; }
+.ckt-stats-tab.on { background: rgba(71,255,180,0.15); color: var(--grn); }
+.ckt-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.ckt-stat-card { background: var(--sur2); border: 1px solid var(--bdr); border-radius: 8px; padding: 12px; text-align: center; }
+.ckt-stats-empty { padding: 20px; text-align: center; color: var(--mut); font-size: 12px; }
