@@ -267,6 +267,18 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     <div class="exp-row">
       <button class="bexp" id="btn-export-all" data-i18n="hist.export_all">📦 全データエクスポート</button>
     </div>
+    <div class="sync-panel" id="sync-panel">
+      <div class="sync-panel-row">
+        <span class="sync-panel-icon">☁</span>
+        <span class="sync-panel-label" data-i18n="sync.label">クラウド同期</span>
+        <span class="sync-panel-status" id="sync-status-badge">接続中…</span>
+      </div>
+      <div class="sync-panel-row sync-panel-sub" id="sync-transfer-row" style="display:none">
+        <span class="sync-panel-hint" data-i18n="sync.hint">端末移行: </span>
+        <span class="sync-transfer-code" id="sync-transfer-code"></span>
+        <button class="sync-copy-btn" id="sync-copy-btn" onclick="syncShowTransferUI()" data-i18n="sync.copy">コピー</button>
+      </div>
+    </div>
     <div class="hdr">
       <div class="slbl" data-i18n="hist.game_hist">ゲーム履歴</div>
       <button class="bclr" id="btn-clr" data-i18n="hist.clear_all">全件削除</button>
