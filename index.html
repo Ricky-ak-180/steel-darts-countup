@@ -1174,12 +1174,51 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
           <span class="db-dot" id="db-dot-2"></span>
         </div>
       </div>
+      <div class="db-mode-toggle">
+        <button class="db-mode-btn db-mode-on" id="db-mode-board" onclick="_dbSetUIMode('board')">🎯</button>
+        <button class="db-mode-btn" id="db-mode-kz" onclick="_dbSetUIMode('kz')">削り</button>
+      </div>
       <button class="db-close-btn" onclick="dbClose()">✕</button>
     </div>
-    <div class="db-canvas-wrap">
+
+    <!-- Board canvas -->
+    <div class="db-canvas-wrap" id="db-canvas-area">
       <canvas id="db-canvas"></canvas>
       <div class="db-flash" id="db-flash"></div>
     </div>
+
+    <!-- Kezuri pad -->
+    <div id="db-kz-view" class="db-kz-view">
+      <div class="db-kz-tabs">
+        <button class="db-kz-tab db-kz-tab-on" data-num="20" onclick="_dbKzSetTarget(20)">T20</button>
+        <button class="db-kz-tab" data-num="19" onclick="_dbKzSetTarget(19)">T19</button>
+        <button class="db-kz-tab" data-num="18" onclick="_dbKzSetTarget(18)">T18</button>
+      </div>
+      <div class="db-kz-main-row">
+        <button class="db-kz-btn db-kz-adj" id="db-kz-left" onclick="_dbKzTap(this)">
+          <div class="db-kz-n" id="db-kz-left-n">5</div>
+          <div class="db-kz-p" id="db-kz-left-p">+5</div>
+        </button>
+        <button class="db-kz-btn db-kz-tri" id="db-kz-tri" onclick="_dbKzTap(this)">
+          <div class="db-kz-zone-lbl">T</div>
+          <div class="db-kz-n" id="db-kz-tri-n">20</div>
+          <div class="db-kz-p" id="db-kz-tri-p">+60</div>
+        </button>
+        <button class="db-kz-btn db-kz-adj" id="db-kz-right" onclick="_dbKzTap(this)">
+          <div class="db-kz-n" id="db-kz-right-n">1</div>
+          <div class="db-kz-p" id="db-kz-right-p">+1</div>
+        </button>
+      </div>
+      <div class="db-kz-sw-row" id="db-kz-sw-row">
+        <button class="db-kz-btn db-kz-sw" onclick="_dbKzTapFixed(54,'T18')">
+          <div class="db-kz-zone-lbl">T</div>
+          <div class="db-kz-n">18</div>
+          <div class="db-kz-p">+54</div>
+          <div class="db-kz-badge">スイッチ</div>
+        </button>
+      </div>
+    </div>
+
     <div class="db-score-row">
       <div class="db-darts-labels" id="db-darts-disp">—</div>
       <div class="db-total-wrap">
