@@ -182,9 +182,13 @@ function _dbDrawMarkers() {
   });
 }
 
-// Redraw board then overlay all current dart markers
+// Redraw board (board or kezuri) then overlay dart markers
 function _dbRedraw() {
-  dbDraw();
+  if (_dbUIMode === 'kz') {
+    _dbDrawKezuri();
+  } else {
+    dbDraw();
+  }
   _dbDrawMarkers();
 }
 
@@ -301,6 +305,208 @@ function dbSubmit() {
 }
 
 // ============================================================
+// KEZURI MODE (削りモード)
+// Zoomed arc view: target segment large + full color,
+// adjacent misses visible, everything else grayed out.
+// ============================================================
+
+var _dbUIMode   = 'board';  // 'board' | 'kz'
+var _dbKzTarget = 20;
+
+// adjacency: [left neighbor, right neighbor, hasSwitch]
+var _dbKzData = {
+  20: { left:5,  right:1,  sw:true  },
+  19: { left:3,  right:7,  sw:true  },
+  18: { left:1,  right:4,  sw:false }
+};
+
+function _dbSetUIMode(mode) {
+  _dbUIMode = mode;
+  var boardBtn = document.getElementById('db-mode-board');
+  var kzBtn    = document.getElementById('db-mode-kz');
+  var kzTabs   = document.getElementById('db-kz-tabs');
+  if (boardBtn) boardBtn.classList.toggle('db-mode-on', mode === 'board');
+  if (kzBtn)    kzBtn.classList.toggle('db-mode-on',    mode === 'kz');
+  if (kzTabs)   kzTabs.style.display = (mode === 'kz') ? 'flex' : 'none';
+  _dbRedraw();
+}
+
+function _dbKzSetTarget(num) {
+  _dbKzTarget = num;
+  document.querySelectorAll('.db-kz-tab').forEach(function(t) {
+    t.classList.toggle('db-kz-tab-on', parseInt(t.dataset.num) === num);
+  });
+  _dbRedraw();
+}
+
+function _dbDrawKezuri() {
+  var canvas = _db.canvas;
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W   = canvas.width;
+
+  // Virtual board: zoomed so target triple fills upper canvas
+  var R  = W * 0.68;
+  var CX = W / 2;
+  var CY = W * 0.40 + 0.44 * R;
+  var wire = Math.max(2, W / 250);
+
+  ctx.clearRect(0, 0, W, W);
+  ctx.fillStyle = DB_C.bg;
+  ctx.fillRect(0, 0, W, W);
+
+  // Rotation: bring target segment to top-center
+  var idx         = DB_NUMS.indexOf(_dbKzTarget);
+  var targetAngle = DB_START + idx * DB_SEG + DB_SEG / 2;
+  var rotation    = -Math.PI / 2 - targetAngle;
+
+  // Active segment sets
+  var d         = _dbKzData[_dbKzTarget];
+  var primary   = [_dbKzTarget, d.left, d.right];
+  var switchNum = d.sw ? 18 : null;
+
+  // Muted colors
+  var MC = { seg1:'#191917', seg2:'#222220', tri:'#1e1e1c' };
+
+  ctx.save();
+  ctx.translate(CX, CY);
+  ctx.rotate(rotation);
+  ctx.translate(-CX, -CY);
+
+  // Outer wire ring
+  ctx.beginPath();
+  ctx.arc(CX, CY, DB_R.dbl * R + wire * 3, 0, Math.PI * 2);
+  ctx.fillStyle = DB_C.wire;
+  ctx.fill();
+
+  // Segments — color based on relevance
+  for (var i = 0; i < 20; i++) {
+    var num  = DB_NUMS[i];
+    var isPri = primary.indexOf(num) >= 0;
+    var isSw  = (num === switchNum);
+    var a1 = DB_START + i * DB_SEG;
+    var a2 = a1 + DB_SEG;
+    var odd = (i % 2 === 0);
+
+    if (isPri) {
+      // Full authentic color
+      _dbArc(ctx,CX,CY, DB_R.obull*R,DB_R.isin*R, a1,a2, odd?DB_C.black:DB_C.cream);
+      _dbArc(ctx,CX,CY, DB_R.triI*R, DB_R.triO*R, a1,a2, odd?DB_C.red  :DB_C.green);
+      _dbArc(ctx,CX,CY, DB_R.triO*R, DB_R.osin*R, a1,a2, odd?DB_C.black:DB_C.cream);
+      _dbArc(ctx,CX,CY, DB_R.osin*R, DB_R.dbl*R,  a1,a2, odd?DB_C.red  :DB_C.green);
+    } else if (isSw) {
+      // Switch: gold tint
+      _dbArc(ctx,CX,CY, DB_R.obull*R,DB_R.isin*R, a1,a2, '#252318');
+      _dbArc(ctx,CX,CY, DB_R.triI*R, DB_R.triO*R, a1,a2, '#8a6f1a');
+      _dbArc(ctx,CX,CY, DB_R.triO*R, DB_R.osin*R, a1,a2, '#252318');
+      _dbArc(ctx,CX,CY, DB_R.osin*R, DB_R.dbl*R,  a1,a2, '#6a5212');
+    } else {
+      // Muted / grayed out
+      _dbArc(ctx,CX,CY, DB_R.obull*R,DB_R.isin*R, a1,a2, odd?MC.seg1:MC.seg2);
+      _dbArc(ctx,CX,CY, DB_R.triI*R, DB_R.triO*R, a1,a2, MC.tri);
+      _dbArc(ctx,CX,CY, DB_R.triO*R, DB_R.osin*R, a1,a2, odd?MC.seg1:MC.seg2);
+      _dbArc(ctx,CX,CY, DB_R.osin*R, DB_R.dbl*R,  a1,a2, MC.tri);
+    }
+  }
+
+  // Radial wires
+  ctx.strokeStyle = DB_C.wire;
+  ctx.lineWidth   = wire;
+  for (var k = 0; k < 20; k++) {
+    var wa = DB_START + k * DB_SEG;
+    ctx.beginPath();
+    ctx.moveTo(CX+Math.cos(wa)*DB_R.obull*R, CY+Math.sin(wa)*DB_R.obull*R);
+    ctx.lineTo(CX+Math.cos(wa)*DB_R.dbl*R,   CY+Math.sin(wa)*DB_R.dbl*R);
+    ctx.stroke();
+  }
+
+  // Ring wires
+  [DB_R.isin,DB_R.triI,DB_R.triO,DB_R.osin,DB_R.dbl].forEach(function(r){
+    ctx.beginPath();
+    ctx.arc(CX, CY, r*R, 0, Math.PI*2);
+    ctx.strokeStyle = DB_C.wire;
+    ctx.lineWidth   = wire;
+    ctx.stroke();
+  });
+
+  // Bulls
+  ctx.beginPath();
+  ctx.arc(CX, CY, DB_R.obull*R, 0, Math.PI*2);
+  ctx.fillStyle = DB_C.obull; ctx.fill();
+  ctx.strokeStyle = DB_C.wire; ctx.lineWidth = wire; ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(CX, CY, DB_R.bull*R, 0, Math.PI*2);
+  ctx.fillStyle = DB_C.bull; ctx.fill();
+
+  // Number labels — size/color by relevance
+  var numR = DB_R.dbl * R + wire * 5 + R * 0.04;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  for (var j = 0; j < 20; j++) {
+    var jnum  = DB_NUMS[j];
+    var jPri  = primary.indexOf(jnum) >= 0;
+    var jSw   = (jnum === switchNum);
+    var ca    = DB_START + j * DB_SEG + DB_SEG / 2;
+    var jx    = CX + Math.cos(ca) * numR;
+    var jy    = CY + Math.sin(ca) * numR;
+
+    if (jPri) {
+      ctx.font      = 'bold ' + Math.floor(R*0.13) + 'px "Bebas Neue",Arial,sans-serif';
+      ctx.fillStyle = DB_C.num;           // bright yellow
+    } else if (jSw) {
+      ctx.font      = 'bold ' + Math.floor(R*0.10) + 'px "Bebas Neue",Arial,sans-serif';
+      ctx.fillStyle = '#c8a840';          // gold
+    } else {
+      ctx.font      = 'bold ' + Math.floor(R*0.065) + 'px "Bebas Neue",Arial,sans-serif';
+      ctx.fillStyle = '#303030';          // nearly invisible
+    }
+    ctx.fillText(String(jnum), jx, jy);
+  }
+
+  ctx.restore();
+}
+
+// Hit test for kezuri zoomed view (reverses the rotation transform)
+function _dbHitTestKezuri(tapX, tapY) {
+  var canvas = _db.canvas;
+  var rect   = canvas.getBoundingClientRect();
+  var dpr    = canvas.width / rect.width;
+  var cx     = (tapX - rect.left) * dpr;
+  var cy     = (tapY - rect.top)  * dpr;
+
+  var W  = canvas.width;
+  var R  = W * 0.68;
+  var CX = W / 2;
+  var CY = W * 0.40 + 0.44 * R;
+
+  var idx         = DB_NUMS.indexOf(_dbKzTarget);
+  var targetAngle = DB_START + idx * DB_SEG + DB_SEG / 2;
+  var rotation    = -Math.PI / 2 - targetAngle;
+
+  // Reverse rotation
+  var dx  = cx - CX, dy = cy - CY;
+  var rdx = dx * Math.cos(-rotation) - dy * Math.sin(-rotation);
+  var rdy = dx * Math.sin(-rotation) + dy * Math.cos(-rotation);
+
+  var r  = Math.sqrt(rdx*rdx + rdy*rdy);
+  var rn = r / R;
+
+  if (rn > DB_R.dbl)   return { score:0,  label:'Miss' };
+  if (rn < DB_R.bull)  return { score:50, label:'Bull' };
+  if (rn < DB_R.obull) return { score:25, label:'25'   };
+
+  var angle  = Math.atan2(rdy, rdx) * 180 / Math.PI + 90;
+  if (angle < 0) angle += 360;
+  var segIdx = Math.floor(((angle + 9) % 360) / 18) % 20;
+  var num    = DB_NUMS[segIdx];
+
+  if (rn < DB_R.isin) return { score:num,   label:String(num) };
+  if (rn < DB_R.triO) return { score:num*3,  label:'T'+num    };
+  if (rn < DB_R.osin) return { score:num,   label:String(num) };
+  return                     { score:num*2,  label:'D'+num     };
+}
+
+// ============================================================
 // OPEN / CLOSE
 // ============================================================
 
@@ -312,7 +518,14 @@ function dbOpen(mode) {
   modal.classList.add('db-show');
   _db.open = true;
   _dbUpdateDisplay();
-  dbDraw();  // always redraw — clears previous session's markers
+  // Sync UI mode buttons/tabs
+  var kzTabs   = document.getElementById('db-kz-tabs');
+  var boardBtn = document.getElementById('db-mode-board');
+  var kzBtn    = document.getElementById('db-mode-kz');
+  if (kzTabs)   kzTabs.style.display = (_dbUIMode === 'kz') ? 'flex' : 'none';
+  if (boardBtn) boardBtn.classList.toggle('db-mode-on', _dbUIMode === 'board');
+  if (kzBtn)    kzBtn.classList.toggle('db-mode-on',    _dbUIMode === 'kz');
+  _dbRedraw();
 }
 
 function dbClose() {
@@ -341,8 +554,10 @@ function _dbOnTap(e) {
   e.preventDefault();
   if (_db.darts.length >= 3) return;
   var touch = e.changedTouches ? e.changedTouches[0] : e;
-  var hit = _dbHitTest(touch.clientX, touch.clientY);
-  hit._tapX = touch.clientX;  // store for marker drawing
+  var hit = _dbUIMode === 'kz'
+    ? _dbHitTestKezuri(touch.clientX, touch.clientY)
+    : _dbHitTest(touch.clientX, touch.clientY);
+  hit._tapX = touch.clientX;
   hit._tapY = touch.clientY;
   _dbAddDart(hit);
 }
