@@ -1174,17 +1174,15 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
           <span class="db-dot" id="db-dot-2"></span>
         </div>
       </div>
+      <div class="db-kz-tabs" id="db-kz-tabs" style="display:none">
+        <button class="db-kz-tab db-kz-tab-on" data-mode="kz1" onclick="_dbKzSetMode('kz1')">T20</button>
+        <button class="db-kz-tab" data-mode="kz2" onclick="_dbKzSetMode('kz2')">T19</button>
+      </div>
       <div class="db-mode-toggle">
         <button class="db-mode-btn db-mode-on" id="db-mode-board" onclick="_dbSetUIMode('board')">🎯</button>
         <button class="db-mode-btn" id="db-mode-kz" onclick="_dbSetUIMode('kz')">削り</button>
       </div>
       <button class="db-close-btn" onclick="dbClose()">✕</button>
-    </div>
-
-    <!-- Kezuri target tabs (visible in kz mode only) -->
-    <div class="db-kz-tabs" id="db-kz-tabs" style="display:none">
-      <button class="db-kz-tab db-kz-tab-on" data-mode="kz1" onclick="_dbKzSetMode('kz1')">T20</button>
-      <button class="db-kz-tab" data-mode="kz2" onclick="_dbKzSetMode('kz2')">T19</button>
     </div>
 
     <!-- Canvas — used for both board and kezuri zoomed view -->
