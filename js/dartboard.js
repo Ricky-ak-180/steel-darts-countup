@@ -367,7 +367,7 @@ function _dbDrawKezuri() {
 
   // Visual ring boundaries based on real BDO dartboard proportions
   // (99/170, 107/170, 162/170) — hit detection zones unchanged
-  var kzTriI = 0.559;   // triple inner (real center 0.606, width ×2)
+  var kzTriI = 0.520;   // triple inner (extended slightly inward)
   var kzTriO = 0.653;   // triple outer
   var kzDblI = 0.906;   // double inner (width ×2)
 
