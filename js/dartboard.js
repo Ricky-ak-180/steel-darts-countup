@@ -320,8 +320,8 @@ var _dbKzMode = 'kz1';   // 'kz1' = T20/T18 zone, 'kz2' = T19/T17 zone
 var _dbKzZones = {
   // cy: CY = W * cy.  rotDir: rotation = rotDir*π/2 - centerAngle
   // kz1: target at top (bull at bottom), kz2: target at bottom (bull at top)
-  kz1: { nums:[12,5,20,1,18], scoring:[20,18], centerIdx:0,  mirror:false, cy:1.04, rotDir:-1 },
-  kz2: { nums:[7,19,3,17,2],  scoring:[19,17], centerIdx:10, mirror:false, cy:0.04, rotDir: 1 }
+  kz1: { nums:[5,20,1,18,4],  scoring:[20,18], centerIdx:0,  mirror:false, cy:0.98, rotDir:-1, r:0.52 },
+  kz2: { nums:[7,19,3,17,2], scoring:[19,17], centerIdx:10, mirror:false, cy:0.04, rotDir: 1, r:0.72 }
 };
 
 // Restore persisted mode
@@ -357,7 +357,7 @@ function _dbDrawKezuri() {
   var primary = zone.nums;
   var idx     = zone.centerIdx;
   // kz1: target at top (bull at bottom), kz2: target at bottom (bull at top)
-  var R  = W * 0.72;
+  var R  = W * zone.r;
   var CX = W / 2;
   var CY = W * zone.cy;
   var wire = Math.max(2, W / 250);
@@ -509,7 +509,7 @@ function _dbHitTestKezuri(tapX, tapY) {
 
   var W  = canvas.width;
   var zone     = _dbKzZones[_dbKzMode];
-  var R  = W * 0.72;
+  var R  = W * zone.r;
   var CX = W / 2;
   var CY = W * zone.cy;
 
