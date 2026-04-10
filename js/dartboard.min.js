@@ -152,6 +152,7 @@ function _dbDrawMarkers() {
 
   _db.darts.forEach(function(d, i) {
     if (d._tapX === undefined) return;  // Miss (no tap coord)
+    if (d._kzZone && d._kzZone !== _dbKzMode) return;  // hide markers from other zone
     var cx = (d._tapX - rect.left) * scaleX;
     var cy = (d._tapY - rect.top)  * scaleY;
 
@@ -348,9 +349,7 @@ function _dbKzSetMode(m) {
   document.querySelectorAll('.db-kz-tab').forEach(function(t) {
     t.classList.toggle('db-kz-tab-on', t.dataset.mode === m);
   });
-  // Hide visual markers (tap coords are zone-specific) but keep scores/labels
-  _db.darts.forEach(function(d) { d._tapX = undefined; d._tapY = undefined; });
-  _dbRedraw();
+  _dbRedraw();  // markers hidden per-zone via _kzZone tag in _dbDrawMarkers
 }
 
 function _dbDrawKezuri() {
@@ -623,6 +622,7 @@ function _dbOnTap(e) {
     : _dbHitTest(touch.clientX, touch.clientY);
   hit._tapX = touch.clientX;
   hit._tapY = touch.clientY;
+  if (_dbUIMode === 'kz') hit._kzZone = _dbKzMode;  // tag which zone this dart belongs to
   _dbAddDart(hit);
 }
 
