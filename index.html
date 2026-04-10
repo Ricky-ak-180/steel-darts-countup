@@ -1183,9 +1183,8 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
 
     <!-- Kezuri target tabs (visible in kz mode only) -->
     <div class="db-kz-tabs" id="db-kz-tabs" style="display:none">
-      <button class="db-kz-tab db-kz-tab-on" data-num="20" onclick="_dbKzSetTarget(20)">T20</button>
-      <button class="db-kz-tab" data-num="19" onclick="_dbKzSetTarget(19)">T19</button>
-      <button class="db-kz-tab" data-num="18" onclick="_dbKzSetTarget(18)">T18</button>
+      <button class="db-kz-tab db-kz-tab-on" data-mode="kz1" onclick="_dbKzSetMode('kz1')">T20 · T18</button>
+      <button class="db-kz-tab" data-mode="kz2" onclick="_dbKzSetMode('kz2')">T19 · T17</button>
     </div>
 
     <!-- Canvas — used for both board and kezuri zoomed view -->
