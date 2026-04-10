@@ -328,6 +328,9 @@ var _dbKzZones = {
 // Restore persisted mode
 try { var _km = localStorage.getItem('db_kz_mode'); if (_dbKzZones[_km]) _dbKzMode = _km; } catch(e) {}
 
+// Visual ring boundaries shared by draw + hit test (single source of truth)
+var _kzTriI = 0.520, _kzTriO = 0.653, _kzDblI = 0.906;
+
 function _dbSetUIMode(mode) {
   _dbUIMode = mode;
   var boardBtn = document.getElementById('db-mode-board');
@@ -345,8 +348,8 @@ function _dbKzSetMode(m) {
   document.querySelectorAll('.db-kz-tab').forEach(function(t) {
     t.classList.toggle('db-kz-tab-on', t.dataset.mode === m);
   });
-  _db.darts = [];       // clear dart markers when switching zones
-  _dbUpdateDisplay();
+  // Hide visual markers (tap coords are zone-specific) but keep scores/labels
+  _db.darts.forEach(function(d) { d._tapX = undefined; d._tapY = undefined; });
   _dbRedraw();
 }
 
@@ -365,11 +368,8 @@ function _dbDrawKezuri() {
   var CY = W * zone.cy;
   var wire = Math.max(2, W / 250);
 
-  // Visual ring boundaries based on real BDO dartboard proportions
-  // (99/170, 107/170, 162/170) — hit detection zones unchanged
-  var kzTriI = 0.520;   // triple inner (extended slightly inward)
-  var kzTriO = 0.653;   // triple outer
-  var kzDblI = 0.906;   // double inner (width ×2)
+  // Visual ring boundaries — shared with hit test via _kzTriI/_kzTriO/_kzDblI
+  var kzTriI = _kzTriI, kzTriO = _kzTriO, kzDblI = _kzDblI;
 
   ctx.clearRect(0, 0, W, W);
   ctx.fillStyle = DB_C.bg;
@@ -465,7 +465,7 @@ function _dbDrawKezuri() {
   ctx.restore();  // end rotation+mirror — text is now drawn upright
 
   // Labels outside the double ring, in screen space (always upright)
-  var numR    = DB_R.dbl * R + wire * 5 + R * 0.045;
+  var numR    = DB_R.dbl * R + wire * 5 + R * 0.08;
   var outline = Math.max(2, R * 0.008);
   ctx.textAlign    = 'center';
   ctx.textBaseline = 'middle';
@@ -540,10 +540,10 @@ function _dbHitTestKezuri(tapX, tapY) {
   var segIdx = Math.floor(((angle + 9) % 360) / 18) % 20;
   var num    = DB_NUMS[segIdx];
 
-  if (rn < DB_R.isin) return { score:num,   label:String(num) };
-  if (rn < DB_R.triO) return { score:num*3,  label:'T'+num    };
-  if (rn < DB_R.osin) return { score:num,   label:String(num) };
-  return                     { score:num*2,  label:'D'+num     };
+  if (rn < _kzTriI)   return { score:num,   label:String(num) };
+  if (rn < _kzTriO)   return { score:num*3, label:'T'+num    };
+  if (rn < _kzDblI)   return { score:num,   label:String(num) };
+  return                     { score:num*2,  label:'D'+num    };
 }
 
 // ============================================================
