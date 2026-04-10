@@ -1163,10 +1163,17 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
 <div class="sync-status" id="sync-status"></div>
 
 <!-- Dartboard Input Modal -->
-<div id="db-modal" class="db-modal">
-  <div class="db-modal-inner">
+<div id="db-modal" class="db-modal" onclick="dbClose()">
+  <div class="db-modal-inner" onclick="event.stopPropagation()">
     <div class="db-modal-hdr">
-      <span class="db-count-disp" id="db-count-disp">1本目</span>
+      <div class="db-hdr-left">
+        <span class="db-count-disp" id="db-count-disp">1本目</span>
+        <div class="db-progress-dots">
+          <span class="db-dot" id="db-dot-0"></span>
+          <span class="db-dot" id="db-dot-1"></span>
+          <span class="db-dot" id="db-dot-2"></span>
+        </div>
+      </div>
       <button class="db-close-btn" onclick="dbClose()">✕</button>
     </div>
     <div class="db-canvas-wrap">
@@ -1182,7 +1189,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     </div>
     <div class="db-actions">
       <button class="db-action-btn db-miss-btn" id="db-miss-btn" onclick="dbAddMiss()">Miss</button>
-      <button class="db-action-btn db-undo-btn" id="db-undo-btn" onclick="dbUndoLast()" disabled>↩</button>
+      <button class="db-action-btn db-undo-btn" id="db-undo-btn" onclick="dbUndoLast()" disabled>取消</button>
       <button class="db-action-btn db-ok-btn"   id="db-ok-btn"   onclick="dbSubmit()"  disabled>OK ✓</button>
     </div>
   </div>
