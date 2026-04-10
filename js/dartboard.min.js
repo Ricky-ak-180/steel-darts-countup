@@ -322,8 +322,8 @@ var _dbKzZones = {
   // cx/cy: CX=W*cx, CY=W*cy.  rotDir: rotation = rotDir*π/2 - centerAngle
   // kz1: target at top (bull at bottom). cx shifted left to fit T4 on right with large R
   // kz2: target at bottom (bull at top)
-  kz1: { nums:[5,20,1,18,4],  scoring:[20,18], centerIdx:0,  mirror:false, cx:0.34, cy:0.97, rotDir:-1, r:0.72 },
-  kz2: { nums:[7,19,3,17,2], scoring:[19,17], centerIdx:10, mirror:false, cx:0.50, cy:0.04, rotDir: 1, r:0.72 }
+  kz1: { nums:[5,20,1,18,4],  scoring:[20,18], centerIdx:0,  mirror:false, cx:0.34, cy:0.97, rotDir:-1, r:0.68 },
+  kz2: { nums:[7,19,3,17,2], scoring:[19,17], centerIdx:10, mirror:false, cx:0.50, cy:0.04, rotDir: 1, r:0.62 }
 };
 
 // Restore persisted mode
