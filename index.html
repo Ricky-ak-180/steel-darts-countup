@@ -1203,6 +1203,11 @@ if (FIREBASE_ENABLED) {
       s3.onload = function() {
         var s4 = document.createElement('script');
         s4.src = './js/leaderboard.min.js?v=20260409d';
+        s4.onload = function() {
+          var s5 = document.createElement('script');
+          s5.src = './js/sync.min.js?v=20260410a';
+          document.head.appendChild(s5);
+        };
         document.head.appendChild(s4);
       };
       document.head.appendChild(s3);
@@ -1213,6 +1218,11 @@ if (FIREBASE_ENABLED) {
 } else {
   var sl = document.createElement('script');
   sl.src = './js/leaderboard.min.js?v=20260409d';
+  sl.onload = function() {
+    var sl2 = document.createElement('script');
+    sl2.src = './js/sync.min.js?v=20260410a';
+    document.head.appendChild(sl2);
+  };
   document.head.appendChild(sl);
 }
 </script>
