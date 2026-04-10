@@ -16,14 +16,16 @@ var DB_SEG  = Math.PI * 2 / 20;
 var DB_START = -Math.PI/2 - DB_SEG/2;
 
 // Normalized radii (0–1, where 1.0 = outer edge of double)
+// Touch-optimized: inner single drastically shrunk so triple/double
+// become finger-friendly tap targets (triple: ×5 wider, double: ×3 wider)
 var DB_R = {
-  bull:  0.047,
-  obull: 0.110,
-  isin:  0.560,
-  triI:  0.647,
-  triO:  0.707,
-  osin:  0.917,
-  dbl:   1.000
+  bull:  0.070,  // Bull          (was 0.047)
+  obull: 0.160,  // Outer Bull    (was 0.110)
+  isin:  0.300,  // inner single outer edge — compressed! (was 0.560)
+  triI:  0.300,  // triple inner edge = isin (no gap)
+  triO:  0.580,  // triple outer edge — wide band! (was 0.707)
+  osin:  0.780,  // outer single outer edge (was 0.917)
+  dbl:   1.000   // double outer edge (unchanged)
 };
 
 // Colors
@@ -118,14 +120,15 @@ function dbDraw() {
   ctx.fillStyle = DB_C.bull;
   ctx.fill();
 
-  // Number labels (outside double ring)
-  var numR = DB_R.dbl * R + wire * 7 + R * 0.055;
-  var fontSize = Math.max(10, Math.floor(R * 0.108));
+  // Number labels — placed at center of triple zone (wide enough to fit)
+  var numR = (DB_R.triI + DB_R.triO) / 2 * R;
+  var fontSize = Math.max(12, Math.floor(R * 0.155));
   ctx.font = 'bold ' + fontSize + 'px "Bebas Neue", Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   for (var j = 0; j < 20; j++) {
     var ca = DB_START + j * DB_SEG + DB_SEG / 2;
+    // Alternate color for readability on red/green bands
     ctx.fillStyle = DB_C.num;
     ctx.fillText(String(DB_NUMS[j]),
       CX + Math.cos(ca) * numR,
