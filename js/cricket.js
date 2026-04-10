@@ -922,6 +922,17 @@ function _cktRenderHistory() {
   html += _cktStatCard(t('ckt.two_p'), twoPGames.length);
   html += '</div></div>';
 
+  // スパークライン（直近10ゲームMPR推移）
+  if (h.length >= 2) {
+    var sparkSvg = renderCktSparkline(h, 200, 28);
+    if (sparkSvg) {
+      html += '<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px;">';
+      html += '<span style="font-size:10px;color:var(--mut);letter-spacing:1px;flex-shrink:0;">LAST ' + Math.min(h.length,10) + ' GAMES</span>';
+      html += sparkSvg;
+      html += '</div>';
+    }
+  }
+
   // MPR推移とレベル別成績
   html += _cktRenderMprTrend(h);
   html += _cktRenderLevelStats(h);
@@ -1180,14 +1191,14 @@ function renderCktStats() {
   }
 
   // 統計計算
-  var mprs = filtered.map(function(g) { return g.mpr || 0; });
+  var mprs = filtered.map(function(g) { return (g.mpr && g.mpr[0]) || 0; });
   var avgMpr = (mprs.reduce(function(a, b) { return a + b; }, 0) / mprs.length).toFixed(2);
   var maxMpr = Math.max.apply(null, mprs);
   var minMpr = Math.min.apply(null, mprs);
   var trend = '';
   if (filtered.length >= 2) {
-    var latestMpr = filtered[0].mpr || 0;
-    var prevMpr = filtered[1].mpr || 0;
+    var latestMpr = (filtered[0].mpr && filtered[0].mpr[0]) || 0;
+    var prevMpr = (filtered[1].mpr && filtered[1].mpr[0]) || 0;
     if (latestMpr > prevMpr) trend = '<span style="color:#ff6b35;font-weight:900;">▲</span>';
     else if (latestMpr < prevMpr) trend = '<span style="color:#4fc3f7;font-weight:900;">▼</span>';
   }
@@ -1327,7 +1338,7 @@ function renderCktSparkline(games, width, height) {
 
   width = width || 60;
   height = height || 20;
-  var mprs = games.slice(0, 10).map(function(g) { return g.mpr || 0; });
+  var mprs = games.slice(0, 10).map(function(g) { return (g.mpr && g.mpr[0]) || 0; });
   if (mprs.length === 0) return '';
 
   var min = Math.min.apply(null, mprs);
@@ -1362,7 +1373,7 @@ function getWeeklyStats() {
 
   if (!weekGames.length) return null;
 
-  var mprs = weekGames.map(function(g) { return g.mpr || 0; });
+  var mprs = weekGames.map(function(g) { return (g.mpr && g.mpr[0]) || 0; });
   var avgMpr = (mprs.reduce(function(a, b) { return a + b; }, 0) / mprs.length).toFixed(2);
   var maxMpr = Math.max.apply(null, mprs);
   var minMpr = Math.min.apply(null, mprs);

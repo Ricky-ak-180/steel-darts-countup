@@ -21,9 +21,9 @@ var DB_START = -Math.PI/2 - DB_SEG/2;
 var DB_R = {
   bull:  0.070,  // Bull          (was 0.047)
   obull: 0.160,  // Outer Bull    (was 0.110)
-  isin:  0.300,  // inner single outer edge — compressed! (was 0.560)
-  triI:  0.300,  // triple inner edge = isin (no gap)
-  triO:  0.580,  // triple outer edge — wide band! (was 0.707)
+  isin:  0.440,  // inner single outer edge (= obull + 0.280)
+  triI:  0.440,  // triple inner edge = isin (no gap)
+  triO:  0.590,  // triple outer edge (= triI + 0.150)
   osin:  0.870,  // outer single outer edge — wider (double is checkout-only so thinner)
   dbl:   1.000   // double outer edge (unchanged)
 };
@@ -145,13 +145,15 @@ function _dbDrawMarkers() {
   if (!canvas || !_db.darts.length) return;
   var ctx = canvas.getContext('2d');
   var W = canvas.width;
+  var H = canvas.height;
   var rect = canvas.getBoundingClientRect();
   var scaleX = W / rect.width;
-  var scaleY = W / rect.height;
-  var dotR = Math.max(7, W * 0.026);
+  var scaleY = H / rect.height;
+  var dotR = Math.max(7, Math.min(W, H) * 0.026);
 
   _db.darts.forEach(function(d, i) {
     if (d._tapX === undefined) return;  // Miss (no tap coord)
+    if (d._uiMode && d._uiMode !== _dbUIMode) return;  // hide markers from other UI mode
     if (d._kzZone && d._kzZone !== _dbKzMode) return;  // hide markers from other zone
     var cx = (d._tapX - rect.left) * scaleX;
     var cy = (d._tapY - rect.top)  * scaleY;
@@ -185,6 +187,17 @@ function _dbDrawMarkers() {
 
 // Redraw board (board or kezuri) then overlay dart markers
 function _dbRedraw() {
+  var canvas = _db.canvas;
+  if (canvas) {
+    // Kezuri: 4:3 wide canvas for max display area; board: square
+    var H = canvas.height;
+    var targetW = (_dbUIMode === 'kz') ? Math.round(H * 4 / 3) : H;
+    if (canvas.width !== targetW) canvas.width = targetW;
+    canvas.style.borderRadius = (_dbUIMode === 'kz') ? '12px' : '50%';
+    // Sync kz-mode class so CSS can widen canvas display
+    var isec = document.getElementById('isec');
+    if (isec) isec.classList.toggle('kz-mode', _dbUIMode === 'kz');
+  }
   if (_dbUIMode === 'kz') {
     _dbDrawKezuri();
   } else {
@@ -288,6 +301,7 @@ function dbAddMiss() {
 
 function dbSubmit() {
   var total = _db.darts.reduce(function(s, d) { return s + d.score; }, 0);
+  var wasCuPersist = _dbCuPersist && (_db.mode === 'cu');
   dbClose();
 
   if (_db.mode === '01') {
@@ -303,6 +317,21 @@ function dbSubmit() {
       commit(total);
     }
   }
+
+  // Stay in board mode for CountUp if user didn't explicitly switch to numpad
+  if (wasCuPersist) {
+    setTimeout(function() {
+      var ngp = document.getElementById('ngp');
+      var gameOver = ngp && ngp.classList.contains('show');
+      if (!gameOver) dbOpen('cu');
+    }, 80);
+  }
+}
+
+// Close board and return to numpad (clears persist preference)
+function dbCloseToKey() {
+  _dbCuPersist = false;
+  dbClose();
 }
 
 // ============================================================
@@ -311,26 +340,21 @@ function dbSubmit() {
 // adjacent misses visible, everything else grayed out.
 // ============================================================
 
-var _dbUIMode = 'board';  // 'board' | 'kz'
-var _dbKzMode = 'kz1';   // 'kz1' = T20/T18 zone, 'kz2' = T19/T17 zone
+var _dbUIMode   = 'board';  // 'board' | 'kz'
+var _dbKzMode   = 'kz1';   // 'kz1' = T20/T18 zone, 'kz2' = T19/T17 zone
+var _dbIsInline  = false;   // true when board is shown inline inside #isec
+var _dbCuPersist = false;   // true = stay in board mode after each round submit
 
 // Zone definitions
-// centerIdx: DB_NUMS index of the segment placed at top-center after rotation
-// scoring: the two main triple targets in the zone (get glow + perfect flash)
-// mirror: true = flip horizontally so left-right order feels natural to the player
+// kz1: top-half view (T20/T18 zone), kz2: bottom-half view (T19/T17 zone)
+// Board center placed at canvas bottom/top edge so half-board fills canvas
 var _dbKzZones = {
-  // cx/cy: CX=W*cx, CY=W*cy.  rotDir: rotation = rotDir*π/2 - centerAngle
-  // kz1: target at top (bull at bottom). cx shifted left to fit T4 on right with large R
-  // kz2: target at bottom (bull at top)
-  kz1: { nums:[5,20,1,18,4],  scoring:[20,18], centerIdx:0,  mirror:false, cx:0.34, cy:0.97, rotDir:-1, r:0.68 },
-  kz2: { nums:[7,19,3,17,2], scoring:[19,17], centerIdx:10, mirror:false, cx:0.50, cy:0.04, rotDir: 1, r:0.62 }
+  kz1: { nums:[5,20,1,18,4],  scoring:[20,18] },
+  kz2: { nums:[7,19,3,17,2], scoring:[19,17] }
 };
 
 // Restore persisted mode
 try { var _km = localStorage.getItem('db_kz_mode'); if (_dbKzZones[_km]) _dbKzMode = _km; } catch(e) {}
-
-// Visual ring boundaries shared by draw + hit test (single source of truth)
-var _kzTriI = 0.520, _kzTriO = 0.653, _kzDblI = 0.906;
 
 function _dbSetUIMode(mode) {
   _dbUIMode = mode;
@@ -357,191 +381,148 @@ function _dbDrawKezuri() {
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
   var W   = canvas.width;
+  var H   = canvas.height;
 
-  var zone    = _dbKzZones[_dbKzMode];
-  var primary = zone.nums;
-  var idx     = zone.centerIdx;
-  // kz1: target at top (bull at bottom), kz2: target at bottom (bull at top)
-  var R  = W * zone.r;
-  var CX = W * zone.cx;
-  var CY = W * zone.cy;
-  var wire = Math.max(2, W / 250);
-
-  // Visual ring boundaries — shared with hit test via _kzTriI/_kzTriO/_kzDblI
-  var kzTriI = _kzTriI, kzTriO = _kzTriO, kzDblI = _kzDblI;
-
-  ctx.clearRect(0, 0, W, W);
+  ctx.clearRect(0, 0, W, H);
   ctx.fillStyle = DB_C.bg;
-  ctx.fillRect(0, 0, W, W);
+  ctx.fillRect(0, 0, W, H);
 
-  var centerAngle = DB_START + idx * DB_SEG + DB_SEG / 2;
-  var rotation    = zone.rotDir * Math.PI / 2 - centerAngle;
-  var mirrorX     = zone.mirror ? -1 : 1;
+  // Zoomed half-board: center at canvas bottom (kz1=top half) or top (kz2=bottom half)
+  var isKz1 = (_dbKzMode === 'kz1');
+  var CX = W / 2;
+  var CY = isKz1 ? H : 0;
+  var R  = H * 0.95;
+  var wire = Math.max(2, H / 250);
 
-  var MC = { seg1:'#0f0f0d', seg2:'#141412', tri:'#111110' };
-
-  ctx.save();
-  ctx.translate(CX, CY);
-  ctx.rotate(rotation);
-  if (zone.mirror) ctx.scale(-1, 1);
-  ctx.translate(-CX, -CY);
-
-  // Outer ring border
+  // Outer wire ring
   ctx.beginPath();
   ctx.arc(CX, CY, DB_R.dbl * R + wire * 3, 0, Math.PI * 2);
-  ctx.fillStyle = '#3a3420';
+  ctx.fillStyle = DB_C.wire;
   ctx.fill();
 
-  // Segments — 5 active = full color, others = near-invisible
+  // All 20 segments — full color, no grayout
   for (var i = 0; i < 20; i++) {
-    var num   = DB_NUMS[i];
-    var isPri = primary.indexOf(num) >= 0;
-    var a1    = DB_START + i * DB_SEG;
-    var a2    = a1 + DB_SEG;
-    var odd   = (i % 2 === 0);
-    if (isPri) {
-      _dbArc(ctx,CX,CY, DB_R.obull*R, kzTriI*R,  a1,a2, odd?DB_C.black:DB_C.cream);
-      _dbArc(ctx,CX,CY, kzTriI*R,     kzTriO*R,  a1,a2, odd?DB_C.red  :DB_C.green);
-      _dbArc(ctx,CX,CY, kzTriO*R,     kzDblI*R,  a1,a2, odd?DB_C.black:DB_C.cream);
-      _dbArc(ctx,CX,CY, kzDblI*R,     DB_R.dbl*R,a1,a2, odd?DB_C.red  :DB_C.green);
-    } else {
-      _dbArc(ctx,CX,CY, DB_R.obull*R, kzTriI*R,  a1,a2, odd?MC.seg1:MC.seg2);
-      _dbArc(ctx,CX,CY, kzTriI*R,     kzTriO*R,  a1,a2, MC.tri);
-      _dbArc(ctx,CX,CY, kzTriO*R,     kzDblI*R,  a1,a2, odd?MC.seg1:MC.seg2);
-      _dbArc(ctx,CX,CY, kzDblI*R,     DB_R.dbl*R,a1,a2, MC.tri);
-    }
+    var a1 = DB_START + i * DB_SEG;
+    var a2 = a1 + DB_SEG;
+    var odd = (i % 2 === 0);
+    _dbArc(ctx, CX, CY, DB_R.obull*R, DB_R.isin*R, a1, a2, odd ? DB_C.black : DB_C.cream);
+    _dbArc(ctx, CX, CY, DB_R.triI*R,  DB_R.triO*R, a1, a2, odd ? DB_C.red   : DB_C.green);
+    _dbArc(ctx, CX, CY, DB_R.triO*R,  DB_R.osin*R, a1, a2, odd ? DB_C.black : DB_C.cream);
+    _dbArc(ctx, CX, CY, DB_R.osin*R,  DB_R.dbl*R,  a1, a2, odd ? DB_C.red   : DB_C.green);
   }
 
-  // Glow on each scoring triple (T20+T18 for kz1, T19+T17 for kz2)
-  zone.scoring.forEach(function(sNum) {
-    var si  = DB_NUMS.indexOf(sNum);
-    var sa1 = DB_START + si * DB_SEG;
-    var sa2 = sa1 + DB_SEG;
-    ctx.save();
-    ctx.shadowColor = 'rgba(232,255,71,0.55)';
-    ctx.shadowBlur  = R * 0.045;
-    ctx.beginPath();
-    ctx.arc(CX, CY, kzTriO * R, sa1, sa2);
-    ctx.arc(CX, CY, kzTriI * R, sa2, sa1, true);
-    ctx.closePath();
-    ctx.strokeStyle = 'rgba(232,255,71,0.5)';
-    ctx.lineWidth   = Math.max(3, R * 0.012);
-    ctx.stroke();
-    ctx.restore();
-  });
-
-  // Radial wires — bright between active segments, dim elsewhere
+  // Radial wires
+  ctx.strokeStyle = DB_C.wire;
+  ctx.lineWidth = wire;
   for (var k = 0; k < 20; k++) {
-    var kn1 = DB_NUMS[k];
-    var kn2 = DB_NUMS[(k + 19) % 20];
-    ctx.strokeStyle = (primary.indexOf(kn1) >= 0 || primary.indexOf(kn2) >= 0) ? DB_C.wire : '#252320';
-    ctx.lineWidth   = wire;
     var wa = DB_START + k * DB_SEG;
     ctx.beginPath();
-    ctx.moveTo(CX+Math.cos(wa)*DB_R.obull*R, CY+Math.sin(wa)*DB_R.obull*R);
-    ctx.lineTo(CX+Math.cos(wa)*DB_R.dbl*R,   CY+Math.sin(wa)*DB_R.dbl*R);
+    ctx.moveTo(CX + Math.cos(wa) * DB_R.obull * R, CY + Math.sin(wa) * DB_R.obull * R);
+    ctx.lineTo(CX + Math.cos(wa) * DB_R.dbl   * R, CY + Math.sin(wa) * DB_R.dbl   * R);
     ctx.stroke();
   }
 
-  // Ring wires — subdued
-  [kzTriI,kzTriO,kzDblI,DB_R.dbl].forEach(function(r){
+  // Ring wires
+  [DB_R.isin, DB_R.triI, DB_R.triO, DB_R.osin, DB_R.dbl].forEach(function(r) {
     ctx.beginPath();
-    ctx.arc(CX, CY, r*R, 0, Math.PI*2);
-    ctx.strokeStyle = '#4a4228';
-    ctx.lineWidth   = wire * 0.7;
+    ctx.arc(CX, CY, r * R, 0, Math.PI * 2);
+    ctx.strokeStyle = DB_C.wire;
+    ctx.lineWidth = wire;
     ctx.stroke();
   });
 
-  // Bull — enabled (barely visible at very bottom)
+  // Outer bull
   ctx.beginPath();
-  ctx.arc(CX, CY, DB_R.obull*R, 0, Math.PI*2);
-  ctx.fillStyle = DB_C.obull; ctx.fill();
-  ctx.strokeStyle = DB_C.wire; ctx.lineWidth = wire; ctx.stroke();
+  ctx.arc(CX, CY, DB_R.obull * R, 0, Math.PI * 2);
+  ctx.fillStyle = DB_C.obull;
+  ctx.fill();
+  ctx.strokeStyle = DB_C.wire;
+  ctx.lineWidth = wire;
+  ctx.stroke();
+
+  // Bull
   ctx.beginPath();
-  ctx.arc(CX, CY, DB_R.bull*R, 0, Math.PI*2);
-  ctx.fillStyle = DB_C.bull; ctx.fill();
+  ctx.arc(CX, CY, DB_R.bull * R, 0, Math.PI * 2);
+  ctx.fillStyle = DB_C.bull;
+  ctx.fill();
 
-  ctx.restore();  // end rotation+mirror — text is now drawn upright
-
-  // Labels outside the double ring, in screen space (always upright)
-  var numR    = DB_R.dbl * R + wire * 5 + R * 0.08;
-  var outline = Math.max(2, R * 0.008);
-  ctx.textAlign    = 'center';
+  // Number labels — all segments with visible area
+  var zone    = _dbKzZones[_dbKzMode];
+  var numR    = DB_R.dbl * R + wire * 4 + R * 0.015;
+  var triMidR = (DB_R.triI + DB_R.triO) / 2 * R;
+  var fontSize     = Math.max(11, Math.floor(R * 0.10));
+  var fontSizeBig  = Math.max(13, Math.floor(R * 0.13));
+  var fmg = fontSize * 0.6;
+  ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-
   for (var j = 0; j < 20; j++) {
-    var jnum = DB_NUMS[j];
-    if (primary.indexOf(jnum) < 0) continue;
-
-    var ca = DB_START + j * DB_SEG + DB_SEG / 2 + rotation;
-    var jx = CX + mirrorX * Math.cos(ca) * numR;
-    var jy = CY + Math.sin(ca) * numR;
-    if (jx < -20 || jx > W + 20 || jy < -20 || jy > W + 20) continue;
-
-    var isScoring = zone.scoring.indexOf(jnum) >= 0;
-    if (isScoring) {
-      ctx.save();
-      ctx.shadowColor = 'rgba(232,255,71,0.8)';
-      ctx.shadowBlur  = R * 0.04;
-      ctx.font        = 'bold ' + Math.floor(R * 0.155) + 'px "Bebas Neue",Arial,sans-serif';
-      ctx.strokeStyle = 'rgba(0,0,0,0.75)';
-      ctx.lineWidth   = Math.max(3, R * 0.013);
-      ctx.strokeText(String(jnum), jx, jy);
-      ctx.fillStyle   = DB_C.num;
-      ctx.fillText(String(jnum), jx, jy);
-      ctx.restore();
+    var ca  = DB_START + j * DB_SEG + DB_SEG / 2;
+    var num = DB_NUMS[j];
+    // Visibility: triple-ring center must be within (or near) canvas
+    var tmx = CX + Math.cos(ca) * triMidR;
+    var tmy = CY + Math.sin(ca) * triMidR;
+    if (tmx < -R * 0.1 || tmx > W + R * 0.1 || tmy < -R * 0.1 || tmy > H + R * 0.1) continue;
+    // Natural label position (outside double ring)
+    var lx0 = CX + Math.cos(ca) * numR;
+    var ly0 = CY + Math.sin(ca) * numR;
+    var lx, ly;
+    if (lx0 >= fmg && lx0 <= W - fmg && ly0 >= fmg && ly0 <= H - fmg) {
+      // Label fits outside ring
+      lx = lx0; ly = ly0;
     } else {
-      ctx.font        = 'bold ' + Math.floor(R * 0.11) + 'px "Bebas Neue",Arial,sans-serif';
-      ctx.strokeStyle = 'rgba(0,0,0,0.65)';
-      ctx.lineWidth   = outline;
-      ctx.strokeText(String(jnum), jx, jy);
-      ctx.fillStyle   = 'rgba(232,255,71,0.75)';
-      ctx.fillText(String(jnum), jx, jy);
+      // Edge segment: draw label inside triple band instead
+      lx = Math.max(fmg, Math.min(W - fmg, tmx));
+      ly = Math.max(fmg, Math.min(H - fmg, tmy));
     }
+    var isScoring = zone.scoring.indexOf(num) >= 0;
+    if (isScoring) {
+      ctx.font = 'bold ' + fontSizeBig + 'px "Bebas Neue", Arial, sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = DB_C.num;
+      ctx.shadowBlur  = 10;
+    } else {
+      ctx.font = 'bold ' + fontSize + 'px "Bebas Neue", Arial, sans-serif';
+      ctx.fillStyle = DB_C.num;
+      ctx.shadowBlur = 0;
+    }
+    ctx.fillText(String(num), lx, ly);
   }
+  ctx.shadowBlur = 0;
 }
 
-// Hit test for kezuri zoomed view (reverses the rotation transform)
+// Hit test for kezuri zoomed view — matches _dbDrawKezuri() geometry exactly
 function _dbHitTestKezuri(tapX, tapY) {
   var canvas = _db.canvas;
   var rect   = canvas.getBoundingClientRect();
-  var dpr    = canvas.width / rect.width;
-  var cx     = (tapX - rect.left) * dpr;
-  var cy     = (tapY - rect.top)  * dpr;
+  var scaleX = canvas.width  / rect.width;
+  var scaleY = canvas.height / rect.height;
+  var cx     = (tapX - rect.left) * scaleX;
+  var cy     = (tapY - rect.top)  * scaleY;
 
   var W  = canvas.width;
-  var zone     = _dbKzZones[_dbKzMode];
-  var R  = W * zone.r;
-  var CX = W * zone.cx;
-  var CY = W * zone.cy;
+  var H  = canvas.height;
+  var isKz1 = (_dbKzMode === 'kz1');
+  var CX = W / 2;
+  var CY = isKz1 ? H : 0;
+  var R  = H * 0.95;
 
-  var idx      = zone.centerIdx;
-  var centerAngle = DB_START + idx * DB_SEG + DB_SEG / 2;
-  var rotation    = zone.rotDir * Math.PI / 2 - centerAngle;
-
-  // Un-mirror for kz2 before reversing rotation
-  if (zone.mirror) cx = W - cx;
-
-  // Reverse rotation
-  var dx  = cx - CX, dy = cy - CY;
-  var rdx = dx * Math.cos(-rotation) - dy * Math.sin(-rotation);
-  var rdy = dx * Math.sin(-rotation) + dy * Math.cos(-rotation);
-
-  var r  = Math.sqrt(rdx*rdx + rdy*rdy);
+  var dx = cx - CX;
+  var dy = cy - CY;
+  var r  = Math.sqrt(dx*dx + dy*dy);
   var rn = r / R;
 
   if (rn > DB_R.dbl)   return { score:0,  label:'Miss' };
   if (rn < DB_R.bull)  return { score:50, label:'Bull' };
   if (rn < DB_R.obull) return { score:25, label:'25'   };
 
-  var angle  = Math.atan2(rdy, rdx) * 180 / Math.PI + 90;
+  var angle  = Math.atan2(dy, dx) * 180 / Math.PI + 90;
   if (angle < 0) angle += 360;
   var segIdx = Math.floor(((angle + 9) % 360) / 18) % 20;
   var num    = DB_NUMS[segIdx];
 
-  if (rn < _kzTriI)   return { score:num,   label:String(num) };
-  if (rn < _kzTriO)   return { score:num*3, label:'T'+num    };
-  if (rn < _kzDblI)   return { score:num,   label:String(num) };
+  if (rn < DB_R.isin) return { score:num,   label:String(num) };
+  if (rn < DB_R.triO) return { score:num*3, label:'T'+num    };
+  if (rn < DB_R.osin) return { score:num,   label:String(num) };
   return                     { score:num*2,  label:'D'+num    };
 }
 
@@ -554,7 +535,22 @@ function dbOpen(mode) {
   _db.mode  = mode || 'cu';
   var modal = document.getElementById('db-modal');
   if (!modal) return;
-  modal.classList.add('db-show');
+
+  // CountUp: show board inline inside #isec instead of full-screen modal
+  var isec  = (mode === 'cu') ? document.getElementById('isec') : null;
+  var inner = modal.querySelector('.db-modal-inner');
+  if (isec && inner) {
+    // Hide normal isec children
+    Array.from(isec.children).forEach(function(c) { c.dataset.dbHide = '1'; c.style.display = 'none'; });
+    isec.appendChild(inner);
+    isec.classList.add('db-isec-active');
+    _dbIsInline = true;
+    _dbCuPersist = true;  // remember user chose board input
+  } else {
+    modal.classList.add('db-show');
+    _dbIsInline = false;
+  }
+
   _db.open = true;
   _dbUpdateDisplay();
   // Sync UI mode buttons/tabs
@@ -573,6 +569,18 @@ function dbOpen(mode) {
 
 function dbClose() {
   var modal = document.getElementById('db-modal');
+  if (_dbIsInline) {
+    var isec  = document.getElementById('isec');
+    var inner = isec && isec.querySelector('.db-modal-inner');
+    if (inner && modal) {
+      modal.appendChild(inner);
+      isec.classList.remove('db-isec-active');
+      Array.from(isec.children).forEach(function(c) {
+        if (c.dataset.dbHide) { c.style.display = ''; delete c.dataset.dbHide; }
+      });
+    }
+    _dbIsInline = false;
+  }
   if (modal) modal.classList.remove('db-show');
   _db.open = false;
 }
@@ -622,6 +630,7 @@ function _dbOnTap(e) {
     : _dbHitTest(touch.clientX, touch.clientY);
   hit._tapX = touch.clientX;
   hit._tapY = touch.clientY;
+  hit._uiMode = _dbUIMode;  // tag which UI mode (board/kz) this dart belongs to
   if (_dbUIMode === 'kz') hit._kzZone = _dbKzMode;  // tag which zone this dart belongs to
   _dbAddDart(hit);
 }

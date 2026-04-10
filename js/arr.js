@@ -3285,7 +3285,8 @@ var _fns = { kp: kp, kd: kd, doOk: doOk, commit: commit,
   showQuestHome: showQuestHome,
   quitQuestPlay: quitQuestPlay,
   shareCU: shareCU, shareZ01: shareZ01, shareSim: shareSim,
-  toggleSettings: toggleSettings
+  toggleSettings: toggleSettings,
+  toggleCallerGender: function(){ if(typeof toggleCallerGender==='function') toggleCallerGender(); }
 };
 
 function _exec(el) {

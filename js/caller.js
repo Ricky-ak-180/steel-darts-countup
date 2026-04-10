@@ -5,8 +5,11 @@
 // ============================================================
 
 var _callerOn = localStorage.getItem('caller') !== '0';
+var _callerGender = localStorage.getItem('caller_gender') || 'M'; // 'M' | 'F'
 var _callerMode = 'speech'; // 'audio' | 'speech'
-var _callerAudioBase = './audio/caller/';
+var _callerAudioBaseM = './audio/caller/';
+var _callerAudioBaseF = './audio/caller/female/';
+var _callerAudioBase = _callerGender === 'F' ? _callerAudioBaseF : _callerAudioBaseM;
 var _callerCache = {};      // filename -> AudioBuffer
 var _callerCtx = null;
 var _callerQueue = [];      // [{buffers:[], opts:{}}]
@@ -20,21 +23,41 @@ var _speechBusy = false;
 // ---- 初期化 ----
 // manifest.json の存在確認だけ先に行う（AudioContext はユーザー操作時に作成）
 var _callerManifestReady = false;
-(function _callerInit() {
+function _callerInitAudio() {
+  _callerManifestReady = false;
   fetch(_callerAudioBase + 'manifest.json')
     .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
     .then(function(m) {
       _callerMode = 'audio';
       _callerManifestReady = true;
-      console.log('[Caller] Audio mode ready');
-      _callerInitSpeech(); // フォールバック音声も準備
+      console.log('[Caller] Audio mode ready: ' + _callerAudioBase);
+      _callerInitSpeech();
     })
     .catch(function() {
-      _callerMode = 'speech';
-      console.log('[Caller] Speech mode (fallback)');
-      _callerInitSpeech();
+      // 女性フォルダが未生成の場合は男性フォルダでフォールバック
+      if (_callerAudioBase === _callerAudioBaseF) {
+        console.log('[Caller] Female audio not found, falling back to male audio');
+        _callerAudioBase = _callerAudioBaseM;
+        fetch(_callerAudioBase + 'manifest.json')
+          .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
+          .then(function() {
+            _callerMode = 'audio';
+            _callerManifestReady = true;
+            console.log('[Caller] Audio mode ready (male fallback)');
+            _callerInitSpeech();
+          })
+          .catch(function() {
+            _callerMode = 'speech';
+            _callerInitSpeech();
+          });
+      } else {
+        _callerMode = 'speech';
+        console.log('[Caller] Speech mode (fallback)');
+        _callerInitSpeech();
+      }
     });
-})();
+}
+_callerInitAudio();
 
 // ユーザー操作コンテキストで AudioContext を作成・取得
 function _callerGetCtx() {
@@ -55,6 +78,10 @@ function _callerGetCtx() {
   }
 }
 
+// 男性/女性ボイス名パターン
+var _VOICE_MALE   = /david|ryan|james|george|mark|richard|thomas|eric|luca|reed|malo|noel|grandpa|male/i;
+var _VOICE_FEMALE = /hazel|sonia|libby|samantha|zira|susan|kate|fiona|moira|tessa|helen|female|junior/i;
+
 function _callerInitSpeech() {
   if (!window.speechSynthesis) return;
   function pick() {
@@ -66,13 +93,34 @@ function _callerInitSpeech() {
       if (/en[-_]GB/i.test(v.lang)) s += 50;
       if (/neural|online|natural/i.test(v.name)) s += 100;
       if (/google/i.test(v.name)) s += 40;
-      if (/david|hazel|ryan|sonia|libby/i.test(v.name)) s += 20;
+      // 性別スコア
+      var isMale   = _VOICE_MALE.test(v.name);
+      var isFemale = _VOICE_FEMALE.test(v.name);
+      if (_callerGender === 'M' && isMale)   s += 80;
+      if (_callerGender === 'F' && isFemale) s += 80;
+      if (_callerGender === 'M' && isFemale) s -= 30;
+      if (_callerGender === 'F' && isMale)   s -= 30;
       if (s > bestScore) { bestScore = s; best = v; }
     }
     if (best) _callerVoice = best;
   }
   pick();
   if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = pick;
+}
+
+// 性別設定トグル（設定パネルから呼ぶ）
+function toggleCallerGender() {
+  _callerGender = _callerGender === 'M' ? 'F' : 'M';
+  localStorage.setItem('caller_gender', _callerGender);
+  // キャッシュクリア＆audioベースURL切替
+  _callerCache = {};
+  _callerQueue = [];
+  _callerPlaying = false;
+  _callerAudioBase = _callerGender === 'F' ? _callerAudioBaseF : _callerAudioBaseM;
+  _callerVoice = null;
+  _callerInitAudio();
+  var btn = document.getElementById('btn-caller-gender');
+  if (btn) btn.textContent = _callerGender === 'M' ? '♂' : '♀';
 }
 
 // ---- 歓声SE（Web Audio API合成） ----
@@ -185,6 +233,7 @@ function _callerPlaySequence(names, idx, onDone) {
     var doPlay = function() {
       var source = ctx.createBufferSource();
       source.buffer = buf;
+      // 女性声: ピッチ高め（1.22倍）、男性声: 通常
       var gain = ctx.createGain();
       gain.gain.value = 1.0;
       source.connect(gain);
@@ -324,6 +373,8 @@ function toggleCaller() {
 (function(){
   var btn = document.getElementById('btn-caller');
   if (btn && !_callerOn) btn.classList.add('caller-off');
+  var gBtn = document.getElementById('btn-caller-gender');
+  if (gBtn) gBtn.textContent = _callerGender === 'M' ? '♂' : '♀';
 })();
 
 // ============================================================

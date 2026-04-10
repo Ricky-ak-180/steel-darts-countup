@@ -61,6 +61,7 @@ body::before {
 /* Legacy button styles for settings panel */
 .btn-snd, .btn-caller, .btn-lang, .btn-theme { min-width: unset; min-height: unset; }
 .btn-caller.caller-off { opacity: 0.3; }
+.btn-caller-gender { min-width: unset; min-height: unset; font-size: 15px; padding: 6px 10px; background: var(--sur2); border: 1px solid var(--bdr); border-radius: 8px; color: var(--acc); cursor: pointer; }
 
 /* Views */
 .view { display: flex; flex-direction: column; gap: 5px; flex: 1; min-height: 0; overflow: hidden; }

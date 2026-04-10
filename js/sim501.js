@@ -7,7 +7,14 @@ var _S_SEGS = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 var _S_CX=120,_S_CY=120,_S_R=100,_S_RD=92,_S_RT2=62,_S_RT1=54,_S_RB=16,_S_RBULL=7;
 
 // ---- Levels: σ in board-px (board radius = 100px in 240px SVG) ----
-var _S_LVL = [
+var _S_LVL = (_currentLang==='en') ? [
+  {name:'Beginner',  sigma:42},
+  {name:'Amateur',   sigma:26},
+  {name:'Club',      sigma:16},
+  {name:'Semi-Pro',  sigma:10},
+  {name:'Pro',       sigma:6},
+  {name:'Elite',     sigma:3},
+] : [
   {name:'初心者',   sigma:42},
   {name:'アマ',     sigma:26},
   {name:'ハウス',   sigma:16},
@@ -360,10 +367,10 @@ function _simShowLegOverlay(winner) {
     var pCo=_simG.legPCoA>0?Math.round(_simG.legPCoH/_simG.legPCoA*100)+'%':'—';
     var cCo=_simG.legCCoA>0?Math.round(_simG.legCCoH/_simG.legCCoA*100)+'%':'—';
     var h='<div class="sim-leg-stat-hdr"><span>YOU</span><span></span><span>CPU</span></div>';
-    h+='<div class="sim-leg-stat-row"><b>'+pA+'</b><span>3本平均</span><b>'+cA+'</b></div>';
-    h+='<div class="sim-leg-stat-row"><b>'+(_simG.legPBest||'—')+'</b><span>最高R</span><b>'+(_simG.legCBest||'—')+'</b></div>';
-    h+='<div class="sim-leg-stat-row"><b>'+pCo+'</b><span>CO率</span><b>'+cCo+'</b></div>';
-    h+='<div class="sim-leg-stat-row"><b>'+_simG.legPThrows+'</b><span>本数</span><b>'+_simG.legCThrows+'</b></div>';
+    h+='<div class="sim-leg-stat-row"><b>'+pA+'</b><span>'+t('s.3avg')+'</span><b>'+cA+'</b></div>';
+    h+='<div class="sim-leg-stat-row"><b>'+(_simG.legPBest||'—')+'</b><span>'+t('s.best_r')+'</span><b>'+(_simG.legCBest||'—')+'</b></div>';
+    h+='<div class="sim-leg-stat-row"><b>'+pCo+'</b><span>'+t('s.co_rate')+'</span><b>'+cCo+'</b></div>';
+    h+='<div class="sim-leg-stat-row"><b>'+_simG.legPThrows+'</b><span>'+t('s.darts_count')+'</span><b>'+_simG.legCThrows+'</b></div>';
     legStats.innerHTML=h;
     legStats.style.display='';
   } else if(legStats){ legStats.style.display='none'; }
@@ -396,7 +403,7 @@ function _simCorkInit() {
   _simShowScreen('sim-cork-screen');
   _simCorkDraw(null,null);
   var msg=document.getElementById('sim-cork-msg');
-  if(msg) msg.textContent='ブルを狙って投げる — ボードをタップ！';
+  if(msg) msg.textContent=t('s.cork_msg');
   var btn=document.getElementById('sim-cork-btn');
   if(btn) btn.style.display='none';
 }
@@ -423,7 +430,7 @@ function _simCorkPlayer(tx,ty) {
   _simCorkDraw(land.x,land.y);
   var msg=document.getElementById('sim-cork-msg');
   var d=_sHit(land.x,land.y);
-  if(msg) msg.textContent='あなた: '+d.s+'  (距離='+_simG.corkPDist.toFixed(1)+'px)';
+  if(msg) msg.textContent=t('s.you')+' '+d.s+'  ('+t('s.dist')+'='+_simG.corkPDist.toFixed(1)+'px)';
   setTimeout(_simCorkCpu,900);
 }
 
@@ -438,9 +445,9 @@ function _simCorkCpu() {
   _simG.firstThrow=playerFirst?'player':'cpu';
   var msg=document.getElementById('sim-cork-msg');
   var d=_sHit(land.x,land.y);
-  if(msg) msg.textContent='CPU: '+d.s+'  (距離='+_simG.corkCDist.toFixed(1)+'px)\n→ '+(playerFirst?'あなたの先行！':'CPUの先行！');
+  if(msg) msg.textContent='CPU: '+d.s+'  ('+t('s.dist')+'='+_simG.corkCDist.toFixed(1)+'px)\n→ '+(playerFirst?t('s.you_first'):t('s.cpu_first'));
   var btn=document.getElementById('sim-cork-btn');
-  if(btn){btn.style.display='';btn.textContent=playerFirst?'あなたの先行でスタート！':'CPUの先行でスタート！';}
+  if(btn){btn.style.display='';btn.textContent=playerFirst?t('s.you_first_start'):t('s.cpu_first_start');}
 }
 
 function _simCorkGo() { _simBeginGame(); }
@@ -545,12 +552,10 @@ function _simRefresh() {
   // Turn message
   var tm=document.getElementById('sim-turn-msg');
   if(tm){
-    if(_simG.mode==='solo'){
-      tm.innerHTML='<span class="sim-tm-you">あなたのターン</span> — ボードをタップ';
-    } else if(_simG.curPlayer==='player'){
-      tm.innerHTML='<span class="sim-tm-you">あなたのターン</span> — ボードをタップ';
+    if(_simG.mode==='solo'||_simG.curPlayer==='player'){
+      tm.innerHTML='<span class="sim-tm-you">'+t('s.your_turn')+'</span> — '+t('s.tap_board');
     } else {
-      tm.innerHTML='<span class="sim-tm-cpu">CPU ターン</span>…';
+      tm.innerHTML='<span class="sim-tm-cpu">'+t('s.cpu_turn')+'</span>…';
     }
   }
   // Checkout hint
@@ -558,7 +563,7 @@ function _simRefresh() {
   if(hn){
     var sc=_simG.curPlayer==='player'?_simG.playerScore:_simG.cpuScore;
     if(sc<=170&&sc>=2&&typeof CHECKOUT!=='undefined'&&CHECKOUT[sc]){
-      hn.textContent='上がり目: '+CHECKOUT[sc].join(' → ');
+      hn.textContent=t('s.checkout_hint')+' '+CHECKOUT[sc].join(' → ');
       hn.style.display='';
     } else {
       hn.style.display='none';
@@ -608,22 +613,22 @@ function _simShowResult() {
   var cC=_simG.cCoAttempts>0?Math.round(_simG.cCoHits/_simG.cCoAttempts*100)+'%':'—';
   if(rs){
     var isCpu=_simG.mode==='cpu';
-    var lg=isCpu?'<div class="sim-stat"><span>レグ</span><b>'+_simG.playerLegs+' – '+_simG.cpuLegs+'</b></div>':'';
+    var lg=isCpu?'<div class="sim-stat"><span>'+t('s.legs')+'</span><b>'+_simG.playerLegs+' – '+_simG.cpuLegs+'</b></div>':'';
     var hdr='<div class="sim-stat sim-stat-hdr"><span></span><b>YOU</b>'+(isCpu?'<b>CPU</b>':'')+'</div>';
-    var avg='<div class="sim-stat"><span>3本平均</span><b>'+pA+'</b>'+(isCpu?'<b>'+cA+'</b>':'')+'</div>';
-    var best='<div class="sim-stat"><span>最高R</span><b>'+(_simG.pBestRound||'—')+'</b>'+(isCpu?'<b>'+(_simG.cBestRound||'—')+'</b>':'')+'</div>';
-    var co ='<div class="sim-stat"><span>CO率</span><b>'+pC+'</b>'+(isCpu?'<b>'+cC+'</b>':'')+'</div>';
-    var thr='<div class="sim-stat"><span>スロー数</span><b>'+_simG.pThrows+'</b>'+(isCpu?'<b>'+_simG.cThrows+'</b>':'')+'</div>';
+    var avg='<div class="sim-stat"><span>'+t('s.3avg')+'</span><b>'+pA+'</b>'+(isCpu?'<b>'+cA+'</b>':'')+'</div>';
+    var best='<div class="sim-stat"><span>'+t('s.best_r')+'</span><b>'+(_simG.pBestRound||'—')+'</b>'+(isCpu?'<b>'+(_simG.cBestRound||'—')+'</b>':'')+'</div>';
+    var co ='<div class="sim-stat"><span>'+t('s.co_rate')+'</span><b>'+pC+'</b>'+(isCpu?'<b>'+cC+'</b>':'')+'</div>';
+    var thr='<div class="sim-stat"><span>'+t('s.throws')+'</span><b>'+_simG.pThrows+'</b>'+(isCpu?'<b>'+_simG.cThrows+'</b>':'')+'</div>';
     rs.innerHTML=lg+hdr+avg+best+co+thr;
   }
   // F: ヒートマップ描画
   var hmEl=document.getElementById('sim-heatmaps');
   if(hmEl){
-    var h='<div class="sim-hm-title">着弾分布</div>';
+    var h='<div class="sim-hm-title">'+t('s.landing')+'</div>';
     h+='<div class="sim-hm-row">';
-    h+='<div class="sim-hm-col"><div class="sim-hm-label">YOU ('+_simG.pLands.length+'本)</div>'+_simHeatmapSVG(_simG.pLands,'rgba(66,165,245,0.7)')+'</div>';
+    h+='<div class="sim-hm-col"><div class="sim-hm-label">YOU ('+t('s.landing_count').replace('{n}',_simG.pLands.length)+')</div>'+_simHeatmapSVG(_simG.pLands,'rgba(66,165,245,0.7)')+'</div>';
     if(_simG.mode==='cpu'){
-      h+='<div class="sim-hm-col"><div class="sim-hm-label">CPU ('+_simG.cLands.length+'本)</div>'+_simHeatmapSVG(_simG.cLands,'rgba(239,83,80,0.7)')+'</div>';
+      h+='<div class="sim-hm-col"><div class="sim-hm-label">CPU ('+t('s.landing_count').replace('{n}',_simG.cLands.length)+')</div>'+_simHeatmapSVG(_simG.cLands,'rgba(239,83,80,0.7)')+'</div>';
     }
     h+='</div>';
     hmEl.innerHTML=h;
@@ -688,13 +693,13 @@ function _simRenderHistory() {
 // D: CPU実況コメント生成
 // ============================================================
 function _simCpuComment(dart, res, scoreBefore) {
-  if (res.checkout) return '🎯 チェックアウト！ ' + dart.s + ' で上がり！';
-  if (res.bust) return '💥 バスト！ 残り' + scoreBefore + 'に戻る';
-  if (dart.v >= 60) return '🔥 ' + dart.s + '！ ナイスショット！';
-  if (dart.v >= 40) return '👍 ' + dart.s + ' — 堅実なスロー';
-  if (scoreBefore <= 170 && (scoreBefore - dart.v) > 170) return '😤 上がり目を逃した...';
-  if (dart.v === 0) return '😬 ボード外！ CPU ミスショット';
-  if (scoreBefore <= 40 && !dart.dbl) return '⚡ ダブルを外した！ チャンス！';
+  if (res.checkout) return t('s.cpu_co').replace('{s}', dart.s);
+  if (res.bust) return t('s.cpu_bust').replace('{n}', scoreBefore);
+  if (dart.v >= 60) return t('s.cpu_nice').replace('{s}', dart.s);
+  if (dart.v >= 40) return t('s.cpu_solid').replace('{s}', dart.s);
+  if (scoreBefore <= 170 && (scoreBefore - dart.v) > 170) return t('s.cpu_missed_co');
+  if (dart.v === 0) return t('s.cpu_miss');
+  if (scoreBefore <= 40 && !dart.dbl) return t('s.cpu_dbl_miss');
   return '';
 }
 
