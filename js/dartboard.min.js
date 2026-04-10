@@ -120,9 +120,9 @@ function dbDraw() {
   ctx.fillStyle = DB_C.bull;
   ctx.fill();
 
-  // Number labels — placed at center of triple zone (wide enough to fit)
-  var numR = (DB_R.triI + DB_R.triO) / 2 * R;
-  var fontSize = Math.max(12, Math.floor(R * 0.155));
+  // Number labels — outside the double ring
+  var numR = DB_R.dbl * R + wire * 7 + R * 0.055;
+  var fontSize = Math.max(10, Math.floor(R * 0.108));
   ctx.font = 'bold ' + fontSize + 'px "Bebas Neue", Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
