@@ -320,7 +320,7 @@ var _dbKzMode = 'kz1';   // 'kz1' = T20/T18 zone, 'kz2' = T19/T17 zone
 var _dbKzZones = {
   // cy: CY = W * cy.  rotDir: rotation = rotDir*π/2 - centerAngle
   // kz1: target at top (bull at bottom), kz2: target at bottom (bull at top)
-  kz1: { nums:[5,20,1,18,4],  scoring:[20,18], centerIdx:1,  mirror:false, cy:1.04, rotDir:-1 },
+  kz1: { nums:[12,5,20,1,18], scoring:[20,18], centerIdx:0,  mirror:false, cy:1.04, rotDir:-1 },
   kz2: { nums:[7,19,3,17,2],  scoring:[19,17], centerIdx:10, mirror:false, cy:0.04, rotDir: 1 }
 };
 
@@ -398,12 +398,12 @@ function _dbDrawKezuri() {
     var a2    = a1 + DB_SEG;
     var odd   = (i % 2 === 0);
     if (isPri) {
-      _dbArc(ctx,CX,CY, DB_R.obull*R, DB_R.isin*R, a1,a2, odd?DB_C.black:DB_C.cream);
+      _dbArc(ctx,CX,CY, DB_R.obull*R, kzTriI*R,    a1,a2, odd?DB_C.black:DB_C.cream);
       _dbArc(ctx,CX,CY, kzTriI*R,     kzTriO*R,    a1,a2, odd?DB_C.red  :DB_C.green);
       _dbArc(ctx,CX,CY, kzTriO*R,     DB_R.osin*R, a1,a2, odd?DB_C.black:DB_C.cream);
       _dbArc(ctx,CX,CY, DB_R.osin*R,  DB_R.dbl*R,  a1,a2, odd?DB_C.red  :DB_C.green);
     } else {
-      _dbArc(ctx,CX,CY, DB_R.obull*R, DB_R.isin*R, a1,a2, odd?MC.seg1:MC.seg2);
+      _dbArc(ctx,CX,CY, DB_R.obull*R, kzTriI*R,    a1,a2, odd?MC.seg1:MC.seg2);
       _dbArc(ctx,CX,CY, kzTriI*R,     kzTriO*R,    a1,a2, MC.tri);
       _dbArc(ctx,CX,CY, kzTriO*R,     DB_R.osin*R, a1,a2, odd?MC.seg1:MC.seg2);
       _dbArc(ctx,CX,CY, DB_R.osin*R,  DB_R.dbl*R,  a1,a2, MC.tri);
@@ -442,7 +442,7 @@ function _dbDrawKezuri() {
   }
 
   // Ring wires — subdued
-  [DB_R.isin,kzTriI,kzTriO,DB_R.osin,DB_R.dbl].forEach(function(r){
+  [kzTriI,kzTriO,DB_R.osin,DB_R.dbl].forEach(function(r){
     ctx.beginPath();
     ctx.arc(CX, CY, r*R, 0, Math.PI*2);
     ctx.strokeStyle = '#4a4228';
