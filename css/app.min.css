@@ -463,28 +463,48 @@ canvas.schart { width: 100%; height: 100%; }
 .db-open-btn { display:block; width:100%; margin-top:10px; background:rgba(232,255,71,0.08); border:1px solid rgba(232,255,71,0.3); color:var(--acc); border-radius:12px; padding:11px 0; font-size:14px; font-weight:700; letter-spacing:1px; cursor:pointer; touch-action:manipulation; transition:background 0.2s; }
 .db-open-btn:active { background:rgba(232,255,71,0.18); }
 
-.db-modal { display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.88); align-items:center; justify-content:center; backdrop-filter:blur(6px); }
+/* ── Dartboard Modal ── */
+.db-modal { display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.92); align-items:center; justify-content:center; backdrop-filter:blur(8px); cursor:pointer; }
 .db-modal.db-show { display:flex; }
-.db-modal-inner { display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; max-width:400px; padding:16px 12px calc(16px + env(safe-area-inset-bottom)); }
+.db-modal-inner { display:flex; flex-direction:column; align-items:center; gap:12px; width:100%; max-width:400px; padding:16px 12px calc(20px + env(safe-area-inset-bottom)); cursor:default; }
+
+/* Header */
 .db-modal-hdr { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:380px; }
-.db-count-disp { font-family:'Bebas Neue',cursive; font-size:22px; color:var(--acc); letter-spacing:3px; }
-.db-close-btn { background:none; border:1px solid var(--bdr); color:var(--mut); border-radius:8px; padding:6px 14px; font-size:16px; cursor:pointer; touch-action:manipulation; }
+.db-hdr-left { display:flex; flex-direction:column; gap:7px; }
+.db-count-disp { font-family:'Bebas Neue',cursive; font-size:22px; color:var(--acc); letter-spacing:3px; line-height:1; }
+.db-close-btn { background:none; border:1px solid var(--bdr); color:var(--mut); border-radius:8px; padding:6px 14px; font-size:16px; cursor:pointer; touch-action:manipulation; transition:border-color 0.15s,color 0.15s; }
+.db-close-btn:active { color:var(--txt); border-color:var(--txt); }
+
+/* Progress dots */
+.db-progress-dots { display:flex; gap:9px; align-items:center; }
+.db-dot { display:inline-block; width:14px; height:14px; border-radius:50%; background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.22); transition:background 0.25s,border-color 0.25s,box-shadow 0.25s; }
+.db-dot.db-dot-hit { background:var(--acc); border-color:var(--acc); box-shadow:0 0 8px rgba(232,255,71,0.6); }
+
+/* Canvas */
 .db-canvas-wrap { position:relative; display:flex; align-items:center; justify-content:center; }
-#db-canvas { border-radius:50%; display:block; touch-action:none; cursor:crosshair; box-shadow:0 0 40px rgba(0,0,0,0.8); }
-.db-flash { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.82); color:var(--acc); font-family:'Bebas Neue',cursive; font-size:28px; letter-spacing:3px; padding:8px 20px; border-radius:10px; pointer-events:none; opacity:0; transition:opacity 0.15s; white-space:nowrap; }
+#db-canvas { border-radius:50%; display:block; touch-action:none; cursor:crosshair; box-shadow:0 0 48px rgba(0,0,0,0.9), 0 0 0 3px rgba(200,168,64,0.25); }
+
+/* Flash */
+.db-flash { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.85); color:var(--acc); font-family:'Bebas Neue',cursive; font-size:30px; letter-spacing:3px; padding:8px 22px; border-radius:12px; pointer-events:none; opacity:0; transition:opacity 0.15s; white-space:nowrap; border:1px solid rgba(232,255,71,0.3); }
 .db-flash.db-flash-show { opacity:1; }
-.db-score-row { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:380px; background:var(--sur); border:1px solid var(--bdr); border-radius:12px; padding:10px 16px; }
-.db-darts-labels { font-size:13px; color:var(--mut); flex:1; letter-spacing:1px; }
+
+/* Score row */
+.db-score-row { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:380px; background:var(--sur); border:1px solid var(--bdr); border-radius:12px; padding:10px 16px; min-height:52px; }
+.db-darts-labels { font-size:15px; color:var(--txt); font-weight:700; flex:1; letter-spacing:1px; }
 .db-total-wrap { display:flex; align-items:baseline; gap:6px; }
 .db-total-label { font-size:11px; color:var(--mut); }
-.db-total { font-family:'Bebas Neue',cursive; font-size:32px; color:var(--acc); letter-spacing:2px; min-width:48px; text-align:right; }
+.db-total { font-family:'Bebas Neue',cursive; font-size:34px; color:var(--acc); letter-spacing:2px; min-width:52px; text-align:right; }
+
+/* Action buttons */
 .db-actions { display:flex; gap:10px; width:100%; max-width:380px; }
-.db-action-btn { flex:1; border:none; border-radius:12px; padding:13px 0; font-size:15px; font-weight:700; cursor:pointer; touch-action:manipulation; transition:all 0.15s; }
-.db-action-btn:disabled { opacity:0.3; pointer-events:none; }
-.db-miss-btn { background:rgba(255,255,255,0.08); color:var(--mut); }
-.db-undo-btn { background:rgba(255,255,255,0.08); color:var(--txt); font-size:20px; }
+.db-action-btn { flex:1; border:none; border-radius:12px; padding:14px 0; font-size:15px; font-weight:700; cursor:pointer; touch-action:manipulation; transition:all 0.15s; }
+.db-action-btn:disabled { opacity:0.28; pointer-events:none; }
+.db-miss-btn { background:rgba(255,255,255,0.07); color:var(--mut); border:1px solid rgba(255,255,255,0.1); }
+.db-miss-btn:active { background:rgba(255,255,255,0.14); }
+.db-undo-btn { background:rgba(255,255,255,0.07); color:var(--txt); border:1px solid rgba(255,255,255,0.1); font-size:13px; letter-spacing:0.5px; }
+.db-undo-btn:active { background:rgba(255,255,255,0.14); }
 .db-ok-btn   { background:var(--acc); color:#000; flex:2; }
-.db-ok-btn:active { transform:scale(0.96); }
+.db-ok-btn:active { transform:scale(0.96); background:#c8e600; }
 
 .bimp { flex: 1; background: transparent; border: 1px solid var(--bdr); color: var(--mut); border-radius: 8px; padding: 10px; font-size: 12px; font-weight: 700; letter-spacing: 1px; cursor: pointer; }
 .hempty .ei { font-size: 36px; margin-bottom: 10px; }

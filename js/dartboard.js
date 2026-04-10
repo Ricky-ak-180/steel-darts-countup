@@ -5,29 +5,28 @@
 
 var _db = {
   canvas: null,
-  darts: [],      // [{score, label}, ...]  max 3
+  darts: [],      // [{score, label, _tapX, _tapY}, ...]  max 3
   open: false,
-  drawn: false,
   mode: 'cu'      // 'cu' = CountUp, '01' = 01 game
 };
 
 // Numbers clockwise from top
 var DB_NUMS = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
-var DB_SEG  = Math.PI * 2 / 20;         // 18° per segment
-var DB_START = -Math.PI/2 - DB_SEG/2;   // start angle (top, offset by half segment)
+var DB_SEG  = Math.PI * 2 / 20;
+var DB_START = -Math.PI/2 - DB_SEG/2;
 
 // Normalized radii (0–1, where 1.0 = outer edge of double)
 var DB_R = {
-  bull:  0.047,  // Bull
-  obull: 0.110,  // Outer Bull
-  isin:  0.560,  // inner single outer edge
-  triI:  0.647,  // triple inner edge
-  triO:  0.707,  // triple outer edge
-  osin:  0.917,  // outer single outer edge
-  dbl:   1.000   // double outer edge
+  bull:  0.047,
+  obull: 0.110,
+  isin:  0.560,
+  triI:  0.647,
+  triO:  0.707,
+  osin:  0.917,
+  dbl:   1.000
 };
 
-// Colors (authentic dartboard palette)
+// Colors
 var DB_C = {
   black: '#1c1a14', cream: '#f0e0a0',
   red:   '#c0392b', green: '#1a8a3a',
@@ -35,6 +34,9 @@ var DB_C = {
   wire:  '#c8a840', bg:    '#0f0e0a',
   num:   '#e8ff47'
 };
+
+// Dart marker colors (dart 1 / 2 / 3)
+var DB_DART_COLORS = ['#e8ff47', '#ff9f43', '#ff6b6b'];
 
 // ============================================================
 // DRAWING
@@ -55,7 +57,7 @@ function dbDraw() {
   var ctx = canvas.getContext('2d');
   var W = canvas.width;
   var CX = W / 2, CY = W / 2;
-  var R = W / 2 * 0.88;          // board usable radius
+  var R = W / 2 * 0.76;          // board radius — matches hit test
   var wire = Math.max(1, W / 400);
 
   ctx.clearRect(0, 0, W, W);
@@ -64,13 +66,13 @@ function dbDraw() {
   ctx.fillStyle = DB_C.bg;
   ctx.fillRect(0, 0, W, W);
 
-  // Outer wire ring
+  // Outer wire ring (gold border)
   ctx.beginPath();
   ctx.arc(CX, CY, DB_R.dbl * R + wire * 3, 0, Math.PI * 2);
   ctx.fillStyle = DB_C.wire;
   ctx.fill();
 
-  // Segments (inner single → triple → outer single → double)
+  // Segments: inner single → triple → outer single → double
   for (var i = 0; i < 20; i++) {
     var a1 = DB_START + i * DB_SEG;
     var a2 = a1 + DB_SEG;
@@ -93,8 +95,7 @@ function dbDraw() {
   }
 
   // Ring wires
-  var rings = [DB_R.isin, DB_R.triI, DB_R.triO, DB_R.osin, DB_R.dbl];
-  rings.forEach(function(r) {
+  [DB_R.isin, DB_R.triI, DB_R.triO, DB_R.osin, DB_R.dbl].forEach(function(r) {
     ctx.beginPath();
     ctx.arc(CX, CY, r * R, 0, Math.PI * 2);
     ctx.strokeStyle = DB_C.wire;
@@ -102,7 +103,7 @@ function dbDraw() {
     ctx.stroke();
   });
 
-  // Outer bull
+  // Outer bull (green)
   ctx.beginPath();
   ctx.arc(CX, CY, DB_R.obull * R, 0, Math.PI * 2);
   ctx.fillStyle = DB_C.obull;
@@ -111,15 +112,15 @@ function dbDraw() {
   ctx.lineWidth = wire;
   ctx.stroke();
 
-  // Bull
+  // Bull (red)
   ctx.beginPath();
   ctx.arc(CX, CY, DB_R.bull * R, 0, Math.PI * 2);
   ctx.fillStyle = DB_C.bull;
   ctx.fill();
 
   // Number labels (outside double ring)
-  var numR = DB_R.dbl * R + wire * 10 + R * 0.06;
-  var fontSize = Math.max(11, Math.floor(R * 0.115));
+  var numR = DB_R.dbl * R + wire * 7 + R * 0.055;
+  var fontSize = Math.max(10, Math.floor(R * 0.108));
   ctx.font = 'bold ' + fontSize + 'px "Bebas Neue", Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -130,8 +131,58 @@ function dbDraw() {
       CX + Math.cos(ca) * numR,
       CY + Math.sin(ca) * numR);
   }
+}
 
-  _db.drawn = true;
+// ============================================================
+// DART MARKERS — colored dot where each dart landed
+// ============================================================
+
+function _dbDrawMarkers() {
+  var canvas = _db.canvas;
+  if (!canvas || !_db.darts.length) return;
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width;
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = W / rect.width;
+  var scaleY = W / rect.height;
+  var dotR = Math.max(7, W * 0.026);
+
+  _db.darts.forEach(function(d, i) {
+    if (d._tapX === undefined) return;  // Miss (no tap coord)
+    var cx = (d._tapX - rect.left) * scaleX;
+    var cy = (d._tapY - rect.top)  * scaleY;
+
+    // Drop shadow
+    ctx.shadowColor = 'rgba(0,0,0,0.7)';
+    ctx.shadowBlur  = W * 0.015;
+
+    // Colored dot
+    ctx.beginPath();
+    ctx.arc(cx, cy, dotR, 0, Math.PI * 2);
+    ctx.fillStyle = DB_DART_COLORS[i];
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+
+    // White outline
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.lineWidth = Math.max(1.5, W * 0.004);
+    ctx.stroke();
+
+    // Dart number (1/2/3)
+    var fs = Math.max(9, Math.floor(dotR * 1.05));
+    ctx.font = 'bold ' + fs + 'px Arial, sans-serif';
+    ctx.fillStyle = '#111';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(String(i + 1), cx, cy);
+  });
+}
+
+// Redraw board then overlay all current dart markers
+function _dbRedraw() {
+  dbDraw();
+  _dbDrawMarkers();
 }
 
 // ============================================================
@@ -143,27 +194,26 @@ function _dbHitTest(tapX, tapY) {
   var rect = canvas.getBoundingClientRect();
   var CX = rect.left + rect.width  / 2;
   var CY = rect.top  + rect.height / 2;
-  var R  = rect.width / 2 * 0.88;
+  var R  = rect.width / 2 * 0.76;  // must match dbDraw()
 
   var dx = tapX - CX;
   var dy = tapY - CY;
   var r  = Math.sqrt(dx * dx + dy * dy);
-  var rn = r / R;  // normalized
+  var rn = r / R;
 
   if (rn < DB_R.bull)  return { score: 50, label: 'Bull' };
   if (rn < DB_R.obull) return { score: 25, label: '25'   };
   if (rn > DB_R.dbl)   return { score: 0,  label: 'Miss' };
 
-  // Clockwise angle from top (0° = 20 segment center)
   var angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
   if (angle < 0) angle += 360;
   var segIdx = Math.floor(((angle + 9) % 360) / 18) % 20;
   var num = DB_NUMS[segIdx];
 
-  if (rn < DB_R.isin) return { score: num,     label: String(num)    };
-  if (rn < DB_R.triO) return { score: num * 3,  label: 'T' + num     };
-  if (rn < DB_R.osin) return { score: num,     label: String(num)    };
-  return                     { score: num * 2,  label: 'D' + num      };
+  if (rn < DB_R.isin) return { score: num,    label: String(num) };
+  if (rn < DB_R.triO) return { score: num * 3, label: 'T' + num  };
+  if (rn < DB_R.osin) return { score: num,    label: String(num) };
+  return                     { score: num * 2, label: 'D' + num   };
 }
 
 // ============================================================
@@ -182,13 +232,21 @@ function _dbUpdateDisplay() {
   var n = _db.darts.length;
 
   if (totalEl) totalEl.textContent = total;
-  if (dartsEl) dartsEl.textContent = _db.darts.length
-    ? _db.darts.map(function(d) { return d.label; }).join(' + ')
-    : '—';
+  if (dartsEl) {
+    dartsEl.textContent = n
+      ? _db.darts.map(function(d) { return d.label; }).join(' + ')
+      : '—';
+  }
   if (countEl) countEl.textContent = ['1本目', '2本目', '3本目', '確認'][Math.min(n, 3)];
   if (okBtn)   okBtn.disabled   = (n === 0);
   if (undoBtn) undoBtn.disabled = (n === 0);
   if (missBtn) missBtn.disabled = (n >= 3);
+
+  // Progress dots
+  for (var i = 0; i < 3; i++) {
+    var dot = document.getElementById('db-dot-' + i);
+    if (dot) dot.className = 'db-dot' + (i < n ? ' db-dot-hit' : '');
+  }
 }
 
 function _dbAddDart(hit) {
@@ -196,10 +254,11 @@ function _dbAddDart(hit) {
   _db.darts.push(hit);
   _dbUpdateDisplay();
   _dbFlash(hit);
+  _dbDrawMarkers();
 
-  // Auto-submit after 3rd dart
+  // Auto-submit after 3rd dart (1.5s — enough to see, short enough to feel snappy)
   if (_db.darts.length === 3) {
-    setTimeout(function() { dbSubmit(); }, 500);
+    setTimeout(function() { dbSubmit(); }, 1500);
   }
 }
 
@@ -207,15 +266,16 @@ function dbUndoLast() {
   if (_db.darts.length === 0) return;
   _db.darts.pop();
   _dbUpdateDisplay();
+  _dbRedraw();  // board + remaining markers
 }
 
 function dbAddMiss() {
   if (_db.darts.length >= 3) return;
-  _dbAddDart({ score: 0, label: 'Miss' });
+  _dbAddDart({ score: 0, label: 'Miss' });  // no _tapX/_tapY → no dot drawn
 }
 
 // ============================================================
-// SUBMIT — enter score into current game mode
+// SUBMIT
 // ============================================================
 
 function dbSubmit() {
@@ -223,11 +283,12 @@ function dbSubmit() {
   dbClose();
 
   if (_db.mode === '01') {
-    // 01モード
     if (typeof z01Pre === 'function') z01Pre(total);
-    else if (typeof _z01BufUpdate === 'function') { _z01BufUpdate(String(total)); if (typeof z01Ok === 'function') z01Ok(); }
+    else if (typeof _z01BufUpdate === 'function') {
+      _z01BufUpdate(String(total));
+      if (typeof z01Ok === 'function') z01Ok();
+    }
   } else {
-    // CountUpモード
     if (total > 180) total = 180;
     if (typeof commit === 'function') {
       if (typeof buf !== 'undefined') buf = '';
@@ -248,7 +309,7 @@ function dbOpen(mode) {
   modal.classList.add('db-show');
   _db.open = true;
   _dbUpdateDisplay();
-  if (!_db.drawn) dbDraw();
+  dbDraw();  // always redraw — clears previous session's markers
 }
 
 function dbClose() {
@@ -264,9 +325,9 @@ function dbClose() {
 function _dbFlash(hit) {
   var el = document.getElementById('db-flash');
   if (!el) return;
-  el.textContent = hit.score === 0 ? 'Miss' : hit.label + '  +' + hit.score;
+  el.textContent = hit.score === 0 ? 'Miss!' : hit.label + '  +' + hit.score;
   el.className = 'db-flash db-flash-show';
-  setTimeout(function() { el.className = 'db-flash'; }, 700);
+  setTimeout(function() { el.className = 'db-flash'; }, 1500);  // 700 → 1500ms
 }
 
 // ============================================================
@@ -278,6 +339,8 @@ function _dbOnTap(e) {
   if (_db.darts.length >= 3) return;
   var touch = e.changedTouches ? e.changedTouches[0] : e;
   var hit = _dbHitTest(touch.clientX, touch.clientY);
+  hit._tapX = touch.clientX;  // store for marker drawing
+  hit._tapY = touch.clientY;
   _dbAddDart(hit);
 }
 
@@ -301,6 +364,5 @@ window.addEventListener('load', function() {
   canvas.addEventListener('touchstart', _dbOnTap, { passive: false });
   canvas.addEventListener('click',      _dbOnTap);
 
-  // Pre-draw
   dbDraw();
 });
