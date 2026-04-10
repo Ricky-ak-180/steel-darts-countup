@@ -24,7 +24,7 @@ var DB_R = {
   isin:  0.300,  // inner single outer edge — compressed! (was 0.560)
   triI:  0.300,  // triple inner edge = isin (no gap)
   triO:  0.580,  // triple outer edge — wide band! (was 0.707)
-  osin:  0.780,  // outer single outer edge (was 0.917)
+  osin:  0.870,  // outer single outer edge — wider (double is checkout-only so thinner)
   dbl:   1.000   // double outer edge (unchanged)
 };
 
