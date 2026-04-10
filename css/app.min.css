@@ -497,6 +497,11 @@ canvas.schart { width: 100%; height: 100%; }
 /* Flash */
 .db-flash { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.85); color:var(--acc); font-family:'Bebas Neue',cursive; font-size:30px; letter-spacing:3px; padding:8px 22px; border-radius:12px; pointer-events:none; opacity:0; transition:opacity 0.15s; white-space:nowrap; border:1px solid rgba(232,255,71,0.3); }
 .db-flash.db-flash-show { opacity:1; }
+/* Kezuri flash variants — hit quality feedback */
+.db-flash.db-flash-perfect { color:#4caf50; border-color:rgba(76,175,80,0.4); text-shadow:0 0 14px rgba(76,175,80,0.6); }
+.db-flash.db-flash-good { color:#8bc34a; border-color:rgba(139,195,74,0.3); }
+.db-flash.db-flash-off { color:#ff9800; border-color:rgba(255,152,0,0.3); }
+.db-flash.db-flash-miss { color:#ef5350; border-color:rgba(239,83,80,0.3); }
 
 /* Score row */
 .db-score-row { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:380px; background:var(--sur); border:1px solid var(--bdr); border-radius:12px; padding:10px 16px; min-height:52px; }

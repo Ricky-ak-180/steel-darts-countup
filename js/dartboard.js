@@ -313,12 +313,15 @@ function dbSubmit() {
 var _dbUIMode   = 'board';  // 'board' | 'kz'
 var _dbKzTarget = 20;
 
-// adjacency: [left neighbor, right neighbor, hasSwitch]
+// adjacency: left/right neighbor on board, sw = switch target number (0 = none)
 var _dbKzData = {
-  20: { left:5,  right:1,  sw:true  },
-  19: { left:3,  right:7,  sw:true  },
-  18: { left:1,  right:4,  sw:false }
+  20: { left:5,  right:1,  sw:18 },
+  19: { left:3,  right:7,  sw:18 },
+  18: { left:1,  right:4,  sw:0  }
 };
+
+// Restore persisted kezuri target
+try { var _t = parseInt(localStorage.getItem('db_kz_target')); if (_dbKzData[_t]) _dbKzTarget = _t; } catch(e) {}
 
 function _dbSetUIMode(mode) {
   _dbUIMode = mode;
@@ -333,6 +336,7 @@ function _dbSetUIMode(mode) {
 
 function _dbKzSetTarget(num) {
   _dbKzTarget = num;
+  try { localStorage.setItem('db_kz_target', String(num)); } catch(e) {}
   document.querySelectorAll('.db-kz-tab').forEach(function(t) {
     t.classList.toggle('db-kz-tab-on', parseInt(t.dataset.num) === num);
   });
@@ -363,20 +367,20 @@ function _dbDrawKezuri() {
   // Active segment sets
   var d         = _dbKzData[_dbKzTarget];
   var primary   = [_dbKzTarget, d.left, d.right];
-  var switchNum = d.sw ? 18 : null;
+  var switchNum = d.sw || null;
 
-  // Muted colors
-  var MC = { seg1:'#191917', seg2:'#222220', tri:'#1e1e1c' };
+  // Muted colors — darker than before for stronger contrast
+  var MC = { seg1:'#131311', seg2:'#181816', tri:'#151513' };
 
   ctx.save();
   ctx.translate(CX, CY);
   ctx.rotate(rotation);
   ctx.translate(-CX, -CY);
 
-  // Outer wire ring
+  // Outer wire ring — dimmer in kezuri
   ctx.beginPath();
   ctx.arc(CX, CY, DB_R.dbl * R + wire * 3, 0, Math.PI * 2);
-  ctx.fillStyle = DB_C.wire;
+  ctx.fillStyle = '#3a3420';
   ctx.fill();
 
   // Segments — color based on relevance
@@ -389,19 +393,16 @@ function _dbDrawKezuri() {
     var odd = (i % 2 === 0);
 
     if (isPri) {
-      // Full authentic color
       _dbArc(ctx,CX,CY, DB_R.obull*R,DB_R.isin*R, a1,a2, odd?DB_C.black:DB_C.cream);
       _dbArc(ctx,CX,CY, DB_R.triI*R, DB_R.triO*R, a1,a2, odd?DB_C.red  :DB_C.green);
       _dbArc(ctx,CX,CY, DB_R.triO*R, DB_R.osin*R, a1,a2, odd?DB_C.black:DB_C.cream);
       _dbArc(ctx,CX,CY, DB_R.osin*R, DB_R.dbl*R,  a1,a2, odd?DB_C.red  :DB_C.green);
     } else if (isSw) {
-      // Switch: gold tint
       _dbArc(ctx,CX,CY, DB_R.obull*R,DB_R.isin*R, a1,a2, '#252318');
       _dbArc(ctx,CX,CY, DB_R.triI*R, DB_R.triO*R, a1,a2, '#8a6f1a');
       _dbArc(ctx,CX,CY, DB_R.triO*R, DB_R.osin*R, a1,a2, '#252318');
       _dbArc(ctx,CX,CY, DB_R.osin*R, DB_R.dbl*R,  a1,a2, '#6a5212');
     } else {
-      // Muted / grayed out
       _dbArc(ctx,CX,CY, DB_R.obull*R,DB_R.isin*R, a1,a2, odd?MC.seg1:MC.seg2);
       _dbArc(ctx,CX,CY, DB_R.triI*R, DB_R.triO*R, a1,a2, MC.tri);
       _dbArc(ctx,CX,CY, DB_R.triO*R, DB_R.osin*R, a1,a2, odd?MC.seg1:MC.seg2);
@@ -409,10 +410,29 @@ function _dbDrawKezuri() {
     }
   }
 
-  // Radial wires
-  ctx.strokeStyle = DB_C.wire;
-  ctx.lineWidth   = wire;
+  // ★ Target triple glow highlight — bright border around the thing you aim for
+  var tA1 = DB_START + idx * DB_SEG;
+  var tA2 = tA1 + DB_SEG;
+  ctx.save();
+  ctx.shadowColor = 'rgba(232,255,71,0.7)';
+  ctx.shadowBlur  = R * 0.05;
+  ctx.beginPath();
+  ctx.arc(CX, CY, DB_R.triO * R, tA1, tA2);
+  ctx.arc(CX, CY, DB_R.triI * R, tA2, tA1, true);
+  ctx.closePath();
+  ctx.strokeStyle = 'rgba(232,255,71,0.6)';
+  ctx.lineWidth   = Math.max(3, R * 0.012);
+  ctx.stroke();
+  ctx.restore();
+
+  // Radial wires — bright for active zones, dim for muted
   for (var k = 0; k < 20; k++) {
+    var kn1 = DB_NUMS[k];
+    var kn2 = DB_NUMS[(k + 19) % 20];
+    var kActive = (primary.indexOf(kn1) >= 0 || primary.indexOf(kn2) >= 0 ||
+                   kn1 === switchNum || kn2 === switchNum);
+    ctx.strokeStyle = kActive ? DB_C.wire : '#2a2820';
+    ctx.lineWidth   = wire;
     var wa = DB_START + k * DB_SEG;
     ctx.beginPath();
     ctx.moveTo(CX+Math.cos(wa)*DB_R.obull*R, CY+Math.sin(wa)*DB_R.obull*R);
@@ -420,50 +440,70 @@ function _dbDrawKezuri() {
     ctx.stroke();
   }
 
-  // Ring wires
+  // Ring wires — subdued
   [DB_R.isin,DB_R.triI,DB_R.triO,DB_R.osin,DB_R.dbl].forEach(function(r){
     ctx.beginPath();
     ctx.arc(CX, CY, r*R, 0, Math.PI*2);
-    ctx.strokeStyle = DB_C.wire;
-    ctx.lineWidth   = wire;
+    ctx.strokeStyle = '#4a4228';
+    ctx.lineWidth   = wire * 0.7;
     ctx.stroke();
   });
 
-  // Bulls
+  // Bulls — dimmed (not a kezuri target)
   ctx.beginPath();
   ctx.arc(CX, CY, DB_R.obull*R, 0, Math.PI*2);
-  ctx.fillStyle = DB_C.obull; ctx.fill();
-  ctx.strokeStyle = DB_C.wire; ctx.lineWidth = wire; ctx.stroke();
+  ctx.fillStyle = '#1a2a1a'; ctx.fill();
+  ctx.strokeStyle = '#2a2820'; ctx.lineWidth = wire; ctx.stroke();
   ctx.beginPath();
   ctx.arc(CX, CY, DB_R.bull*R, 0, Math.PI*2);
-  ctx.fillStyle = DB_C.bull; ctx.fill();
+  ctx.fillStyle = '#2a1a1a'; ctx.fill();
 
-  // Number labels — size/color by relevance
-  var numR = DB_R.dbl * R + wire * 5 + R * 0.04;
+  ctx.restore();  // ← end rotation so text draws upright
+
+  // Number labels — drawn in screen space (post-rotation) so text is always readable
+  // Position: inside outer single zone to stay on-canvas
+  var numR = ((DB_R.triO + DB_R.osin) / 2) * R;
   ctx.textAlign    = 'center';
   ctx.textBaseline = 'middle';
   for (var j = 0; j < 20; j++) {
     var jnum  = DB_NUMS[j];
     var jPri  = primary.indexOf(jnum) >= 0;
     var jSw   = (jnum === switchNum);
-    var ca    = DB_START + j * DB_SEG + DB_SEG / 2;
-    var jx    = CX + Math.cos(ca) * numR;
-    var jy    = CY + Math.sin(ca) * numR;
+    if (!jPri && !jSw) continue;  // skip muted — no label noise
 
-    if (jPri) {
-      ctx.font      = 'bold ' + Math.floor(R*0.13) + 'px "Bebas Neue",Arial,sans-serif';
-      ctx.fillStyle = DB_C.num;           // bright yellow
-    } else if (jSw) {
-      ctx.font      = 'bold ' + Math.floor(R*0.10) + 'px "Bebas Neue",Arial,sans-serif';
-      ctx.fillStyle = '#c8a840';          // gold
+    // Apply rotation manually to get screen position
+    var ca = DB_START + j * DB_SEG + DB_SEG / 2 + rotation;
+    var jx = CX + Math.cos(ca) * numR;
+    var jy = CY + Math.sin(ca) * numR;
+    var outline = Math.max(2, R * 0.008);
+
+    if (jnum === _dbKzTarget) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(232,255,71,0.8)';
+      ctx.shadowBlur  = R * 0.04;
+      ctx.font      = 'bold ' + Math.floor(R*0.16) + 'px "Bebas Neue",Arial,sans-serif';
+      ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+      ctx.lineWidth   = Math.max(3, R * 0.012);
+      ctx.strokeText(String(jnum), jx, jy);
+      ctx.fillStyle = DB_C.num;
+      ctx.fillText(String(jnum), jx, jy);
+      ctx.restore();
+    } else if (jPri) {
+      ctx.font      = 'bold ' + Math.floor(R*0.12) + 'px "Bebas Neue",Arial,sans-serif';
+      ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+      ctx.lineWidth   = outline;
+      ctx.strokeText(String(jnum), jx, jy);
+      ctx.fillStyle = 'rgba(232,255,71,0.8)';
+      ctx.fillText(String(jnum), jx, jy);
     } else {
-      ctx.font      = 'bold ' + Math.floor(R*0.065) + 'px "Bebas Neue",Arial,sans-serif';
-      ctx.fillStyle = '#303030';          // nearly invisible
+      ctx.font      = 'bold ' + Math.floor(R*0.10) + 'px "Bebas Neue",Arial,sans-serif';
+      ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+      ctx.lineWidth   = outline;
+      ctx.strokeText(String(jnum), jx, jy);
+      ctx.fillStyle = '#c8a840';
+      ctx.fillText(String(jnum), jx, jy);
     }
-    ctx.fillText(String(jnum), jx, jy);
   }
-
-  ctx.restore();
 }
 
 // Hit test for kezuri zoomed view (reverses the rotation transform)
@@ -525,6 +565,10 @@ function dbOpen(mode) {
   if (kzTabs)   kzTabs.style.display = (_dbUIMode === 'kz') ? 'flex' : 'none';
   if (boardBtn) boardBtn.classList.toggle('db-mode-on', _dbUIMode === 'board');
   if (kzBtn)    kzBtn.classList.toggle('db-mode-on',    _dbUIMode === 'kz');
+  // Sync persisted kezuri target tab
+  document.querySelectorAll('.db-kz-tab').forEach(function(t) {
+    t.classList.toggle('db-kz-tab-on', parseInt(t.dataset.num) === _dbKzTarget);
+  });
   _dbRedraw();
 }
 
@@ -542,8 +586,28 @@ function _dbFlash(hit) {
   var el = document.getElementById('db-flash');
   if (!el) return;
   el.textContent = hit.score === 0 ? 'Miss!' : hit.label + '  +' + hit.score;
-  el.className = 'db-flash db-flash-show';
-  setTimeout(function() { el.className = 'db-flash'; }, 1500);  // 700 → 1500ms
+  var cls = 'db-flash db-flash-show';
+
+  // Kezuri mode: color-code flash by hit quality
+  if (_dbUIMode === 'kz' && _dbKzData[_dbKzTarget]) {
+    var d   = _dbKzData[_dbKzTarget];
+    var pri = [_dbKzTarget, d.left, d.right];
+    var m   = hit.label.match(/^[TD]?(\d+)$/);
+    var hitNum = m ? parseInt(m[1]) : 0;
+
+    if (hit.label === 'T' + _dbKzTarget) {
+      cls += ' db-flash-perfect';            // target triple — green glow
+    } else if (hitNum === _dbKzTarget) {
+      cls += ' db-flash-good';               // target single/double
+    } else if (hit.score === 0) {
+      cls += ' db-flash-miss';               // miss — red
+    } else if (pri.indexOf(hitNum) < 0) {
+      cls += ' db-flash-off';                // off-target — amber
+    }
+  }
+
+  el.className = cls;
+  setTimeout(function() { el.className = 'db-flash'; }, 1500);
 }
 
 // ============================================================
