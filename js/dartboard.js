@@ -365,13 +365,11 @@ function _dbDrawKezuri() {
   var CY = W * zone.cy;
   var wire = Math.max(2, W / 250);
 
-  // Visual ring proportions (hit areas unchanged; these affect drawing only)
-  // Triple and double get the same narrow visual width for elegant symmetry
-  var triMid  = (DB_R.triI + DB_R.triO) / 2;
-  var triHalf = (DB_R.triO - DB_R.triI) / 2 * 0.30;   // 30% → narrow stripe
-  var kzTriI  = triMid - triHalf;
-  var kzTriO  = triMid + triHalf;
-  var kzDblI  = DB_R.dbl - (kzTriO - kzTriI);          // same visual width as triple
+  // Visual ring boundaries based on real BDO dartboard proportions
+  // (99/170, 107/170, 162/170) — hit detection zones unchanged
+  var kzTriI = 0.582;   // real board triple inner (99mm / 170mm)
+  var kzTriO = 0.629;   // real board triple outer (107mm / 170mm)
+  var kzDblI = 0.953;   // real board double inner (162mm / 170mm)
 
   ctx.clearRect(0, 0, W, W);
   ctx.fillStyle = DB_C.bg;
