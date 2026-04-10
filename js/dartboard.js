@@ -318,8 +318,10 @@ var _dbKzMode = 'kz1';   // 'kz1' = T20/T18 zone, 'kz2' = T19/T17 zone
 // scoring: the two main triple targets in the zone (get glow + perfect flash)
 // mirror: true = flip horizontally so left-right order feels natural to the player
 var _dbKzZones = {
-  kz1: { nums:[5,20,1,18,4],  scoring:[20,18], centerIdx:1,  mirror:false },
-  kz2: { nums:[7,19,3,17,2],  scoring:[19,17], centerIdx:10, mirror:true  }
+  // cy: CY = W * cy.  rotDir: rotation = rotDir*π/2 - centerAngle
+  // kz1: target at top (bull at bottom), kz2: target at bottom (bull at top)
+  kz1: { nums:[5,20,1,18,4],  scoring:[20,18], centerIdx:1,  mirror:false, cy:1.04, rotDir:-1 },
+  kz2: { nums:[7,19,3,17,2],  scoring:[19,17], centerIdx:10, mirror:false, cy:0.04, rotDir: 1 }
 };
 
 // Restore persisted mode
@@ -351,21 +353,27 @@ function _dbDrawKezuri() {
   var ctx = canvas.getContext('2d');
   var W   = canvas.width;
 
-  // Panoramic zoom: board center pushed below canvas so 5 segments fill the top
-  var R  = W * 0.88;
+  var zone    = _dbKzZones[_dbKzMode];
+  var primary = zone.nums;
+  var idx     = zone.centerIdx;
+  // kz1: target at top (bull at bottom), kz2: target at bottom (bull at top)
+  var R  = W * 0.72;
   var CX = W / 2;
-  var CY = W * 1.06;  // center is 6% below canvas bottom
+  var CY = W * zone.cy;
   var wire = Math.max(2, W / 250);
+
+  // Narrowed triple ring (2/3 width for visual beauty; hit area stays full)
+  var triMid  = (DB_R.triI + DB_R.triO) / 2;
+  var triHalf = (DB_R.triO - DB_R.triI) / 2 * (2 / 3);
+  var kzTriI  = triMid - triHalf;
+  var kzTriO  = triMid + triHalf;
 
   ctx.clearRect(0, 0, W, W);
   ctx.fillStyle = DB_C.bg;
   ctx.fillRect(0, 0, W, W);
 
-  var zone    = _dbKzZones[_dbKzMode];
-  var primary = zone.nums;
-  var idx     = zone.centerIdx;
   var centerAngle = DB_START + idx * DB_SEG + DB_SEG / 2;
-  var rotation    = -Math.PI / 2 - centerAngle;
+  var rotation    = zone.rotDir * Math.PI / 2 - centerAngle;
   var mirrorX     = zone.mirror ? -1 : 1;
 
   var MC = { seg1:'#0f0f0d', seg2:'#141412', tri:'#111110' };
@@ -390,15 +398,15 @@ function _dbDrawKezuri() {
     var a2    = a1 + DB_SEG;
     var odd   = (i % 2 === 0);
     if (isPri) {
-      _dbArc(ctx,CX,CY, DB_R.obull*R,DB_R.isin*R, a1,a2, odd?DB_C.black:DB_C.cream);
-      _dbArc(ctx,CX,CY, DB_R.triI*R, DB_R.triO*R, a1,a2, odd?DB_C.red  :DB_C.green);
-      _dbArc(ctx,CX,CY, DB_R.triO*R, DB_R.osin*R, a1,a2, odd?DB_C.black:DB_C.cream);
-      _dbArc(ctx,CX,CY, DB_R.osin*R, DB_R.dbl*R,  a1,a2, odd?DB_C.red  :DB_C.green);
+      _dbArc(ctx,CX,CY, DB_R.obull*R, DB_R.isin*R, a1,a2, odd?DB_C.black:DB_C.cream);
+      _dbArc(ctx,CX,CY, kzTriI*R,     kzTriO*R,    a1,a2, odd?DB_C.red  :DB_C.green);
+      _dbArc(ctx,CX,CY, kzTriO*R,     DB_R.osin*R, a1,a2, odd?DB_C.black:DB_C.cream);
+      _dbArc(ctx,CX,CY, DB_R.osin*R,  DB_R.dbl*R,  a1,a2, odd?DB_C.red  :DB_C.green);
     } else {
-      _dbArc(ctx,CX,CY, DB_R.obull*R,DB_R.isin*R, a1,a2, odd?MC.seg1:MC.seg2);
-      _dbArc(ctx,CX,CY, DB_R.triI*R, DB_R.triO*R, a1,a2, MC.tri);
-      _dbArc(ctx,CX,CY, DB_R.triO*R, DB_R.osin*R, a1,a2, odd?MC.seg1:MC.seg2);
-      _dbArc(ctx,CX,CY, DB_R.osin*R, DB_R.dbl*R,  a1,a2, MC.tri);
+      _dbArc(ctx,CX,CY, DB_R.obull*R, DB_R.isin*R, a1,a2, odd?MC.seg1:MC.seg2);
+      _dbArc(ctx,CX,CY, kzTriI*R,     kzTriO*R,    a1,a2, MC.tri);
+      _dbArc(ctx,CX,CY, kzTriO*R,     DB_R.osin*R, a1,a2, odd?MC.seg1:MC.seg2);
+      _dbArc(ctx,CX,CY, DB_R.osin*R,  DB_R.dbl*R,  a1,a2, MC.tri);
     }
   }
 
@@ -411,8 +419,8 @@ function _dbDrawKezuri() {
     ctx.shadowColor = 'rgba(232,255,71,0.55)';
     ctx.shadowBlur  = R * 0.045;
     ctx.beginPath();
-    ctx.arc(CX, CY, DB_R.triO * R, sa1, sa2);
-    ctx.arc(CX, CY, DB_R.triI * R, sa2, sa1, true);
+    ctx.arc(CX, CY, kzTriO * R, sa1, sa2);
+    ctx.arc(CX, CY, kzTriI * R, sa2, sa1, true);
     ctx.closePath();
     ctx.strokeStyle = 'rgba(232,255,71,0.5)';
     ctx.lineWidth   = Math.max(3, R * 0.012);
@@ -434,7 +442,7 @@ function _dbDrawKezuri() {
   }
 
   // Ring wires — subdued
-  [DB_R.isin,DB_R.triI,DB_R.triO,DB_R.osin,DB_R.dbl].forEach(function(r){
+  [DB_R.isin,kzTriI,kzTriO,DB_R.osin,DB_R.dbl].forEach(function(r){
     ctx.beginPath();
     ctx.arc(CX, CY, r*R, 0, Math.PI*2);
     ctx.strokeStyle = '#4a4228';
@@ -500,14 +508,14 @@ function _dbHitTestKezuri(tapX, tapY) {
   var cy     = (tapY - rect.top)  * dpr;
 
   var W  = canvas.width;
-  var R  = W * 0.88;
-  var CX = W / 2;
-  var CY = W * 1.06;
-
   var zone     = _dbKzZones[_dbKzMode];
+  var R  = W * 0.72;
+  var CX = W / 2;
+  var CY = W * zone.cy;
+
   var idx      = zone.centerIdx;
   var centerAngle = DB_START + idx * DB_SEG + DB_SEG / 2;
-  var rotation    = -Math.PI / 2 - centerAngle;
+  var rotation    = zone.rotDir * Math.PI / 2 - centerAngle;
 
   // Un-mirror for kz2 before reversing rotation
   if (zone.mirror) cx = W - cx;
