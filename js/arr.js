@@ -118,7 +118,7 @@ function trainWeakMode() {
     return (ea.c/ea.a) - (eb.c/eb.a); // 成功率が低い順
   });
   if (weak.length === 0) {
-    alert(t('tr.no_weak'));
+    _toast(t('tr.no_weak'));
     return;
   }
   // 苦手スコアキューをセットして最初のスコアからスタート
@@ -3341,6 +3341,16 @@ document.addEventListener('click', function(e) {
 var _obStep = 0;
 var _obLevel = -1; // -1 = not selected
 
+function obSetLang(lang) {
+  // 言語を切替
+  if (typeof setLang === 'function') setLang(lang);
+  // ボタンのアクティブ状態を更新
+  var jaBtn = document.getElementById('ob-lang-ja');
+  var enBtn = document.getElementById('ob-lang-en');
+  if (jaBtn) jaBtn.classList.toggle('ob-lang-active', lang === 'ja');
+  if (enBtn) enBtn.classList.toggle('ob-lang-active', lang === 'en');
+}
+
 function obGoStep(n) {
   var cards = document.querySelectorAll('.ob-card');
   var dots = document.querySelectorAll('.ob-dot');
@@ -3440,6 +3450,7 @@ _updSndBtn();
       'ct-avg': function(){ switchChart('avg'); },
       'ct-time': function(){ switchChart('time'); },
       'btn-export': exportData,
+      'btn-export-all': exportAllData,
       'btn-import': triggerImport,
       'btn-clr': openCfm,
       'rb-new': startNew,
@@ -3500,6 +3511,9 @@ if (!localStorage.getItem('ob_done')) {
   document.getElementById('onboard').classList.add('show');
   // オンボーディング中はゲームスタート画面を隠す
   document.getElementById('game-start').classList.add('hide');
+  // 現在の言語設定をオンボーディングのボタンに反映
+  var _obCurLang = localStorage.getItem('lang') || 'ja';
+  obSetLang(_obCurLang);
 } else {
   // 2回目以降：ゲームスタートボタンを表示（タイマー未開始状態）
 }

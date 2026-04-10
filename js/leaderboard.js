@@ -34,6 +34,8 @@ function lbInit() {
       _lb.uid = cred.user.uid;
       // Load saved display name
       _lb.displayName = localStorage.getItem('lb_name') || '';
+      // クラウド同期を開始
+      if (typeof syncInit === 'function') syncInit(_lb.uid);
     }).catch(function(err) {
       console.log('Firebase auth error:', err.message);
     });

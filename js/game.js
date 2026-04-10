@@ -1556,7 +1556,7 @@ function importData(input) {
     try {
       var obj = JSON.parse(e.target.result);
       var incoming = obj.data || obj; // 配列直接 or {data:[...]}
-      if (!Array.isArray(incoming)) throw new Error('形式が違います');
+      if (!Array.isArray(incoming)) throw new Error(t('g.import_err'));
       var current = getH();
       // 日付で重複チェックしてマージ
       var dates = {};
@@ -1567,6 +1567,7 @@ function importData(input) {
       });
       // 日付順で並べ直す
       current.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+      if (current.length > 200) { _toast(t('g.hist_trimmed') || 'Old records removed'); }
       localStorage.setItem('dh', JSON.stringify(current.slice(0, 200)));
       // totals 更新
       var t = getTotals();
@@ -1607,6 +1608,28 @@ function exportZ01Data() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+/* All-data Export */
+function exportAllData() {
+  var keys = ['dh', 'dh01', 'arr_train_v1', 'arr_quest_v1', 'arr_weakness_v1', 'player_xp', 'daily_streak', 'dh_totals'];
+  var payload = { version: 1, exported: new Date().toISOString() };
+  keys.forEach(function(k) {
+    var raw = localStorage.getItem(k);
+    if (raw !== null) {
+      try { payload[k] = JSON.parse(raw); } catch(e) { payload[k] = raw; }
+    }
+  });
+  var json = JSON.stringify(payload, null, 2);
+  var blob = new Blob([json], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'steel-darts-all-' + localDateStr(new Date()) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function triggerImportZ01() {
   var input = document.getElementById('imp-z01-file');
   input.value = '';
@@ -1620,7 +1643,7 @@ function importZ01Data(input) {
     try {
       var obj = JSON.parse(e.target.result);
       var incoming = obj.data || obj;
-      if (!Array.isArray(incoming)) throw new Error('形式が違います');
+      if (!Array.isArray(incoming)) throw new Error(t('g.import_err'));
       var current = _z01GetH();
       var dates = {};
       current.forEach(function(x){ dates[x.date] = true; });
@@ -3826,7 +3849,9 @@ function z01Undo() {
   }
   if (scored === null) return;
   var sub = document.getElementById('z01-undo-sub');
-  if (sub) sub.textContent = playerName + ' の ' + scored + ' 点を取り消します';
+  if (sub) sub.textContent = (_currentLang === 'en')
+    ? scored + ' ' + t('g.undo_pts') + ' \u2014 ' + playerName
+    : playerName + ' \u306e ' + scored + ' ' + t('g.undo_pts');
   var undoCfm = document.getElementById('z01-undo-confirm');
   undoCfm.style.display = 'flex';
   // Register modal for Escape key and backdrop close

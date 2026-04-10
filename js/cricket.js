@@ -31,10 +31,24 @@ var _CKT_CPU_DESC = [
   '', 'MPR ~0.8', 'MPR ~1.3', 'MPR ~1.8', 'MPR ~2.3', 'MPR ~2.8',
   'MPR ~3.4', 'MPR ~3.9', 'MPR ~4.4', 'MPR ~5.0', 'MPR ~5.7', 'MPR ~6.5', 'MPR ~7.0'
 ];
+// CPU name keys for i18n (index 0 unused; 1-12)
+var _CKT_CPU_NAME_KEYS = [
+  '', 'ckt.cpu.intro', 'ckt.cpu.beginner', 'ckt.cpu.novice', 'ckt.cpu.int', 'ckt.cpu.int',
+  'ckt.cpu.int', 'ckt.cpu.int', 'ckt.cpu.advanced', 'ckt.cpu.advanced', 'ckt.cpu.pro', 'ckt.cpu.pro', 'ckt.cpu.pro'
+];
+// Fallback display names (used if t() is unavailable)
 var _CKT_CPU_NAME = [
   '', '入門', '初心者', '初級', '中初級', 'アマチュア',
   '中級', '中級+', '上級', '上級+', 'エキスパート', 'セミプロ', 'プロ'
 ];
+function _cktCpuName(lv) {
+  var key = _CKT_CPU_NAME_KEYS[lv];
+  if (key && typeof t === 'function') {
+    var translated = t(key);
+    if (translated !== key) return translated;
+  }
+  return _CKT_CPU_NAME[lv] || '';
+}
 
 // ============================================================
 // SETUP FUNCTIONS
@@ -54,7 +68,7 @@ function cktSetCpu(arg) {
   var slider = document.getElementById('ckt-cpu-slider');
   if (slider) slider.value = arg;
   var disp = document.getElementById('ckt-cpu-level-disp');
-  if (disp) disp.textContent = 'LV' + arg + ' ' + (_CKT_CPU_NAME[arg] || '');
+  if (disp) disp.textContent = 'LV' + arg + ' ' + _cktCpuName(arg);
   var desc = document.getElementById('ckt-cpu-desc');
   if (desc) desc.textContent = _CKT_CPU_DESC[arg] || '';
 }

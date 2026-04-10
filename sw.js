@@ -1,5 +1,6 @@
 // Service Worker for Steel Darts Pro
-const CACHE_NAME = 'steel-darts-v3';
+const CACHE_NAME = 'steel-darts-v4';
+const FONT_CACHE_NAME = 'steel-darts-fonts-v1';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -11,7 +12,8 @@ const ASSETS_TO_CACHE = [
   '/js/game.min.js',
   '/js/arr.min.js',
   '/js/sim501.min.js',
-  '/js/cricket.min.js'
+  '/js/cricket.min.js',
+  '/js/route-table.min.js'
 ];
 
 // Install event - cache essential assets
@@ -32,7 +34,7 @@ self.addEventListener('activate', event => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
+          if (cacheName !== CACHE_NAME && cacheName !== FONT_CACHE_NAME) {
             return caches.delete(cacheName);
           }
         })
@@ -46,6 +48,26 @@ self.addEventListener('activate', event => {
 // Always try network first, fall back to cache for offline support
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') {
+    return;
+  }
+
+  const url = event.request.url;
+
+  // Cache-First strategy for Google Fonts
+  if (url.includes('fonts.googleapis.com') || url.includes('fonts.gstatic.com')) {
+    event.respondWith(
+      caches.open(FONT_CACHE_NAME).then(cache => {
+        return cache.match(event.request).then(cached => {
+          if (cached) return cached;
+          return fetch(event.request).then(response => {
+            if (response && response.status === 200) {
+              cache.put(event.request, response.clone());
+            }
+            return response;
+          });
+        });
+      })
+    );
     return;
   }
 

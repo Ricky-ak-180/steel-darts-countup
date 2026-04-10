@@ -350,13 +350,16 @@
      272: S20→T20→S-BULL = 167残し
      271: SS19→T20→S-BULL = 167残し
 
-   ■ 269〜262：T20×1＋S18かS19×1の組み合わせを活かす
-   - 2本のうち1本がT20・1本がS18かS19になった場合（順不同）、3本目S20で164・167・170に収められる
-   - 1本目T20+2本目S18/S19 でも 1本目S18/S19+2本目T20 でも結果は同じ
-   - ⚠ T20+S20+S20=100点取ってしまうと → 162〜169（ボギー）
-     269: SS19→T20→S20 = 170残し
-     266: SS19→T20→S20 = 167残し
-     262: SS18→T20→S20 = 164残し
+   ■ 269〜259：20狙い(100削り)でボギーになるスコアの回避ルート
+   - T20+S20+S20=100点取るとボギーナンバーに落ちるスコア群
+   - 3本目をS19/S18に切り替えるか、T18を使って回避
+     269: T20→S20→S19 = 170残し（99点削り）← 100だと169ボギー
+     268: T20→S20→S18 = 170残し（98点削り）← 100だと168ボギー
+     266: T20→T18→S18 = 164残し（102点削り）← 100だと166ボギー
+     265: T19→S19→S19 = 170残し（95点削り）← 100だと165ボギー
+     263: T20→T18→S18 = 161残し（102点削り）← 100だと163ボギー
+     262: T20→T18→S18 = 160残し（102点削り）← 100だと162ボギー
+     259: T20→S20→S19 = 160残し（99点削り）← 100だと159ボギー
 
    ■ 229〜220：3本目をS18・S19に切り替える
    - T20を狙うもS20に2本外れてしまった場合（残り182〜189）の対処
@@ -368,7 +371,7 @@
      223(S19) → 164残し　222(S18) → 164残し
    - T20のままOK：227, 224, 221, 220
 
-   ■ 199〜171：最後の1本　要注意（S20に外すとボギー直落ち）
+   ■ 195〜179：最後の1本　要注意（S20に外すとボギー直落ち）
    - このゾーンはS20への外れがボギーナンバーに直結する危険スコアが存在する
    - 特別スコア（S-BULLでチェックアウト設計）：
      195 → S-BULL(25) = 170残し（次ターンT20×2+D-Bullで一気にチェックアウト可能）
@@ -429,6 +432,25 @@
 /* ============================================================
    アレンジ練習
    ============================================================ */
+
+// localStorage 容量超過エラー通知ヘルパー
+function _lsSet(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch(e) {
+    if (e && (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED' || e.code === 22)) {
+      var msg = typeof t === 'function'
+        ? (t('err.storage_full') || 'ストレージ容量が不足しています。設定から履歴を削除してください。\nStorage full. Please clear history in settings.')
+        : 'ストレージ容量が不足しています。設定から履歴を削除してください。\nStorage full. Please clear history in settings.';
+      if (typeof _toast === 'function') {
+        _toast(msg);
+      } else {
+        console.warn('[Storage] QuotaExceededError:', key, msg);
+      }
+    }
+  }
+}
+
 var CHECKOUT = {
   2:["D1"],4:["D2"],6:["D3"],8:["D4"],10:["D5"],
   12:["D6"],14:["D7"],16:["D8"],18:["D9"],20:["D10"],
@@ -475,6 +497,12 @@ var CHECKOUT = {
 // アレンジ理論解説（アレンジ表に表示）
 // 掲載ルール：①T19/T18スタートの理由、②2本フィニッシュのD選択理由（隣接リスク）、③特殊ケース
 var CHECKOUT_TIPS = {};
+// 170〜160: 最高チェックアウト帯
+CHECKOUT_TIPS[170]='最高チェックアウト！T20+T20+D-BULLの「ビッグフィッシュ」。プロでも滅多に出ない。';
+CHECKOUT_TIPS[167]='T20+T19+D-BULL。170に次ぐ高得点フィニッシュ。';
+CHECKOUT_TIPS[164]='T20+T18+D-BULL。トリプル2本+D-BULLの最後のパターン。';
+CHECKOUT_TIPS[161]='T20+T17+D-BULL。ここからD-BULL不要のルートも増える。';
+CHECKOUT_TIPS[160]='T20+T20+D20。BULLを使わない最高チェックアウト。D20フィニッシュで安定。';
 // T19/T18スタート: T20外れS20になると2本では対応できない帯
 CHECKOUT_TIPS[139]='T19スタートで残り82→T14+D20。T20スタートだと残り79→D11になり、外れたとき次のダブルにつながらない。';
 CHECKOUT_TIPS[126]='T20スタートだとS20ミスで残り106→2本では上がれない。T19スタートならT19をS19に外しても残り107→T19+Bullで2本対応できる。';
@@ -699,7 +727,7 @@ var _ARR_KEZURI_QS = [
    choices:["S18","S19","S20","S17"],ans:0,
    exp:"222−20−20=182残し。S18(18点)→164残し。S20を打つと182−20=162（ボギー）！"},
 
-  // ── 199〜171：要注意スコア（9問）──
+  // ── 195〜179：要注意スコア（9問）──
   {q:"残り195点。どこを狙う？",
    choices:["S-BULL","T20","T19","S20"],ans:0,
    exp:"S-BULL(25点)→170残し。次ターンT20+T20+D-BULLで一気にチェックアウト可能！T20→S20ミスで175残し（上がり目なし）。"},
@@ -778,6 +806,9 @@ function _arrShuffle(a) {
 // ダーツ記号の得点
 function _dartVal(s) {
   if (s === "Bull") return 50;
+  if (s === "25") return 25;
+  if (/^\d+od$/.test(s)) return parseInt(s) * 2; // 10od = outer double 10 = 20
+  if (/^\d+o$/.test(s)) return parseInt(s);       // 18o = outer single 18
   if (s[0] === "T") return parseInt(s.slice(1)) * 3;
   if (s[0] === "D") return parseInt(s.slice(1)) * 2;
   return parseInt(s) || 0;
@@ -941,7 +972,7 @@ function _arrGetQuizData() {
   try { return JSON.parse(localStorage.getItem('arr_quiz_v1') || '{}'); } catch(e) { return {}; }
 }
 function _arrSaveQuizData(qd) {
-  try { localStorage.setItem('arr_quiz_v1', JSON.stringify(qd)); } catch(e) {}
+  _lsSet('arr_quiz_v1', JSON.stringify(qd));
 }
 
 /* 重み付きサンプリング（非復元） */
@@ -1097,9 +1128,40 @@ function _isCheckable(n) {
 function _renderTactics() {
   var html = '';
 
+  // ── スコア入力→即ジャンプ ──
+  html += '<div style="margin-bottom:16px;">' +
+    '<div style="display:flex;gap:8px;align-items:center;">' +
+      '<input id="kezuri-search" type="number" inputmode="numeric" placeholder="スコアを入力…" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;color:var(--fg);font-size:16px;font-family:inherit;outline:none;" />' +
+      '<button onclick="_kezuriJump()" style="background:var(--acc);color:#000;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;">検索</button>' +
+    '</div>' +
+  '</div>';
+
+  // ── フローチャート（ミニマップ）──
+  var fSteps = [
+    {range:'501〜310', label:'T20で削る', color:'var(--acc)', id:'sec-501'},
+    {range:'309〜302', label:'140削りの罠', color:'#ff6b6b', id:'sec-309'},
+    {range:'300〜296', label:'S-BULLで調整', color:'#4fc3f7', id:'sec-300'},
+    {range:'275〜271', label:'S-BULLで上がり目へ', color:'#4fc3f7', id:'sec-275'},
+    {range:'269〜259', label:'100削りの罠', color:'#ff6b6b', id:'sec-269'},
+    {range:'229〜220', label:'60削りの罠', color:'#ff6b6b', id:'sec-229'},
+    {range:'195〜179', label:'最後の1本注意', color:'#ff8a65', id:'sec-195'}
+  ];
+  html += '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:20px;">' +
+    '<div style="font-size:11px;color:var(--mut);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">戦術マップ</div>';
+  fSteps.forEach(function(s, i) {
+    html += '<a onclick="_kezuriScrollTo(\'' + s.id + '\')" style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer;text-decoration:none;">' +
+      '<span style="font-family:\'Bebas Neue\',cursive;font-size:14px;color:' + s.color + ';min-width:80px;">' + s.range + '</span>' +
+      '<span style="font-size:13px;color:var(--fg);">' + s.label + '</span>' +
+    '</a>';
+    if (i < fSteps.length - 1) {
+      html += '<div style="margin-left:36px;border-left:2px solid var(--bd);height:8px;"></div>';
+    }
+  });
+  html += '</div>';
+
   // ヘッダー
-  html += '<div style="font-size:22px;font-weight:700;color:var(--fg);margin-bottom:6px;">基本は <span style="color:var(--acc);">T20</span></div>';
-  html += '<div style="font-size:14px;color:var(--mut);margin-bottom:20px;line-height:1.6;">以下のスコアのみ例外。それ以外はすべてT20を狙う。</div>';
+  html += '<div style="font-size:22px;font-weight:700;color:var(--fg);margin-bottom:6px;">迷ったら <span style="color:var(--acc);">T20</span></div>';
+  html += '<div style="font-size:14px;color:var(--mut);margin-bottom:20px;line-height:1.6;">310より上は何も考えずT20。<strong style="color:var(--fg);">309以下で罠がある。</strong></div>';
 
   function scoreCard(n, zone) {
     var ex = TACTICS_EXCEPTIONS[n];
@@ -1210,11 +1272,11 @@ function _renderTactics() {
   }
 
   // 501〜310: T20のみ
-  html += '<div style="background:rgba(232,255,71,0.07);border:1px solid rgba(232,255,71,0.15);border-radius:12px;padding:16px 18px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;">' +
+  html += '<div id="sec-501" style="background:rgba(232,255,71,0.07);border:1px solid rgba(232,255,71,0.15);border-radius:12px;padding:16px 18px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;">' +
     '<div>' +
       '<div style="font-family:\'Bebas Neue\',cursive;font-size:38px;color:var(--acc);line-height:1;margin-bottom:6px;letter-spacing:1px;">501 〜 310</div>' +
-      '<div style="font-size:22px;font-weight:700;color:var(--fg);"><span style="color:var(--acc);">T20</span> ファースト</div>' +
-      '<div style="font-size:13px;color:var(--mut);margin-top:6px;line-height:1.5;">S20に外れてもボギーにならない。<br>刺さり方によってはT19・T18にスイッチしてOK。</div>' +
+      '<div style="font-size:22px;font-weight:700;color:var(--fg);"><span style="color:var(--acc);">T20</span>をひたすら狙え</div>' +
+      '<div style="font-size:13px;color:var(--mut);margin-top:6px;line-height:1.5;">S20に外れても安全。<br>ダーツの刺さり位置でT19・T18に切り替えてもOK。</div>' +
     '</div>' +
     '<div style="font-family:\'Bebas Neue\',cursive;font-size:56px;color:rgba(232,255,71,0.25);line-height:1;">T20</div>' +
   '</div>';
@@ -1222,39 +1284,26 @@ function _renderTactics() {
   // 300〜309
   (function(){
     var dangerScores = [309, 308, 306, 305, 303, 302];
-    var safeScores   = [310, 307, 304, 301, 300];
-    function scoreBadge(n, color, bg, border) {
-      return '<span style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:' + color + ';background:' + bg + ';border:1px solid ' + border + ';border-radius:6px;padding:2px 8px;letter-spacing:0.5px;">' + n + '</span>';
-    }
-    var dangerBadges = dangerScores.map(function(n){ return scoreBadge(n,'#ff6b6b','rgba(255,107,107,0.1)','rgba(255,107,107,0.3)'); }).join('');
-    var quickRef =
-      '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:12px;">' +
-        '<div style="font-size:10px;color:var(--mut);letter-spacing:1.5px;margin-bottom:10px;text-transform:uppercase;">309〜302 切替必要スコア</div>' +
-        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
-          '<span style="font-size:11px;color:#ff6b6b;font-weight:700;letter-spacing:0.5px;min-width:64px;flex-shrink:0;">❌ 切替必要</span>' +
-          '<div style="display:flex;gap:5px;flex-wrap:wrap;">' + dangerBadges + '</div>' +
-        '</div>' +
-        '<div style="font-size:11px;color:var(--mut);margin-top:10px;padding-top:8px;border-top:1px solid var(--bd);line-height:1.5;">T20+T20+S20で140点取ると残りがボギーナンバーになる。奇数→T19、偶数→T18に切替。</div>' +
-      '</div>';
     var cards = '';
     dangerScores.forEach(function(n){ cards += scoreCard(n, '300s'); });
     html +=
-      '<div style="margin-bottom:24px;">' +
-        '<div style="font-family:\'Bebas Neue\',cursive;font-size:26px;color:var(--acc);line-height:1.2;margin-bottom:4px;letter-spacing:0.5px;">309〜302　T19 / T18 ファースト</div>' +
-        '<div style="font-size:12px;color:var(--mut);margin-bottom:10px;line-height:1.5;">3本でT20+T20+S20＝140点を取るとボギー圏に落ちるスコアがある。奇数は T19、偶数は T18 に切り替える。</div>' +
-        quickRef +
+      '<div id="sec-309" style="margin-bottom:24px;">' +
+        '<div style="font-family:\'Bebas Neue\',cursive;font-size:26px;color:var(--acc);line-height:1.2;margin-bottom:4px;letter-spacing:0.5px;">309〜302　140点削りはボギーの罠</div>' +
+        '<div style="font-size:12px;color:var(--mut);margin-bottom:10px;line-height:1.5;">3本でT20+T20+S20＝140点を取るとボギー圏に落ちるスコア。T19 / T18に切り替えて回避。</div>' +
         cards +
+        '<div style="text-align:center;margin-top:10px;"><button onclick="_kezuriQuiz(0,6)" style="background:rgba(232,255,71,0.1);border:1px solid rgba(232,255,71,0.3);color:var(--acc);border-radius:8px;padding:8px 20px;font-size:13px;cursor:pointer;">このスコア帯をクイズで確認 →</button></div>' +
       '</div>';
   })();
 
   // ── 296〜300帯：3本目（残り1本）は25を狙う ──
-  html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
+  html += '<div id="sec-300" style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
     '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">300 〜 296<br>3本目（残り1本）は25を狙う</div>' +
     '<div style="font-size:13px;color:var(--mut);margin-bottom:12px;line-height:1.6;">そのターン2本を打ち終えて残り296〜300になったら、最後の1本で<strong style="color:#ff8a65;">S-BULL（25）</strong>を狙い271〜275帯に収める。ブルエリアは面積が広く期待値が高い。次のターンは2本のうち1本がT20・1本がシングルになった場合（順不同）、3本目S-BULLで167か170に収めてチェックアウトを目指す。</div>' +
     '<div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">' +
       '<div><span style="color:#66bb6a;font-weight:700;">✓ D-BULL（50）ヒット</span><span style="color:var(--mut);"> → 残り246〜250（次ターンT20ファーストで削る）</span></div>' +
       '<div><span style="color:#4fc3f7;font-weight:700;">✓ S-BULL（25）ヒット</span><span style="color:var(--mut);"> → 残り271〜275 → 次ターンはT20×1＋シングル×1（順不同）になればS-BULLで167か170残し ✅</span></div>' +
     '</div>' +
+    '<div style="text-align:center;margin-top:12px;"><button onclick="_kezuriQuiz(6,5)" style="background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.3);color:#4fc3f7;border-radius:8px;padding:8px 20px;font-size:13px;cursor:pointer;">このスコア帯をクイズで確認 →</button></div>' +
   '</div>';
 
   // ── 271〜275帯：S-BULL（25）でつなぐ ──
@@ -1300,36 +1349,43 @@ function _renderTactics() {
           '</div>' +
         '</div>';
     });
-    html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
-      '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">275 〜 271<br>S-BULL（25）でつなぐ</div>' +
+    html += '<div id="sec-275" style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
+      '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">275 〜 271<br>S-BULLで上がり目に収める</div>' +
       '<div style="font-size:13px;color:var(--mut);margin-bottom:10px;line-height:1.6;">2本のうち1本がT20・1本がシングルになった場合（順不同）、3本目に<strong style="color:#ff8a65;">S-BULL（25点）</strong>を打つと<strong style="color:var(--fg);">167か170</strong>に収められる。</div>' +
       cards275 +
       '<div style="margin-top:4px;"><span style="color:#ff6b6b;font-size:13px;">⚠ T20+S20+S20 で100点を取ってしまうと → 171〜175（上がり目なし）</span></div>' +
+      '<div style="text-align:center;margin-top:12px;"><button onclick="_kezuriQuiz(11,5)" style="background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.3);color:#4fc3f7;border-radius:8px;padding:8px 20px;font-size:13px;cursor:pointer;">このスコア帯をクイズで確認 →</button></div>' +
     '</div>';
   })();
 
   // ── 269〜262帯：1本目で下の桁を調整 ──
   (function(){
     var rows260 = [
-      {score:269, cut:99, d1:'S19', v1:19, d2:'T20', v2:60, d3:'S20', v3:20, leave:170},
-      {score:266, cut:99, d1:'S19', v1:19, d2:'T20', v2:60, d3:'S20', v3:20, leave:167},
-      {score:262, cut:98, d1:'S18', v1:18, d2:'T20', v2:60, d3:'S20', v3:20, leave:164}
+      {score:269, cut:99,  d1:'T20', v1:60, d2:'S20', v2:20, d3:'S19', v3:19, leave:170, bogey:169},
+      {score:268, cut:98,  d1:'T20', v1:60, d2:'S20', v2:20, d3:'S18', v3:18, leave:170, bogey:168},
+      {score:266, cut:96,  d1:'T20', v1:60, d2:'S18', v2:18, d3:'S18', v3:18, leave:170, bogey:166},
+      {score:265, cut:95,  d1:'T19', v1:57, d2:'S19', v2:19, d3:'S19', v3:19, leave:170, bogey:165},
+      {score:263, cut:93,  d1:'T19', v1:57, d2:'S18', v2:18, d3:'S18', v3:18, leave:170, bogey:163},
+      {score:262, cut:92,  d1:'T18', v1:54, d2:'S19', v2:19, d3:'S19', v3:19, leave:170, bogey:162},
+      {score:259, cut:99,  d1:'T20', v1:60, d2:'S20', v2:20, d3:'S19', v3:19, leave:160, bogey:159}
     ];
     var cards260 = '';
     rows260.forEach(function(r){
       var r1=r.score-r.v1, r2=r.score-r.v1-r.v2;
-      var isB=r.v1===18, isR=r.v1===19;
+      var d1Num = r.d1.replace(/[TS]/g,'');
+      var isB=d1Num==='18', isR=d1Num==='19';
       var wmColor    = isB ? 'rgba(79,195,247,0.15)'  : isR ? 'rgba(255,107,107,0.15)'  : 'rgba(255,255,255,0.07)';
       var scoreColor = isB ? '#4fc3f7'                : isR ? '#ff6b6b'                 : 'var(--fg)';
       var bdColor    = 'rgba(255,255,255,0.08)';
       var bgColor    = 'rgba(255,255,255,0.03)';
       cards260 +=
         '<div style="background:' + bgColor + ';border:1px solid ' + bdColor + ';border-radius:10px;padding:12px 14px;margin-bottom:8px;position:relative;overflow:hidden;">' +
-          '<div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:\'Bebas Neue\',cursive;font-size:72px;color:' + wmColor + ';line-height:1;pointer-events:none;">' + r.v1 + '</div>' +
-          '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;position:relative;">' +
+          '<div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:\'Bebas Neue\',cursive;font-size:72px;color:' + wmColor + ';line-height:1;pointer-events:none;">' + d1Num + '</div>' +
+          '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px;position:relative;">' +
             '<span style="font-family:\'Bebas Neue\',cursive;font-size:32px;color:' + scoreColor + ';line-height:1;">' + r.score + '</span>' +
             '<span style="font-size:16px;color:var(--mut);">' + r.cut + '点削り</span>' +
           '</div>' +
+          '<div style="font-size:11px;color:#ff6b6b;margin-bottom:6px;position:relative;">100削り → ' + r.bogey + '（ボギー）</div>' +
           '<div style="display:flex;align-items:center;gap:4px;position:relative;">' +
             '<div style="display:flex;flex-direction:column;align-items:center;">' +
               '<span style="font-size:18px;font-weight:700;color:' + scoreColor + ';">' + r.d1 + '</span>' +
@@ -1349,23 +1405,24 @@ function _renderTactics() {
           '</div>' +
         '</div>';
     });
-    html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
-      '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">269 〜 262<br>T20 ＋ S18/S19 でつなぐ</div>' +
-      '<div style="font-size:13px;color:var(--mut);margin-bottom:10px;line-height:1.6;">2本のうち1本がT20・1本がS18かS19になった場合（順不同）、3本目に<strong style="color:var(--fg);">S20</strong>を打つと<strong style="color:var(--fg);">164・167・170</strong>に収められる。</div>' +
+    html += '<div id="sec-269" style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' +
+      '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">269 〜 259<br>100点削りはボギーの罠</div>' +
+      '<div style="font-size:13px;color:var(--mut);margin-bottom:10px;line-height:1.6;">T20+S20+S20＝100点削りだとボギーに落ちるスコア。<br>3本目を<strong style="color:var(--fg);">S19/S18</strong>に切り替えるか、<strong style="color:var(--fg);">T19/T18</strong>スタートで回避。</div>' +
       cards260 +
-      '<div style="margin-top:4px;"><span style="color:#ff6b6b;font-size:13px;">⚠ T20+S20+S20 で100点を取ってしまうと → 162〜169（ボギー）</span></div>' +
+      '<div style="margin-top:4px;"><span style="color:#ff6b6b;font-size:13px;">⚠ T20+S20+S20 で100点削ると → 159〜169（ボギー）</span></div>' +
+      '<div style="text-align:center;margin-top:12px;"><button onclick="_kezuriQuiz(16,3)" style="background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.3);color:#4fc3f7;border-radius:8px;padding:8px 20px;font-size:13px;cursor:pointer;">このスコア帯をクイズで確認 →</button></div>' +
     '</div>';
   })();
 
   // ── 220〜229帯：3本目を18・19に切り替える ──
   (function(){
     var rows220 = [
-      {score:229, cut:59, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:170},
-      {score:228, cut:58, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:170},
-      {score:226, cut:59, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:167},
-      {score:225, cut:58, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:167},
-      {score:223, cut:59, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:164},
-      {score:222, cut:58, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:164}
+      {score:229, cut:59, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:170, bogey:169},
+      {score:228, cut:58, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:170, bogey:168},
+      {score:226, cut:59, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:167, bogey:166},
+      {score:225, cut:58, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:167, bogey:165},
+      {score:223, cut:59, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S19', v3:19, leave:164, bogey:163},
+      {score:222, cut:58, d1:'S20', v1:20, d2:'S20', v2:20, d3:'S18', v3:18, leave:164, bogey:162}
     ];
     var cards220 = '';
     rows220.forEach(function(r){
@@ -1382,6 +1439,7 @@ function _renderTactics() {
             '<span style="font-family:\'Bebas Neue\',cursive;font-size:32px;color:' + scoreColor + ';line-height:1;">' + r.score + '</span>' +
             '<span style="font-size:16px;color:var(--mut);">' + r.cut + '点削り</span>' +
           '</div>' +
+          '<div style="font-size:11px;color:#ff6b6b;margin-bottom:6px;position:relative;">60削り → ' + r.bogey + '（ボギー）</div>' +
           '<div style="display:flex;align-items:center;gap:4px;position:relative;">' +
             '<div style="display:flex;flex-direction:column;align-items:center;">' +
               '<span style="font-size:18px;font-weight:700;color:var(--mut);">' + r.d1 + '</span>' +
@@ -1401,33 +1459,697 @@ function _renderTactics() {
           '</div>' +
         '</div>';
     });
-    html += '<div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:24px;">' +
-      '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">229 〜 220<br>3本目を18・19に切り替える</div>' +
+    html += '<div id="sec-229" style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.35);border-radius:12px;padding:16px 18px;margin-bottom:24px;">' +
+      '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#4fc3f7;line-height:1.2;margin-bottom:4px;">229 〜 220<br>60点削りはボギーの罠</div>' +
       '<div style="font-size:13px;color:var(--mut);margin-bottom:10px;line-height:1.6;">T20を狙うもS20に2本外れた後（残り182〜189）、3本目もS20に入るとボギーナンバーに落ちる。3本目を<strong style="color:var(--acc);">S18かS19</strong>に切り替えて<strong style="color:var(--fg);">164・167・170</strong>に収める。</div>' +
       cards220 +
       '<div style="margin-top:4px;"><span style="color:#ff6b6b;font-size:13px;">⚠ S20＋S20＋S20（合計60点取ると）→ 162〜169 すべてボギーナンバーに落ちる</span></div>' +
+      '<div style="text-align:center;margin-top:12px;"><button onclick="_kezuriQuiz(19,6)" style="background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.3);color:#4fc3f7;border-radius:8px;padding:8px 20px;font-size:13px;cursor:pointer;">このスコア帯をクイズで確認 →</button></div>' +
     '</div>';
   })();
 
   // 171〜199（S20ミスでボギーになる8スコアのみ）
-  html += rangeSection(
-    '199〜171<br>最後の一本　要注意',
-    '最後の一本がS20だと、上がり目がなくなってしまう（ボギーナンバーになる）',
-    171, 199, '170s'
-  );
+  (function(){
+    var secCards = '';
+    for (var n = 195; n >= 179; n--) { secCards += scoreCard(n, '170s'); }
+    if (secCards) {
+      html += '<div id="sec-195" style="margin-bottom:24px;">' +
+        '<div style="font-family:\'Bebas Neue\',cursive;font-size:26px;color:var(--acc);line-height:1.2;margin-bottom:4px;letter-spacing:0.5px;">195〜179<br>最後の一本　要注意</div>' +
+        '<div style="font-size:12px;color:var(--mut);margin-bottom:10px;line-height:1.5;">最後の一本がS20だと、上がり目がなくなってしまう（ボギーナンバーになる）</div>' +
+        secCards +
+        '<div style="text-align:center;margin-top:10px;"><button onclick="_kezuriQuiz(25,9)" style="background:rgba(232,255,71,0.1);border:1px solid rgba(232,255,71,0.3);color:var(--acc);border-radius:8px;padding:8px 20px;font-size:13px;cursor:pointer;">このスコア帯をクイズで確認 →</button></div>' +
+      '</div>';
+    }
+  })();
 
-  // ボギーナンバー
-  html += '<div style="margin-top:16px;">' +
-    '<div style="font-size:13px;font-weight:700;letter-spacing:2px;color:var(--mut);margin-bottom:10px;">ボギーナンバー（3本で上がれない）</div>' +
-    '<div style="display:flex;flex-wrap:wrap;gap:8px;">';
-  BOGEY_NUMS.slice().sort(function(a,b){return b-a;}).forEach(function(n){ html += '<span style="font-family:\'Bebas Neue\',cursive;font-size:28px;background:rgba(255,107,107,0.12);color:#ff6b6b;border:1px solid rgba(255,107,107,0.3);border-radius:8px;padding:4px 14px;">' + n + '</span>'; });
-  html += '</div></div>';
+  // ボギーナンバー ビジュアルマップ
+  html += '<div id="sec-bogey" style="margin-top:16px;background:rgba(255,107,107,0.05);border:1px solid rgba(255,107,107,0.2);border-radius:12px;padding:16px 18px;">' +
+    '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:#ff6b6b;line-height:1.2;margin-bottom:4px;">Bogey Numbers</div>' +
+    '<div style="font-size:13px;color:var(--mut);margin-bottom:12px;">3本では絶対に上がれないスコア。この7つを覚えれば削り戦術は完璧。</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">';
+  BOGEY_NUMS.slice().sort(function(a,b){return b-a;}).forEach(function(n){
+    html += '<span style="font-family:\'Bebas Neue\',cursive;font-size:28px;background:rgba(255,107,107,0.12);color:#ff6b6b;border:1px solid rgba(255,107,107,0.3);border-radius:8px;padding:4px 14px;">' + n + '</span>';
+  });
+  html += '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;margin-bottom:8px;">';
+  for (var bn = 159; bn <= 170; bn++) {
+    var isBogey = BOGEY_NUMS.indexOf(bn) >= 0;
+    var bg = isBogey ? 'rgba(255,107,107,0.25)' : 'rgba(102,187,106,0.15)';
+    var fg = isBogey ? '#ff6b6b' : '#66bb6a';
+    var icon = isBogey ? '✕' : '✓';
+    html += '<div style="background:' + bg + ';border-radius:6px;padding:6px 2px;">' +
+      '<div style="font-family:\'Bebas Neue\',cursive;font-size:18px;color:' + fg + ';">' + bn + '</div>' +
+      '<div style="font-size:10px;color:' + fg + ';">' + icon + '</div>' +
+    '</div>';
+  }
+  html += '</div>' +
+    '<div style="font-size:11px;color:var(--mut);text-align:center;">159〜170 の中で <span style="color:#ff6b6b;font-weight:700;">赤 = ボギー</span>　<span style="color:#66bb6a;font-weight:700;">緑 = 上がれる</span></div>' +
+    '<div style="text-align:center;margin-top:12px;"><button onclick="_kezuriQuiz(34,7)" style="background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.3);color:#ff6b6b;border-radius:8px;padding:8px 20px;font-size:13px;cursor:pointer;">ボギーナンバークイズ →</button></div>' +
+  '</div>';
 
   document.getElementById('arr-teiseki-list').innerHTML = html;
+
+  // スティッキーヘッダー（スクロール中のスコア帯表示）
+  var _stickyEl = document.createElement('div');
+  _stickyEl.id = 'kezuri-sticky';
+  _stickyEl.style.cssText = 'position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--bd);padding:6px 12px;font-size:12px;color:var(--mut);display:none;transition:opacity 0.2s;';
+  var container = document.getElementById('arr-teiseki-list');
+  container.insertBefore(_stickyEl, container.firstChild);
+
+  var _secAnchors = [
+    {id:'sec-501', label:'501〜310 T20ファースト'},
+    {id:'sec-309', label:'309〜302 140削りの罠'},
+    {id:'sec-300', label:'300〜296 S-BULLで調整'},
+    {id:'sec-275', label:'275〜271 S-BULLで上がり目へ'},
+    {id:'sec-269', label:'269〜259 100削りの罠'},
+    {id:'sec-229', label:'229〜220 60削りの罠'},
+    {id:'sec-195', label:'195〜179 最後の1本注意'},
+    {id:'sec-bogey', label:'ボギーナンバー'}
+  ];
+  container.addEventListener('scroll', function() {
+    var top = container.scrollTop;
+    if (top < 100) { _stickyEl.style.display = 'none'; return; }
+    var cur = '';
+    _secAnchors.forEach(function(s) {
+      var el = document.getElementById(s.id);
+      if (el && el.offsetTop <= top + 60) cur = s.label;
+    });
+    if (cur) {
+      _stickyEl.textContent = cur;
+      _stickyEl.style.display = 'block';
+    } else {
+      _stickyEl.style.display = 'none';
+    }
+  });
+
+  // Enterキーでスコア検索
+  var searchInput = document.getElementById('kezuri-search');
+  if (searchInput) {
+    searchInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') _kezuriJump();
+    });
+  }
+}
+
+/* 削り戦術ヘルパー関数 */
+function _kezuriScrollTo(id) {
+  var el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function _kezuriJump() {
+  var input = document.getElementById('kezuri-search');
+  if (!input) return;
+  var n = parseInt(input.value, 10);
+  if (isNaN(n) || n < 170 || n > 501) return;
+
+  // スコアに応じた該当セクションにジャンプ
+  var targetId = '';
+  if (n >= 310) targetId = 'sec-501';
+  else if (n >= 302) targetId = 'sec-309';
+  else if (n >= 296) targetId = 'sec-300';
+  else if (n >= 271) targetId = 'sec-275';
+  else if (n >= 259) targetId = 'sec-269';
+  else if (n >= 220) targetId = 'sec-229';
+  else if (n >= 179) targetId = 'sec-195';
+  else targetId = 'sec-bogey';
+
+  var el = document.getElementById(targetId);
+  if (el) {
+    el.scrollIntoView({behavior:'smooth', block:'start'});
+    el.style.boxShadow = '0 0 0 2px var(--acc)';
+    setTimeout(function() { el.style.boxShadow = ''; }, 2000);
+  }
+}
+
+function _kezuriQuiz(startIdx, count) {
+  // 削り戦術クイズを指定範囲で開始する
+  _arrG.mode = 4;
+  _arrG.isKezuri = true;
+  _arrG.qList = [];
+  for (var i = startIdx; i < startIdx + count && i < _ARR_KEZURI_QS.length; i++) {
+    _arrG.qList.push(i);
+  }
+  _arrG.qCount = _arrG.qList.length;
+  _arrG.qIdx = 0;
+  _arrG.totalScore = 0; _arrG.maxScore = 0;
+  _arrG.correctCt = 0; _arrG.totalStages = 0; _arrG.totalTimeMs = 0; _arrG.combo = 0;
+  _arrG.log = [];
+  document.getElementById('arr-setup').style.display = 'none';
+  document.getElementById('arr-hist-wrap').style.display = 'none';
+  document.getElementById('arr-finish').className = 'arr-finish hide';
+  document.getElementById('arr-hud').className = 'arr-hud';
+  document.getElementById('arr-card').className = 'arr-card';
+  _arrNextQ();
 }
 
 /* アレンジ表 */
 var _teisekiFilter = 501; // 501=戦術, 41=41〜100, 99=99〜170
+
+// ── レベル別最適化セレクター ──
+var _TEISEKI_LEVELS = [40, 60, 70, 80, 100];
+var _teisekiAvg = 0; // 0=OFF, otherwise avg value
+
+function _detectUserAvg() {
+  // 01履歴から直近の3dart avgを推定
+  try {
+    var h01 = JSON.parse(localStorage.getItem('dh01') || '[]');
+    if (h01.length >= 3) {
+      var recent = h01.slice(-10);
+      var sum = 0, cnt = 0;
+      for (var i = 0; i < recent.length; i++) {
+        var a = recent[i].data && recent[i].data[0] && recent[i].data[0].avg;
+        if (a > 0) { sum += a; cnt++; }
+      }
+      if (cnt >= 3) return Math.min(110, Math.round(sum / cnt));
+    }
+  } catch(e) {}
+  // 01履歴がなければ自動検出しない（CountUpとは性質が異なるため）
+  return 0;
+}
+
+function _nearestLevel(avg) {
+  if (!avg) return 60; // デフォルト
+  var best = _TEISEKI_LEVELS[0], bestD = 9999;
+  for (var i = 0; i < _TEISEKI_LEVELS.length; i++) {
+    var d = Math.abs(_TEISEKI_LEVELS[i] - avg);
+    if (d < bestD) { bestD = d; best = _TEISEKI_LEVELS[i]; }
+  }
+  return best;
+}
+
+function _setTeisekiAvg(avg) {
+  _teisekiAvg = (+avg === _teisekiAvg) ? 0 : +avg; // 同じボタンでOFF
+  _renderTeiseki();
+}
+
+// ── 詳細理由パネル ──
+function _toggleEngDetail(score) {
+  var existing = document.getElementById('eng-detail-' + score);
+  if (existing) { existing.remove(); return; }
+  // 他のPro分析パネルだけ閉じる（定番解説はそのまま）
+  document.querySelectorAll('.arr-eng-detail:not(.arr-route-explain)').forEach(function(el) { el.remove(); });
+  var avgKey = '' + _teisekiAvg;
+  var entry = window.ROUTE_TABLE && ROUTE_TABLE[avgKey] && ROUTE_TABLE[avgKey][score];
+  if (!entry) return;
+  var panel = document.createElement('div');
+  panel.id = 'eng-detail-' + score;
+  panel.className = 'arr-eng-detail';
+  panel.innerHTML = _buildEngDetail(score, avgKey, entry);
+  var engWrap = document.querySelector('.arr-t-row[data-score="' + score + '"] .arr-t-eng-wrap');
+  if (engWrap) engWrap.after(panel);
+}
+
+// 展開アイコンの切替
+function _setExplainLink(score, open) {
+  var wrap = document.getElementById('explain-link-' + score);
+  if (!wrap) return;
+  var arrow = wrap.querySelector('.arr-explain-expand');
+  if (arrow) arrow.textContent = open ? '▲' : '▼';
+  wrap.classList.toggle('open', open);
+}
+
+// 他のパネルを閉じ、リンクも戻す
+function _closeAllExplains() {
+  document.querySelectorAll('.arr-route-explain').forEach(function(el) {
+    var id = el.id.replace('route-explain-', '');
+    _setExplainLink(+id, false);
+    el.remove();
+  });
+  document.querySelectorAll('.arr-eng-detail').forEach(function(el) {
+    var id = el.id.replace('eng-detail-', '');
+    _setExplainLink(+id, false);
+    el.remove();
+  });
+}
+
+// 全スコア共通：定番ルートの解説を展開
+function _toggleRouteExplain(score) {
+  var existing = document.getElementById('route-explain-' + score);
+  if (existing) {
+    _setExplainLink(score, false);
+    existing.remove();
+    return;
+  }
+  // 定番解説と他の定番解説パネルを閉じる（Pro分析パネルはそのまま）
+  document.querySelectorAll('.arr-route-explain').forEach(function(el) {
+    var id = el.id.replace('route-explain-', '');
+    _setExplainLink(+id, false);
+    el.remove();
+  });
+  var std = CHECKOUT[score];
+  if (!std) return;
+  // avgが未選択でもrecデータ取得のため80にフォールバック
+  var avgKey = '' + (_teisekiAvg || 80);
+  var entry = window.ROUTE_TABLE && ROUTE_TABLE[avgKey] && ROUTE_TABLE[avgKey][score];
+
+  var panel = document.createElement('div');
+  panel.id = 'route-explain-' + score;
+  panel.className = 'arr-route-explain arr-eng-detail';
+  panel.innerHTML = _buildStdExplain(score, entry);
+  var link = document.getElementById('explain-link-' + score);
+  if (link) link.after(panel);
+  _setExplainLink(score, true);
+}
+
+// 定番ルートのみの解説パネル
+function _buildStdExplain(score, entry) {
+  var std = CHECKOUT[score];
+  if (!std) return '';
+  var h = '<div class="eng-d-section">' +
+    '<div class="eng-d-label">ルート解説</div>' +
+    '<div class="eng-d-explain-block eng-d-explain-std">' +
+      '<div class="eng-d-explain-route">' + _routeDisplay(std) + '</div>' +
+      '<div class="eng-d-explain-text">' + _narrateStdRoute(score, std) + '</div>' +
+      (entry && entry.rec ? _buildMissScenarios(entry.rec, '外れた場合', std[0], std.slice(1)) : '') +
+    '</div></div>';
+  return h;
+}
+
+function _buildEngDetail(score, avgKey, entry) {
+  var std = CHECKOUT[score];
+  var nDarts = std ? std.length : 3;
+  var eng = _getEngineAlt(score, avgKey);
+  if (!eng) return '';
+
+  var whyData = entry.why;
+  var isExpanded = whyData && whyData.expanded;
+  var stdCo = whyData ? whyData.current.co : entry.co;
+  var engCo = whyData ? whyData.better.co : entry.co;
+  var stdPct = (stdCo * 100).toFixed(1);
+  var engPct = (engCo * 100).toFixed(1);
+  var stdR = whyData ? whyData.current.route : std;
+  var engR = whyData ? whyData.better.route : eng.route;
+  var diffComp = whyData ? whyData.diff : 0;
+  var diffPct = (diffComp * 100).toFixed(1);
+  var isSmallDiff = Math.abs(diffComp) < 0.01;
+
+  var h = '';
+
+  // ── 1. チェックアウト率比較 ──
+  var stdNDarts = stdR.length;
+  var engNDarts = engR.length;
+  var dartLabel = isExpanded
+    ? '定番' + stdNDarts + '本 vs Pro' + engNDarts + '本'
+    : nDarts + '本';
+  h += '<div class="eng-d-section">' +
+    '<div class="eng-d-label">チェックアウト率（' + dartLabel + '）</div>' +
+    '<div class="eng-d-compare">' +
+      '<div class="eng-d-bar-row">' +
+        '<span class="eng-d-bar-label">定番</span>' +
+        '<div class="eng-d-bar"><div class="eng-d-bar-fill eng-d-bar-std" style="width:' + Math.min(100, stdCo * 400) + '%"></div></div>' +
+        '<span class="eng-d-bar-val">' + stdPct + '%</span>' +
+      '</div>' +
+      '<div class="eng-d-bar-row">' +
+        '<span class="eng-d-bar-label">Pro</span>' +
+        '<div class="eng-d-bar"><div class="eng-d-bar-fill eng-d-bar-eng" style="width:' + Math.min(100, engCo * 400) + '%"></div></div>' +
+        '<span class="eng-d-bar-val eng-d-bar-val-eng">' + engPct + '%</span>' +
+      '</div>' +
+    '</div></div>';
+
+  // ── 2. Pro分析の解説（定番ルートの解説は「解説を見る」リンクで独立表示） ──
+  h += '<div class="eng-d-section">' +
+    '<div class="eng-d-label eng-d-label-pro">Pro分析の解説</div>' +
+    '<div class="eng-d-explain-block eng-d-explain-eng">' +
+      '<div class="eng-d-explain-route">' + _routeDisplay(engR) +
+        (isExpanded ? ' <span class="eng-d-expanded-badge">' + engNDarts + '本</span>' : '') +
+      '</div>' +
+      '<div class="eng-d-explain-text">' + _narrateEngRoute(score, stdR, engR, whyData || {diff:0}, stdPct, engPct) + '</div>' +
+      (entry && entry.engRec ? _buildMissScenarios(entry.engRec, '外れた場合', engR[0], engR.slice(1)) : '') +
+    '</div></div>';
+
+  // ── 4. 判定コメント ──
+  if (isExpanded && isSmallDiff) {
+    h += '<div class="eng-d-section"><span class="eng-d-principle">co差はわずか +' + diffPct + '% — 実戦では定番の' + stdNDarts + '本ルートで十分。好みで選んでOK</span></div>';
+  } else if (isSmallDiff) {
+    h += '<div class="eng-d-section"><span class="eng-d-principle">co差はわずか +' + diffPct + '% — どちらを選んでも大きな差はない。好みや慣れで選んでOK</span></div>';
+  } else if (isExpanded) {
+    h += '<div class="eng-d-section"><span class="eng-d-principle">Pro推奨ルートは +' + diffPct + '% 有利。' + engNDarts + '本使える場面では積極的に狙いたい</span></div>';
+  } else {
+    h += '<div class="eng-d-section"><span class="eng-d-principle">Pro推奨ルートは +' + diffPct + '% 有利</span></div>';
+  }
+
+  return h;
+}
+
+// 1投目の結果シナリオ（命中・ミス・バストを分けて表示）
+// hitRouteOverride: 元ルートの2本目以降（命中時の実際の継続ルート）
+function _buildMissScenarios(rec, title, aimTarget, hitRouteOverride) {
+  if (!rec || rec.length === 0) return '';
+
+  // 同じ残り点数の結果を合算（17o + 17 → S17 合算）
+  var grouped = {};
+  var bustProb = 0;
+  for (var i = 0; i < rec.length; i++) {
+    var r = rec[i];
+    if (r.bust) { bustProb += r.p; continue; }
+    // 命中判定: 狙いターゲットと完全一致のみ
+    var isHit = (r.d === aimTarget);
+    // 残りが同じものをグループ化
+    var key = r.lv + '_' + r.co.toFixed(3);
+    if (grouped[key]) {
+      grouped[key].prob += r.p;
+      // 狙いターゲット一致をグループに引き継ぐ
+      if (isHit) { grouped[key].isHit = true; grouped[key].dart = r.d; }
+      // より代表的な名前に（トリプル > シングル）
+      else if (/^T/.test(r.d) || r.d === 'Bull') grouped[key].dart = r.d;
+    } else {
+      grouped[key] = {
+        dart: r.d, prob: r.p, lv: r.lv,
+        route: r.route, co: r.co, isHit: isHit
+      };
+    }
+  }
+
+  // 命中（狙い通り）とミスに分類
+  var hits = [], misses = [];
+  var keys = Object.keys(grouped);
+  for (var i = 0; i < keys.length; i++) {
+    var g = grouped[keys[i]];
+    if (g.isHit) {
+      // 元ルートの2本目以降が渡されている場合はそれで上書き
+      if (hitRouteOverride && hitRouteOverride.length > 0) {
+        g.route = hitRouteOverride;
+      }
+      hits.push(g);
+    } else misses.push(g);
+  }
+  // ダーツボード時計回り配列順にソート（同じナンバーならシングル→ダブル→トリプル）
+  // 狙いターゲットからのボード上の距離順にソート
+  var _BOARD_SEQ = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+  var aimNum = aimTarget ? parseInt((aimTarget.match(/\d+/) || [0])[0]) : 20;
+  if (aimTarget === 'Bull' || aimTarget === '25') aimNum = -1; // Bull狙いは距離計算しない
+  var aimIdx = _BOARD_SEQ.indexOf(aimNum);
+  misses.sort(function(a,b){
+    var aNum = parseInt((a.dart.match(/\d+/) || [0])[0]);
+    var bNum = parseInt((b.dart.match(/\d+/) || [0])[0]);
+    if (a.dart === 'Bull' || a.dart === '25') return 1; // Bull系は最後
+    if (b.dart === 'Bull' || b.dart === '25') return -1;
+    var aIdx = _BOARD_SEQ.indexOf(aNum);
+    var bIdx = _BOARD_SEQ.indexOf(bNum);
+    // aimIdxからの距離（時計回り・反時計回りの短い方）
+    var aDist = Math.min(Math.abs(aIdx - aimIdx), 20 - Math.abs(aIdx - aimIdx));
+    var bDist = Math.min(Math.abs(bIdx - aimIdx), 20 - Math.abs(bIdx - aimIdx));
+    return aDist - bDist;
+  });
+
+  var h = '<div class="eng-d-miss-block">';
+
+  // 命中シナリオ
+  if (hits.length > 0) {
+    h += '<div class="eng-d-miss-title">命中した場合</div>';
+    for (var i = 0; i < Math.min(2, hits.length); i++) {
+      h += _scenarioRow(hits[i], true);
+    }
+  }
+
+  // ミスシナリオ
+  if (misses.length > 0 || bustProb > 0) {
+    h += '<div class="eng-d-miss-title">' + title + '</div>';
+    for (var i = 0; i < Math.min(3, misses.length); i++) {
+      h += _scenarioRow(misses[i], false);
+    }
+    if (bustProb > 0.01) {
+      h += '<div class="eng-d-sc-row">' +
+        '<span class="eng-d-sc-dart">ボード外</span>' +
+        '<span class="eng-d-sc-prob">' + (bustProb * 100).toFixed(0) + '%</span>' +
+        '<span class="eng-d-sc-result"><span class="eng-d-bust">バスト</span></span></div>';
+    }
+  }
+
+  return h + '</div>';
+}
+
+function _dartValSimple(d) {
+  if (d === 'Bull') return 50;
+  if (d === '25') return 25;
+  var m = d.match(/^([TDStds]?)(\d+)(o|od|i)?$/);
+  if (!m) return 0;
+  var n = parseInt(m[2]);
+  var prefix = (m[1] || '').toUpperCase();
+  if (prefix === 'T') return n * 3;
+  if (prefix === 'D' || m[3] === 'od') return n * 2;
+  return n;
+}
+
+// 2ダーツチェックアウト可能スコアの事前計算テーブル
+// _2DART_CO[score] = [firstDart, finishDouble] の最適ルート
+var _2DART_CO = (function() {
+  var tbl = {};
+  // 全ダブル（フィニッシュ用）
+  var doubles = [];
+  for (var di = 1; di <= 20; di++) doubles.push({d: 'D' + di, v: di * 2});
+  doubles.push({d: 'Bull', v: 50}); // D-BULL
+  // 全1投目候補
+  var firsts = [];
+  for (var fi = 1; fi <= 20; fi++) {
+    firsts.push({d: fi + 'o', v: fi});        // シングル
+    firsts.push({d: 'D' + fi, v: fi * 2});    // ダブル
+    firsts.push({d: 'T' + fi, v: fi * 3});    // トリプル
+  }
+  firsts.push({d: '25', v: 25});  // S-BULL
+  firsts.push({d: 'Bull', v: 50}); // D-BULL
+  // ダブル一発（2〜40偶数 + 50）
+  for (var dbi = 0; dbi < doubles.length; dbi++) {
+    var sc = doubles[dbi].v;
+    if (!tbl[sc]) tbl[sc] = [doubles[dbi].d]; // 1本ルート
+  }
+  // 2本ルート: firstDart + double = score
+  // 優先順位: T > S > D（1投目）、D-BULL > D20 > ... > D1（フィニッシュ）
+  for (var si = 2; si <= 170; si++) {
+    if (tbl[si]) continue; // 既にダブル一発がある
+    var best = null;
+    for (var dj = doubles.length - 1; dj >= 0; dj--) { // D-BULL優先
+      var need = si - doubles[dj].v;
+      if (need < 1 || need > 60) continue;
+      for (var fk = 0; fk < firsts.length; fk++) {
+        if (firsts[fk].v === need) {
+          if (!best || doubles[dj].v > best.dv) {
+            best = {f: firsts[fk].d, fin: doubles[dj].d, dv: doubles[dj].v};
+          }
+          break;
+        }
+      }
+    }
+    if (best) tbl[si] = [best.f, best.fin];
+  }
+  return tbl;
+})();
+
+function _scenarioRow(g, isHit) {
+  var dartDisp = _dartDisplayName(g.dart);
+  var pPct = (g.prob * 100).toFixed(0);
+  var scenario = '';
+  if (g.co > 0 && g.route && g.route.length > 0) {
+    // ルート合計がlvと一致するか検証、不一致ならCHECKOUTにフォールバック
+    var displayRoute = g.route;
+    var routeSum = 0;
+    for (var ri = 0; ri < g.route.length; ri++) routeSum += _dartValSimple(g.route[ri]);
+    if (routeSum !== g.lv && CHECKOUT[g.lv]) displayRoute = CHECKOUT[g.lv];
+    scenario = '<strong>' + g.lv + '</strong>残 → ' + displayRoute.map(_dartDisplayName).join('→') +
+      ' <span class="eng-d-co">(' + (g.co * 100).toFixed(1) + '%)</span>';
+  } else if (g.lv > 0) {
+    // 2ダーツチェックアウト可能か判定（CHECKOUT優先、_2DART_COフォールバック）
+    var fallbackRoute = CHECKOUT[g.lv];
+    var fb2 = (fallbackRoute && fallbackRoute.length <= 2) ? fallbackRoute : null;
+    var co2route = fb2 || (_2DART_CO[g.lv] && _2DART_CO[g.lv].length <= 2 ? _2DART_CO[g.lv] : null);
+    if (co2route) {
+      scenario = '<strong>' + g.lv + '</strong>残 → ' + co2route.map(_dartDisplayName).join('→') + ' で上がりを狙う';
+    } else if (CHECKOUT[g.lv] && CHECKOUT[g.lv].length > 2) {
+      // 残り2本ではチェックアウト不可 → 削りで得点を稼ぐ
+      var kezuriTarget = g.lv > 110 ? 'T20' : 'T' + Math.min(20, g.lv - 40);
+      var kezuriVal = _dartValSimple(kezuriTarget);
+      var kezuriLeave = g.lv - kezuriVal;
+      if (kezuriLeave >= 2 && kezuriLeave <= 170 && CHECKOUT[kezuriLeave]) {
+        scenario = '<strong>' + g.lv + '</strong>残 → ' + _dartDisplayName(kezuriTarget) + 'で削り → <strong>' + kezuriLeave + '</strong>残へ';
+      } else {
+        scenario = '<strong>' + g.lv + '</strong>残 → 削りで調整';
+      }
+    } else {
+      // ボギーまたは170超：削りで調整が必要。最適な削り先を提示
+      var bestLeave = null;
+      // T20(60)→S20(20)→T19(57)→S19(19)の順で削り先を探す
+      var kezuri = [60,20,57,19,54,18,51,17,48,16,45,15,42,14,40,13,39,12,36,11,50,25];
+      for (var ki = 0; ki < kezuri.length; ki++) {
+        var leave = g.lv - kezuri[ki];
+        if (leave >= 2 && leave <= 170 && CHECKOUT[leave]) {
+          var kezuriNames = {60:'T20',20:'20',57:'T19',19:'19',54:'T18',18:'18',51:'T17',17:'17',
+            48:'T16',16:'16',45:'T15',15:'15',42:'T14',14:'14',40:'D20',13:'13',39:'T13',
+            12:'12',36:'T12',11:'11',50:'D-BULL',25:'S-BULL'};
+          bestLeave = {dart: kezuriNames[kezuri[ki]], leave: leave};
+          break;
+        }
+      }
+      if (bestLeave) {
+        scenario = '<strong>' + g.lv + '</strong>残 → 削り ' + bestLeave.dart + ' で<strong>' + bestLeave.leave + '</strong>残へ';
+      } else {
+        scenario = '<strong>' + g.lv + '</strong>残 → 削りで調整';
+      }
+    }
+  }
+  return '<div class="eng-d-sc-row' + (isHit ? ' eng-d-sc-hit' : '') + '">' +
+    '<span class="eng-d-sc-dart">' + dartDisp + '</span>' +
+    '<span class="eng-d-sc-prob">' + pPct + '%</span>' +
+    '<span class="eng-d-sc-result">' + scenario + '</span></div>';
+}
+
+// ダブルチェーン段数（ミス時の再チャレンジ回数）
+var _DOUBLE_CHAIN = {
+  'D20':5,'D16':5,'D10':4,'D8':4,'D5':3,'D4':3,'D2':2,'D1':1,
+  'D3':2,'D6':2,'D7':1,'D9':1,'D11':1,'D12':2,'D13':1,'D14':1,
+  'D15':2,'D17':1,'D18':2,'D19':1
+};
+
+function _dartDisplayName(d) {
+  if (d === 'Bull') return 'D-BULL';
+  if (d === '25') return 'S-BULL';
+  if (/^\d+o$/.test(d)) return d.replace('o','');
+  if (/^\d+od$/.test(d)) return 'D' + d.replace('od','');
+  return d;
+}
+
+function _routeDisplay(route) {
+  return route.map(_dartDisplayName).join('→');
+}
+
+// 定番ルートの解説文を生成（初心者向け・ナラティブ）
+function _narrateStdRoute(score, stdRoute) {
+  var n = stdRoute.length;
+  var first = stdRoute[0];
+  var last = stdRoute[n - 1];
+  var chain = _DOUBLE_CHAIN[last] || 0;
+  var firstDisp = _dartDisplayName(first);
+  var lastDisp = _dartDisplayName(last);
+  var firstVal = _dartVal(first);
+  var lines = [];
+
+  // 1投目の説明
+  if (n === 1) {
+    lines.push(score + '点はダブルリング1本で直接上がれるスコアです。' + lastDisp + '（' + score + '点）を狙います。');
+  } else if (n === 2) {
+    var rem = score - firstVal;
+    lines.push('1投目に' + firstDisp + '（' + firstVal + '点）を狙い、<strong>' + rem + '点</strong>を残します。');
+    lines.push('2投目は' + lastDisp + 'で上がり。');
+  } else {
+    var rem1 = score - firstVal;
+    var secondDisp = _dartDisplayName(stdRoute[1]);
+    var secondVal = _dartVal(stdRoute[1]);
+    var rem2 = rem1 - secondVal;
+    lines.push('1投目に' + firstDisp + '（' + firstVal + '点）→ 2投目に' + secondDisp + '（' + secondVal + '点）で<strong>' + rem2 + '点</strong>を残します。');
+    lines.push('3投目は' + lastDisp + 'で上がり。');
+  }
+
+  // 1投目の特徴
+  if (/^T20$/.test(first)) {
+    lines.push('T20はダーツで最も練習されるトリプルで、安定して狙えます。');
+  } else if (/^T\d+$/.test(first)) {
+    var rem = score - firstVal;
+    if (rem > 0 && rem % 2 === 0) {
+      lines.push(firstDisp + 'を選ぶことで偶数（' + rem + '）を残せるため、ダブルで直接上がれます。');
+    }
+  } else if (/^\d+o?$/.test(first) && n >= 2) {
+    lines.push('シングル' + firstDisp + 'は命中率が高く、確実に残り点数を調整できます。');
+  }
+
+  // フィニッシュダブルのチェーン説明
+  if (chain >= 4) {
+    lines.push(lastDisp + 'はチェーン' + chain + '段（外しても半分の点数で再チャレンジ可能）で、ミスに強いフィニッシュです。');
+  } else if (chain >= 3) {
+    lines.push(lastDisp + 'はチェーン' + chain + '段あり、外しても再チャレンジの余地があります。');
+  } else if (chain === 1) {
+    lines.push('ただし' + lastDisp + 'はチェーン1段のみで、外すとリカバリーが難しい場面があります。');
+  }
+
+  return lines.join(' ');
+}
+
+// Pro推奨ルートの解説文を生成（初心者向け・ナラティブ）
+function _narrateEngRoute(score, stdRoute, engRoute, whyData, stdPct, engPct) {
+  var n = engRoute.length;
+  var first = engRoute[0];
+  var last = engRoute[n - 1];
+  var firstDisp = _dartDisplayName(first);
+  var lastDisp = _dartDisplayName(last);
+  var firstVal = _dartVal(first);
+  var diffPct = (whyData.diff * 100).toFixed(1);
+  var isExpanded = whyData.expanded;
+  var engChain = _DOUBLE_CHAIN[last] || 0;
+  var stdLast = stdRoute[stdRoute.length - 1];
+  var stdChain = _DOUBLE_CHAIN[stdLast] || 0;
+  var stdLastDisp = _dartDisplayName(stdLast);
+  var lines = [];
+
+  // ルート概要
+  if (n === 2) {
+    var rem = score - firstVal;
+    lines.push('1投目に' + firstDisp + '（' + firstVal + '点）を狙い、<strong>' + rem + '点</strong>を残します。');
+    lines.push('2投目は' + lastDisp + 'で上がり。');
+  } else if (n === 3) {
+    var rem1 = score - firstVal;
+    var secondDisp = _dartDisplayName(engRoute[1]);
+    var secondVal = _dartVal(engRoute[1]);
+    var rem2 = rem1 - secondVal;
+    lines.push('1投目に' + firstDisp + '（' + firstVal + '点）→ 2投目に' + secondDisp + '（' + secondVal + '点）で<strong>' + rem2 + '点</strong>を残します。');
+    lines.push('3投目は' + lastDisp + 'で上がり。');
+  }
+
+  // なぜこのルートが有利か（理由を重ねる）
+  // Bull推奨
+  if (first === 'Bull' || first === 'D-BULL') {
+    lines.push('このスキルレベルではD-BULL命中率が高く、50点を一発で稼げるBull起点のルートが有利になります。');
+  }
+
+  // expanded（本数増加）
+  if (isExpanded && !(first === 'Bull' || first === 'D-BULL')) {
+    lines.push('通常' + stdRoute.length + '本で狙うスコアですが、' + n + '本使うことでミス時の選択肢が増え、総合的なcheckout確率が上がります。');
+  }
+
+  // トリプル2連
+  if (/^T\d+$/.test(engRoute[0]) && n >= 2 && /^T\d+$/.test(engRoute[1])) {
+    lines.push('トリプル2本を組み合わせることで、1投目が外れてシングルに入っても残り点数がチェックアウト圏内に収まりやすくなります。');
+  }
+
+  // チェーン比較
+  if (engChain > stdChain && engChain >= 3) {
+    lines.push('フィニッシュの' + lastDisp + 'はチェーン' + engChain + '段あり、定番の' + stdLastDisp + '（' + stdChain + '段）と比べてミス時の修正力が格段に高くなります。');
+  }
+
+  // 偶数残り原則
+  if (stdRoute.length === engRoute.length && n <= 2) {
+    var stdFirst = stdRoute[0];
+    var sfVal = _dartVal(stdFirst);
+    var stdRem = score - sfVal;
+    var engRem = score - firstVal;
+    if (engRem % 2 === 0 && stdRem % 2 !== 0) {
+      lines.push(firstDisp + 'なら偶数（' + engRem + '）を残せるため、ダブルで直接上がれます。定番の' + _dartDisplayName(stdFirst) + 'だと奇数（' + stdRem + '）が残り、もう1本調整が必要です。');
+    }
+  }
+
+  // 結論
+  lines.push('この差がcheckout率 <strong>' + stdPct + '% → ' + engPct + '%（+' + diffPct + '%）</strong>に表れています。');
+
+  return lines.join(' ');
+}
+
+function _getEngineAlt(score, avgKey) {
+  if (!window.ROUTE_TABLE || !ROUTE_TABLE[avgKey]) return null;
+  var entry = ROUTE_TABLE[avgKey][score];
+  if (!entry) return null;
+  // why フィールドのみ使用（固定ルート同士の公平な比較）
+  // opt（適応型）は比較方法が異なるため Pro分析 には使わない
+  if (!entry.why) return null;
+  var whyRoute = entry.why.better.route;
+  // 検証: ルート合計がスコアと一致するか（理想形チェックアウト可能か）
+  var whySum = 0;
+  for (var j = 0; j < whyRoute.length; j++) whySum += _dartVal(whyRoute[j]);
+  if (whySum !== score) return null;
+  return {
+    route: whyRoute,
+    co: entry.why.better.co,
+    stdCo: entry.why.current.co,
+    diff: entry.why.diff // composite差
+  };
+}
 
 function _buildTeisekiEntries() {
   var entries = Object.keys(CHECKOUT).map(function(k){ return {score: +k, path: CHECKOUT[k]}; });
@@ -1469,7 +2191,7 @@ var _userRoutes = (function() {
 })();
 
 function _saveUserRoutes() {
-  try { localStorage.setItem('arr_user_routes', JSON.stringify(_userRoutes)); } catch(e) {}
+  _lsSet('arr_user_routes', JSON.stringify(_userRoutes));
 }
 
 function _parseRouteInput(str) {
@@ -1527,7 +2249,11 @@ function _pathHtml(path, noFinish, startScore) {
   path.forEach(function(d, i) {
     if (i > 0) h += '<span class="arr-t-arr">→</span>';
     var isFinish = !noFinish && i === path.length - 1;
-    var dLabel = (d === 'Bull') ? 'D-BULL' : (d === '25') ? 'S-BULL' : d;
+    // エンジン表記変換: 18o→18, 10od→D10, D25→D-BULL
+    var dDisp = d;
+    if (/^\d+od$/.test(d)) dDisp = 'D' + d.replace('od', ''); // 10od → D10
+    else if (/^\d+o$/.test(d)) dDisp = d.replace('o', '');     // 18o → 18
+    var dLabel = (dDisp === 'Bull') ? 'D-BULL' : (dDisp === '25') ? 'S-BULL' : dDisp;
     var showRemain = !!(startScore && !isFinish);
     if (showRemain) rem -= _dartVal(d);
     h += '<span class="arr-t-dart' + (isFinish ? ' finish' : '') + '">';
@@ -1580,14 +2306,80 @@ function _2hHtml(score) {
 
 function _renderTeiseki() {
   var entries = _buildTeisekiEntries();
-  if (_teisekiFilter === 99) entries = entries.filter(function(e){ return e.score >= 99 && e.score <= 170 && e.score !== 100; });
-  else if (_teisekiFilter === 41) entries = entries.filter(function(e){ return e.score >= 3 && e.score <= 100 && e.score !== 99 && (e.score % 2 !== 0 || e.score >= 41); });
+  var is170 = (_teisekiFilter === 99);
+  var is100 = (_teisekiFilter === 41);
+  if (is170) entries = entries.filter(function(e){ return e.score >= 99 && e.score <= 170 && e.score !== 100; });
+  else if (is100) entries = entries.filter(function(e){ return e.score >= 3 && e.score <= 100 && e.score !== 99 && (e.score % 2 !== 0 || e.score >= 41); });
   var html = '';
+
+  // ── スコア検索バー ──
+  html += '<div style="margin-bottom:14px;">' +
+    '<div style="display:flex;gap:8px;align-items:center;">' +
+      '<input id="teiseki-search" type="number" inputmode="numeric" placeholder="スコアを入力…" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;color:var(--fg);font-size:16px;font-family:inherit;outline:none;" />' +
+      '<button onclick="_teisekiJump()" style="background:var(--acc);color:#000;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;">検索</button>' +
+    '</div>' +
+  '</div>';
+
+  // ── レベル別最適化バー ──
+  if (is170 || is100) {
+    var detectedAvg = _detectUserAvg();
+    var detectedLvl = _nearestLevel(detectedAvg);
+    var _lvlLabels = {40:'初級',60:'中上級',70:'上級',80:'トップアマ',100:'プロ'};
+    html += '<div class="arr-lvl-bar">' +
+      '<div class="arr-lvl-header">' +
+        '<span class="arr-lvl-title"><span class="arr-lvl-icon">🎯</span>独自エンジン分析</span>' +
+        (detectedAvg ? '<span class="arr-lvl-detected">あなた: avg ' + detectedAvg + '</span>' : '') +
+      '</div>' +
+      '<div class="arr-lvl-avg-label">3-Dart Average</div>' +
+      '<div class="arr-lvl-btns">';
+    for (var li = 0; li < _TEISEKI_LEVELS.length; li++) {
+      var lv = _TEISEKI_LEVELS[li];
+      var isOn = _teisekiAvg === lv;
+      var isDetected = detectedAvg && _nearestLevel(detectedAvg) === lv;
+      html += '<button class="arr-lvl-btn' + (isOn ? ' on' : '') + (isDetected ? ' detected' : '') +
+        '" onclick="_setTeisekiAvg(' + lv + ')">' +
+        '<span class="arr-lvl-num">' + lv + '</span>' +
+        '<span class="arr-lvl-label">' + (_lvlLabels[lv] || '') + '</span>' +
+        '</button>';
+    }
+    html += '</div>';
+    if (_teisekiAvg) {
+      html += '<div class="arr-lvl-info">avg ' + _teisekiAvg + ' で定番と異なるスコアに <span class="arr-eng-badge-inline">Pro分析</span> を表示</div>';
+    } else {
+      html += '<div class="arr-lvl-info">レベルを選ぶと、スキルに合わせた最適ルートを表示します</div>';
+    }
+    html += '</div>';
+  }
+
+  // ── 早見ガイド（100〜3タブのみ） ──
+  if (is100) {
+    html += '<div style="background:rgba(232,255,71,0.07);border:1px solid rgba(232,255,71,0.15);border-radius:12px;padding:14px 16px;margin-bottom:16px;">' +
+      '<div style="font-size:15px;font-weight:700;color:var(--fg);margin-bottom:8px;">チェックアウト早見</div>' +
+      '<div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mut);line-height:1.5;">' +
+        '<div><span style="color:#ff8a65;font-weight:700;">1本フィニッシュ</span>　偶数 2〜40 → ダブルで直接上がり</div>' +
+        '<div><span style="color:#4fc3f7;font-weight:700;">2本フィニッシュ</span>　41〜100 → トリプル/シングル＋ダブル</div>' +
+        '<div><span style="color:var(--acc);font-weight:700;">BULL</span>　50 = D-BULLで1本上がり</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  // ── 早見ガイド（170〜99タブ） ──
+  if (is170) {
+    html += '<div style="background:rgba(232,255,71,0.07);border:1px solid rgba(232,255,71,0.15);border-radius:12px;padding:14px 16px;margin-bottom:16px;">' +
+      '<div style="font-size:15px;font-weight:700;color:var(--fg);margin-bottom:8px;">3本フィニッシュのポイント</div>' +
+      '<div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mut);line-height:1.5;">' +
+        '<div><span style="color:var(--acc);font-weight:700;">170</span> = 最高チェックアウト（T20+T20+D-BULL）</div>' +
+        '<div><span style="color:#ff6b6b;font-weight:700;">赤字スコア</span> = ボギー（3本で上がれない）</div>' +
+        '<div><span style="color:#4fc3f7;">Tips付き</span> = 覚えると有利なスコア</div>' +
+      '</div>' +
+    '</div>';
+  }
+
   entries.forEach(function(e) {
     if (!e.path) {
-      html += '<div class="arr-t-bogey-slim" data-score="' + e.score + '">' +
-        '<span class="arr-t-bogey-slim-score">' + e.score + '</span>' +
-        '<span class="arr-t-bogey-slim-label">上がり不可</span>' +
+      html += '<div class="arr-t-bogey-slim" data-score="' + e.score + '" style="background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.2);border-radius:8px;padding:8px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;">' +
+        '<span class="arr-t-bogey-slim-score" style="font-family:\'Bebas Neue\',cursive;font-size:28px;color:#ff6b6b;min-width:50px;">' + e.score + '</span>' +
+        '<span style="font-size:13px;color:#ff6b6b;font-weight:700;">✕ 上がり不可（ボギー）</span>' +
         '</div>';
       return;
     }
@@ -1609,9 +2401,25 @@ function _renderTeiseki() {
     html += '<div class="arr-t-row" data-score="' + e.score + '">' +
       '<div class="arr-t-score">' + e.score + '</div>' +
       '<div class="arr-t-routes">' +
-        '<div class="arr-t-path arr-t-main">' + mainLabel + (hasCtxMix ? _holdLabel(mainCtx) : '') + _pathHtml(e.path, false, showRem) + '</div>' +
+        '<div class="arr-t-explain-wrap" id="explain-link-' + e.score + '" onclick="_toggleRouteExplain(' + e.score + ')">' +
+          '<div class="arr-t-path arr-t-main">' + mainLabel + (hasCtxMix ? _holdLabel(mainCtx) : '') + _pathHtml(e.path, false, showRem) +
+            '<span class="arr-explain-right"><span class="arr-explain-badge">解説</span><span class="arr-explain-expand">▼</span></span>' +
+          '</div>' +
+        '</div>' +
         (show2h ? _2hHtml(e.score) : '') +
         (CHECKOUT_TIPS[e.score] ? '<div class="arr-t-tip">' + CHECKOUT_TIPS[e.score] + '</div>' : '') +
+        (_teisekiAvg ? (function() {
+          var eng = _getEngineAlt(e.score, '' + _teisekiAvg);
+          if (!eng) return '';
+          var diffPct = (eng.diff * 100).toFixed(1);
+          return '<div class="arr-t-eng-wrap" onclick="event.stopPropagation();_toggleEngDetail(' + e.score + ')" style="cursor:pointer;">' +
+            '<div class="arr-eng-header-line"><span class="arr-eng-badge">Pro分析</span>' +
+            '<span class="arr-eng-diff-badge">' + (eng.diff > 0.005 ? '+' + diffPct + '%' : '') + '</span></div>' +
+            '<div class="arr-t-path arr-t-eng">' +
+            _pathHtml(eng.route, false, showRem) +
+            '<span class="arr-explain-right"><span class="arr-eng-label-kaisetsu">解説</span><span class="arr-eng-expand">▼</span></span>' +
+            '</div></div>';
+        })() : '') +
         alts.map(function(a, i) {
           var ctx = (!is3 && hasCtxMix) ? _holdLabel(altCtxs[i]) : '';
           return '<div class="arr-t-path arr-t-alt">' + ctx + _pathHtml(a, false, showRem) + '</div>';
@@ -1625,7 +2433,52 @@ function _renderTeiseki() {
         '<button class="arr-t-add-btn" onclick="_addUserRoute(' + e.score + ')">＋ 自分のルートを追加</button>' +
       '</div></div>';
   });
-  document.getElementById('arr-teiseki-list').innerHTML = html;
+  var container = document.getElementById('arr-teiseki-list');
+  container.innerHTML = html;
+
+  // Enterキーで検索
+  var searchInput = document.getElementById('teiseki-search');
+  if (searchInput) {
+    searchInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') _teisekiJump();
+    });
+  }
+
+  // スティッキーヘッダー
+  var oldSticky = document.getElementById('teiseki-sticky');
+  if (oldSticky) oldSticky.remove();
+  var sticky = document.createElement('div');
+  sticky.id = 'teiseki-sticky';
+  sticky.style.cssText = 'position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--bd);padding:6px 12px;font-size:12px;color:var(--mut);display:none;';
+  container.insertBefore(sticky, container.firstChild);
+
+  container.onscroll = function() {
+    if (container.scrollTop < 80) { sticky.style.display = 'none'; return; }
+    var rows = container.querySelectorAll('.arr-t-row, .arr-t-bogey-slim');
+    var cur = '';
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i].offsetTop <= container.scrollTop + 60) {
+        cur = rows[i].getAttribute('data-score');
+      }
+    }
+    if (cur) {
+      sticky.textContent = cur + '点';
+      sticky.style.display = 'block';
+    }
+  };
+}
+
+function _teisekiJump() {
+  var input = document.getElementById('teiseki-search');
+  if (!input) return;
+  var n = parseInt(input.value, 10);
+  if (isNaN(n)) return;
+  var row = document.querySelector('.arr-t-row[data-score="' + n + '"], .arr-t-bogey-slim[data-score="' + n + '"]');
+  if (row) {
+    row.scrollIntoView({behavior:'smooth', block:'start'});
+    row.style.boxShadow = '0 0 0 2px var(--acc)';
+    setTimeout(function() { row.style.boxShadow = ''; }, 2000);
+  }
 }
 
 /* 次の問題へ */
@@ -2041,7 +2894,7 @@ function _arrFinish() {
   // ベスト更新
   var bests = _arrGetBests();
   var isNewBest = score > bests[_arrG.mode];
-  if (isNewBest) { bests[_arrG.mode] = score; try { localStorage.setItem('arr_best', JSON.stringify(bests)); } catch(e){} }
+  if (isNewBest) { bests[_arrG.mode] = score; _lsSet('arr_best', JSON.stringify(bests)); }
 
   // ランク
   var grade, gc;
@@ -2069,7 +2922,7 @@ function _arrFinish() {
   hist.unshift({ date: new Date().toISOString(), mode: _arrG.mode, score: score,
     grade: grade, correct: _arrG.correctCt, total: _arrG.totalStages });
   if (hist.length > 30) hist.length = 30;
-  try { localStorage.setItem('arr_history', JSON.stringify(hist)); } catch(e) {}
+  _lsSet('arr_history', JSON.stringify(hist));
 
   // デイリー & XP更新
   var correctRate = _arrG.totalStages > 0 ? _arrG.correctCt / _arrG.totalStages : 0;

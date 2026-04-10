@@ -7,27 +7,13 @@
         "$uid": {
           ".write": "auth != null && $uid === auth.uid",
           ".validate": "newData.hasChildren(['uid', 'name', 'score', 'ts'])",
-          "uid": {
-            ".validate": "newData.val() === auth.uid"
-          },
-          "name": {
-            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 16"
-          },
-          "score": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1440"
-          },
-          "ts": {
-            ".validate": "newData.val() === now"
-          },
-          "avg": {
-            ".validate": "newData.isString()"
-          },
-          "rank": {
-            ".validate": "newData.isString()"
-          },
-          "$other": {
-            ".validate": false
-          }
+          "uid":   { ".validate": "newData.val() === auth.uid" },
+          "name":  { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 16" },
+          "score": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1440" },
+          "ts":    { ".validate": "newData.val() === now" },
+          "avg":   { ".validate": "newData.isString()" },
+          "rank":  { ".validate": "newData.isString()" },
+          "$other":{ ".validate": false }
         }
       }
     },
@@ -39,22 +25,31 @@
           "$uid": {
             ".write": "auth != null && $uid === auth.uid",
             ".validate": "newData.hasChildren(['uid', 'name', 'score', 'ts'])",
-            "uid": {
-              ".validate": "newData.val() === auth.uid"
-            },
-            "name": {
-              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 16"
-            },
-            "score": {
-              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1440"
-            },
-            "ts": {
-              ".validate": "newData.val() === now"
-            },
-            "$other": {
-              ".validate": "newData.isString() || newData.isNumber()"
-            }
+            "uid":   { ".validate": "newData.val() === auth.uid" },
+            "name":  { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 16" },
+            "score": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1440" },
+            "ts":    { ".validate": "newData.val() === now" },
+            "$other":{ ".validate": "newData.isString() || newData.isNumber()" }
           }
+        }
+      }
+    },
+    "users": {
+      "$uid": {
+        ".read":  "auth != null && $uid === auth.uid",
+        ".write": "auth != null && $uid === auth.uid",
+        "sync": {
+          "_ts": { ".validate": "newData.isNumber()" },
+          "dh":            { ".validate": "newData.isString()" },
+          "dh01":          { ".validate": "newData.isString()" },
+          "arr_train_v1":  { ".validate": "newData.isString()" },
+          "arr_best":      { ".validate": "newData.isString()" },
+          "arr_quiz_v1":   { ".validate": "newData.isString()" },
+          "player_xp":     { ".validate": "newData.isString()" },
+          "daily_streak":  { ".validate": "newData.isString()" },
+          "user_level":    { ".validate": "newData.isString()" },
+          "lang":          { ".validate": "newData.isString()" },
+          "$other":        { ".validate": false }
         }
       }
     }

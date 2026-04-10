@@ -48,7 +48,7 @@ function _callerGetCtx() {
     // 作成直後に resume（一部ブラウザで suspended になる）
     if (_callerCtx.state === 'suspended') _callerCtx.resume();
     // よく使う音声を先読み
-    _callerPreload(['s0','s60','s100','s140','s180','gameshot_match','gameshot_leg','bust','caller_on']);
+    _callerPreload(['s0','s60','s100','s140','s180','s180_high','s140_high','s100_high','gameshot_match','gameshot_leg','bust','caller_on']);
     return _callerCtx;
   } catch(e) {
     return null;
@@ -73,6 +73,54 @@ function _callerInitSpeech() {
   }
   pick();
   if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = pick;
+}
+
+// ---- 歓声SE（Web Audio API合成） ----
+function _callerPlayCrowd(level) {
+  if (!_callerOn) return;
+  var ctx = _callerGetCtx();
+  if (!ctx) return;
+  // level: 'small' | 'medium' | 'big'
+  var duration = level === 'big' ? 2.0 : level === 'medium' ? 1.2 : 0.6;
+  var volume = level === 'big' ? 0.15 : level === 'medium' ? 0.10 : 0.06;
+  var layerCount = level === 'big' ? 8 : level === 'medium' ? 5 : 3;
+
+  // ホワイトノイズベースの歓声（複数レイヤーで厚みを出す）
+  var sampleRate = ctx.sampleRate;
+  var bufLen = Math.floor(sampleRate * duration);
+  var buf = ctx.createBuffer(1, bufLen, sampleRate);
+  var data = buf.getChannelData(0);
+
+  for (var i = 0; i < bufLen; i++) {
+    var t = i / sampleRate;
+    var env = Math.sin(Math.PI * t / duration); // フェードイン・アウト
+    env *= env; // よりスムーズなエンベロープ
+    var noise = 0;
+    for (var l = 0; l < layerCount; l++) {
+      // 各レイヤーに異なる周波数帯のノイズ
+      noise += (Math.random() * 2 - 1) * Math.sin(t * (200 + l * 150));
+    }
+    data[i] = noise / layerCount * env;
+  }
+
+  var source = ctx.createBufferSource();
+  source.buffer = buf;
+
+  // バンドパスフィルタで人声っぽい帯域に制限
+  var filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = 1200;
+  filter.Q.value = 0.8;
+
+  var gain = ctx.createGain();
+  gain.gain.value = volume;
+
+  source.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  // 少し遅延させてコーラー音声の後に重ねる
+  source.start(ctx.currentTime + 0.3);
 }
 
 // ---- Audio モード: ファイル読み込み ----
@@ -195,7 +243,10 @@ function _sText(n) {
   if (n < 20) return ones[n];
   if (n < 100) { var t=Math.floor(n/10),o=n%10; return tens[t]+(o?' '+ones[o]:''); }
   var h=Math.floor(n/100), r=n%100;
-  var base=(h===1?'One Hundred':'Two Hundred');
+  var hundreds=['','One Hundred','Two Hundred','Three Hundred','Four Hundred','Five Hundred',
+                'Six Hundred','Seven Hundred','Eight Hundred','Nine Hundred'];
+  var base = h <= 9 ? hundreds[h] : 'One Thousand';
+  if (h >= 10) return base; // 1000
   return base + (r > 0 ? ' and ' + _sText(r) : '');
 }
 
@@ -205,14 +256,34 @@ function _sText(n) {
 
 function callerScore(score) {
   if (!_callerOn || score == null) return;
-  _callerPlay(['s' + score], {text: _sText(score)});
+  var key = 's' + score;
+
+  // 歓声SE: 高スコアでは歓声を重ねる
+  if (score === 180) _callerPlayCrowd('big');
+  else if (score >= 140) _callerPlayCrowd('medium');
+  else if (score >= 100) _callerPlayCrowd('small');
+
+  // テンション別音声: _high版を先にload試行 → あれば使用、なければ通常版
+  if (score >= 100) {
+    var highKey = key + '_high';
+    _callerLoad(highKey, function(buf) {
+      if (buf) {
+        _callerPlay([highKey], {text: _sText(score), rate: 1.05, pitch: 1.05});
+      } else {
+        _callerPlay([key], {text: _sText(score)});
+      }
+    });
+  } else {
+    _callerPlay([key], {text: _sText(score)});
+  }
 }
 
 function callerGameShot(isMatchWin) {
   if (!_callerOn) return;
   var key = isMatchWin ? 'gameshot_match' : 'gameshot_leg';
   var text = isMatchWin ? 'Game Shot! And the match!' : 'Game Shot! And the leg.';
-  _callerPlay([key], {text: text});
+  _callerPlayCrowd(isMatchWin ? 'big' : 'medium');
+  _callerPlay([key], {text: text, rate: 1.1, pitch: 1.1});
 }
 
 function callerBust() {
@@ -236,8 +307,8 @@ function callerSimCheckout(who) {
 
 function callerFinish(total) {
   if (!_callerOn) return;
-  // "Game over." → "Total score," → [スコア]
-  _callerPlay(['gameover', null, 'total_score', null, 's' + total], {text: 'Game over. Total score, ' + _sText(total)});
+  // "Total score," → [スコア] 全て同じ音声で読み上げ
+  _callerPlay(['total_score', null, 's' + total], {text: 'Total score, ' + _sText(total)});
 }
 
 // 設定トグル
@@ -314,4 +385,20 @@ function toggleCaller() {
   } else {
     patch();
   }
+})();
+
+// iOS Safari: 最初のユーザー操作で AudioContext を unlock する
+(function _callerIosUnlock() {
+  function unlock() {
+    if (_callerCtx) {
+      if (_callerCtx.state === 'suspended') _callerCtx.resume();
+    } else if (_callerManifestReady) {
+      // manifest が読み込まれていれば AudioContext を先に作成しておく
+      _callerGetCtx();
+    }
+    document.removeEventListener('touchstart', unlock, true);
+    document.removeEventListener('click', unlock, true);
+  }
+  document.addEventListener('touchstart', unlock, true);
+  document.addEventListener('click', unlock, true);
 })();

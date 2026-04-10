@@ -64,9 +64,16 @@ var _i18n = {
     'hist.total': 'TOTAL',
     'hist.period': '期間別成績',
     'hist.export': '📤 エクスポート',
+    'hist.export_all': '📦 全データエクスポート',
     'hist.import': '📥 インポート',
     'hist.game_hist': 'ゲーム履歴',
     'hist.clear_all': '全件削除',
+
+    /* ---- Cloud Sync ---- */
+    'sync.label': 'クラウド同期',
+    'sync.hint': '端末移行コード: ',
+    'sync.copy': 'コピー',
+    'db.board_btn': '🎯 ボード入力',
 
     /* ---- Confirm dialogs ---- */
     'cfm.clear_title': '全件削除の確認',
@@ -550,7 +557,34 @@ var _i18n = {
     'common.best': 'ベスト',
     'common.date': '日付',
     'common.game': 'ゲーム',
-    'common.history': '履歴'
+    'common.history': '履歴',
+
+    /* ---- CPU tier labels (01 mode) ---- */
+    'cpu.tier.intro': '入門',
+    'cpu.tier.amateur': '初心者',
+    'cpu.tier.int': '中級〜上級',
+    'cpu.tier.pro': 'プロ',
+
+    /* ---- Simulator level options ---- */
+    'sim.lv.beginner': '初心者',
+    'sim.lv.amateur': 'アマ',
+    'sim.lv.house': 'ハウス',
+    'sim.lv.semipro': 'セミプロ',
+    'sim.lv.pro': 'プロ',
+    'sim.lv.elite': 'エリート',
+
+    /* ---- Cricket CPU slider labels ---- */
+    'ckt.cpu.intro': '入門',
+    'ckt.cpu.beginner': '初心者',
+    'ckt.cpu.novice': '初級',
+    'ckt.cpu.int': '中級',
+    'ckt.cpu.advanced': '上級',
+    'ckt.cpu.pro': 'プロ',
+
+    /* ---- Game messages ---- */
+    'g.undo_pts': '点を取り消します',
+    'g.import_err': '形式が違います',
+    'g.hist_trimmed': '古い履歴を削除しました'
   },
 
   en: {
@@ -608,6 +642,11 @@ var _i18n = {
     'hist.total': 'TOTAL',
     'hist.period': 'Period Stats',
     'hist.export': '📤 Export',
+    'hist.export_all': '📦 Export All Data',
+    'sync.label': 'Cloud Sync',
+    'sync.hint': 'Transfer code: ',
+    'sync.copy': 'Copy',
+    'db.board_btn': '🎯 Board Input',
     'hist.import': '📥 Import',
     'hist.game_hist': 'Game History',
     'hist.clear_all': 'Delete All',
@@ -1094,7 +1133,34 @@ var _i18n = {
     'common.best': 'Best',
     'common.date': 'Date',
     'common.game': 'Game',
-    'common.history': 'History'
+    'common.history': 'History',
+
+    /* ---- CPU tier labels (01 mode) ---- */
+    'cpu.tier.intro': 'Intro',
+    'cpu.tier.amateur': 'Amateur',
+    'cpu.tier.int': 'Intermediate+',
+    'cpu.tier.pro': 'Pro',
+
+    /* ---- Simulator level options ---- */
+    'sim.lv.beginner': 'Beginner',
+    'sim.lv.amateur': 'Amateur',
+    'sim.lv.house': 'House Player',
+    'sim.lv.semipro': 'Semi-Pro',
+    'sim.lv.pro': 'Pro',
+    'sim.lv.elite': 'Elite',
+
+    /* ---- Cricket CPU slider labels ---- */
+    'ckt.cpu.intro': 'Intro',
+    'ckt.cpu.beginner': 'Beginner',
+    'ckt.cpu.novice': 'Novice',
+    'ckt.cpu.int': 'Intermediate',
+    'ckt.cpu.advanced': 'Advanced',
+    'ckt.cpu.pro': 'Pro',
+
+    /* ---- Game messages ---- */
+    'g.undo_pts': 'pts undone',
+    'g.import_err': 'Invalid data format',
+    'g.hist_trimmed': 'Old records removed'
   }
 };
 
@@ -1131,6 +1197,7 @@ function setLang(lang) {
   if (!_i18n[lang]) return;
   _currentLang = lang;
   localStorage.setItem('app_lang', lang);
+  document.documentElement.lang = lang;
   _applyI18n();
   _updateLangToggle();
 }
