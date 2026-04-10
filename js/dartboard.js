@@ -321,7 +321,7 @@ var _dbKzZones = {
   // cx/cy: CX=W*cx, CY=W*cy.  rotDir: rotation = rotDir*π/2 - centerAngle
   // kz1: target at top (bull at bottom). cx shifted left to fit T4 on right with large R
   // kz2: target at bottom (bull at top)
-  kz1: { nums:[5,20,1,18,4],  scoring:[20,18], centerIdx:0,  mirror:false, cx:0.36, cy:0.98, rotDir:-1, r:0.70 },
+  kz1: { nums:[5,20,1,18,4],  scoring:[20,18], centerIdx:0,  mirror:false, cx:0.34, cy:0.97, rotDir:-1, r:0.72 },
   kz2: { nums:[7,19,3,17,2], scoring:[19,17], centerIdx:10, mirror:false, cx:0.50, cy:0.04, rotDir: 1, r:0.72 }
 };
 
@@ -345,6 +345,8 @@ function _dbKzSetMode(m) {
   document.querySelectorAll('.db-kz-tab').forEach(function(t) {
     t.classList.toggle('db-kz-tab-on', t.dataset.mode === m);
   });
+  _db.darts = [];       // clear dart markers when switching zones
+  _dbUpdateDisplay();
   _dbRedraw();
 }
 
@@ -363,11 +365,13 @@ function _dbDrawKezuri() {
   var CY = W * zone.cy;
   var wire = Math.max(2, W / 250);
 
-  // Narrowed triple ring (2/3 width for visual beauty; hit area stays full)
+  // Visual ring proportions (hit areas unchanged; these affect drawing only)
+  // Triple and double get the same narrow visual width for elegant symmetry
   var triMid  = (DB_R.triI + DB_R.triO) / 2;
-  var triHalf = (DB_R.triO - DB_R.triI) / 2 * (2 / 3);
+  var triHalf = (DB_R.triO - DB_R.triI) / 2 * 0.30;   // 30% → narrow stripe
   var kzTriI  = triMid - triHalf;
   var kzTriO  = triMid + triHalf;
+  var kzDblI  = DB_R.dbl - (kzTriO - kzTriI);          // same visual width as triple
 
   ctx.clearRect(0, 0, W, W);
   ctx.fillStyle = DB_C.bg;
@@ -399,15 +403,15 @@ function _dbDrawKezuri() {
     var a2    = a1 + DB_SEG;
     var odd   = (i % 2 === 0);
     if (isPri) {
-      _dbArc(ctx,CX,CY, DB_R.obull*R, kzTriI*R,    a1,a2, odd?DB_C.black:DB_C.cream);
-      _dbArc(ctx,CX,CY, kzTriI*R,     kzTriO*R,    a1,a2, odd?DB_C.red  :DB_C.green);
-      _dbArc(ctx,CX,CY, kzTriO*R,     DB_R.osin*R, a1,a2, odd?DB_C.black:DB_C.cream);
-      _dbArc(ctx,CX,CY, DB_R.osin*R,  DB_R.dbl*R,  a1,a2, odd?DB_C.red  :DB_C.green);
+      _dbArc(ctx,CX,CY, DB_R.obull*R, kzTriI*R,  a1,a2, odd?DB_C.black:DB_C.cream);
+      _dbArc(ctx,CX,CY, kzTriI*R,     kzTriO*R,  a1,a2, odd?DB_C.red  :DB_C.green);
+      _dbArc(ctx,CX,CY, kzTriO*R,     kzDblI*R,  a1,a2, odd?DB_C.black:DB_C.cream);
+      _dbArc(ctx,CX,CY, kzDblI*R,     DB_R.dbl*R,a1,a2, odd?DB_C.red  :DB_C.green);
     } else {
-      _dbArc(ctx,CX,CY, DB_R.obull*R, kzTriI*R,    a1,a2, odd?MC.seg1:MC.seg2);
-      _dbArc(ctx,CX,CY, kzTriI*R,     kzTriO*R,    a1,a2, MC.tri);
-      _dbArc(ctx,CX,CY, kzTriO*R,     DB_R.osin*R, a1,a2, odd?MC.seg1:MC.seg2);
-      _dbArc(ctx,CX,CY, DB_R.osin*R,  DB_R.dbl*R,  a1,a2, MC.tri);
+      _dbArc(ctx,CX,CY, DB_R.obull*R, kzTriI*R,  a1,a2, odd?MC.seg1:MC.seg2);
+      _dbArc(ctx,CX,CY, kzTriI*R,     kzTriO*R,  a1,a2, MC.tri);
+      _dbArc(ctx,CX,CY, kzTriO*R,     kzDblI*R,  a1,a2, odd?MC.seg1:MC.seg2);
+      _dbArc(ctx,CX,CY, kzDblI*R,     DB_R.dbl*R,a1,a2, MC.tri);
     }
   }
 
@@ -443,7 +447,7 @@ function _dbDrawKezuri() {
   }
 
   // Ring wires — subdued
-  [kzTriI,kzTriO,DB_R.osin,DB_R.dbl].forEach(function(r){
+  [kzTriI,kzTriO,kzDblI,DB_R.dbl].forEach(function(r){
     ctx.beginPath();
     ctx.arc(CX, CY, r*R, 0, Math.PI*2);
     ctx.strokeStyle = '#4a4228';
