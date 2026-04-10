@@ -59,7 +59,7 @@ function dbDraw() {
   var ctx = canvas.getContext('2d');
   var W = canvas.width;
   var CX = W / 2, CY = W / 2;
-  var R = W / 2 * 0.76;          // board radius — matches hit test
+  var R = W / 2 * 0.84;          // board radius — matches hit test
   var wire = Math.max(1, W / 400);
 
   ctx.clearRect(0, 0, W, W);
@@ -197,7 +197,7 @@ function _dbHitTest(tapX, tapY) {
   var rect = canvas.getBoundingClientRect();
   var CX = rect.left + rect.width  / 2;
   var CY = rect.top  + rect.height / 2;
-  var R  = rect.width / 2 * 0.76;  // must match dbDraw()
+  var R  = rect.width / 2 * 0.84;  // must match dbDraw()
 
   var dx = tapX - CX;
   var dy = tapY - CY;
@@ -358,7 +358,7 @@ window.addEventListener('load', function() {
 
   // Retina-aware sizing
   var dpr  = window.devicePixelRatio || 1;
-  var size = Math.min(window.innerWidth - 24, 360);
+  var size = Math.min(window.innerWidth - 16, 440);  // use more screen width
   canvas.style.width  = size + 'px';
   canvas.style.height = size + 'px';
   canvas.width  = size * dpr;

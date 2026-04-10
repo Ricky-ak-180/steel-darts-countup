@@ -466,7 +466,7 @@ canvas.schart { width: 100%; height: 100%; }
 /* ── Dartboard Modal ── */
 .db-modal { display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.92); align-items:center; justify-content:center; backdrop-filter:blur(8px); cursor:pointer; }
 .db-modal.db-show { display:flex; }
-.db-modal-inner { display:flex; flex-direction:column; align-items:center; gap:12px; width:100%; max-width:400px; padding:16px 12px calc(20px + env(safe-area-inset-bottom)); cursor:default; }
+.db-modal-inner { display:flex; flex-direction:column; align-items:center; gap:12px; width:100%; max-width:460px; padding:16px 8px calc(20px + env(safe-area-inset-bottom)); cursor:default; }
 
 /* Header */
 .db-modal-hdr { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:380px; }
