@@ -120,7 +120,7 @@ body::before {
 .tkh { font-size: 10px; color: var(--mut); }
 .tkd-db-btn { background: none; border: none; padding: 0; color: rgba(232,255,71,0.55); font-size: 11px; font-weight: 700; cursor: pointer; touch-action: manipulation; letter-spacing: 0.5px; margin-left: auto; white-space: nowrap; }
 .tkd-db-btn:active { color: var(--acc); }
-.db-tk-switch-btn { background: none; border: none; padding: 0; color: rgba(232,255,71,0.55); font-size: 11px; font-weight: 700; cursor: pointer; touch-action: manipulation; letter-spacing: 0.5px; white-space: nowrap; margin-left: 10px; }
+.db-tk-switch-btn { background: none; border: none; padding: 0; color: rgba(232,255,71,0.55); font-size: 11px; font-weight: 700; cursor: pointer; touch-action: manipulation; letter-spacing: 0.5px; white-space: nowrap; }
 .db-tk-switch-btn:active { color: var(--acc); }
 
 /* Tenkey grid */
@@ -538,7 +538,7 @@ canvas.schart { width: 100%; height: 100%; }
 
 /* Score row */
 .db-score-row { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:380px; background:var(--sur); border:1px solid var(--bdr); border-radius:12px; padding:10px 16px; min-height:52px; }
-.db-darts-labels { font-size:15px; color:var(--txt); font-weight:700; flex:1; letter-spacing:1px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.db-darts-labels { font-size:15px; color:var(--txt); font-weight:700; letter-spacing:1px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
 .db-dart-chip { display:inline-block; background:rgba(255,255,255,0.09); border:1px solid rgba(255,255,255,0.14); border-radius:8px; padding:3px 10px; font-size:14px; font-weight:700; color:var(--txt); letter-spacing:0.5px; }
 .db-dart-empty { color:var(--mut); font-weight:400; }
 .db-total-wrap { display:flex; align-items:baseline; gap:6px; }
