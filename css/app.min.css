@@ -473,7 +473,7 @@ canvas.schart { width: 100%; height: 100%; }
 
 /* ── Dartboard Mode Toggle ── */
 .db-mode-toggle { display:flex; gap:4px; background:rgba(255,255,255,0.06); border-radius:8px; padding:3px; }
-.db-mode-btn { background:none; border:none; color:var(--mut); border-radius:6px; padding:4px 10px; font-size:13px; font-weight:700; cursor:pointer; touch-action:manipulation; transition:all 0.15s; letter-spacing:0.5px; }
+.db-mode-btn { background:none; border:none; color:var(--mut); border-radius:6px; padding:4px 7px; font-size:12px; font-weight:700; cursor:pointer; touch-action:manipulation; transition:all 0.15s; letter-spacing:0.3px; }
 .db-mode-btn.db-mode-on { background:var(--acc); color:#000; }
 .db-mode-btn-sz { color:rgba(255,140,0,0.8); }
 .db-mode-btn-sz.db-mode-on { background:#ff8c00; color:#000; }
@@ -490,8 +490,8 @@ canvas.schart { width: 100%; height: 100%; }
 .db-auto-btn.db-auto-on { background:rgba(232,255,71,0.1); border-color:var(--acc) !important; color:var(--acc); }
 
 /* ── Dartboard Modal ── */
-.db-modal { display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.92); align-items:center; justify-content:center; backdrop-filter:blur(8px); cursor:pointer; }
-.db-modal.db-show { display:flex; }
+.db-modal { display:flex; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.92); align-items:center; justify-content:center; backdrop-filter:blur(8px); cursor:pointer; opacity:0; pointer-events:none; transition:opacity 0.2s ease; }
+.db-modal.db-show { opacity:1; pointer-events:auto; }
 .db-modal-inner { display:flex; flex-direction:column; align-items:center; gap:12px; width:100%; max-width:460px; padding:16px 8px calc(20px + env(safe-area-inset-bottom)); cursor:default; }
 
 /* ── Inline board mode (CountUp) ── */
@@ -555,6 +555,34 @@ canvas.schart { width: 100%; height: 100%; }
 .db-total-label { font-size:11px; color:var(--mut); }
 .db-total { font-family:'Bebas Neue',cursive; font-size:34px; color:var(--acc); letter-spacing:2px; min-width:52px; text-align:right; }
 
+/* ── SCR Zone Grid ── */
+.db-scr-wrap { display:none; flex-direction:column; gap:8px; width:100%; max-width:380px; }
+.db-scr-zones { display:flex; gap:6px; }
+.db-scr-zone-btn { flex:1; padding:10px 0; border-radius:10px; background:transparent; border:1.5px solid rgba(80,160,220,0.35); color:rgba(110,180,240,0.7); font-size:13px; font-weight:700; cursor:pointer; touch-action:manipulation; transition:all 0.15s; }
+.db-scr-zone-btn.db-scr-zone-on { border-color:#5ab0e8; color:#5ab0e8; background:rgba(80,160,220,0.15); }
+.db-scr-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; }
+.db-scr-btn { padding:18px 0; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.07); color:var(--txt); font-size:17px; font-weight:700; cursor:pointer; touch-action:manipulation; transition:opacity 0.1s; text-align:center; }
+.db-scr-btn:active { opacity:0.65; }
+.db-scr-tri { background:rgba(192,57,43,0.18); border-color:rgba(192,57,43,0.4); color:#f08878; }
+.db-scr-tri.db-scr-main { background:rgba(192,57,43,0.32); border-color:#c0392b; color:#fff; font-size:22px; }
+.db-scr-main:not(.db-scr-tri) { font-size:21px; font-weight:800; }
+.db-scr-dbl { background:rgba(26,138,58,0.18); border-color:rgba(26,138,58,0.4); color:#70c090; }
+.db-scr-miss { background:rgba(255,255,255,0.03); border-color:rgba(255,255,255,0.07); color:var(--mut); font-size:13px; }
+.db-scr-bull { background:#c0392b; border-color:#c0392b; color:#fff; grid-column:span 2; }
+.db-scr-25   { background:#1a8a3a; border-color:#1a8a3a; color:#fff; grid-column:span 2; }
+/* ── Grid Input ── */
+.db-grid-wrap { display:none; flex-direction:column; gap:7px; width:100%; max-width:380px; }
+.db-grid-mult { display:flex; gap:6px; }
+.db-grid-mult-btn { flex:1; padding:11px 0; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:var(--mut); font-size:13px; font-weight:700; cursor:pointer; touch-action:manipulation; transition:all 0.15s; }
+.db-grid-mult-btn.db-grid-mult-on { background:rgba(232,255,71,0.15); border-color:var(--acc); color:var(--acc); }
+.db-grid-nums { display:grid; grid-template-columns:repeat(5,1fr); gap:5px; }
+.db-grid-num { padding:15px 0; border-radius:8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:var(--txt); font-size:19px; font-weight:700; cursor:pointer; touch-action:manipulation; transition:background 0.1s; }
+.db-grid-num:active { background:rgba(232,255,71,0.25); }
+.db-grid-special { display:flex; gap:5px; }
+.db-grid-spec { flex:1; padding:13px 0; border-radius:8px; border:none; font-size:14px; font-weight:700; cursor:pointer; touch-action:manipulation; }
+.db-grid-bull { background:#c0392b; color:#fff; }
+.db-grid-25   { background:#1a8a3a; color:#fff; }
+.db-grid-miss { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12) !important; color:var(--mut); }
 /* Action buttons */
 .db-actions { display:flex; gap:10px; width:100%; max-width:380px; }
 .db-action-btn { flex:1; border:none; border-radius:12px; padding:14px 0; font-size:15px; font-weight:700; cursor:pointer; touch-action:manipulation; transition:all 0.15s; }
