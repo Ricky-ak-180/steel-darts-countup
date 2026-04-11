@@ -508,8 +508,8 @@ canvas.schart { width: 100%; height: 100%; }
 /* Kezuri: canvas fits container like object-fit:contain — maintains 4:3 aspect ratio */
 .db-isec-active.kz-mode .db-canvas-wrap { flex:1; min-height:0; display:flex; justify-content:center; align-items:center; }
 .db-isec-active.kz-mode .db-canvas-wrap #db-canvas { width:auto !important; height:auto !important; max-width:100% !important; max-height:100% !important; aspect-ratio:auto !important; }
-.db-isec-active .db-score-row { width:100%; flex-shrink:0; background:linear-gradient(180deg,#161628 0%,#0e0e1e 100%); border:1px solid rgba(232,255,71,0.12); border-radius:10px; padding:6px 14px; min-height:auto; }
-.db-isec-active .db-actions { width:100%; flex-shrink:0; }
+.db-isec-active .db-score-row { width:100%; max-width:100%; flex-shrink:0; background:linear-gradient(180deg,#161628 0%,#0e0e1e 100%); border:1px solid rgba(232,255,71,0.12); border-radius:10px; padding:6px 14px; min-height:auto; }
+.db-isec-active .db-actions { width:100%; max-width:100%; flex-shrink:0; }
 
 /* Header */
 .db-modal-hdr { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:380px; }
