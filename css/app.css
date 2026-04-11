@@ -117,7 +117,10 @@ body::before {
 .tkd { background: linear-gradient(180deg, #161628 0%, #0e0e1e 100%); border: 1px solid rgba(232,255,71,0.12); border-radius: 10px; padding: 6px 14px; display: flex; align-items: center; justify-content: space-between; }
 .tkv { font-family: 'Bebas Neue', cursive; font-size: 40px; color: var(--acc); letter-spacing: 3px; }
 .tkv.empty { color: var(--mut); font-size: 28px; }
+.tkd-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
 .tkh { font-size: 10px; color: var(--mut); text-align: right; }
+.tkd-db-btn { background: none; border: none; padding: 0; color: rgba(232,255,71,0.55); font-size: 11px; font-weight: 700; cursor: pointer; touch-action: manipulation; letter-spacing: 0.5px; }
+.tkd-db-btn:active { color: var(--acc); }
 
 /* Tenkey grid */
 .tkg { display: grid; grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(4,1fr); gap: 6px; flex: 1; min-height: 0; }
@@ -504,7 +507,7 @@ canvas.schart { width: 100%; height: 100%; }
 /* Kezuri: canvas fits container like object-fit:contain — maintains 4:3 aspect ratio */
 .db-isec-active.kz-mode .db-canvas-wrap { flex:1; min-height:0; display:flex; justify-content:center; align-items:center; }
 .db-isec-active.kz-mode .db-canvas-wrap #db-canvas { width:auto !important; height:auto !important; max-width:100% !important; max-height:100% !important; aspect-ratio:auto !important; }
-.db-isec-active .db-score-row { width:100%; flex-shrink:0; }
+.db-isec-active .db-score-row { width:100%; flex-shrink:0; background:linear-gradient(180deg,#161628 0%,#0e0e1e 100%); border:1px solid rgba(232,255,71,0.12); border-radius:10px; padding:6px 14px; min-height:auto; }
 .db-isec-active .db-actions { width:100%; flex-shrink:0; }
 
 /* Header */
@@ -1255,7 +1258,10 @@ canvas.schart { width: 100%; height: 100%; }
 .z01-ar-exit:active{background:rgba(255,107,107,0.12);}
 .z01-ar-undo{color:var(--txt);border-color:rgba(255,255,255,0.18);}
 /* Finish button: full-width, prominent, below numpad */
-.z01-finish-main{display:block;width:100%;background:transparent;border:1.5px solid rgba(255,255,255,0.12);color:var(--mut);border-radius:10px;font-size:15px;font-weight:800;padding:12px 0;cursor:pointer;letter-spacing:2px;touch-action:manipulation;font-family:'Noto Sans JP',sans-serif;text-align:center;margin-top:4px;transition:all 0.15s;}
+.z01-finish-row { display:flex; gap:6px; margin-top:4px; }
+.z01-finish-main{flex:1;display:block;background:transparent;border:1.5px solid rgba(255,255,255,0.12);color:var(--mut);border-radius:10px;font-size:15px;font-weight:800;padding:12px 0;cursor:pointer;letter-spacing:2px;touch-action:manipulation;font-family:'Noto Sans JP',sans-serif;text-align:center;transition:all 0.15s;}
+.z01-grid-btn { flex:0 0 auto; width:48px; background:transparent; border:1.5px solid rgba(232,255,71,0.25); color:rgba(232,255,71,0.55); border-radius:10px; font-size:20px; cursor:pointer; touch-action:manipulation; transition:all 0.15s; }
+.z01-grid-btn:active { background:rgba(232,255,71,0.1); color:var(--acc); }
 .z01-finish-main:active{opacity:0.7;transform:scale(0.97);}
 .z01-finish-main.finish-ready{color:#000;background:var(--acc);border-color:var(--acc);box-shadow:0 0 18px rgba(232,255,71,0.25);}
 /* Exit confirmation */
