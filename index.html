@@ -680,6 +680,13 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         <div class="z01-cpu-total" id="z01-cpu-total"></div>
       </div>
       <!-- Action row: undo + hint + customize -->
+      <!-- Input area -->
+      <div class="z01-input" id="z01-input-area">
+        <div class="z01-expr-row hide" id="z01-expr-row">
+          <span class="z01-single-expr" id="z01-single-expr"></span>
+        </div>
+        <div class="z01-presets" id="z01-presets"></div>
+      </div>
       <div class="z01-action-row">
         <button class="z01-ar-btn z01-ar-exit" data-fn="z01ConfirmExit" data-i18n="z01.exit">Exit</button>
         <button class="z01-ar-btn z01-ar-undo" data-fn="z01Undo" data-i18n="z01.undo">↩ 取消</button>
@@ -688,12 +695,8 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         <button class="sc-customize-btn" data-fn="toggleScEditor">⚙</button>
         <button class="z01-ar-btn z01-single-btn" id="z01-single-btn" data-fn="toggleZ01SingleMode">1本ずつ</button>
       </div>
-      <!-- Input area -->
-      <div class="z01-input" id="z01-input-area">
-        <div class="z01-expr-row hide" id="z01-expr-row">
-          <span class="z01-single-expr" id="z01-single-expr"></span>
-        </div>
-        <div class="z01-presets" id="z01-presets"></div>
+      <!-- Numpad (moved inside its own wrapper) -->
+      <div class="z01-input z01-numpad-wrap" id="z01-numpad-area">
         <div class="z01-tkg">
           <div class="z01-tk" data-fn="z01Kp" data-arg="1">1</div><div class="z01-tk" data-fn="z01Kp" data-arg="2">2</div><div class="z01-tk" data-fn="z01Kp" data-arg="3">3</div>
           <div class="z01-tk" data-fn="z01Kp" data-arg="4">4</div><div class="z01-tk" data-fn="z01Kp" data-arg="5">5</div><div class="z01-tk" data-fn="z01Kp" data-arg="6">6</div>
