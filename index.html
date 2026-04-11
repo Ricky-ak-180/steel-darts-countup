@@ -145,7 +145,7 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     <div class="settings-row">
       <button class="btn-snd" id="btn-snd" data-fn="toggleSound" data-i18n-aria="aria.snd" aria-label="サウンドのオン/オフ">🔊 <span data-i18n="set.sound">サウンド</span></button>
       <button class="btn-caller" id="btn-caller" onclick="toggleCaller()" data-i18n-aria="aria.caller" aria-label="コーラーのオン/オフ">🎙️ <span data-i18n="set.caller">コーラー</span></button>
-      <button class="btn-caller-gender" id="btn-caller-gender" data-fn="toggleCallerGender" aria-label="コーラー性別切替">♂</button>
+      <button class="btn-caller-expand hide" id="btn-caller-expand" onclick="toggleCallerExpand()" aria-label="コーラー設定を展開">▾</button>
       <button class="btn-lang" id="btn-lang" onclick="toggleLang()" data-i18n-aria="aria.lang" aria-label="言語切替">🌐 <span id="lang-label">EN</span></button>
       <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" data-i18n-aria="aria.theme" aria-label="テーマ切替">🌙 <span data-i18n="set.theme">テーマ</span></button>
     </div>
