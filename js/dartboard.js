@@ -391,7 +391,7 @@ function _dbDrawKezuri() {
   var isKz1 = (_dbKzMode === 'kz1');
   var CX = W / 2;
   var CY = isKz1 ? H : 0;
-  var R  = H * 0.95;
+  var R  = H * 0.80;
   var wire = Math.max(2, H / 250);
 
   // Outer wire ring
@@ -504,7 +504,7 @@ function _dbHitTestKezuri(tapX, tapY) {
   var isKz1 = (_dbKzMode === 'kz1');
   var CX = W / 2;
   var CY = isKz1 ? H : 0;
-  var R  = H * 0.95;
+  var R  = H * 0.80;
 
   var dx = cx - CX;
   var dy = cy - CY;

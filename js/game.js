@@ -868,8 +868,9 @@ function _getPersonalBests() {
 
   if (hCkt.length) {
     for (var i = 0; i < hCkt.length; i++) {
-      if (hCkt[i].mpr > bestCkt) {
-        bestCkt = hCkt[i].mpr;
+      var cktMpr = Array.isArray(hCkt[i].mpr) ? hCkt[i].mpr[0] : (hCkt[i].mpr || 0);
+      if (cktMpr > bestCkt) {
+        bestCkt = cktMpr;
       }
     }
   }

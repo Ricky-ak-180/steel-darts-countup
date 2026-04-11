@@ -469,16 +469,25 @@ canvas.schart { width: 100%; height: 100%; }
 .db-to-key-btn:active { background:rgba(232,255,71,0.18); }
 .db-isec-active .db-to-key-btn { display:block; }
 .db-isec-active .db-close-btn { display:none; }
+.db-modal.db-01-mode .db-to-key-btn { display:block; }
 
 /* ── Dartboard Mode Toggle ── */
 .db-mode-toggle { display:flex; gap:4px; background:rgba(255,255,255,0.06); border-radius:8px; padding:3px; }
 .db-mode-btn { background:none; border:none; color:var(--mut); border-radius:6px; padding:4px 10px; font-size:13px; font-weight:700; cursor:pointer; touch-action:manipulation; transition:all 0.15s; letter-spacing:0.5px; }
 .db-mode-btn.db-mode-on { background:var(--acc); color:#000; }
+.db-mode-btn-sz { color:rgba(255,140,0,0.8); }
+.db-mode-btn-sz.db-mode-on { background:#ff8c00; color:#000; }
+.db-isec-active .db-canvas-wrap #db-canvas.sz-active { aspect-ratio:unset !important; height:auto !important; width:100% !important; }
 
-/* ── Kezuri Target Tabs ── */
-.db-kz-tabs { display:flex; gap:8px; width:100%; max-width:380px; }
-.db-kz-tab { flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:var(--mut); border-radius:10px; padding:9px 0; font-size:15px; font-weight:700; cursor:pointer; touch-action:manipulation; transition:all 0.15s; letter-spacing:1px; }
-.db-kz-tab.db-kz-tab-on { background:rgba(232,255,71,0.12); border-color:var(--acc); color:var(--acc); }
+/* ── Header right (zone wrap + mode toggle) ── */
+.db-hdr-right { display:flex; align-items:center; gap:6px; }
+/* ── KZ Zone buttons (上側/下側) ── */
+.db-kz-zone-wrap { display:flex; gap:4px; padding-right:6px; border-right:1px solid rgba(255,255,255,0.12); }
+.db-zone-btn { background:transparent; border:1.5px solid rgba(80,160,220,0.35); color:rgba(110,180,240,0.7); border-radius:8px; padding:4px 0; min-width:64px; text-align:center; font-size:12px; font-weight:700; cursor:pointer; touch-action:manipulation; transition:all 0.15s; letter-spacing:0.5px; }
+.db-zone-btn.db-kz-tab-on { border-color:#5ab0e8; color:#5ab0e8; background:rgba(80,160,220,0.15); }
+/* ── AUTO button in actions row ── */
+.db-auto-btn { flex:0 0 auto !important; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12) !important; color:var(--mut); font-size:11px !important; letter-spacing:1.5px; }
+.db-auto-btn.db-auto-on { background:rgba(232,255,71,0.1); border-color:var(--acc) !important; color:var(--acc); }
 
 /* ── Dartboard Modal ── */
 .db-modal { display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.92); align-items:center; justify-content:center; backdrop-filter:blur(8px); cursor:pointer; }
@@ -489,7 +498,7 @@ canvas.schart { width: 100%; height: 100%; }
 .db-isec-active { padding:4px !important; }
 .db-isec-active .db-modal-inner { max-width:100%; width:100%; padding:4px; gap:6px; flex:1; min-height:0; align-items:stretch; overflow:hidden; }
 .db-isec-active .db-modal-hdr { width:100%; max-width:100%; flex-shrink:0; }
-.db-isec-active .db-kz-tabs { width:100%; flex-shrink:0; }
+.db-isec-active .db-kz-zone-wrap { flex-shrink:0; }
 .db-isec-active .db-canvas-wrap { width:100%; flex:1; min-height:0; display:flex; justify-content:center; align-items:center; }
 .db-isec-active .db-canvas-wrap #db-canvas { display:block !important; width:auto !important; height:100% !important; max-width:100%; aspect-ratio:1/1; }
 /* Kezuri: absolute within cu-game-wrap, matches scard width */
@@ -539,7 +548,9 @@ canvas.schart { width: 100%; height: 100%; }
 
 /* Score row */
 .db-score-row { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:380px; background:var(--sur); border:1px solid var(--bdr); border-radius:12px; padding:10px 16px; min-height:52px; }
-.db-darts-labels { font-size:15px; color:var(--txt); font-weight:700; flex:1; letter-spacing:1px; }
+.db-darts-labels { font-size:15px; color:var(--txt); font-weight:700; flex:1; letter-spacing:1px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.db-dart-chip { display:inline-block; background:rgba(255,255,255,0.09); border:1px solid rgba(255,255,255,0.14); border-radius:8px; padding:3px 10px; font-size:14px; font-weight:700; color:var(--txt); letter-spacing:0.5px; }
+.db-dart-empty { color:var(--mut); font-weight:400; }
 .db-total-wrap { display:flex; align-items:baseline; gap:6px; }
 .db-total-label { font-size:11px; color:var(--mut); }
 .db-total { font-family:'Bebas Neue',cursive; font-size:34px; color:var(--acc); letter-spacing:2px; min-width:52px; text-align:right; }
