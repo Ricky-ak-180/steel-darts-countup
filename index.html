@@ -1190,6 +1190,15 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
       <button class="db-close-btn" onclick="dbClose()">✕</button>
     </div>
 
+    <!-- Score display — always visible, above input area (matches テンキー tkd position) -->
+    <div class="db-score-row">
+      <div class="db-darts-labels" id="db-darts-disp">—</div>
+      <div class="db-total-wrap">
+        <span class="db-total-label">合計</span>
+        <span class="db-total" id="db-total">0</span>
+      </div>
+    </div>
+
     <!-- Canvas — used for both board and kezuri zoomed view -->
     <div class="db-canvas-wrap" id="db-canvas-wrap">
       <canvas id="db-canvas"></canvas>
