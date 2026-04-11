@@ -73,7 +73,7 @@ var _i18n = {
     'sync.label': 'クラウド同期',
     'sync.hint': '端末移行コード: ',
     'sync.copy': 'コピー',
-    'db.board_btn': '🎯 ボード入力',
+    'db.board_btn': '🎯 グリッド入力',
 
     /* ---- Confirm dialogs ---- */
     'cfm.clear_title': '全件削除の確認',
@@ -646,7 +646,7 @@ var _i18n = {
     'sync.label': 'Cloud Sync',
     'sync.hint': 'Transfer code: ',
     'sync.copy': 'Copy',
-    'db.board_btn': '🎯 Board Input',
+    'db.board_btn': '🎯 Grid Input',
     'hist.import': '📥 Import',
     'hist.game_hist': 'Game History',
     'hist.clear_all': 'Delete All',
