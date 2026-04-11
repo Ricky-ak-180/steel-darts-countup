@@ -115,7 +115,7 @@ body::before {
 
 /* Tenkey display */
 .tkd { background: linear-gradient(180deg, #161628 0%, #0e0e1e 100%); border: 1px solid rgba(232,255,71,0.12); border-radius: 10px; padding: 6px 14px; display: flex; align-items: center; justify-content: space-between; }
-.tkv { font-family: 'Bebas Neue', cursive; font-size: 40px; color: var(--acc); letter-spacing: 3px; }
+.tkv { font-family: 'Bebas Neue', cursive; font-size: 40px; color: var(--acc); letter-spacing: 3px; flex: 1; }
 .tkv.empty { color: var(--mut); font-size: 28px; }
 .tkd-right { display: flex; flex-direction: row; align-items: center; gap: 10px; }
 .tkh { font-size: 10px; color: var(--mut); text-align: right; }
