@@ -284,7 +284,9 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     </div>
     <div class="exp-row">
       <button class="bexp" id="btn-export-all" data-i18n="hist.export_all">📦 全データエクスポート</button>
+      <button class="bexp" id="btn-restore-backup" onclick="restoreAutoBackup()" style="display:none;">♻️ バックアップ復元</button>
     </div>
+    <div id="backup-info-row" style="font-size:10px;color:var(--mut);padding:4px 0 6px;"></div>
     <div class="sync-panel" id="sync-panel">
       <div class="sync-panel-row">
         <span class="sync-panel-icon">☁</span>
