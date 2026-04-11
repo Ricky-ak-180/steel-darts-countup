@@ -1192,9 +1192,29 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
     </div>
 
     <!-- Canvas — used for both board and kezuri zoomed view -->
-    <div class="db-canvas-wrap">
+    <div class="db-canvas-wrap" id="db-canvas-wrap">
       <canvas id="db-canvas"></canvas>
       <div class="db-flash" id="db-flash"></div>
+    </div>
+
+    <!-- Grid input — button-based dart entry -->
+    <div class="db-grid-wrap" id="db-grid-wrap" style="display:none">
+      <div class="db-grid-mult">
+        <button class="db-grid-mult-btn db-grid-mult-on" data-mult="1" onclick="_dbGridSetMult(1)">Single</button>
+        <button class="db-grid-mult-btn" data-mult="2" onclick="_dbGridSetMult(2)">Double</button>
+        <button class="db-grid-mult-btn" data-mult="3" onclick="_dbGridSetMult(3)">Triple</button>
+      </div>
+      <div class="db-grid-nums">
+        <button class="db-grid-num" onclick="_dbGridTapNum(20)">20</button><button class="db-grid-num" onclick="_dbGridTapNum(19)">19</button><button class="db-grid-num" onclick="_dbGridTapNum(18)">18</button><button class="db-grid-num" onclick="_dbGridTapNum(17)">17</button><button class="db-grid-num" onclick="_dbGridTapNum(16)">16</button>
+        <button class="db-grid-num" onclick="_dbGridTapNum(15)">15</button><button class="db-grid-num" onclick="_dbGridTapNum(14)">14</button><button class="db-grid-num" onclick="_dbGridTapNum(13)">13</button><button class="db-grid-num" onclick="_dbGridTapNum(12)">12</button><button class="db-grid-num" onclick="_dbGridTapNum(11)">11</button>
+        <button class="db-grid-num" onclick="_dbGridTapNum(10)">10</button><button class="db-grid-num" onclick="_dbGridTapNum(9)">9</button><button class="db-grid-num" onclick="_dbGridTapNum(8)">8</button><button class="db-grid-num" onclick="_dbGridTapNum(7)">7</button><button class="db-grid-num" onclick="_dbGridTapNum(6)">6</button>
+        <button class="db-grid-num" onclick="_dbGridTapNum(5)">5</button><button class="db-grid-num" onclick="_dbGridTapNum(4)">4</button><button class="db-grid-num" onclick="_dbGridTapNum(3)">3</button><button class="db-grid-num" onclick="_dbGridTapNum(2)">2</button><button class="db-grid-num" onclick="_dbGridTapNum(1)">1</button>
+      </div>
+      <div class="db-grid-special">
+        <button class="db-grid-spec db-grid-bull" onclick="_dbGridTapSpec(50,'Bull')">Bull</button>
+        <button class="db-grid-spec db-grid-25"   onclick="_dbGridTapSpec(25,'25')">25</button>
+        <button class="db-grid-spec db-grid-miss"  onclick="_dbGridTapSpec(0,'Miss')">Miss</button>
+      </div>
     </div>
 
     <div class="db-score-row">
