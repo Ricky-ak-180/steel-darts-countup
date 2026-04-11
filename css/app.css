@@ -554,8 +554,8 @@ canvas.schart { width: 100%; height: 100%; }
 .db-scr-main:not(.db-scr-tri) { font-size:21px; font-weight:800; }
 .db-scr-dbl { background:rgba(26,138,58,0.18); border-color:rgba(26,138,58,0.4); color:#70c090; }
 .db-scr-miss { background:rgba(255,255,255,0.03); border-color:rgba(255,255,255,0.07); color:var(--mut); font-size:13px; }
-.db-scr-bull { background:#c0392b; border-color:#c0392b; color:#fff; grid-column:span 2; }
-.db-scr-25   { background:#1a8a3a; border-color:#1a8a3a; color:#fff; grid-column:span 2; }
+.db-scr-bull { background:#c0392b; border-color:#c0392b; color:#fff; grid-column:span 2; font-size:14px; }
+.db-scr-25   { background:#1a8a3a; border-color:#1a8a3a; color:#fff; grid-column:span 2; font-size:14px; }
 
 /* ── Grid Input ── */
 .db-grid-wrap { display:none; flex-direction:column; gap:7px; width:100%; max-width:380px; }
