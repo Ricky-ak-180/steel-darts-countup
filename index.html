@@ -1197,6 +1197,38 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
       <div class="db-flash" id="db-flash"></div>
     </div>
 
+    <!-- SCR zone grid — T20/T19 area focused input -->
+    <div class="db-scr-wrap" id="db-scr-wrap" style="display:none">
+      <div class="db-scr-zones">
+        <button class="db-scr-zone-btn db-scr-zone-on" data-zone="kz1" onclick="_dbScrSetZone('kz1')">T20 エリア</button>
+        <button class="db-scr-zone-btn" data-zone="kz2" onclick="_dbScrSetZone('kz2')">T19 エリア</button>
+      </div>
+      <div class="db-scr-grid" id="db-scr-kz1">
+        <button class="db-scr-btn db-scr-tri"           onclick="_dbScrTap(15,'T5')">T5</button>
+        <button class="db-scr-btn db-scr-tri db-scr-main" onclick="_dbScrTap(60,'T20')">T20</button>
+        <button class="db-scr-btn db-scr-tri"           onclick="_dbScrTap(3,'T1')">T1</button>
+        <button class="db-scr-btn db-scr-dbl"           onclick="_dbScrTap(40,'D20')">D20</button>
+        <button class="db-scr-btn"                       onclick="_dbScrTap(5,'5')">5</button>
+        <button class="db-scr-btn db-scr-main"           onclick="_dbScrTap(20,'20')">20</button>
+        <button class="db-scr-btn"                       onclick="_dbScrTap(1,'1')">1</button>
+        <button class="db-scr-btn db-scr-miss"           onclick="_dbScrTap(0,'Miss')">Miss</button>
+        <button class="db-scr-btn db-scr-bull"           onclick="_dbScrTap(50,'Bull')">Bull</button>
+        <button class="db-scr-btn db-scr-25"             onclick="_dbScrTap(25,'25')">25</button>
+      </div>
+      <div class="db-scr-grid" id="db-scr-kz2" style="display:none">
+        <button class="db-scr-btn db-scr-tri"           onclick="_dbScrTap(21,'T7')">T7</button>
+        <button class="db-scr-btn db-scr-tri db-scr-main" onclick="_dbScrTap(57,'T19')">T19</button>
+        <button class="db-scr-btn db-scr-tri"           onclick="_dbScrTap(9,'T3')">T3</button>
+        <button class="db-scr-btn db-scr-dbl"           onclick="_dbScrTap(38,'D19')">D19</button>
+        <button class="db-scr-btn"                       onclick="_dbScrTap(7,'7')">7</button>
+        <button class="db-scr-btn db-scr-main"           onclick="_dbScrTap(19,'19')">19</button>
+        <button class="db-scr-btn"                       onclick="_dbScrTap(3,'3')">3</button>
+        <button class="db-scr-btn db-scr-miss"           onclick="_dbScrTap(0,'Miss')">Miss</button>
+        <button class="db-scr-btn db-scr-bull"           onclick="_dbScrTap(50,'Bull')">Bull</button>
+        <button class="db-scr-btn db-scr-25"             onclick="_dbScrTap(25,'25')">25</button>
+      </div>
+    </div>
+
     <!-- Grid input — button-based dart entry -->
     <div class="db-grid-wrap" id="db-grid-wrap" style="display:none">
       <div class="db-grid-mult">
