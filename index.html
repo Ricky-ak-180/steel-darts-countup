@@ -426,11 +426,23 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
         <div class="arr-tp-stars" id="arr-tp-stars">☆☆☆</div>
         <div class="arr-tp-rate" id="arr-tp-rate"></div>
         <div class="arr-tp-streak" id="arr-tp-streak"></div>
+        <!-- 残りダーツ数セレクター -->
+        <div id="arr-tp-darts-sel" style="display:none;justify-content:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:10px;color:var(--mut);align-self:center;">残り</span>
+          <button class="arr-darts-btn on" id="arr-darts-btn-3" onclick="setTrainDarts(3)">3本</button>
+          <button class="arr-darts-btn" id="arr-darts-btn-2" onclick="setTrainDarts(2)">2本</button>
+          <button class="arr-darts-btn" id="arr-darts-btn-1" onclick="setTrainDarts(1)">1本</button>
+        </div>
         <div class="arr-tp-hint-box" id="arr-tp-hint-box"></div>
         <!-- ③ ルートナビ -->
         <div id="arr-tp-route-nav" style="display:none;align-items:center;justify-content:center;gap:10px;font-size:11px;color:var(--mut);margin-top:3px;"></div>
-        <!-- ② ミス後ルート -->
+        <!-- ② ミス後ルート (ROUTE_TABLE.rec) -->
         <div id="arr-tp-miss" style="display:none;background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.2);border-radius:6px;padding:7px 10px;margin-top:6px;font-size:11px;"></div>
+        <!-- Why パネル -->
+        <div id="arr-tp-why-wrap" style="display:none;margin-top:6px;">
+          <button class="arr-why-btn" id="arr-tp-why-btn" onclick="toggleTrainWhy()">なぜこのルート？ ▼</button>
+          <div id="arr-tp-why-panel" style="display:none;"></div>
+        </div>
         <!-- ⑤ トレンドドット + ⑧ ベストダーツ -->
         <div id="arr-tp-trend" style="min-height:14px;margin-top:6px;"></div>
         <div id="arr-tp-best-darts" style="font-size:11px;color:var(--mut);text-align:center;margin-top:2px;"></div>
