@@ -1106,6 +1106,15 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
       <div class="lb-tab on" id="lb-tab-global" onclick="lbSwitchTab('global')" data-i18n="lb.global">All-Time</div>
       <div class="lb-tab" id="lb-tab-weekly" onclick="lbSwitchTab('weekly')" data-i18n="lb.weekly">This Week</div>
     </div>
+    <!-- ライブステータスバー -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 14px 6px;font-size:11px;color:var(--mut);flex-shrink:0;">
+      <span>
+        <span id="lb-live-dot" style="display:none;color:#66bb6a;margin-right:4px;">● LIVE</span>
+        <span id="lb-updated-label" style="color:var(--mut);">最終更新: </span>
+        <span id="lb-updated-ts" style="color:var(--mut);">-</span>
+      </span>
+      <button onclick="lbManualRefresh()" style="background:transparent;border:1px solid var(--bdr);border-radius:4px;color:var(--mut);font-size:10px;padding:2px 8px;cursor:pointer;">↻ 更新</button>
+    </div>
     <div id="lb-board"></div>
   </div>
 
