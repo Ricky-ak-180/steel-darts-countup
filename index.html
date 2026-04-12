@@ -395,6 +395,21 @@ body{background:#0a0a0f;color:#f0f0f8;margin:0;font-family:sans-serif}
           <button class="arr-train-weak-btn" data-fn="trainWeakMode" data-i18n="arr.weak_mode">🎯 苦手集中</button>
         </div>
       </div>
+      <!-- ④ スコア直接ジャンプ -->
+      <div style="display:flex;gap:6px;padding:6px 12px 0;flex-shrink:0;">
+        <input type="number" id="arr-train-search" placeholder="スコアに飛ぶ (2〜170)" min="2" max="170" style="flex:1;background:var(--sur);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--txt);font-size:14px;">
+        <button data-fn="trainJumpScore" style="padding:7px 14px;border-radius:6px;background:var(--acc);color:#000;font-weight:700;font-size:14px;border:none;cursor:pointer;">→</button>
+      </div>
+      <!-- ⑥ 練習セット -->
+      <div style="padding:6px 12px 8px;flex-shrink:0;">
+        <div style="font-size:10px;color:var(--mut);letter-spacing:1.2px;margin-bottom:5px;font-weight:700;">PRACTICE SETS</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button data-fn="trainStartSet" data-arg="doubles"    style="font-size:11px;padding:5px 10px;border-radius:6px;background:var(--sur);border:1px solid var(--bdr);color:var(--txt);cursor:pointer;">🎯 ダブル基礎</button>
+          <button data-fn="trainStartSet" data-arg="classic"    style="font-size:11px;padding:5px 10px;border-radius:6px;background:var(--sur);border:1px solid var(--bdr);color:var(--txt);cursor:pointer;">⭐ 定番</button>
+          <button data-fn="trainStartSet" data-arg="highfinish" style="font-size:11px;padding:5px 10px;border-radius:6px;background:var(--sur);border:1px solid var(--bdr);color:var(--txt);cursor:pointer;">🔥 高得点</button>
+          <button data-fn="trainStartSet" data-arg="century"    style="font-size:11px;padding:5px 10px;border-radius:6px;background:var(--sur);border:1px solid var(--bdr);color:var(--txt);cursor:pointer;">💯 100超え</button>
+        </div>
+      </div>
       <div class="arr-train-map" id="arr-train-map"></div>
     </div>
     <!-- トレーニング練習 -->
